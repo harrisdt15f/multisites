@@ -13,8 +13,8 @@
 -->
                 </div>
                 <div class="m-card-user__details">
-                    <span class="m-card-user__name m--font-weight-500">Mark Andre</span>
-                    <a href="" class="m-card-user__email m--font-weight-300 m-link">mark.andre@gmail.com</a>
+                    <span class="m-card-user__name m--font-weight-500">{{ Auth::user()->name }}</span>
+                    <a href="" class="m-card-user__email m--font-weight-300 m-link">{{ Auth::user()->email }}</a>
                 </div>
             </div>
         </div>
