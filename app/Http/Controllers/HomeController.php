@@ -13,4 +13,9 @@ class HomeController extends Controller
       $menulists = Menus::menuLists();
       return view('index',['menulists' => $menulists]);
   }
+
+    public function login()
+    {
+        return view('user.login');
+    }
 }

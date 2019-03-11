@@ -19,6 +19,7 @@
 
 Route::any('/', ['as' => 'home.index', 'uses' => 'HomeController@index']);
 
+Route::any('/login', ['as' => 'home.login', 'uses' => 'HomeController@login']);
 Route::get('/welcome', function () {
     return view('welcome');
 });

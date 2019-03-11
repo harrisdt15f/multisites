@@ -16031,8 +16031,8 @@ code {
 .btn-outline-focus.m-btn--air,
 .btn-focus.m-btn--air,
 .m-btn--gradient-from-focus.m-btn--air {
-  -webkit-box-shadow: 0px 5px 10px 2px rgba(152, 22, 244, 0.19) !important;
-  box-shadow: 0px 5px 10px 2px rgba(152, 22, 244, 0.19) !important; }
+    -webkit-box-shadow: 0px 5px 10px 2px rgba(236, 34, 34, 0.19) !important;
+    box-shadow: 0px 5px 10px 2px rgba(239, 67, 67, 0.19) !important; }
   .btn-outline-focus.m-btn--air.focus, .btn-outline-focus.m-btn--air:focus, .btn-outline-focus.m-btn--air:hover,
   .btn-focus.m-btn--air.focus,
   .btn-focus.m-btn--air:focus,
@@ -16040,8 +16040,8 @@ code {
   .m-btn--gradient-from-focus.m-btn--air.focus,
   .m-btn--gradient-from-focus.m-btn--air:focus,
   .m-btn--gradient-from-focus.m-btn--air:hover {
-    -webkit-box-shadow: 0px 5px 10px 2px rgba(152, 22, 244, 0.36) !important;
-    box-shadow: 0px 5px 10px 2px rgba(152, 22, 244, 0.36) !important; }
+      -webkit-box-shadow: 0px 5px 10px 2px rgba(232, 58, 58, 0.36) !important;
+      box-shadow: 0px 5px 10px 2px rgba(234, 38, 38, 0.36) !important; }
 
 .btn-outline-focus.focus, .btn-outline-focus:focus, .btn-outline-focus:hover {
   border-color: #9816f4;
