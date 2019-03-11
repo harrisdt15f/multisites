@@ -17,9 +17,7 @@
     Route::any('list', ['as' => 'withdrawList', 'uses' => $controller . 'index']);
 });*/
 
-Route::any('/', ['as' => 'home.index', 'uses' => 'HomeController@index']);
 
-Route::any('/login', ['as' => 'home.login', 'uses' => 'HomeController@login']);
-Route::get('/welcome', function () {
-    return view('welcome');
-});
+
+Auth::routes();
+Route::get('/', ['as' => 'home', 'uses' => 'HomeController@index']);
