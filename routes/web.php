@@ -20,4 +20,7 @@
 
 
 Auth::routes();
-Route::get('/', ['as' => 'home', 'uses' => 'HomeController@index']);
+Route::group(['before' => 'auth'], function () {
+    Route::get('/', ['as' => 'home', 'uses' => 'HomeController@index']);
+});
+
