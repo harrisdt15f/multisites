@@ -22,5 +22,8 @@
 Auth::routes();
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/', ['as' => 'home', 'uses' => 'HomeController@index']);
+    Route::group(['prefix' => 'menu'], function () {
+        Route::get('/', ['as' => 'menu.setting', 'uses' => 'MenuSettingController@index']);
+    });
 });
 
