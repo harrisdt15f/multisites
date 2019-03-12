@@ -3,6 +3,36 @@
     <title>菜单配置</title>
 @stop
 @section('body')
+    <?php
+    $parentItems = <<<parentitem
+<li data-jstree='{ "opened" : true }'>
+                            ~plabel~
+                            <ul>
+                                ~inner~
+                            </ul>
+ </li>
+parentitem;
+    $innerItems = <<<inner
+ <li data-jstree='{ "icon" : "fa fa-briefcase m--font-success " }'>~ilabel~</li>
+inner;
+    //Generate menus
+    $menuItems = $tempParentItems = $tempInnerItems = '';
+    foreach ($menulists as $value) {
+        if ($value['pid'] === 0) {
+            $tempParentItems = $tempParentItems === '' ? $parentItems : $tempParentItems . $parentItems;
+            $tempParentItems = str_replace('~plabel~', $value['label'], $tempParentItems);
+            if (array_key_exists('child', $value)) {
+                foreach ($value['child'] as $_value) {
+                    $tempInnerItems = $tempInnerItems === '' ? $innerItems : $tempInnerItems . $innerItems;
+                    $tempInnerItems = str_replace('~ilabel~', $_value['label'], $tempInnerItems);
+                }
+            }
+            $tempMenuItems = str_replace('~inner~', $tempInnerItems, $tempParentItems);
+            $menuItems = $menuItems === '' ? $tempMenuItems : $menuItems . $tempMenuItems;
+            $tempMenuItems = $tempParentItems = $tempInnerItems = '';
+        }
+    }
+    ?>
     <div class="col-lg-6">
 
         <!--begin::Portlet-->
@@ -19,7 +49,8 @@
             <div class="m-portlet__body">
                 <div id="m_tree_1" class="tree-demo">
                     <ul>
-                        <li data-jstree='{ "opened" : true }'>
+                        {!! $menuItems !!}
+                        {{--<li data-jstree='{ "opened" : true }'>
                             Root node 1
                             <ul>
                                 <li data-jstree='{ "icon" : "fa fa-briefcase m--font-success " }'>
@@ -32,7 +63,7 @@
                                     custom icon URL
                                 </li>
                             </ul>
-                        </li>
+                        </li>--}}
                     </ul>
                 </div>
             </div>
