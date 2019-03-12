@@ -130,3 +130,8 @@
         <!--end::Portlet-->
     </div>
 @stop
+@section('endscript')
+    @parent
+    <script src="{{ asset('assets/demo/custom/components/base/treeview.js') }}" type="text/javascript"></script>
+
+@stop
