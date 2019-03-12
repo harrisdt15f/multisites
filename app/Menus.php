@@ -72,4 +72,9 @@ class Menus extends Ardent
         }
         return $parent_menu;
     }
+
+    public static function getFirstLevelList()
+    {
+        return self::where('pid',0)->get();
+    }
 }
