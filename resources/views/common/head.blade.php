@@ -22,7 +22,7 @@
 
     <!--begin:: Global Optional Vendors -->
     @section('optional-head')
-        @include('common.optional-head')
+        @include('common.optional.optional-head')
     @show
 
     <!--end:: Global Optional Vendors -->

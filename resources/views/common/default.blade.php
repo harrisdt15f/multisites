@@ -133,6 +133,8 @@
 <!-- end::Scroll Top -->
 
 @section('endscript')
+    @yield('mandatory-endscripts')
+    @yield('optional-endscripts')
     @include('common.endscript')
 @show
 
