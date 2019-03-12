@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class MenuSettingController extends Controller
+class MenuSettingController extends AdminMainController
 {
     //
     public function index()

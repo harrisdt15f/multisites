@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -11,18 +12,17 @@ use phpDocumentor\Reflection\Types\Self_;
 class Menus extends Ardent
 {
     protected $table = 'admin_menus';
-
     /**
      * @return array
      * TODO : 由于快速开发 后续需要弄缓存与异常处理
      */
-    public static function menuLists()
+    public function menuLists()
     {
         $hourToStore = 24;
         $parent_menu = [];
-        $groupId = Auth::user()->group_id;
+        $groupId = Auth::guard('web')->user()->group_id;
         if ($groupId === 1) {
-            $parent_menu = self::forStar();
+            $parent_menu = $this->forStar();
         } else {
             /*if (Cache::has('ms_menus')) {
                 $parent_menu = Cache::get('ms_menus');
@@ -48,7 +48,7 @@ class Menus extends Ardent
         return $parent_menu;
     }
 
-    public static function forStar()
+    public function forStar()
     {
         $parent_menu = [];
         if (Cache::has('ms_menus.*')) {

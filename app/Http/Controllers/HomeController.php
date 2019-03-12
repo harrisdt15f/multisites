@@ -6,7 +6,7 @@ use App\Menus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
-class HomeController extends Controller
+class HomeController extends AdminMainController
 {
     /*public function __construct()
     {
@@ -20,7 +20,6 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $menulists = Menus::menuLists();
-        return view('index',['menulists' => $menulists]);
+        return view('index');
     }
 }
