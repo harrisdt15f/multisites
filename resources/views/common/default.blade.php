@@ -4,6 +4,8 @@
 @yield('title')
 <!-- begin::Head -->
     @section('head')
+        @yield('mandatory-head')
+        @yield('optional-head')
         @include('common.head')
     @show
 </head>
