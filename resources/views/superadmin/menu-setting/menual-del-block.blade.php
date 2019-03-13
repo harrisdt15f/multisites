@@ -1,8 +1,8 @@
 <?php
 $state = [
-    'id'=>'',
+    'id' => '',
     'text' => '',
-    'nodeId'=> '',
+    'nodeId' => '',
     'children' => [],
     'state' => ['opened' => true]
 ];
@@ -10,13 +10,13 @@ $arrTree = [];
 foreach ($menulists as $key => $value) {
     if ($value['pid'] === 0) {
         $temp = $state;
-        $temp['id']=$key;
-        $temp['text']=$value['label'];
+        $temp['id'] = $key;
+        $temp['text'] = $value['label'];
 //        $arrTree[]['text'] = ;
         if (array_key_exists('child', $value)) {
             foreach ($value['child'] as $_key => $_value) {
-                $tempChild['text']=$_value['label'];
-                $tempChild['id']=$_key;
+                $tempChild['text'] = $_value['label'];
+                $tempChild['id'] = $_key;
                 $temp['children'][] = $tempChild;
             }
         }
@@ -45,6 +45,9 @@ $treejson = json_encode($arrTree, JSON_UNESCAPED_UNICODE);
         </div>
     </div>
 
+    <textarea id="ttarea">
+</textarea>
+
     <!--end::Portlet-->
 </div>
 @section('script-temp-start')
@@ -56,17 +59,17 @@ $treejson = json_encode($arrTree, JSON_UNESCAPED_UNICODE);
                 $('#m_tree_1_del').jstree({
                     'plugins': ["wholerow", "checkbox", "types"],
                     'core': {
-                        "themes" : {
+                        "themes": {
                             "responsive": false
                         },
                         'data': {!! $treejson !!},
                     },
-                    "types" : {
-                        "default" : {
-                            "icon" : "fa fa-folder m--font-warning"
+                    "types": {
+                        "default": {
+                            "icon": "fa fa-folder m--font-warning"
                         },
-                        "file" : {
-                            "icon" : "fa fa-file  m--font-warning"
+                        "file": {
+                            "icon": "fa fa-file  m--font-warning"
                         }
                     },
                 });
@@ -77,6 +80,14 @@ $treejson = json_encode($arrTree, JSON_UNESCAPED_UNICODE);
         @stop
         @section('script-temp-end')
     </script>
+@stop
+@section('demodel-tree-additional-scripts')
+    <xcript>
+        {{-- $('#m_tree_1_del').on("changed.jstree", function (e, data) {
+         console.log(data.instance.get_selected(true)[0].text);
+         console.log(data.instance.get_node(data.selected[0]).text);
+         });--}}
+    </xcript>
 @stop
 @section('script-temp-start')
 @overwrite

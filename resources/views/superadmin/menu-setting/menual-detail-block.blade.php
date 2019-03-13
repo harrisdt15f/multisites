@@ -82,6 +82,16 @@ $treejson = json_encode($arrTree, JSON_UNESCAPED_UNICODE);
         @section('script-temp-end')
     </script>
 @stop
+{{--@section('demo1-tree-additional-scripts')
+    <xcript>
+        $('#m_tree_1').on("changed.jstree", function (e, data) {
+        console.log(data.instance.get_selected(true)[0].text);
+        console.log(data.instance.get_node(data.selected[0]).text);
+        });
+    </xcript>
+@stop--}}
+
+
 @section('script-temp-start')
 @overwrite
 @section('script-temp-end')
