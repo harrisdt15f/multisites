@@ -24,6 +24,12 @@
 {{--                    <span class="m-form__help">We'll never share your email with anyone else.</span>--}}
                 </div>
                 <div class="form-group m-form__group">
+                <label class="m-checkbox m-checkbox--state-brand">
+                    <input type="checkbox"> 是否父菜单
+                    <span></span>
+                </label>
+                </div>
+                <div class="form-group m-form__group">
                     <label for="route">请选择路由名</label>
                     <select class="form-control m-select2" name="route" id="route">
                         @foreach($rname as $rkey => $rvalue)
