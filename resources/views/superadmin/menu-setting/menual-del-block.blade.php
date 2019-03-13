@@ -73,6 +73,20 @@ $treejson = json_encode($arrTree, JSON_UNESCAPED_UNICODE);
                         }
                     },
                 });
+
+                $('#m_tree_1_del').on("changed.jstree", function (e, data) {
+                    console.log(data); // newly selected
+                    var ids = data.selected;
+                    $("#ttarea").val(JSON.stringify(ids));
+                }).jstree({
+                    /*"core": {
+                        "animation": 0,
+                        "check_callback": true,
+                        'force_text': true,
+                        "themes": {"stripes": true}
+                    },*/
+                    "plugins": ["search", "state", "types", "wholerow", "checkbox"]
+                });
             }
         @stop
         @section('demodel-tree-return')
