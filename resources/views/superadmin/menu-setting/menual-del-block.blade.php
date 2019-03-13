@@ -42,11 +42,14 @@ $treejson = json_encode($arrTree, JSON_UNESCAPED_UNICODE);
         <div class="m-portlet__body">
             <div id="m_tree_1_del" class="tree-demo">
             </div>
+            <br>
+            <button type="button" class="btn btn-primary btn-block" id="delete-submit" disabled="disabled">提交</button>
         </div>
+        <form>
+            @csrf
+            <input type="hidden" value="" name="toDelete" id="toDelete">
+        </form>
     </div>
-
-    <textarea id="ttarea">
-</textarea>
 
     <!--end::Portlet-->
 </div>
@@ -77,7 +80,12 @@ $treejson = json_encode($arrTree, JSON_UNESCAPED_UNICODE);
                 $('#m_tree_1_del').on("changed.jstree", function (e, data) {
                     console.log(data); // newly selected
                     var ids = data.selected;
-                    $("#ttarea").val(JSON.stringify(ids));
+                    if (ids !== undefined && ids.length !== 0) {
+                        $('#delete-submit').removeAttr('disabled')
+                    } else {
+                        $('#delete-submit').attr("disabled", "disabled");
+                    }
+                    $("#toDelete").val(JSON.stringify(ids));
                 }).jstree({
                     /*"core": {
                         "animation": 0,

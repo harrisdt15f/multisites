@@ -40,7 +40,13 @@ $treejson = json_encode($arrTree, JSON_UNESCAPED_UNICODE);
         <div class="m-portlet__body">
             <div id="m_tree_1" class="tree-demo">
             </div>
+            <br>
+            <button type="button" class="btn btn-primary btn-block" id="detail-submit" disabled="disabled">提交</button>
         </div>
+        <form>
+            @csrf
+            <input type="hidden" name="dragResult" value="" id="dragResult">
+        </form>
     </div>
 
     <!--end::Portlet-->
