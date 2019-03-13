@@ -1,36 +1,34 @@
 <?php
-$parentItems = <<<parentitem
-<li data-jstree='{ "opened" : true }'>
-                            ~plabel~
-                            <ul>
-                                ~inner~
-                            </ul>
- </li>
-parentitem;
-$innerItems = <<<inner
- <li data-jstree='{ "icon" : "fa fa-briefcase m--font-success " }'>~ilabel~</li>
-inner;
-//Generate menus
-$menuItems = $tempParentItems = $tempInnerItems = '';
-foreach ($menulists as $value) {
+$state = [
+    'id'=>'',
+    'text' => '',
+    'nodeId'=> '',
+    'children' => [],
+    'state' => ['opened' => true]
+];
+$arrTree = [];
+foreach ($menulists as $key => $value) {
     if ($value['pid'] === 0) {
-        $tempParentItems = $tempParentItems === '' ? $parentItems : $tempParentItems . $parentItems;
-        $tempParentItems = str_replace('~plabel~', $value['label'], $tempParentItems);
+        $temp = $state;
+        $temp['id']=$key;
+        $temp['text']=$value['label'];
+//        $arrTree[]['text'] = ;
         if (array_key_exists('child', $value)) {
-            foreach ($value['child'] as $_value) {
-                $tempInnerItems = $tempInnerItems === '' ? $innerItems : $tempInnerItems . $innerItems;
-                $tempInnerItems = str_replace('~ilabel~', $_value['label'], $tempInnerItems);
+            foreach ($value['child'] as $_key => $_value) {
+                $tempChild['text']=$_value['label'];
+                $tempChild['id']=$_key;
+                $temp['children'][] = $tempChild;
             }
         }
-        $tempMenuItems = str_replace('~inner~', $tempInnerItems, $tempParentItems);
-        $menuItems = $menuItems === '' ? $tempMenuItems : $menuItems . $tempMenuItems;
-        $tempMenuItems = $tempParentItems = $tempInnerItems = '';
+        $arrTree[] = $temp;
     }
 }
+$treejson = json_encode($arrTree, JSON_UNESCAPED_UNICODE);
 ?>
 <div class="col-lg-3">
 
     <!--begin::Portlet-->
+
     <div class="m-portlet">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
@@ -43,9 +41,6 @@ foreach ($menulists as $value) {
         </div>
         <div class="m-portlet__body">
             <div id="m_tree_1_del" class="tree-demo">
-                <ul>
-                    {!! $menuItems !!}
-                </ul>
             </div>
         </div>
     </div>
@@ -59,20 +54,21 @@ foreach ($menulists as $value) {
             @section('demodel-tree')
         var demo1del = function () {
                 $('#m_tree_1_del').jstree({
-                    "core": {
-                        "themes": {
+                    'plugins': ["wholerow", "checkbox", "types"],
+                    'core': {
+                        "themes" : {
                             "responsive": false
-                        }
-                    },
-                    "types": {
-                        "default": {
-                            "icon": "fa fa-folder"
                         },
-                        "file": {
-                            "icon": "fa fa-file"
+                        'data': {!! $treejson !!},
+                    },
+                    "types" : {
+                        "default" : {
+                            "icon" : "fa fa-folder m--font-warning"
+                        },
+                        "file" : {
+                            "icon" : "fa fa-file  m--font-warning"
                         }
                     },
-                    "plugins": ["types"]
                 });
             }
         @stop

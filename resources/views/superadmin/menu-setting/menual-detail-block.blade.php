@@ -61,6 +61,9 @@ $treejson = json_encode($arrTree, JSON_UNESCAPED_UNICODE);
                         'data': {!! $treejson !!},
                     },
                     "types": {
+                        "#" : {
+                            "max_depth" : 2,
+                        },
                         "default": {
                             "icon": "fa fa-folder m--font-success"
                         },
