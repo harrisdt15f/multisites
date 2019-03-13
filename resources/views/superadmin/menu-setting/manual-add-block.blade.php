@@ -29,7 +29,7 @@
                     <span></span>
                 </label>
             </div>
-            <div class="form-group m-form__group">
+            <div class="form-group m-form__group add-children-menu-related">
                 <label for="route">请选择路由名</label>
                 <select class="form-control m-select2" name="route" id="route">
                     @foreach($rname as $rkey => $rvalue)
@@ -37,7 +37,7 @@
                     @endforeach
                 </select>
             </div>
-            <div class="form-group m-form__group">
+            <div class="form-group m-form__group add-children-menu-related">
                 <label for="parentMenu">请选择父级</label>
                 <select class="form-control m-select2" name="parentid" id="parentid">
                     @foreach($firstlevelmenus as $flvalue)
@@ -68,6 +68,19 @@
         });
         @stop
         @section('script-temp-end')
+    </script>
+@stop
+@section('add-block-additional-scripts')
+    <script>
+        $("#isParent").change(function () {
+            if (this.checked) {
+                $('.add-children-menu-related').hide();
+                //Do stuff
+            } else {
+                $('.add-children-menu-related').show();
+                // $(this).prop("checked", false);//or $(this).attr("checked", false),can't use $(this).removeAttr('checked');
+            }
+        });
     </script>
 @stop
 @section('script-temp-start')
