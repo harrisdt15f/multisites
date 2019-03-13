@@ -25,7 +25,7 @@ foreach ($menulists as $key => $value) {
 }
 $treejson = json_encode($arrTree, JSON_UNESCAPED_UNICODE);
 ?>
-<div class="col-lg-3">
+
     <!--begin::Portlet-->
     <div class="m-portlet">
         <div class="m-portlet__head">
@@ -50,7 +50,6 @@ $treejson = json_encode($arrTree, JSON_UNESCAPED_UNICODE);
     </div>
 
     <!--end::Portlet-->
-</div>
 @section('script-temp-start')
     <script>
             @stop

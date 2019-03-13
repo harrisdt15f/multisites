@@ -1,4 +1,4 @@
-    <!--begin::Portlet-->
+ <!--begin::Portlet-->
     <div class="m-portlet m-portlet--tab">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
@@ -7,7 +7,7 @@
 													<i class="la la-gear"></i>
 												</span>
                     <h3 class="m-portlet__head-text">
-                        添加菜单
+                        编辑菜单
                     </h3>
                 </div>
             </div>
@@ -18,27 +18,28 @@
             @csrf
             <div class="m-portlet__body">
                 <div class="form-group m-form__group">
+                    <label for="menuid">请选菜单编辑</label>
+                    <select class="form-control m-select2" name="menuid" id="menuid">
+                        @foreach($editMenu as $editMenuV)
+                            <option value="{{$editMenuV->id}}">{{$editMenuV->label}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group m-form__group">
                     <label for="menulabel">菜单名</label>
                     <input type="text" name="menulabel" class="form-control m-input m-input--square" id="menulabel" placeholder="输入菜单名">
-{{--                    <span class="m-form__help">We'll never share your email with anyone else.</span>--}}
                 </div>
                 <div class="form-group m-form__group">
-                <label class="m-checkbox m-checkbox--state-brand">
-                    <input type="checkbox"> 是否父菜单
-                    <span></span>
-                </label>
-                </div>
-                <div class="form-group m-form__group">
-                    <label for="route">请选择路由名</label>
-                    <select class="form-control m-select2" name="route" id="route">
+                    <label for="eroute">请选择路由名</label>
+                    <select class="form-control m-select2" name="eroute" id="eroute">
                         @foreach($rname as $rkey => $rvalue)
                             <option value="{{$rkey}}">name: ( {{$rkey}} ) | url:( {{$rvalue}} )</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="form-group m-form__group">
-                    <label for="parentMenu">请选择父级</label>
-                    <select class="form-control m-select2" name="parentid" id="parentid">
+                    <label for="eparentMenu">请选择父级</label>
+                    <select class="form-control m-select2" name="eparentid" id="eparentid">
                         @foreach($firstlevelmenus as $flvalue)
                             <option value="{{$flvalue->id}}">{{$flvalue->label}}</option>
                         @endforeach

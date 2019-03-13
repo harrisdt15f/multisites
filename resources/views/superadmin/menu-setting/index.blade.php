@@ -4,11 +4,18 @@
 @stop
 @section('body')
     <div class="row">
-        @include('superadmin.menu-setting.manual-add-block')
+        <div class="col-lg-6">
+            @include('superadmin.menu-setting.manual-add-block')
+            @include('superadmin.menu-setting.manual-edit-block')
+        </div>
         {{-- 详情模块--}}
-        @include('superadmin.menu-setting.menual-detail-block')
+        <div class="col-lg-3">
+            @include('superadmin.menu-setting.menual-detail-block')
+        </div>
         {{-- 详情模块--}}
-        @include('superadmin.menu-setting.menual-del-block')
+        <div class="col-lg-3">
+            @include('superadmin.menu-setting.menual-del-block')
+        </div>
     </div>
 @stop
 @section('endscript')
