@@ -7,13 +7,67 @@
         @include('superadmin.menu-setting.manual-add-block')
         {{-- 详情模块--}}
         @include('superadmin.menu-setting.menual-detail-block')
+        {{-- 详情模块--}}
+        @include('superadmin.menu-setting.menual-del-block')
     </div>
 @stop
 @section('endscript')
     @parent
-    <script src="{{ asset('assets/demo/custom/components/base/treeview.js') }}" type="text/javascript"></script>
+{{--    <script src="{{ asset('assets/demo/custom/components/base/treeview.js') }}" type="text/javascript"></script>--}}
     <script src="{{ asset('assets/demo/custom/crud/forms/widgets/select2.js') }}" type="text/javascript"></script>
     <script>
+        var Treeview = function () {
+
+            var demo1 = function () {
+                $('#m_tree_1').jstree({
+                    "core" : {
+                        "themes" : {
+                            "responsive": false
+                        }
+                    },
+                    "types" : {
+                        "default" : {
+                            "icon" : "fa fa-folder"
+                        },
+                        "file" : {
+                            "icon" : "fa fa-file"
+                        }
+                    },
+                    "plugins": ["types"]
+                });
+            }
+
+            var demo1del = function () {
+                $('#m_tree_1_del').jstree({
+                    "core" : {
+                        "themes" : {
+                            "responsive": false
+                        }
+                    },
+                    "types" : {
+                        "default" : {
+                            "icon" : "fa fa-folder"
+                        },
+                        "file" : {
+                            "icon" : "fa fa-file"
+                        }
+                    },
+                    "plugins": ["types"]
+                });
+            }
+
+            return {
+                //main function to initiate the module
+                init: function () {
+                    demo1();
+                    demo1del();
+                }
+            };
+        }();
+        jQuery(document).ready(function() {
+            Treeview.init();
+        });
+
         //== Class definition
         var Select2 = function() {
             //== Private functions

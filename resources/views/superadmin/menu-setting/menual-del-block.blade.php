@@ -36,13 +36,13 @@ foreach ($menulists as $value) {
             <div class="m-portlet__head-caption">
                 <div class="m-portlet__head-title">
                     <h3 class="m-portlet__head-text">
-                        菜单详情与拖拽排序
+                        菜单移除
                     </h3>
                 </div>
             </div>
         </div>
         <div class="m-portlet__body">
-            <div id="m_tree_1" class="tree-demo">
+            <div id="m_tree_1_del" class="tree-demo">
                 <ul>
                     {!! $menuItems !!}
                 </ul>
