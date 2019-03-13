@@ -1,35 +1,31 @@
 <?php
-$parentItems = <<<parentitem
-<li data-jstree='{ "opened" : true }'>
-                            ~plabel~
-                            <ul>
-                                ~inner~
-                            </ul>
- </li>
-parentitem;
-$innerItems = <<<inner
- <li data-jstree='{ "icon" : "fa fa-briefcase m--font-success " }'>~ilabel~</li>
-inner;
-//Generate menus
-$menuItems = $tempParentItems = $tempInnerItems = '';
-foreach ($menulists as $value) {
+$state = [
+    'id'=>'',
+    'text' => '',
+    'nodeId'=> '',
+    'children' => [],
+    'state' => ['opened' => true]
+];
+$arrTree = [];
+foreach ($menulists as $key => $value) {
     if ($value['pid'] === 0) {
-        $tempParentItems = $tempParentItems === '' ? $parentItems : $tempParentItems . $parentItems;
-        $tempParentItems = str_replace('~plabel~', $value['label'], $tempParentItems);
+       $temp = $state;
+       $temp['id']=$key;
+       $temp['text']=$value['label'];
+//        $arrTree[]['text'] = ;
         if (array_key_exists('child', $value)) {
-            foreach ($value['child'] as $_value) {
-                $tempInnerItems = $tempInnerItems === '' ? $innerItems : $tempInnerItems . $innerItems;
-                $tempInnerItems = str_replace('~ilabel~', $_value['label'], $tempInnerItems);
+            foreach ($value['child'] as $_key => $_value) {
+                $tempChild['text']=$_value['label'];
+                $tempChild['id']=$_key;
+                $temp['children'][] = $tempChild;
             }
         }
-        $tempMenuItems = str_replace('~inner~', $tempInnerItems, $tempParentItems);
-        $menuItems = $menuItems === '' ? $tempMenuItems : $menuItems . $tempMenuItems;
-        $tempMenuItems = $tempParentItems = $tempInnerItems = '';
+        $arrTree[] = $temp;
     }
 }
+$treejson = json_encode($arrTree, JSON_UNESCAPED_UNICODE);
 ?>
 <div class="col-lg-3">
-
     <!--begin::Portlet-->
     <div class="m-portlet">
         <div class="m-portlet__head">
@@ -62,48 +58,7 @@ foreach ($menulists as $value) {
                         },
                         // so that create works
                         "check_callback": true,
-                        'data': [{
-                            "text": "Parent Node",
-                            "children": [{
-                                "text": "Initially selected",
-                                "state": {
-                                    "selected": true
-                                }
-                            }, {
-                                "text": "Custom Icon",
-                                "icon": "fa fa-warning m--font-danger"
-                            }, {
-                                "text": "Initially open",
-                                "icon": "fa fa-folder m--font-success",
-                                "state": {
-                                    "opened": true
-                                },
-                                "children": [
-                                    {"text": "Another node", "icon": "fa fa-file m--font-waring"}
-                                ]
-                            }, {
-                                "text": "Another Custom Icon",
-                                "icon": "fa fa-warning m--font-waring"
-                            }, {
-                                "text": "Disabled Node",
-                                "icon": "fa fa-check m--font-success",
-                                "state": {
-                                    "disabled": true
-                                }
-                            }, {
-                                "text": "Sub Nodes",
-                                "icon": "fa fa-folder m--font-danger",
-                                "children": [
-                                    {"text": "Item 1", "icon": "fa fa-file m--font-waring"},
-                                    {"text": "Item 2", "icon": "fa fa-file m--font-success"},
-                                    {"text": "Item 3", "icon": "fa fa-file m--font-default"},
-                                    {"text": "Item 4", "icon": "fa fa-file m--font-danger"},
-                                    {"text": "Item 5", "icon": "fa fa-file m--font-info"}
-                                ]
-                            }]
-                        },
-                            "Another Node"
-                        ]
+                        'data': {!! $treejson !!},
                     },
                     "types": {
                         "default": {
