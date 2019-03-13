@@ -52,3 +52,37 @@ foreach ($menulists as $value) {
 
     <!--end::Portlet-->
 </div>
+@section('script-temp-start')
+    <script>
+            @stop
+
+            @section('demodel-tree')
+        var demo1del = function () {
+                $('#m_tree_1_del').jstree({
+                    "core": {
+                        "themes": {
+                            "responsive": false
+                        }
+                    },
+                    "types": {
+                        "default": {
+                            "icon": "fa fa-folder"
+                        },
+                        "file": {
+                            "icon": "fa fa-file"
+                        }
+                    },
+                    "plugins": ["types"]
+                });
+            }
+        @stop
+        @section('demodel-tree-return')
+        demo1del();
+        @stop
+        @section('script-temp-end')
+    </script>
+@stop
+@section('script-temp-start')
+@overwrite
+@section('script-temp-end')
+@overwrite

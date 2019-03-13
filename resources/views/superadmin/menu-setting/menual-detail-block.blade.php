@@ -43,12 +43,88 @@ foreach ($menulists as $value) {
         </div>
         <div class="m-portlet__body">
             <div id="m_tree_1" class="tree-demo">
-                <ul>
-                    {!! $menuItems !!}
-                </ul>
             </div>
         </div>
     </div>
 
     <!--end::Portlet-->
 </div>
+@section('script-temp-start')
+    <script>
+            @stop
+
+            @section('demo1-tree')
+        var demo1 = function () {
+                $("#m_tree_1").jstree({
+                    "core": {
+                        "themes": {
+                            "responsive": false
+                        },
+                        // so that create works
+                        "check_callback": true,
+                        'data': [{
+                            "text": "Parent Node",
+                            "children": [{
+                                "text": "Initially selected",
+                                "state": {
+                                    "selected": true
+                                }
+                            }, {
+                                "text": "Custom Icon",
+                                "icon": "fa fa-warning m--font-danger"
+                            }, {
+                                "text": "Initially open",
+                                "icon": "fa fa-folder m--font-success",
+                                "state": {
+                                    "opened": true
+                                },
+                                "children": [
+                                    {"text": "Another node", "icon": "fa fa-file m--font-waring"}
+                                ]
+                            }, {
+                                "text": "Another Custom Icon",
+                                "icon": "fa fa-warning m--font-waring"
+                            }, {
+                                "text": "Disabled Node",
+                                "icon": "fa fa-check m--font-success",
+                                "state": {
+                                    "disabled": true
+                                }
+                            }, {
+                                "text": "Sub Nodes",
+                                "icon": "fa fa-folder m--font-danger",
+                                "children": [
+                                    {"text": "Item 1", "icon": "fa fa-file m--font-waring"},
+                                    {"text": "Item 2", "icon": "fa fa-file m--font-success"},
+                                    {"text": "Item 3", "icon": "fa fa-file m--font-default"},
+                                    {"text": "Item 4", "icon": "fa fa-file m--font-danger"},
+                                    {"text": "Item 5", "icon": "fa fa-file m--font-info"}
+                                ]
+                            }]
+                        },
+                            "Another Node"
+                        ]
+                    },
+                    "types": {
+                        "default": {
+                            "icon": "fa fa-folder m--font-success"
+                        },
+                        "file": {
+                            "icon": "fa fa-file  m--font-success"
+                        }
+                    },
+                    "state": {"key": "demo2"},
+                    "plugins": ["dnd", "state", "types"]
+                });
+            }
+        @stop
+        @section('demo1-tree-return')
+        demo1();
+        @stop
+        @section('script-temp-end')
+    </script>
+@stop
+@section('script-temp-start')
+@overwrite
+@section('script-temp-end')
+@overwrite
