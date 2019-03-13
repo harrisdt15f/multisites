@@ -56,3 +56,26 @@
         <!--end::Form-->
     </div>
     <!--end::Portlet-->
+ @section('script-temp-start')
+     <script>
+         @stop
+         @section('edit-block-select2')
+         $('#eparentid, #eparentid_validate').select2({
+             placeholder: "Select a state"
+         });
+
+         $('#eroute, #eroute_validate').select2({
+             placeholder: "Select a state"
+         });
+
+         $('#menuid, #menuid_validate').select2({
+             placeholder: "Select a state"
+         });
+         @stop
+         @section('script-temp-end')
+     </script>
+ @stop
+ @section('script-temp-start')
+ @overwrite
+ @section('script-temp-end')
+ @overwrite

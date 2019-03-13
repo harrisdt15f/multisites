@@ -41,72 +41,13 @@
         var Select2 = function () {
             //== Private functions
             var demos = function () {
-                // basic
-                $('#parentid, #parentid_validate').select2({
-                    placeholder: "Select a state"
-                });
-
-                $('#route, #route_validate').select2({
-                    placeholder: "Select a state"
-                });
-
-                $('#eparentid, #eparentid_validate').select2({
-                    placeholder: "Select a state"
-                });
-
-                $('#eroute, #eroute_validate').select2({
-                    placeholder: "Select a state"
-                });
-
-                $('#menuid, #menuid_validate').select2({
-                    placeholder: "Select a state"
-                });
-
-
+                @yield('add-block-select2')
+                @yield('edit-block-select2')
             }
-
-            var modalDemos = function () {
-                $('#parentid_modal').on('shown.bs.modal', function () {
-                    // basic
-                    $('#parentid_modal').select2({
-                        placeholder: "Select a state"
-                    });
-                });
-
-                $('#route_modal').on('shown.bs.modal', function () {
-                    // basic
-                    $('#route_modal').select2({
-                        placeholder: "Select a state"
-                    });
-                });
-
-                $('#eparentid_modal').on('shown.bs.modal', function () {
-                    // basic
-                    $('#eparentid_modal').select2({
-                        placeholder: "Select a state"
-                    });
-                });
-
-                $('#eroute_modal').on('shown.bs.modal', function () {
-                    // basic
-                    $('#eroute_modal').select2({
-                        placeholder: "Select a state"
-                    });
-                });
-
-                $('#menuid_modal').on('shown.bs.modal', function () {
-                    // basic
-                    $('#menuid_modal').select2({
-                        placeholder: "Select a state"
-                    });
-                });
-            }
-
             //== Public functions
             return {
                 init: function () {
                     demos();
-                    modalDemos();
                 }
             };
         }();
