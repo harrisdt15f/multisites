@@ -42,7 +42,7 @@ $treejson = json_encode($arrTree, JSON_UNESCAPED_UNICODE);
             <br>
             <button type="button" class="btn btn-primary btn-block" id="delete-submit" disabled="disabled">提交</button>
         </div>
-        <form>
+        <form id="delete-menu-form" method="POST" action="{{ route('menu.delete') }}">
             @csrf
             <input type="hidden" value="" name="toDelete" id="toDelete">
         </form>
@@ -100,12 +100,24 @@ $treejson = json_encode($arrTree, JSON_UNESCAPED_UNICODE);
     </script>
 @stop
 @section('demodel-tree-additional-scripts')
-    <xcript>
-        {{-- $('#m_tree_1_del').on("changed.jstree", function (e, data) {
-         console.log(data.instance.get_selected(true)[0].text);
-         console.log(data.instance.get_node(data.selected[0]).text);
-         });--}}
-    </xcript>
+    <script>
+        $('#delete-submit').click(function (event) {
+            var action = $('#delete-menu-form').attr('action');
+            event.preventDefault();
+            $.ajax({
+                url: action,
+                type: 'POST',
+                data: $('#delete-menu-form').serialize(),
+            })
+                .done(function () {
+                    console.log("success");
+                    location.reload();
+                })
+                .fail(function () {
+                    console.log("error");
+                });
+        });
+    </script>
 @stop
 @section('script-temp-start')
 @overwrite

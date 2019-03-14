@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Menus;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 class MenuSettingController extends AdminMainController
@@ -41,5 +42,25 @@ class MenuSettingController extends AdminMainController
         } else {
             return response()->json(['success' => false, 'menucreated' => 0]);
         }
+    }
+
+    public function delete()
+    {
+        $menuEloq = new Menus();
+        $toDelete = json_decode($this->inputs['toDelete'], true);
+        if (!empty($toDelete)) {
+
+            try {
+                $menuEloq->find($toDelete)->each(function ($product, $key) {
+                    $product->delete();
+                });
+                $menuEloq->refreshStar();
+                return response()->json(['success' => true, 'menudeleted' => 1]);
+            } catch (\Exception $e) {
+                return response()->json(['success' => false, 'menudeleted' => 0]);
+            }
+        }
+
+
     }
 }
