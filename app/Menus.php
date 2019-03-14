@@ -73,6 +73,15 @@ class Menus extends Ardent
         return $parent_menu;
     }
 
+    /**
+     * @return bool
+     */
+    public function refreshStar(): bool
+    {
+        Cache::forget('ms_menus.*');
+        return true;
+    }
+
     public static function getFirstLevelList()
     {
         return self::where('pid',0)->get();

@@ -89,6 +89,7 @@
             })
                 .done(function () {
                     console.log("success");
+                    location.reload();
                 })
                 .fail(function () {
                     console.log("error");

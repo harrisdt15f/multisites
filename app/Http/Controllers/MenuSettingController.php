@@ -3,9 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Menus;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 class MenuSettingController extends AdminMainController
@@ -24,11 +21,25 @@ class MenuSettingController extends AdminMainController
                 }
             }
         }
-        return view('superadmin.menu-setting.index', ['firstlevelmenus' => $firstlevelmenus, 'rname' => $rname,'editMenu'=> $editMenu]);
+        return view('superadmin.menu-setting.index', ['firstlevelmenus' => $firstlevelmenus, 'rname' => $rname, 'editMenu' => $editMenu]);
     }
 
     public function add()
     {
+        $menuEloq = new Menus();
+        if (isset($this->inputs['isParent']) && $this->inputs['isParent'] === 'on') {
 
+            $menuEloq->label = $this->inputs['menulabel'];
+        } else {
+            $menuEloq->label = $this->inputs['menulabel'];
+            $menuEloq->route = $this->inputs['route'];
+            $menuEloq->pid = $this->inputs['parentid'];
+        }
+        if ($menuEloq->save()) {
+            $menuEloq->refreshStar();
+            return response()->json(['success' => true, 'menucreated' => 1]);
+        } else {
+            return response()->json(['success' => false, 'menucreated' => 0]);
+        }
     }
 }
