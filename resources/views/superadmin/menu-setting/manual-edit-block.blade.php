@@ -91,7 +91,11 @@
 @overwrite
 @section('edit-block-additional-scripts')
     <script>
-        $('.edit-children-menu-related').hide();
+        $('.edit-children-menu-related').ready(function() {
+            if ($('#eisParent')[0].checked) {
+                        $('.edit-children-menu-related').hide();
+                    }
+        });
         $("#eisParent").change(function () {
             if (this.checked) {
                 $('.edit-children-menu-related').hide();
