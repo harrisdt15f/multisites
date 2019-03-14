@@ -53,6 +53,7 @@
         }();
     </script>
     @yield('add-block-additional-scripts')
+    @yield('edit-block-additional-scripts')
     @yield('demo1-tree-additional-scripts')
     @yield('demodel-tree-additional-scripts')
     @yield('script-temp-start')

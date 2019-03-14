@@ -14,6 +14,7 @@ class MenuSettingController extends AdminMainController
         $firstlevelmenus = Menus::getFirstLevelList();
         $routeCollection = Route::getRoutes()->get();
         $editMenu = Menus::all();
+        $routeMatchingName = $editMenu->where('route','!=','#')->keyBy('route')->toArray();
         $rname = [];
         foreach ($routeCollection as $key => $r) {
             if (isset($r->action['as'])) {
@@ -22,7 +23,7 @@ class MenuSettingController extends AdminMainController
                 }
             }
         }
-        return view('superadmin.menu-setting.index', ['firstlevelmenus' => $firstlevelmenus, 'rname' => $rname, 'editMenu' => $editMenu]);
+        return view('superadmin.menu-setting.index', ['firstlevelmenus' => $firstlevelmenus, 'rname' => $rname, 'editMenu' => $editMenu,'routeMatchingName'=>$routeMatchingName]);
     }
 
     public function add()
@@ -60,7 +61,10 @@ class MenuSettingController extends AdminMainController
                 return response()->json(['success' => false, 'menudeleted' => 0]);
             }
         }
+    }
 
+    public function edit()
+    {
 
     }
 }

@@ -12,7 +12,6 @@
                 </div>
             </div>
         </div>
-
         <!--begin::Form-->
         <form class="m-form m-form--fit m-form--label-align-right">
             @csrf
@@ -21,7 +20,7 @@
                     <label for="menuid">请选菜单编辑</label>
                     <select class="form-control m-select2" name="menuid" id="menuid">
                         @foreach($editMenu as $editMenuV)
-                            <option value="{{$editMenuV->id}}">{{$editMenuV->label}}</option>
+                            <option value="{{$editMenuV->id}}" parent-id="{{$editMenuV->pid}}">{{$editMenuV->label}}</option>
                         @endforeach
                     </select>
                 </div>
@@ -33,7 +32,7 @@
                     <label for="eroute">请选择路由名</label>
                     <select class="form-control m-select2" name="eroute" id="eroute">
                         @foreach($rname as $rkey => $rvalue)
-                            <option value="{{$rkey}}">name: ( {{$rkey}} ) | url:( {{$rvalue}} )</option>
+                            <option value="{{$rkey}}" menu-id="@if (in_array($rkey,$routeMatchingName,true)){{$routeMatchingName[$rkey]['id']}}@else#@endif">name: ( {{$rkey}} ) | url:( {{$rvalue}} )</option>
                         @endforeach
                     </select>
                 </div>
@@ -61,15 +60,15 @@
          @stop
          @section('edit-block-select2')
          $('#eparentid, #eparentid_validate').select2({
-             placeholder: "Select a state"
+             placeholder: "请选择父级"
          });
 
          $('#eroute, #eroute_validate').select2({
-             placeholder: "Select a state"
+             placeholder: "请选择路由"
          });
 
          $('#menuid, #menuid_validate').select2({
-             placeholder: "Select a state"
+             placeholder: "请选择编辑的菜单"
          });
          @stop
          @section('script-temp-end')
@@ -79,3 +78,19 @@
  @overwrite
  @section('script-temp-end')
  @overwrite
+ @section('edit-block-additional-scripts')
+     <script>
+         // alert('bbbb');
+         $('#menuid').on('select2:select', function (e) {
+             // var data = e.params.data;
+             // console.log(e);
+             var data = e.params.data;
+             datas = {};
+             datas['id']=data.id;
+             datas['text']=data.text;
+             datas['pid']=data['element']['attributes']['parent-id']['nodeValue'];
+             $('#eparentid').val(datas['pid']); // Select the option with a value of '1'
+             $('#eparentid').trigger('change'); // Notify any JS components that the value changed
+         });
+ </script>
+ @stop
