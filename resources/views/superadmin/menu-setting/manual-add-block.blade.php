@@ -95,8 +95,6 @@
                     console.log("error");
                 });
         });
-
-
     </script>
 @stop
 @section('script-temp-start')
