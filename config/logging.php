@@ -52,7 +52,12 @@ return [
             'level' => 'debug',
             'days' => 14,
         ],
-
+        'operate' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/operate.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),

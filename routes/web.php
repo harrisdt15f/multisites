@@ -24,6 +24,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/', ['as' => 'home', 'uses' => 'HomeController@index']);
     Route::group(['prefix' => 'menu'], function () {
         Route::get('/', ['as' => 'menu.setting', 'uses' => 'MenuSettingController@index']);
+        Route::post('/add', ['as' => 'menu.add', 'uses' => 'MenuSettingController@add']);
+        Route::post('/edit', ['as' => 'menu.edit', 'uses' => 'MenuSettingController@edit']);
+        Route::post('/delete', ['as' => 'menu.delete', 'uses' => 'MenuSettingController@delete']);
     });
 });
 

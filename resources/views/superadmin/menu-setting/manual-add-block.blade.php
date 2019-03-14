@@ -14,7 +14,7 @@
     </div>
 
     <!--begin::Form-->
-    <form class="m-form m-form--fit m-form--label-align-right">
+    <form class="m-form m-form--fit m-form--label-align-right" id="add-menu-form" method="POST" action="{{ route('menu.add') }}">
         @csrf
         <div class="m-portlet__body">
             <div class="form-group m-form__group">
@@ -48,7 +48,7 @@
         </div>
         <div class="m-portlet__foot m-portlet__foot--fit">
             <div class="m-form__actions">
-                <button type="reset" class="btn btn-primary">提交</button>
+                <button type="submit" id="add-submit" class="btn btn-primary">提交</button>
             </div>
         </div>
     </form>
@@ -75,12 +75,27 @@
         $("#isParent").change(function () {
             if (this.checked) {
                 $('.add-children-menu-related').hide();
-                //Do stuff
             } else {
                 $('.add-children-menu-related').show();
-                // $(this).prop("checked", false);//or $(this).attr("checked", false),can't use $(this).removeAttr('checked');
             }
         });
+        $('#add-submit').click(function (event) {
+            var action = $('#add-menu-form').attr('action');
+            event.preventDefault();
+            $.ajax({
+                url: action,
+                type: 'POST',
+                data: $('#add-menu-form').serialize(),
+            })
+                .done(function () {
+                    console.log("success");
+                })
+                .fail(function () {
+                    console.log("error");
+                });
+        });
+
+
     </script>
 @stop
 @section('script-temp-start')

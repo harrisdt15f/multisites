@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Menus;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 class MenuSettingController extends AdminMainController
@@ -23,5 +25,10 @@ class MenuSettingController extends AdminMainController
             }
         }
         return view('superadmin.menu-setting.index', ['firstlevelmenus' => $firstlevelmenus, 'rname' => $rname,'editMenu'=> $editMenu]);
+    }
+
+    public function add()
+    {
+
     }
 }
