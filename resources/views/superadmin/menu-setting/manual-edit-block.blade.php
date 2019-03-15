@@ -13,7 +13,7 @@
         </div>
     </div>
     <!--begin::Form-->
-    <form class="m-form m-form--fit m-form--label-align-right">
+    <form class="m-form m-form--fit m-form--label-align-right" id="edit-menu-form" method="POST" action="{{ route('menu.edit') }}">
         @csrf
         <div class="m-portlet__body">
             <div class="form-group m-form__group">
@@ -26,8 +26,8 @@
                 </select>
             </div>
             <div class="form-group m-form__group">
-                <label for="menulabel">菜单名</label>
-                <input type="text" name="menulabel" class="form-control m-input m-input--square" id="menulabel"
+                <label for="emenulabel">菜单名</label>
+                <input type="text" name="emenulabel" class="form-control m-input m-input--square" id="emenulabel"
                        placeholder="输入菜单名">
             </div>
             <div class="form-group m-form__group">
@@ -58,7 +58,7 @@
         </div>
         <div class="m-portlet__foot m-portlet__foot--fit">
             <div class="m-form__actions">
-                <button type="reset" class="btn btn-primary">提交</button>
+                <button type="submit" id="edit-submit" class="btn btn-primary">提交</button>
             </div>
         </div>
     </form>
@@ -135,6 +135,23 @@
             }
             $('#eparentid').val(datas['pid']); // Select the option with a value of '1'
             $('#eparentid').trigger('change'); // Notify any JS components that the value changed
+        });
+
+        $('#edit-submit').click(function (event) {
+            var action = $('#edit-menu-form').attr('action');
+            event.preventDefault();
+            $.ajax({
+                url: action,
+                type: 'POST',
+                data: $('#edit-menu-form').serialize(),
+            })
+                .done(function () {
+                    console.log("success");
+                    location.reload();
+                })
+                .fail(function () {
+                    console.log("error");
+                });
         });
     </script>
 @stop

@@ -45,7 +45,7 @@ class AdminMainController extends Controller
         $datas['user'] = $this->user;
         $datas['ip'] = Request::ip();
         $datas['ips'] = Request::ips();
-        $log = json_encode($datas);
+        $log = json_encode($datas,JSON_UNESCAPED_UNICODE);
         Log::channel('operate')->debug($log);
     }
 }

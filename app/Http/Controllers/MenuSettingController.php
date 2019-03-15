@@ -14,7 +14,7 @@ class MenuSettingController extends AdminMainController
         $firstlevelmenus = Menus::getFirstLevelList();
         $routeCollection = Route::getRoutes()->get();
         $editMenu = Menus::all();
-        $routeMatchingName = $editMenu->where('route','!=','#')->keyBy('route')->toArray();
+        $routeMatchingName = $editMenu->where('route', '!=', '#')->keyBy('route')->toArray();
         $rname = [];
         foreach ($routeCollection as $key => $r) {
             if (isset($r->action['as'])) {
@@ -23,7 +23,7 @@ class MenuSettingController extends AdminMainController
                 }
             }
         }
-        return view('superadmin.menu-setting.index', ['firstlevelmenus' => $firstlevelmenus, 'rname' => $rname, 'editMenu' => $editMenu,'routeMatchingName'=>$routeMatchingName]);
+        return view('superadmin.menu-setting.index', ['firstlevelmenus' => $firstlevelmenus, 'rname' => $rname, 'editMenu' => $editMenu, 'routeMatchingName' => $routeMatchingName]);
     }
 
     public function add()
@@ -65,6 +65,23 @@ class MenuSettingController extends AdminMainController
 
     public function edit()
     {
+        $menuEloq = Menus::find($this->inputs['menuid']);
+        if (isset($this->inputs['eisParent']) && $this->inputs['eisParent'] === 'on') {
+
+            $menuEloq->label = $this->inputs['emenulabel'];
+            $menuEloq->route = '#';
+            $menuEloq->pid = 0;
+        } else {
+            $menuEloq->label = $this->inputs['emenulabel'];
+            $menuEloq->route = $this->inputs['eroute'];
+            $menuEloq->pid = $this->inputs['eparentid'];
+        }
+        if ($menuEloq->save()) {
+            $menuEloq->refreshStar();
+            return response()->json(['success' => true, 'menuedited' => 1]);
+        } else {
+            return response()->json(['success' => false, 'menuedited' => 0]);
+        }
 
     }
 }
