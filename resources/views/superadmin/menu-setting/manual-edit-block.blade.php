@@ -27,7 +27,7 @@
             </div>
             <div class="form-group m-form__group">
                 <label for="emenulabel">菜单名</label>
-                <input type="text" name="emenulabel" class="form-control m-input m-input--square" id="emenulabel"
+                <input type="text" name="emenulabel" class="form-control m-input m-input--square" id="emenulabel" autocomplete="off"
                        placeholder="输入菜单名">
             </div>
             <div class="form-group m-form__group">

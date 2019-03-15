@@ -19,7 +19,7 @@
         <div class="m-portlet__body">
             <div class="form-group m-form__group">
                 <label for="menulabel">菜单名</label>
-                <input type="text" name="menulabel" class="form-control m-input m-input--square" id="menulabel"
+                <input type="text" name="menulabel" class="form-control m-input m-input--square" id="menulabel" autocomplete="off"
                        placeholder="输入菜单名">
                 {{--                    <span class="m-form__help">We'll never share your email with anyone else.</span>--}}
             </div>
