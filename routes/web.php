@@ -27,6 +27,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/add', ['as' => 'menu.add', 'uses' => 'MenuSettingController@add']);
         Route::post('/edit', ['as' => 'menu.edit', 'uses' => 'MenuSettingController@edit']);
         Route::post('/delete', ['as' => 'menu.delete', 'uses' => 'MenuSettingController@delete']);
+        Route::post('/changeParent', ['as' => 'menu.changeParent', 'uses' => 'MenuSettingController@changeParent']);
     });
 });
 

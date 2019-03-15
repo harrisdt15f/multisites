@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Menus;
-use Illuminate\Support\Facades\Log;
+use function GuzzleHttp\json_decode;
 use Illuminate\Support\Facades\Route;
 
 class MenuSettingController extends AdminMainController
@@ -82,6 +82,33 @@ class MenuSettingController extends AdminMainController
         } else {
             return response()->json(['success' => false, 'menuedited' => 0]);
         }
+
+    }
+
+    public function changeParent()
+    {
+        $parseDatas = json_decode($this->inputs['dragResult'], true);
+        $itemProcess = [];
+        $atLeastOne = false;
+        if (!empty($parseDatas)) {
+            foreach ($parseDatas as $key => $value) {
+                $menuEloq = Menus::find($value['currentId']);
+                $menuEloq->pid = $value['currentParent'] === '#' ? 0 : (int)$value['currentParent'];
+                if ($menuEloq->save()) {
+                    $pass['pass'] = $value['currentText'];
+                    $itemProcess[] = $pass;
+                    $atLeastOne = true;
+                } else {
+                    $fail['fail'] = $value['currentText'];
+                    $itemProcess[] = $fail;
+                }
+            }
+            if ($atLeastOne === true) {
+                $menuEloq->refreshStar();
+            }
+            return response()->json(['success' => true, $itemProcess]);
+        }
+
 
     }
 }
