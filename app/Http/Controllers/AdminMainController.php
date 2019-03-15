@@ -27,18 +27,25 @@ class AdminMainController extends Controller
             $this->user = Auth::guard('web')->user();
             $this->inputs = Input::all();
             $this->currentOptRoute = Route::getCurrentRoute();
-            $datas['input'] = $this->inputs;
-            $datas['route'] = $this->currentOptRoute;
-            $datas['user'] = $this->user;
-            $datas['ip'] = Request::ip();
-            $datas['ips']= Request::ips();
-            $log = json_encode($datas);
-            Log::channel('operate')->debug($log);
+            $this->adminOperateLog();
             $menuObj = new Menus();
             $menulists = $menuObj->menuLists();
             View::share('menulists', $menulists);
             return $next($request);
         });
+    }
 
+    /**
+     *记录后台管理员操作日志
+     */
+    private function adminOperateLog(): void
+    {
+        $datas['input'] = $this->inputs;
+        $datas['route'] = $this->currentOptRoute;
+        $datas['user'] = $this->user;
+        $datas['ip'] = Request::ip();
+        $datas['ips'] = Request::ips();
+        $log = json_encode($datas);
+        Log::channel('operate')->debug($log);
     }
 }

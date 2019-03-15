@@ -6,10 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use LaravelArdent\Ardent\Ardent;
-use phpDocumentor\Reflection\Types\Self_;
 
-class Menus extends Ardent
+class Menus extends BaseModel
 {
     protected $table = 'admin_menus';
     /**
