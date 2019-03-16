@@ -13,3 +13,5 @@ yarn-error.log
 \.editorconfig
 
 \.idea/
+
+\.phpintel/
