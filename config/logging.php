@@ -75,7 +75,6 @@ return [
                 'port' => env('PAPERTRAIL_PORT'),
             ],
         ],
-
         'stderr' => [
             'driver' => 'monolog',
             'handler' => StreamHandler::class,
@@ -93,6 +92,14 @@ return [
         'errorlog' => [
             'driver' => 'errorlog',
             'level' => 'debug',
+        ],
+        'graylog' => [
+            'driver' => 'monolog',
+            'handler' => Monolog\Handler\GelfHandler::class,
+            'handler_with' => [
+                'publisher' =>  app(\App\Services\GraylogSetup::class)->getGelfPublisher(),
+            ],
+            'formatter' => \Monolog\Formatter\GelfMessageFormatter::class
         ],
     ],
 
