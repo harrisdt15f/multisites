@@ -14,6 +14,7 @@
         "genealabs/laravel-model-caching": "0.4.*",
         "graylog2/gelf-php": "^1.6",
         "laravel/framework": "5.7.*",
+        "laravel/passport": "^7.2",
         "laravel/tinker": "^1.0",
         "laravelbook/ardent": "^3.6",
         "pda/pheanstalk": "^4.0",
