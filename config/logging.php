@@ -1,5 +1,8 @@
 <?php
 
+use App\Services\GraylogSetup;
+use App\Services\Logs\LogMonolog;
+use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
 
@@ -97,9 +100,13 @@ return [
             'driver' => 'monolog',
             'handler' => Monolog\Handler\GelfHandler::class,
             'handler_with' => [
-                'publisher' =>  app(\App\Services\GraylogSetup::class)->getGelfPublisher(),
+                'publisher' =>  app(GraylogSetup::class)->getGelfPublisher(),
             ],
-            'formatter' => \Monolog\Formatter\GelfMessageFormatter::class
+            'formatter' => GelfMessageFormatter::class
+        ],
+        'byqueue' => [
+            'driver' => 'custom',
+            'via' => LogMonolog::class,
         ],
     ],
 

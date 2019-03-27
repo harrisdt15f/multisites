@@ -40,6 +40,8 @@ class AdminMainController extends Controller
      */
     private function adminOperateLog(): void
     {
+        Log::info('message',['foo'=>'bar']);
+
         $datas['input'] = $this->inputs;
         $datas['route'] = $this->currentOptRoute;
         $datas['user'] = $this->user;
