@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Menus;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 
 class HomeController extends AdminMainController
 {

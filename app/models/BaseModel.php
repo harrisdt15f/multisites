@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\models;
 use LaravelArdent\Ardent\Ardent;
 use GeneaLabs\LaravelModelCaching\Traits\Cachable;
 

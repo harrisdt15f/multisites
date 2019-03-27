@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Menus;
+use App\models\Menus;
 use function GuzzleHttp\json_decode;
 use Illuminate\Support\Facades\Route;
 

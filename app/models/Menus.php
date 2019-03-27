@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\models;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;

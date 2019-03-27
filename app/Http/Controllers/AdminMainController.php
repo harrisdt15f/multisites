@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Menus;
+
+use App\models\Menus;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Facades\Auth;
