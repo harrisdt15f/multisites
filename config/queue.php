@@ -40,14 +40,18 @@ return [
             'queue' => 'default',
             'retry_after' => 90,
         ],
-
         'beanstalkd' => [
             'driver' => 'beanstalkd',
             'host' => env('BEANSTALKT_HOST', 'localhost'),
             'queue' => env('BEANSTALKD_PORT', 'default'),
             'retry_after' => 90,
         ],
-
+        'logs' => [
+            'driver' => 'beanstalkd',
+            'host' => env('BEANSTALKT_HOST', 'localhost'),
+            'queue' => env('BEANSTALKD_PORT', 'default'),
+            'retry_after' => 90,
+        ],
         'sqs' => [
             'driver' => 'sqs',
             'key' => env('SQS_KEY', 'your-public-key'),
@@ -56,7 +60,6 @@ return [
             'queue' => env('SQS_QUEUE', 'your-queue-name'),
             'region' => env('SQS_REGION', 'us-east-1'),
         ],
-
         'redis' => [
             'driver' => 'redis',
             'connection' => 'default',

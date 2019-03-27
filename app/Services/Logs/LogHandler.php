@@ -8,8 +8,6 @@
 
 namespace App\Services\Logs;
 
-//use App\Events\Logs\LogMonologEvent;
-use App\models\Logs;
 use Monolog\Logger;
 use Monolog\Handler\AbstractProcessingHandler;
 
@@ -22,12 +20,8 @@ class LogHandler extends AbstractProcessingHandler
 
     protected function write(array $record)
     {
-        // Simple store implementation
-        $log = new Logs();
-        $log->fill($record['formatted']);
-        $log->save();
-// Queue implementation
-// event(new LogMonologEvent($record));
+        // Queue implementation
+         event(new LogMonologEvent($record));
     }
 
     /**
