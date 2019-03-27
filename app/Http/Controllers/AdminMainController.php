@@ -41,14 +41,11 @@ class AdminMainController extends Controller
      */
     private function adminOperateLog(): void
     {
-        Log::info('message',['foo'=>'bar']);
         $datas['input'] = $this->inputs;
         $datas['route'] = $this->currentOptRoute;
-        $datas['user'] = $this->user;
-        $datas['ip'] = Request::ip();
-        $datas['ips'] = Request::ips();
         $log = json_encode($datas,JSON_UNESCAPED_UNICODE);
-        Log::channel('operate')->debug($log);
+        Log::channel('byqueue')->info($log);
+//        Log::channel('operate')->debug($log);
 //        Log::stack(['operate','graylog'])->debug($log);
     }
 }

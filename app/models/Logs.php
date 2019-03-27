@@ -22,6 +22,7 @@ class Logs extends BaseModel
         'level',
         'token',
         'ip',
+        'ips',
         'user_id',
         'user_agent',
         'session',
@@ -32,6 +33,8 @@ class Logs extends BaseModel
         'browser',
         'bs_version',
         'device_type',
+        'inputs',
+        'route',
         'created_at',
         'updated_at',
     ];
