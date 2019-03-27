@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Controllers\ApiMainController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
-class AuthController extends Controller
+class AuthController extends ApiMainController
 {
     public $successStatus = 200;
 

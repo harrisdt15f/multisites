@@ -1,6 +1,7 @@
 <?php
 
 use App\Services\GraylogSetup;
+use App\Services\ApiLogs\ApiLogMonolog;
 use App\Services\Logs\LogMonolog;
 use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Handler\StreamHandler;
@@ -107,7 +108,13 @@ return [
         'byqueue' => [
             'driver' => 'custom',
             'via' => LogMonolog::class,
+
         ],
+        'apibyqueue' => [
+            'driver' => 'custom',
+            'via' => ApiLogMonolog::class,
+        ],
+
     ],
 
 ];

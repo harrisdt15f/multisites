@@ -6,14 +6,12 @@
  * Time: 9:51 AM
  */
 
-namespace App\Services\Logs;
+namespace App\Services\ApiLogs;
 
-
-use App\models\Logs;
-use Illuminate\Support\Facades\Log;
+use App\models\LogsApi;
 use Jenssegers\Agent\Agent;
 
-class LogProcessor
+class ApiLogProcessor
 {
 
 
@@ -27,17 +25,17 @@ class LogProcessor
         $bsVersion = $agent->version($browser);
         $robot = $agent->robot();
         if ($agent->isRobot()) {
-            $type = Logs::ROBOT;
+            $type = LogsApi::ROBOT;
         } elseif ($agent->isDesktop()) {
-            $type = Logs::DESKSTOP;
+            $type = LogsApi::DESKSTOP;
         } elseif ($agent->isTablet()) {
-            $type = Logs::TABLET;
+            $type = LogsApi::TABLET;
         } elseif ($agent->isMobile()) {
-            $type = Logs::MOBILE;
+            $type = LogsApi::MOBILE;
         } elseif ($agent->isPhone()) {
-            $type = Logs::PHONE;
+            $type = LogsApi::PHONE;
         } else {
-            $type = Logs::OTHER;
+            $type = LogsApi::OTHER;
         }
         $messageArr = json_decode($record['message'],true);
         $record['extra'] = [
