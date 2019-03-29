@@ -1,15 +1,17 @@
 <?php
 
-namespace App;
+namespace App\models;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Passport\HasApiTokens;
 
-class User extends Authenticatable
+class PartnerAdminUsers extends Authenticatable
 {
     use HasApiTokens, Notifiable;
+
+    protected $table = 'partner_admin_users';
 
     /**
      * The attributes that are mass assignable.
