@@ -39,4 +39,10 @@ class PartnerAdminUsers extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+
+    public function platform()
+    {
+        return $this->hasOne('PlatForms');
+    }
 }

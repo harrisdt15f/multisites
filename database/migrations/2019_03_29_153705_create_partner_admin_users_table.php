@@ -20,11 +20,16 @@ class CreatePartnerAdminUsersTable extends Migration {
             $table->timestamp('email_verified_at')->nullable();
 			$table->string('password');
             $table->rememberToken();
-			$table->boolean('is_test')->nullable()->default(0);
+			$table->tinyInteger('is_test')->nullable()->default(0);
 			$table->integer('group_id')->nullable();
-			$table->boolean('status')->nullable()->default(0);
+			$table->tinyInteger('status')->nullable()->default(0);
 			$table->integer('platform_id')->nullable()->default(1);
+            $table->integer('super_id')->unsigned();
 			$table->timestamps();
+            $table->foreign('platform_id')->references('platform_id')->on('platforms')
+                ->onDelete('cascade');
+            $table->foreign('super_id')->references('id')->on('partner_admin_users')
+                ->onDelete('cascade');
 		});
 	}
 
