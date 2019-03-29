@@ -13,7 +13,7 @@ class ApiLogTable extends Migration
      */
     public function up()
     {
-        Schema::create('logs_api', function (Blueprint $t) {
+        Schema::create('parter_logs_api', function (Blueprint $t) {
             $t->increments('id');
             $t->text('description', 65535)->nullable();
             $t->string('origin', 200)->nullable();
@@ -47,6 +47,6 @@ class ApiLogTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('logs_api');
+        Schema::dropIfExists('parter_logs_api');
     }
 }
