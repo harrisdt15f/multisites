@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\models\Menus;
+use App\models\PartnerMenus;
 use function GuzzleHttp\json_decode;
 use Illuminate\Support\Facades\Route;
 
@@ -11,9 +11,9 @@ class MenuSettingController extends AdminMainController
 
     public function index()
     {
-        $firstlevelmenus = Menus::getFirstLevelList();
+        $firstlevelmenus = PartnerMenus::getFirstLevelList();
         $routeCollection = Route::getRoutes()->get();
-        $editMenu = Menus::all();
+        $editMenu = PartnerMenus::all();
         $routeMatchingName = $editMenu->where('route', '!=', '#')->keyBy('route')->toArray();
         $rname = [];
         foreach ($routeCollection as $key => $r) {
@@ -28,7 +28,7 @@ class MenuSettingController extends AdminMainController
 
     public function add()
     {
-        $menuEloq = new Menus();
+        $menuEloq = new PartnerMenus();
         if (isset($this->inputs['isParent']) && $this->inputs['isParent'] === 'on') {
 
             $menuEloq->label = $this->inputs['menulabel'];
@@ -47,7 +47,7 @@ class MenuSettingController extends AdminMainController
 
     public function delete()
     {
-        $menuEloq = new Menus();
+        $menuEloq = new PartnerMenus();
         $toDelete = json_decode($this->inputs['toDelete'], true);
         if (!empty($toDelete)) {
 
@@ -65,7 +65,7 @@ class MenuSettingController extends AdminMainController
 
     public function edit()
     {
-        $menuEloq = Menus::find($this->inputs['menuid']);
+        $menuEloq = PartnerMenus::find($this->inputs['menuid']);
         if (isset($this->inputs['eisParent']) && $this->inputs['eisParent'] === 'on') {
 
             $menuEloq->label = $this->inputs['emenulabel'];
@@ -92,7 +92,7 @@ class MenuSettingController extends AdminMainController
         $atLeastOne = false;
         if (!empty($parseDatas)) {
             foreach ($parseDatas as $key => $value) {
-                $menuEloq = Menus::find($value['currentId']);
+                $menuEloq = PartnerMenus::find($value['currentId']);
                 $menuEloq->pid = $value['currentParent'] === '#' ? 0 : (int)$value['currentParent'];
                 if ($menuEloq->save()) {
                     $pass['pass'] = $value['currentText'];

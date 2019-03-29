@@ -8,7 +8,7 @@
 
 namespace App\Listeners;
 
-use App\models\LogsApi;
+use App\models\PartnerLogsApi;
 use App\Services\ApiLogs\ApiLogMonologEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Carbon;
@@ -20,7 +20,7 @@ class ApiLogMonologEventListener implements ShouldQueue
     protected $log;
     protected $recordedDays;
 
-    public function __construct(LogsApi $log)
+    public function __construct(PartnerLogsApi $log)
     {
         $this->log = $log;
     }

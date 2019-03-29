@@ -3,13 +3,10 @@
 namespace App\Http\Controllers;
 
 
-use App\models\Menus;
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Contracts\Session\Session;
+use App\models\PartnerMenus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 
@@ -29,7 +26,7 @@ class ApiMainController extends Controller
             $this->inputs = Input::all();
             $this->currentOptRoute = Route::getCurrentRoute();
             $this->adminOperateLog();
-//            $menuObj = new Menus();
+//            $menuObj = new PartnerMenus();
 //            $menulists = $menuObj->menuLists();
 //            View::share('menulists', $menulists);
             return $next($request);

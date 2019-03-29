@@ -3,9 +3,9 @@
 namespace App\models;
 
 
-class LogsApi extends BaseModel
+class PartnerLogsApi extends BaseModel
 {
-    protected $table = 'logs_api';
+    protected $table = 'parter_logs_api';
 
     public const PHONE = 1;
     public const DESKSTOP = 2;

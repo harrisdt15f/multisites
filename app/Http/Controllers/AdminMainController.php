@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 
-use App\models\Menus;
+use App\models\PartnerMenus;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Facades\Auth;
@@ -29,7 +29,7 @@ class AdminMainController extends Controller
             $this->inputs = Input::all();
             $this->currentOptRoute = Route::getCurrentRoute();
             $this->adminOperateLog();
-            $menuObj = new Menus();
+            $menuObj = new PartnerMenus();
             $menulists = $menuObj->menuLists();
             View::share('menulists', $menulists);
             return $next($request);

@@ -7,9 +7,9 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
-class Menus extends BaseModel
+class PartnerMenus extends BaseModel
 {
-    protected $table = 'admin_menus';
+    protected $table = 'partner_admin_menus';
     /**
      * @return array
      * TODO : 由于快速开发 后续需要弄缓存与异常处理

@@ -8,7 +8,7 @@
 
 namespace App\Services\ApiLogs;
 
-use App\models\LogsApi;
+use App\models\PartnerLogsApi;
 use Jenssegers\Agent\Agent;
 
 class ApiLogProcessor
@@ -25,17 +25,17 @@ class ApiLogProcessor
         $bsVersion = $agent->version($browser);
         $robot = $agent->robot();
         if ($agent->isRobot()) {
-            $type = LogsApi::ROBOT;
+            $type = PartnerLogsApi::ROBOT;
         } elseif ($agent->isDesktop()) {
-            $type = LogsApi::DESKSTOP;
+            $type = PartnerLogsApi::DESKSTOP;
         } elseif ($agent->isTablet()) {
-            $type = LogsApi::TABLET;
+            $type = PartnerLogsApi::TABLET;
         } elseif ($agent->isMobile()) {
-            $type = LogsApi::MOBILE;
+            $type = PartnerLogsApi::MOBILE;
         } elseif ($agent->isPhone()) {
-            $type = LogsApi::PHONE;
+            $type = PartnerLogsApi::PHONE;
         } else {
-            $type = LogsApi::OTHER;
+            $type = PartnerLogsApi::OTHER;
         }
         $messageArr = json_decode($record['message'],true);
         $record['extra'] = [
