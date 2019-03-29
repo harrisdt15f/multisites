@@ -22,14 +22,11 @@ class CreatePartnerAdminUsersTable extends Migration {
             $table->rememberToken();
 			$table->tinyInteger('is_test')->nullable()->default(0);
 			$table->integer('group_id')->nullable();
-			$table->tinyInteger('status')->nullable()->default(0);
-			$table->integer('platform_id')->nullable()->default(1);
-            $table->integer('super_id')->unsigned();
+            $table->integer('status')->unsigned()->nullable()->default(1);
+			$table->integer('platform_id')->unsigned()->nullable()->default(1);
+            $table->integer('super_id')->unsigned()->nullable()->index('partner_admin_users_super_id_foreign');
 			$table->timestamps();
-            $table->foreign('platform_id')->references('platform_id')->on('platforms')
-                ->onDelete('cascade');
-            $table->foreign('super_id')->references('id')->on('partner_admin_users')
-                ->onDelete('cascade');
+            $table->index(['platform_id','status'], 'fk_platform_id_status');
 		});
 	}
 
