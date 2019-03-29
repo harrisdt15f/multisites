@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\ApiMainController;
+use App\models\OauthAccessTokens;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\User;
@@ -30,16 +31,19 @@ class AuthController extends ApiMainController
             'remember_me' => 'boolean'
         ]);
         $credentials = request(['email', 'password']);
-        if(!Auth::attempt($credentials)) {
+        if (!Auth::attempt($credentials)) {
             return response()->json([
                 'message' => 'Unauthorized'
             ], 401);
         }
         $user = $request->user();
+        OauthAccessTokens::clearOldToken($user->id);
         $tokenResult = $user->createToken('Personal Access Token');
         $token = $tokenResult->token;
         if ($request->remember_me) {
             $token->expires_at = Carbon::now()->addWeeks(1);
+        } else {
+            $token->expires_at = Carbon::now()->addMinute(30);
         }
         $token->save();
         return response()->json([
