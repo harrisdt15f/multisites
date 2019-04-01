@@ -4,12 +4,9 @@ namespace App\Http\Controllers;
 
 
 use App\models\PartnerMenus;
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 
