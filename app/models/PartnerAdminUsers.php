@@ -42,6 +42,11 @@ class PartnerAdminUsers extends Authenticatable
 
     public function platform()
     {
-        return $this->hasOne('App\\models\\PlatForms','platform_id', 'platform_id');
+        return $this->hasOne(PlatForms::class,'platform_id', 'platform_id');
+    }
+
+    public function accessGroup()
+    {
+        return $this->hasOne(PartnerAdminGroupAccess::class,'id','group_id');
     }
 }

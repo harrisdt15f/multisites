@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\View;
 class AdminMainController extends Controller
 {
     protected $inputs;
-    protected $user;
+    protected $partnerAdmin;
     protected $currentOptRoute;
 
     /**
@@ -22,12 +22,13 @@ class AdminMainController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            $this->user = Auth::guard('web')->user();
+            $this->partnerAdmin = Auth::guard('web')->user();
             $this->inputs = Input::all();
             $this->currentOptRoute = Route::getCurrentRoute();
             $this->adminOperateLog();
             $menuObj = new PartnerMenus();
-            $menulists = $menuObj->menuLists();
+            $this->currentPartnerAccessGroup = $this->partnerAdmin->accessGroup;
+            $menulists = $menuObj->menuLists($this->currentPartnerAccessGroup);
             View::share('menulists', $menulists);
             return $next($request);
         });

@@ -14,17 +14,18 @@ class PartnerMenus extends BaseModel
     protected $redisFirstTag = 'ms_menu.';
 
     /**
+     * @param PartnerAdminGroupAccess $accessGroupEloq
      * @return array
      * TODO : 由于快速开发 后续需要弄缓存与异常处理
      */
-    public function menuLists()
+    public function menuLists(PartnerAdminGroupAccess $accessGroupEloq)
     {
         $parent_menu = [];
-        $groupId = Auth::guard('web')->user()->group_id;
-        if ($groupId === 1) {
+        $role = $accessGroupEloq->role;
+        if ($role == '*') {
             $parent_menu = $this->forStar();
         } else {
-
+            $parent_menu = $this->getUserMenuDatas($accessGroupEloq);
         }
         return $parent_menu;
     }
@@ -41,6 +42,28 @@ class PartnerMenus extends BaseModel
         return $parent_menu;
     }
 
+    /**
+     * @param PartnerAdminGroupAccess $accessGroupEloq
+     * @return array|mixed
+     */
+    public function getUserMenuDatas(PartnerAdminGroupAccess $accessGroupEloq)
+    {
+        $redisKey = $this->redisFirstTag. $accessGroupEloq->id;
+        if (Cache::has($redisKey)) {
+            $parent_menu = Cache::get($redisKey);
+        } else {
+            $role = json_decode($accessGroupEloq->role); //[1,2,3,4,5]
+            $menuLists = self::whereIn('id', $role)->get();
+            $parent_menu = self::createMenuDatas($menuLists);
+        }
+        return $parent_menu;
+    }
+
+    /**
+     * @param $menuLists
+     * @param string $tag
+     * @return array
+     */
     public function createMenuDatas($menuLists, $tag = '*')
     {
         $redisKey = $this->redisFirstTag . $tag;

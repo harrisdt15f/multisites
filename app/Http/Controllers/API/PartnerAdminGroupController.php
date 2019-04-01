@@ -44,7 +44,7 @@ class PartnerAdminGroupController extends ApiMainController
         }
         $partnerAccessGroupEloq = PartnerMenus::whereIn('id', $role)->get();
         $partnerMenuObj = new PartnerMenus();
-        $objPartnerAdminGroup->role = serialize($partnerMenuObj->createMenuDatas($partnerAccessGroupEloq,$objPartnerAdminGroup->id));
+        $partnerMenuObj->createMenuDatas($partnerAccessGroupEloq,$objPartnerAdminGroup->id);
         $objPartnerAdminGroup->save();
         return $data;
     }
