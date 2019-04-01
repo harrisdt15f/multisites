@@ -10,7 +10,6 @@ use Laravel\Passport\HasApiTokens;
 class PartnerAdminUsers extends Authenticatable
 {
     use HasApiTokens, Notifiable;
-
     protected $table = 'partner_admin_users';
 
     /**
@@ -43,6 +42,6 @@ class PartnerAdminUsers extends Authenticatable
 
     public function platform()
     {
-        return $this->hasOne('PlatForms');
+        return $this->hasOne('App\\models\\PlatForms','platform_id', 'platform_id');
     }
 }

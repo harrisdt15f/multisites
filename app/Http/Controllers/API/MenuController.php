@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\API;
 use App\Http\Controllers\ApiMainController;
-use App\models\PartnerMenus;
-use Illuminate\Http\Request;
 
 class MenuController extends ApiMainController
 {
@@ -15,6 +13,12 @@ class MenuController extends ApiMainController
             'data' => $this->fullMenuLists,
         ];
         return response()->json($data);
+    }
+
+    public function addPartnerMenu()
+    {
+
+
     }
 
 

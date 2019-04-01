@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Cache;
 class PartnerMenus extends BaseModel
 {
     protected $table = 'partner_admin_menus';
+
+    protected $redisFirstTag = 'ms_menu.';
+
     /**
      * @return array
      * TODO : 由于快速开发 后续需要弄缓存与异常处理
@@ -28,30 +31,38 @@ class PartnerMenus extends BaseModel
 
     public function forStar()
     {
-        $parent_menu = [];
-        if (Cache::has('ms_menus.*')) {
-            $parent_menu = Cache::get('ms_menus.*');
+        $redisKey = $this->redisFirstTag. '*';
+        if (Cache::has($redisKey)) {
+            $parent_menu = Cache::get($redisKey);
         } else {
             $menuLists = self::all();
-            foreach ($menuLists as $key => $value) {
-                if ($value->pid === 0) {
-                    $parent_menu[$value->id]['label'] = $value->label;
-                    $parent_menu[$value->id]['route'] = $value->route;
-                    $parent_menu[$value->id]['class'] = $value->class;
-                    $parent_menu[$value->id]['pid'] = $value->pid;
-                } else {
-                    $parent_menu[$value->pid]['child'][$value->id]['label'] = $value->label;
-                    $parent_menu[$value->pid]['child'][$value->id]['route'] = $value->route;
-                    $parent_menu[$value->pid]['child'][$value->id]['class'] = $value->class;
-                    $parent_menu[$value->pid]['child'][$value->id]['pid'] = $value->pid;
-                }
-            }
-//            $hourToStore = 24;
-//            $expiresAt = Carbon::now()->addHours($hourToStore)->diffInMinutes();
-//            Cache::put('ms_menus', $parent_menu, $expiresAt);
-            Cache::forever('ms_menus.*', $parent_menu);
+            $parent_menu = self::createMenuDatas($menuLists);
         }
         return $parent_menu;
+    }
+
+    public function createMenuDatas($menuLists, $tag = '*')
+    {
+        $redisKey = $this->redisFirstTag . $tag;
+        $menuForFE = [];
+        foreach ($menuLists as $key => $value) {
+            if ($value->pid === 0) {
+                $menuForFE[$value->id]['label'] = $value->label;
+                $menuForFE[$value->id]['route'] = $value->route;
+                $menuForFE[$value->id]['class'] = $value->class;
+                $menuForFE[$value->id]['pid'] = $value->pid;
+            } else {
+                $menuForFE[$value->pid]['child'][$value->id]['label'] = $value->label;
+                $menuForFE[$value->pid]['child'][$value->id]['route'] = $value->route;
+                $menuForFE[$value->pid]['child'][$value->id]['class'] = $value->class;
+                $menuForFE[$value->pid]['child'][$value->id]['pid'] = $value->pid;
+            }
+        }
+        //            $hourToStore = 24;
+//            $expiresAt = Carbon::now()->addHours($hourToStore)->diffInMinutes();
+//            Cache::put('ms_menus', $parent_menu, $expiresAt);
+        Cache::forever($redisKey, $menuForFE);
+        return $menuForFE;
     }
 
     /**
@@ -65,6 +76,6 @@ class PartnerMenus extends BaseModel
 
     public static function getFirstLevelList()
     {
-        return self::where('pid',0)->get();
+        return self::where('pid', 0)->get();
     }
 }

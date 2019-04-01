@@ -15,6 +15,8 @@ class ApiMainController extends Controller
     protected $user;
     protected $currentOptRoute;
     protected $fullMenuLists;
+    protected $currentPlatformEloq;
+    protected $eloqM='';
 
     /**
      * AdminMainController constructor.
@@ -23,11 +25,13 @@ class ApiMainController extends Controller
     {
         $this->middleware(function ($request, $next) {
             $this->user = Auth::guard('api')->user();
-            $this->inputs = Input::all();
+            $this->currentPlatformEloq = $this->user->platform; //获取目前账号用户属于平台的对象
+            $this->inputs = Input::all(); //获取所有相关的传参数据
             $this->currentOptRoute = Route::getCurrentRoute();
             $this->adminOperateLog();
             $partnerEloq = new PartnerMenus();
             $this->fullMenuLists = $partnerEloq->forStar();
+            $this->eloqM = 'App\\models\\' . $this->eloqM;
             return $next($request);
         });
     }
