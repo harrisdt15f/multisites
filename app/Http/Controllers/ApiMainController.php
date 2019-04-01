@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\models\PartnerMenus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
@@ -15,6 +14,7 @@ class ApiMainController extends Controller
     protected $inputs;
     protected $user;
     protected $currentOptRoute;
+    protected $fullMenuLists;
 
     /**
      * AdminMainController constructor.
@@ -26,9 +26,8 @@ class ApiMainController extends Controller
             $this->inputs = Input::all();
             $this->currentOptRoute = Route::getCurrentRoute();
             $this->adminOperateLog();
-//            $menuObj = new PartnerMenus();
-//            $menulists = $menuObj->menuLists();
-//            View::share('menulists', $menulists);
+            $partnerEloq = new PartnerMenus();
+            $this->fullMenuLists = $partnerEloq->forStar();
             return $next($request);
         });
     }

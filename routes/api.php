@@ -18,4 +18,5 @@ Route::group(['middleware' => 'auth:api'], function(){
     Route::post('details', ['as' => 'detail', 'uses' => 'API\AuthController@details']);
     Route::get('logout', ['as' => 'logout', 'uses' => 'API\AuthController@logout']);
     Route::get('user', ['as' => 'user', 'uses' => 'API\AuthController@user']);
+    Route::get('menu/get-all-menu', ['as' => 'detail', 'uses' => 'API\MenuController@getAllMenu']);
 });
