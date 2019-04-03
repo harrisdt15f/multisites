@@ -15,8 +15,8 @@ class ApiMainController extends Controller
     protected $partnerAdmin;//当前的商户用户
     protected $currentOptRoute;//目前路由
     protected $fullMenuLists;//所有的菜单
-    protected $currentPlatformEloq;//当前商户存在的平台
-    protected $currentPartnerAccessGroup;//当前商户的权限组
+    protected $currentPlatformEloq = null;//当前商户存在的平台
+    protected $currentPartnerAccessGroup = null;//当前商户的权限组
     protected $partnerMenulists; //目前所有的菜单为前端展示用的
     protected $eloqM = '';// 当前的eloquent
     protected $currentRouteName;//当前的route name;
@@ -29,15 +29,23 @@ class ApiMainController extends Controller
     {
         $this->middleware(function ($request, $next) {
             $this->partnerAdmin = Auth::guard('api')->user();
-            $this->currentPlatformEloq = $this->partnerAdmin->platform; //获取目前账号用户属于平台的对象
-            $this->currentPartnerAccessGroup = $this->partnerAdmin->accessGroup;
-            $this->inputs = Input::all(); //获取所有相关的传参数据
-            $this->menuAccess();
-            $this->routeAccessCheck();
-            $this->adminOperateLog();
-            if ($this->routeAccessable === false) {
-                return $this->msgout($this->routeAccessable, '404');
+            //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
+            try {
+                $this->currentPlatformEloq = $this->partnerAdmin->platform;//获取目前账号用户属于平台的对象
+                $this->currentPartnerAccessGroup = $this->partnerAdmin->accessGroup;
+            } catch (\Exception $e) {
             }
+            $this->inputs = Input::all(); //获取所有相关的传参数据
+            //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
+            if (!is_null($this->currentPlatformEloq))
+            {
+                $this->menuAccess();
+                $this->routeAccessCheck();
+                if ($this->routeAccessable === false) {
+                    return $this->msgout($this->routeAccessable, '404');
+                }
+            }
+            $this->adminOperateLog();
             $this->eloqM = 'App\\models\\' . $this->eloqM;// 当前的eloquent
             return $next($request);
         });
@@ -62,23 +70,27 @@ class ApiMainController extends Controller
         $this->currentRouteName = $this->currentOptRoute->action['as']; //当前的route name;
         //$partnerAdREloq = PartnerAdminRoute::where('route_name',$this->currentRouteName)->first()->parentRoute->menu;
         $partnerAdREloq = PartnerAdminRoute::where('route_name', $this->currentRouteName)->first();
-        $partnerAdRParentEloq = $partnerAdREloq->parentRoute;//目前路由的父类
-        if (is_null($partnerAdRParentEloq)) {
-            $partnerMenuEloq = $partnerAdREloq->menu;//目前路由属于的菜单
-        } else {
-            $partnerMenuEloq = $partnerAdRParentEloq->menu;
-        }
-        //set if it is accissable or not
-        if (!empty($this->currentPartnerAccessGroup->role)) {
-            if ($this->currentPartnerAccessGroup->role == '*') {
-                $this->routeAccessable = true;
+        if (!is_null($partnerAdREloq))
+        {
+            $partnerAdRParentEloq = $partnerAdREloq->parentRoute;//目前路由的父类
+            if (is_null($partnerAdRParentEloq)) {
+                $partnerMenuEloq = $partnerAdREloq->menu;//目前路由属于的菜单
             } else {
-                $currentRouteGroup = json_decode($this->currentPartnerAccessGroup->role, true);
-                if (in_array($partnerMenuEloq->id, $currentRouteGroup)) {
+                $partnerMenuEloq = $partnerAdRParentEloq->menu;
+            }
+            //set if it is accissable or not
+            if (!empty($this->currentPartnerAccessGroup->role)) {
+                if ($this->currentPartnerAccessGroup->role == '*') {
                     $this->routeAccessable = true;
+                } else {
+                    $currentRouteGroup = json_decode($this->currentPartnerAccessGroup->role, true);
+                    if (in_array($partnerMenuEloq->id, $currentRouteGroup)) {
+                        $this->routeAccessable = true;
+                    }
                 }
             }
         }
+
     }
 
     /**
