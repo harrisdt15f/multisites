@@ -22,7 +22,7 @@ class EnableCors
     public function handle($request, Closure $next)
     {
         $response = $next($request);
-        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, X-Socket-ID, X-HTTP-Method-Override');
+        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, X-Socket-ID, X-HTTP-Method-Override,X-Requested-With');
         $response->headers->set('Access-Control-Allow-Origin', '*');
         $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
         return $response;
