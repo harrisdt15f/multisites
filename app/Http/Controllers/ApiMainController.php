@@ -70,12 +70,7 @@ class ApiMainController extends Controller
         //$partnerAdREloq = PartnerAdminRoute::where('route_name',$this->currentRouteName)->first()->parentRoute->menu;
         $partnerAdREloq = PartnerAdminRoute::where('route_name', $this->currentRouteName)->first();
         if (!is_null($partnerAdREloq)) {
-            $partnerAdRParentEloq = $partnerAdREloq->parentRoute;//目前路由的父类
-            if (is_null($partnerAdRParentEloq)) {
-                $partnerMenuEloq = $partnerAdREloq->menu;//目前路由属于的菜单
-            } else {
-                $partnerMenuEloq = $partnerAdRParentEloq->menu;
-            }
+            $partnerMenuEloq = $partnerAdREloq->menu;
             //set if it is accissable or not
             if (!empty($this->currentPartnerAccessGroup->role)) {
                 if ($this->currentPartnerAccessGroup->role == '*') {
