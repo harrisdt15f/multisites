@@ -10,9 +10,10 @@ use Illuminate\Support\Facades\Input;
 
 class PartnerAdminGroupController extends ApiMainController
 {
-    protected $postUnaccess = ['id','updated_at','created_at'];
+    protected $postUnaccess = ['id', 'updated_at', 'created_at'];
 
     protected $eloqM = 'PartnerAdminGroupAccess';
+
     /**
      * Display a listing of the resource.
      *
@@ -35,18 +36,19 @@ class PartnerAdminGroupController extends ApiMainController
         $data['platform_id'] = $this->currentPlatformEloq->platform_id;
         $role = json_decode($data['role']); //[1,2,3,4,5]
         $objPartnerAdminGroup = new $this->eloqM;
-        $objPartnerAdminGroup->fill( $data);
+        $objPartnerAdminGroup->fill($data);
         try {
             $objPartnerAdminGroup->save();
-            echo 'success';
         } catch (\Exception $e) {
-            echo $e->getMessage();die();
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo;
+            return $this->msgout(false, $msg, $sqlState);
         }
         $partnerAccessGroupEloq = PartnerMenus::whereIn('id', $role)->get();
         $partnerMenuObj = new PartnerMenus();
-        $partnerMenuObj->createMenuDatas($partnerAccessGroupEloq,$objPartnerAdminGroup->id);
+        $partnerMenuObj->createMenuDatas($partnerAccessGroupEloq, $objPartnerAdminGroup->id);
         $objPartnerAdminGroup->save();
-        return $data;
+        return $this->msgout(true, '', '',$data);
     }
 
     protected function accessOnlyColumn()
@@ -70,7 +72,7 @@ class PartnerAdminGroupController extends ApiMainController
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return Response
      */
     public function show($id)
@@ -81,7 +83,7 @@ class PartnerAdminGroupController extends ApiMainController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return Response
      */
     public function edit($id)
@@ -92,7 +94,7 @@ class PartnerAdminGroupController extends ApiMainController
     /**
      * Update the specified resource in storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return Response
      */
     public function update($id)
@@ -103,7 +105,7 @@ class PartnerAdminGroupController extends ApiMainController
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return Response
      */
     public function destroy($id)
