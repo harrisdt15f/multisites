@@ -37,12 +37,11 @@ class ApiMainController extends Controller
             }
             $this->inputs = Input::all(); //获取所有相关的传参数据
             //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
-            if (!is_null($this->currentPlatformEloq))
-            {
+            if (!is_null($this->currentPlatformEloq)) {
                 $this->menuAccess();
                 $this->routeAccessCheck();
                 if ($this->routeAccessable === false) {
-                    return $this->msgout($this->routeAccessable, '404');
+                    return $this->msgout($this->routeAccessable, [],'您没有访问权限','404');
                 }
             }
             $this->adminOperateLog();
@@ -70,8 +69,7 @@ class ApiMainController extends Controller
         $this->currentRouteName = $this->currentOptRoute->action['as']; //当前的route name;
         //$partnerAdREloq = PartnerAdminRoute::where('route_name',$this->currentRouteName)->first()->parentRoute->menu;
         $partnerAdREloq = PartnerAdminRoute::where('route_name', $this->currentRouteName)->first();
-        if (!is_null($partnerAdREloq))
-        {
+        if (!is_null($partnerAdREloq)) {
             $partnerAdRParentEloq = $partnerAdREloq->parentRoute;//目前路由的父类
             if (is_null($partnerAdRParentEloq)) {
                 $partnerMenuEloq = $partnerAdREloq->menu;//目前路由属于的菜单
@@ -104,8 +102,12 @@ class ApiMainController extends Controller
         Log::channel('apibyqueue')->info($log);
     }
 
-    protected function msgout($success = false, $message = '', $code = '', $data = [])
+    protected function msgout($success = false, $data = [], $message = '', $code = '')
     {
+        if ($success === true) {
+            $message = $message == '' ? '执行成功' : $message;
+            $code = $code == '' ? '200' : $code;
+        }
         $datas = [
             'success' => $success,
             'code' => $code,

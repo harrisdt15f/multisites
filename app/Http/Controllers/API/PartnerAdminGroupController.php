@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Input;
 
 class PartnerAdminGroupController extends ApiMainController
 {
-    protected $postUnaccess = ['id', 'updated_at', 'created_at'];
+    protected $postUnaccess = ['id', 'updated_at', 'created_at'];//不需要接收的字段
 
     protected $eloqM = 'PartnerAdminGroupAccess';
 
@@ -21,7 +21,8 @@ class PartnerAdminGroupController extends ApiMainController
      */
     public function index()
     {
-
+        $data = $this->eloqM::all()->toArray();
+        return $this->msgout(true, $data);
     }
 
     /**
@@ -42,13 +43,13 @@ class PartnerAdminGroupController extends ApiMainController
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo;
-            return $this->msgout(false, $msg, $sqlState);
+            return $this->msgout(false, [], $msg, $sqlState);
         }
         $partnerAccessGroupEloq = PartnerMenus::whereIn('id', $role)->get();
         $partnerMenuObj = new PartnerMenus();
         $partnerMenuObj->createMenuDatas($partnerAccessGroupEloq, $objPartnerAdminGroup->id);
         $objPartnerAdminGroup->save();
-        return $this->msgout(true, '', '',$data);
+        return $this->msgout(true, $data);
     }
 
     protected function accessOnlyColumn()

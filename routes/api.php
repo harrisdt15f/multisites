@@ -27,5 +27,8 @@ Route::group(['middleware' => ['api','auth:api'],'namespace' => 'API'], function
     //菜单相关
     Route::match(['get','options'],'menu/get-all-menu', ['as' => 'menu.allPartnerMenu', 'uses' => 'MenuController@getAllMenu']);
     //用户组相关
+    //添加管理员角色
     Route::match(['post','options'],'partner-admin-group/create', ['as' => 'partnerAdminGroup.create', 'uses' => 'PartnerAdminGroupController@create']);
+    //获取管理员角色
+    Route::match(['get','options'],'partner-admin-group/detail', ['as' => 'partnerAdminGroup.detail', 'uses' => 'PartnerAdminGroupController@index']);
 });
