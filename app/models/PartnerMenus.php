@@ -73,11 +73,15 @@ class PartnerMenus extends BaseModel
                 $menuForFE[$value->id]['label'] = $value->label;
                 $menuForFE[$value->id]['route'] = $value->route;
                 $menuForFE[$value->id]['class'] = $value->class;
+                $menuForFE[$value->id]['icon'] = $value->icon;
+                $menuForFE[$value->id]['en_name'] = $value->en_name;
                 $menuForFE[$value->id]['pid'] = $value->pid;
             } else {
                 $menuForFE[$value->pid]['child'][$value->id]['label'] = $value->label;
                 $menuForFE[$value->pid]['child'][$value->id]['route'] = $value->route;
                 $menuForFE[$value->pid]['child'][$value->id]['class'] = $value->class;
+                $menuForFE[$value->pid]['child'][$value->id]['icon'] = $value->icon;
+                $menuForFE[$value->pid]['child'][$value->id]['en_name'] = $value->en_name;
                 $menuForFE[$value->pid]['child'][$value->id]['pid'] = $value->pid;
             }
         }
