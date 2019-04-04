@@ -14,21 +14,28 @@ use Illuminate\Http\Request;
 |
 */
 //Auth::routes();
-Route::group(['middleware' => 'api','namespace' => 'API'], function(){
-    Route::match(['post','options'],'login', ['as' => 'login', 'uses' => 'AuthController@login']);
-    Route::post('register','AuthController@register');
+Route::group(['middleware' => 'api', 'namespace' => 'API'], function () {
+    Route::match(['post', 'options'], 'login', ['as' => 'login', 'uses' => 'AuthController@login']);
+    Route::post('register', 'AuthController@register');
 });
-Route::group(['middleware' => ['api','auth:api'],'namespace' => 'API'], function(){
+Route::group(['middleware' => ['api', 'auth:api'], 'namespace' => 'API'], function () {
+
     //商户用户相关
     Route::post('details', ['as' => 'detail', 'uses' => 'AuthController@details']);
     Route::get('user', ['as' => 'user', 'uses' => 'AuthController@user']);
+    Route::match(['get', 'options'], 'logout', ['as' => 'logout', 'uses' => 'AuthController@logout']);
 
-    Route::match(['get','options'],'logout', ['as' => 'logout', 'uses' => 'AuthController@logout']);
     //菜单相关
-    Route::match(['get','options'],'menu/get-all-menu', ['as' => 'menu.allPartnerMenu', 'uses' => 'MenuController@getAllMenu']);
+    Route::group(['prefix' => 'menu'], function () {
+        Route::match(['get', 'options'], 'menu/get-all-menu', ['as' => 'menu.allPartnerMenu', 'uses' => 'MenuController@getAllMenu']);
+    });
+
     //用户组相关
-    //添加管理员角色
-    Route::match(['post','options'],'partner-admin-group/create', ['as' => 'partnerAdminGroup.create', 'uses' => 'PartnerAdminGroupController@create']);
-    //获取管理员角色
-    Route::match(['get','options'],'partner-admin-group/detail', ['as' => 'partnerAdminGroup.detail', 'uses' => 'PartnerAdminGroupController@index']);
+    Route::group(['prefix' => 'partner-admin-group'], function () {
+        //添加管理员角色
+        Route::match(['post', 'options'], 'create', ['as' => 'partnerAdminGroup.create', 'uses' => 'PartnerAdminGroupController@create']);
+        //获取管理员角色
+        Route::match(['get', 'options'], 'detail', ['as' => 'partnerAdminGroup.detail', 'uses' => 'PartnerAdminGroupController@index']);
+    });
+
 });
