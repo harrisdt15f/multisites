@@ -41,7 +41,7 @@ Route::group(['middleware' => ['api', 'auth:api'], 'namespace' => 'API'], functi
         //获取管理员角色
         Route::match(['get', 'options'], 'detail', ['as' => $namePrefix.'detail', 'uses' => $controller.'index']);
         //编辑管理员角色
-        Route::match(['get', 'options'], 'edit', ['as' => $namePrefix.'edit', 'uses' => $controller.'edit']);
+        Route::match(['post', 'options'], 'edit', ['as' => $namePrefix.'edit', 'uses' => $controller.'edit']);
     });
 
 });

@@ -7,6 +7,7 @@ use App\models\PartnerAdminGroupAccess;
 use App\models\PartnerMenus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Validator;
 
 class PartnerAdminGroupController extends ApiMainController
 {
@@ -54,7 +55,7 @@ class PartnerAdminGroupController extends ApiMainController
 
     protected function accessOnlyColumn()
     {
-        $partnerAdminAccess = new PartnerAdminGroupAccess();
+        $partnerAdminAccess = new $this->eloqM();
         $column = $partnerAdminAccess->getTableColumns();
         $column = array_values(array_diff($column, $this->postUnaccess));
         return $column;
@@ -84,12 +85,31 @@ class PartnerAdminGroupController extends ApiMainController
     /**
      * Show the form for editing the specified resource.
      *
+     * @param Request $request
      * @return Response
      */
-    public function edit()
+    public function edit(Request $request)
     {
-        $data = $this->eloqM::find()->toArray();
 
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|numeric',
+            'group_name' => 'required',
+            'role' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgout(false, [], $validator->errors(), 401);
+        }
+        $id = $request->get('id');
+        $datas = $this->eloqM::find($id);
+        if (!is_null($datas)) {
+            $datas->group_name = $request->get('group_name');
+            $datas->role = $request->get('role');
+            $datas->save();
+            $data = $datas->toArray();
+            return $this->msgout(true, $data);
+        } else {
+            return $this->msgout(false, [], '没有此组可编辑', '0001');
+        }
     }
 
     /**
