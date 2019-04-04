@@ -12,7 +12,7 @@ class PlatForms extends Model
 
     public function partnerAdminUsers()
     {
-        return $this->hasMany('PartnerAdminUsers');
+        return $this->hasMany(PartnerAdminUsers::class,'platform_id','platform_id');
     }
 
 }

@@ -25,6 +25,14 @@ Route::group(['middleware' => ['api', 'auth:api'], 'namespace' => 'API'], functi
     Route::get('user', ['as' => 'user', 'uses' => 'AuthController@user']);
     Route::match(['get', 'options'], 'logout', ['as' => 'logout', 'uses' => 'AuthController@logout']);
 
+    //管理员相关
+    Route::group(['prefix' => 'partner-admin-user'], function () {
+        $namePrefix='partnerAdmin.';
+        $controller = 'AuthController@';
+        Route::match(['get', 'options'], 'get-all-users', ['as' => $namePrefix.'get-all-users', 'uses' => $controller.'allUser']);
+    });
+
+
     //菜单相关
     Route::group(['prefix' => 'menu'], function () {
         $namePrefix='menu.';
@@ -32,7 +40,7 @@ Route::group(['middleware' => ['api', 'auth:api'], 'namespace' => 'API'], functi
         Route::match(['get', 'options'], 'get-all-menu', ['as' => $namePrefix.'allPartnerMenu', 'uses' => $controller.'getAllMenu']);
     });
 
-    //用户组相关
+    //管理员角色相关
     Route::group(['prefix' => 'partner-admin-group'], function () {
         $namePrefix='partnerAdminGroup.';
         $controller = 'PartnerAdminGroupController@';

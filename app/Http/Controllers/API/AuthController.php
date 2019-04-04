@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -81,6 +82,27 @@ class AuthController extends ApiMainController
         $success['name'] = $user->name;
         return $this->msgout(true, $success);
     }
+
+    /**
+     * 获取所有当前平台的商户管理员用户
+     * @return JsonResponse
+     */
+    public function allUser()
+    {
+        try {
+            $data = $this->currentPlatformEloq->partnerAdminUsers;
+            if (is_null($data)) {
+                $result = Arr::wrap($data);
+            } else {
+                $result = $data->toArray();
+            }
+            return $this->msgout(true, $result);
+        } catch (\Exception $e) {
+            return $this->msgout(false, [], $e->getMessage(), $e->getCode());
+        }
+
+    }
+
 
     /**
      * details api
