@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\ApiMainController;
 use App\models\OauthAccessTokens;
+use App\models\PartnerAdminUsers;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -60,20 +61,23 @@ class AuthController extends ApiMainController
      *
      * @return Response
      */
-    public function register(Request $request): Response
+    public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email',
             'password' => 'required',
             'c_password' => 'required|same:password',
+            'is_test' => 'required|numeric',
+            'platform_id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 401);
         }
         $input = $request->all();
+//        dd($input);
         $input['password'] = bcrypt($input['password']);
-        $user = User::create($input);
+        $user = PartnerAdminUsers::create($input);
         $success['token'] = $user->createToken('MyApp')->accessToken;
         $success['name'] = $user->name;
         return response()->json(['success' => $success], $this->successStatus);
