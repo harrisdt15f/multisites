@@ -27,15 +27,21 @@ Route::group(['middleware' => ['api', 'auth:api'], 'namespace' => 'API'], functi
 
     //菜单相关
     Route::group(['prefix' => 'menu'], function () {
-        Route::match(['get', 'options'], 'menu/get-all-menu', ['as' => 'menu.allPartnerMenu', 'uses' => 'MenuController@getAllMenu']);
+        $namePrefix='menu.';
+        $controller = 'MenuController@';
+        Route::match(['get', 'options'], 'get-all-menu', ['as' => $namePrefix.'allPartnerMenu', 'uses' => $controller.'getAllMenu']);
     });
 
     //用户组相关
     Route::group(['prefix' => 'partner-admin-group'], function () {
+        $namePrefix='partnerAdminGroup.';
+        $controller = 'PartnerAdminGroupController@';
         //添加管理员角色
-        Route::match(['post', 'options'], 'create', ['as' => 'partnerAdminGroup.create', 'uses' => 'PartnerAdminGroupController@create']);
+        Route::match(['post', 'options'], 'create', ['as' => $namePrefix.'create', 'uses' => $controller.'create']);
         //获取管理员角色
-        Route::match(['get', 'options'], 'detail', ['as' => 'partnerAdminGroup.detail', 'uses' => 'PartnerAdminGroupController@index']);
+        Route::match(['get', 'options'], 'detail', ['as' => $namePrefix.'detail', 'uses' => $controller.'index']);
+        //编辑管理员角色
+        Route::match(['get', 'options'], 'edit', ['as' => $namePrefix.'edit', 'uses' => $controller.'edit']);
     });
 
 });

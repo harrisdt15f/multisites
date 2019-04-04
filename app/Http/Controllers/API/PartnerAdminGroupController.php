@@ -84,11 +84,11 @@ class PartnerAdminGroupController extends ApiMainController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param int $id
      * @return Response
      */
-    public function edit($id)
+    public function edit()
     {
+        $data = $this->eloqM::find()->toArray();
 
     }
 
