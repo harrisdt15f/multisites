@@ -33,9 +33,7 @@ class AuthController extends ApiMainController
         ]);
         $credentials = request(['email', 'password']);
         if (!Auth::attempt($credentials)) {
-            return response()->json([
-                'message' => 'Unauthorized'
-            ], 401);
+            return $this->msgout(false, [], 'Unauthorized', 401);
         }
         $user = $request->user();
         OauthAccessTokens::clearOldToken($user->id);
@@ -47,13 +45,14 @@ class AuthController extends ApiMainController
             $token->expires_at = Carbon::now()->addMinute(30);
         }
         $token->save();
-        return response()->json([
+        $data = [
             'access_token' => $tokenResult->accessToken,
             'token_type' => 'Bearer',
             'expires_at' => Carbon::parse(
                 $tokenResult->token->expires_at
             )->toDateTimeString()
-        ]);
+        ];
+        return $this->msgout(true, $data);
     }
 
     /**
@@ -70,17 +69,17 @@ class AuthController extends ApiMainController
             'c_password' => 'required|same:password',
             'is_test' => 'required|numeric',
             'platform_id' => 'required|numeric',
+            'group_id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 401);
+            return $this->msgout(false, [], $validator->errors(), 401);
         }
         $input = $request->all();
-//        dd($input);
         $input['password'] = bcrypt($input['password']);
         $user = PartnerAdminUsers::create($input);
         $success['token'] = $user->createToken('MyApp')->accessToken;
         $success['name'] = $user->name;
-        return response()->json(['success' => $success], $this->successStatus);
+        return $this->msgout(true, $success);
     }
 
     /**
@@ -91,7 +90,7 @@ class AuthController extends ApiMainController
     public function details()
     {
         $user = Auth::user();
-        return response()->json(['success' => $user], $this->successStatus);
+        return $this->msgout(true, $user);
     }
 
     /**

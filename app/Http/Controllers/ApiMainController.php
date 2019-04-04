@@ -97,6 +97,13 @@ class ApiMainController extends Controller
         Log::channel('apibyqueue')->info($log);
     }
 
+    /**
+     * @param bool $success
+     * @param array $data
+     * @param string $message
+     * @param string $code
+     * @return \Illuminate\Http\JsonResponse
+     */
     protected function msgout($success = false, $data = [], $message = '', $code = '')
     {
         if ($success === true) {
