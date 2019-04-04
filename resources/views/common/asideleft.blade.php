@@ -36,7 +36,7 @@ inner;
                     $tempInnerItems = $tempInnerItems === '' ? $innerItems : $tempInnerItems . $innerItems;
                     $tempInnerItems = str_replace('~plabel~', $value['label'], $tempInnerItems);
                     $tempInnerItems = str_replace('~ilabel~', $_value['label'], $tempInnerItems);
-                    $tempInnerItems = $_value['route'] === '#' ? str_replace('~iroute~', '#', $tempInnerItems) : str_replace('~iroute~', route($_value['route']), $tempInnerItems);
+                    $tempInnerItems = $_value['route'] === '#' ? str_replace('~iroute~', '#', $tempInnerItems) : str_replace('~iroute~', $_value['route'], $tempInnerItems);
                 }
             }
             $tempMenuItems = str_replace('~inner~', $tempInnerItems, $tempParentItems);
