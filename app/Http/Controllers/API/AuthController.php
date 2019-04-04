@@ -18,6 +18,7 @@ class AuthController extends ApiMainController
 {
     public $successStatus = 200;
 
+    protected $eloqM = 'PartnerAdminUsers';
 
     /**
      * Login user and create token
@@ -100,7 +101,25 @@ class AuthController extends ApiMainController
         } catch (\Exception $e) {
             return $this->msgout(false, [], $e->getMessage(), $e->getCode());
         }
+    }
 
+    public function updateUserGroup()
+    {
+        $validator = Validator::make($this->inputs, [
+            'id' => 'required|numeric',
+            'group_id' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgout(false, [], $validator->errors(), 401);
+        }
+        $targetUserEloq = $this->eloqM::find($this->inputs['id']);
+        if (!is_null($targetUserEloq)) {
+            $targetUserEloq->group_id = $this->inputs['group_id'];
+            if ($targetUserEloq->save()) {
+                $result = $targetUserEloq->toArray();
+                return $this->msgout(true, $result);
+            }
+        }
     }
 
 

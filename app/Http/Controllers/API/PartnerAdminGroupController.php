@@ -43,7 +43,7 @@ class PartnerAdminGroupController extends ApiMainController
             $objPartnerAdminGroup->save();
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo;
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
             return $this->msgout(false, [], $msg, $sqlState);
         }
         $partnerAccessGroupEloq = PartnerMenus::whereIn('id', $role)->get();
