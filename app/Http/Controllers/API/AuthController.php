@@ -159,4 +159,31 @@ class AuthController extends ApiMainController
     {
         return response()->json($request->user());
     }
+
+    public function deletePartnerAdmin()
+    {
+        $validator = Validator::make($this->inputs, [
+            'id' => 'required|numeric',
+            'name' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgout(false, [], $validator->errors(), 401);
+        }
+
+        $targetUserEloq = $this->eloqM::where([
+            ['id', '=', $this->inputs['id']],
+            ['name', '=', $this->inputs['name']],
+        ])->first();
+        if (!is_null($targetUserEloq)) {
+            if ($targetUserEloq->delete()) {
+                return $this->msgout(true, []);
+            }
+        } else {
+            return $this->msgout(false, [], '没有此用户', '0002');
+        }
+
+
+    }
+
+
 }

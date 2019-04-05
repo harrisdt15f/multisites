@@ -31,6 +31,7 @@ Route::group(['middleware' => ['api', 'auth:api'], 'namespace' => 'API'], functi
         $controller = 'AuthController@';
         Route::match(['get', 'options'], 'get-all-users', ['as' => $namePrefix.'get-all-users', 'uses' => $controller.'allUser']);
         Route::match(['post', 'options'], 'update-user-group', ['as' => $namePrefix.'update-user-group', 'uses' => $controller.'updateUserGroup']);
+        Route::match(['post', 'options'], 'delete-user', ['as' => 'partnerAdmin.delete-user', 'uses' => 'AuthController@deletePartnerAdmin']);
     });
 
 
