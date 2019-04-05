@@ -175,7 +175,12 @@ class AuthController extends ApiMainController
             ['name', '=', $this->inputs['name']],
         ])->first();
         if (!is_null($targetUserEloq)) {
-            if ($targetUserEloq->delete()) {
+            $token = $targetUserEloq->token();
+            if ($token) {
+                $token->revoke();//取消目前登录中的状态
+            }
+            OauthAccessTokens::clearOldToken($targetUserEloq->id);//删除相关登录的token
+            if ($targetUserEloq->delete()) {//删除用户
                 return $this->msgout(true, []);
             }
         } else {
