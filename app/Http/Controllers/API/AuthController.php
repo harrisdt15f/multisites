@@ -12,6 +12,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends ApiMainController
@@ -188,6 +189,46 @@ class AuthController extends ApiMainController
         }
 
 
+    }
+
+
+    public function updatePAdmPassword()
+    {
+        $validator = Validator::make($this->inputs, [
+            'id' => 'required|numeric',
+            'password' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgout(false, [], $validator->errors(), 401);
+        }
+        $targetUserEloq = $this->eloqM::where([
+            ['id', '=', $this->inputs['id']],
+            ['name', '=', $this->inputs['name']],
+        ])->first();
+        if (!is_null($targetUserEloq)) {
+            $targetUserEloq->password = Hash::make($this->inputs['password']);
+            if ($targetUserEloq->save()) {//用户更新密码
+                return $this->msgout(true, []);
+            }
+        } else {
+            return $this->msgout(false, [], '没有此用户', '0002');
+        }
+        /*$this->validate($request, [
+            'current' => 'required',
+            'password' => 'required|confirmed',
+            'password_confirmation' => 'required'
+        ]);
+
+        $user = User::find(Auth::id());
+
+        if (!Hash::check($request->current, $user->password)) {
+            return response()->json(['errors' => ['current'=> ['Current password does not match']]], 422);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return $user;*/
     }
 
 
