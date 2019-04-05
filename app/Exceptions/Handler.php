@@ -59,7 +59,7 @@ class Handler extends ExceptionHandler
     }
 
 
-    protected function unauthenticated($request, AuthenticationException $exception)
+    /*protected function unauthenticated($request, AuthenticationException $exception)
     {
         if ($request->expectsJson()) {
             $msg = $exception->getMessage();
@@ -76,5 +76,5 @@ class Handler extends ExceptionHandler
         } else {
             return redirect()->guest($exception->redirectTo() ?? route('login'));
         }
-    }
+    }*/
 }
