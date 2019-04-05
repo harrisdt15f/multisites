@@ -68,9 +68,9 @@ class AuthController extends ApiMainController
             'name' => 'required',
             'email' => 'required|email',
             'password' => 'required',
-            'c_password' => 'required|same:password',
+//            'c_password' => 'required|same:password',
             'is_test' => 'required|numeric',
-            'platform_id' => 'required|numeric',
+//            'platform_id' => 'required|numeric',
             'group_id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
@@ -78,6 +78,7 @@ class AuthController extends ApiMainController
         }
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
+        $input['platform_id'] = $this->currentPlatformEloq->platform_id;
         $user = PartnerAdminUsers::create($input);
         $success['token'] = $user->createToken('MyApp')->accessToken;
         $success['name'] = $user->name;

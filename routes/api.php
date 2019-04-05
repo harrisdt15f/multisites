@@ -16,7 +16,6 @@ use Illuminate\Http\Request;
 //Auth::routes();
 Route::group(['middleware' => 'api', 'namespace' => 'API'], function () {
     Route::match(['post', 'options'], 'login', ['as' => 'login', 'uses' => 'AuthController@login']);
-    Route::post('register', 'AuthController@register');
 });
 Route::group(['middleware' => ['api', 'auth:api'], 'namespace' => 'API'], function () {
 
@@ -24,6 +23,7 @@ Route::group(['middleware' => ['api', 'auth:api'], 'namespace' => 'API'], functi
     Route::post('details', ['as' => 'detail', 'uses' => 'AuthController@details']);
     Route::get('user', ['as' => 'user', 'uses' => 'AuthController@user']);
     Route::match(['get', 'options'], 'logout', ['as' => 'logout', 'uses' => 'AuthController@logout']);
+    Route::match(['post', 'options'], 'partner-admin/register', ['as' => 'partnerAdmin.register', 'uses' => 'AuthController@register']);
 
     //管理员相关
     Route::group(['prefix' => 'partner-admin-user'], function () {
