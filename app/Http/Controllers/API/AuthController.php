@@ -110,16 +110,14 @@ class AuthController extends ApiMainController
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email',
+            'name' => 'required|unique:partner_admin_users',
+            'email' => 'required|email|unique:partner_admin_users',
             'password' => 'required',
-//            'c_password' => 'required|same:password',
             'is_test' => 'required|numeric',
-//            'platform_id' => 'required|numeric',
             'group_id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 401);
+            return $this->msgout(false, [], $validator->errors()->first(), 200);
         }
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);

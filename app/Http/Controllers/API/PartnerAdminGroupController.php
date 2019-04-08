@@ -33,16 +33,6 @@ class PartnerAdminGroupController extends ApiMainController
      */
     public function create()
     {
-        /*$column = $this->accessOnlyColumn();
-        $data = Input::only($column);
-        $validator = Validator::make($this->inputs, [
-            'group_name' => 'required',
-            'role' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 401);
-        }*/
-
         $validator = Validator::make($this->inputs, [
             'group_name' => 'required|unique:partner_access_group',
             'role' => 'required',
