@@ -53,6 +53,8 @@ Route::group(['middleware' => ['api', 'auth:api'], 'namespace' => 'API'], functi
         Route::match(['get', 'options'], 'detail', ['as' => $namePrefix.'detail', 'uses' => $controller.'index']);
         //编辑管理员角色
         Route::match(['post', 'options'], 'edit', ['as' => $namePrefix.'edit', 'uses' => $controller.'edit']);
+        //删除管理员角色
+        Route::match(['post', 'options'], 'delete-access-group', ['as' => $namePrefix.'delete-access-group', 'uses' => $controller.'destroy']);
     });
 
 });

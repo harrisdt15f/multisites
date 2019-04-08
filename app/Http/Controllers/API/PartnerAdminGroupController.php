@@ -124,14 +124,35 @@ class PartnerAdminGroupController extends ApiMainController
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param int $id
-     * @return Response
+     * 删除组管理员角色
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($id)
+    public function destroy()
     {
-
+        $validator = Validator::make($this->inputs,[
+            'id' => 'required|numeric',
+            'group_name' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgout(false, [], $validator->errors(), 401);
+        }
+        $id = $this->inputs['id'];
+        $datas = $this->eloqM::where([
+            ['id', '=', $id],
+            ['group_name', '=', $this->inputs['group_name']],
+        ])->first();
+        if (!is_null($datas)) {
+            try {
+                $datas->delete();
+                return $this->msgout(true, []);
+            } catch (\Exception $e) {
+                $errorObj = $e->getPrevious()->getPrevious();
+                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
+                return $this->msgout(false, [], $msg, $sqlState);
+            }
+        } else {
+            return $this->msgout(false, [], '没有此组可删除', '0001');
+        }
     }
 
 }
