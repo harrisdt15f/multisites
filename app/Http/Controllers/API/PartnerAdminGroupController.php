@@ -48,7 +48,7 @@ class PartnerAdminGroupController extends ApiMainController
             'role' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 200);
+            return $this->msgout(false, [], $validator->errors()->first(), 200);
         }
 //        unique:books,label
         $data['platform_id'] = $this->currentPlatformEloq->platform_id;
