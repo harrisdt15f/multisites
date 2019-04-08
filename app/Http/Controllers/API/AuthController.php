@@ -39,15 +39,7 @@ class AuthController extends ApiMainController
             return $this->msgout(false, [], '参数信息错误', 200);
         }
         $user = $request->user();
-        OauthAccessTokens::clearOldToken($user->id);
-        $tokenResult = $user->createToken('Personal Access Token');
-        $token = $tokenResult->token;
-        if ($request->remember_me) {
-            $token->expires_at = Carbon::now()->addWeeks(1);
-        } else {
-            $token->expires_at = Carbon::now()->addMinute(30);
-        }
-        $token->save();
+        $tokenResult = $this->refreshActivatePartnerToken($user);
         $data = [
             'access_token' => $tokenResult->accessToken,
             'token_type' => 'Bearer',
@@ -56,6 +48,58 @@ class AuthController extends ApiMainController
             )->toDateTimeString()
         ];
         return $this->msgout(true, $data);
+    }
+
+
+    private function refreshActivatePartnerToken($user)
+    {
+        OauthAccessTokens::clearOldToken($user->id);
+        $tokenResult = $user->createToken('Personal Access Token');
+        $token = $tokenResult->token;
+        if (isset($this->inputs['remember_me'])) {
+            $token->expires_at = Carbon::now()->addWeeks(1);
+        } else {
+            $token->expires_at = Carbon::now()->addMinute(30);
+        }
+        $token->save();
+        return $tokenResult;
+    }
+
+    /**
+     * change partner user Password
+     * @return JsonResponse
+     */
+    public function selfResetPassword()
+    {
+        $validator = Validator::make($this->inputs, [
+            'old_password' => 'required|string',
+            'password' => 'required|string',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgout(false, [], $validator->errors(), 401);
+        }
+        if (!Hash::check($this->inputs['old_password'], $this->partnerAdmin->password)) {
+            return $this->msgout(false, [], '旧密码不匹配', 200);
+        } else {
+            $this->partnerAdmin->password = Hash::make($this->inputs['password']);
+            try {
+                $this->partnerAdmin->save();
+                $tokenResult = $this->refreshActivatePartnerToken($this->partnerAdmin);
+                $data = [
+                    'access_token' => $tokenResult->accessToken,
+                    'token_type' => 'Bearer',
+                    'expires_at' => Carbon::parse(
+                        $tokenResult->token->expires_at
+                    )->toDateTimeString()
+                ];
+                return $this->msgout(true, $data, '密码更改成功');
+            } catch (\Exception $e) {
+                $errorObj = $e->getPrevious()->getPrevious();
+                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
+                return $this->msgout(false, [], $msg, $sqlState);
+            }
+        }
+
     }
 
     /**
