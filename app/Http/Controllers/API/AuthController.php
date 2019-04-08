@@ -36,7 +36,7 @@ class AuthController extends ApiMainController
         ]);
         $credentials = request(['email', 'password']);
         if (!Auth::attempt($credentials)) {
-            return $this->msgout(false, [], 'Unauthorized', 401);
+            return $this->msgout(false, [], '参数信息错误', 200);
         }
         $user = $request->user();
         OauthAccessTokens::clearOldToken($user->id);
