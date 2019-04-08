@@ -155,4 +155,21 @@ class PartnerAdminGroupController extends ApiMainController
         }
     }
 
+    public function specificGroupUsers()
+    {
+        $validator = Validator::make($this->inputs,[
+            'id' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgout(false, [], $validator->errors(), 401);
+        }
+        $accessGroupEloq = $this->eloqM::find($this->inputs['id']);
+        if (!is_null($accessGroupEloq)) {
+            $data = $accessGroupEloq->adminUsers->toArray();
+            return $this->msgout(true, $data);
+        } else {
+            return $this->msgout(false, [], '没有此组', '0001');
+        }
+    }
+
 }
