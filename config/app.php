@@ -179,8 +179,10 @@ return [
 
         Laravel\Passport\PassportServiceProvider::class,
         Jenssegers\Agent\AgentServiceProvider::class,
-
+        //Cors
         Barryvdh\Cors\ServiceProvider::class,
+        //Iseeds
+        Orangehill\Iseed\IseedServiceProvider::class,
     ],
 
     /*
