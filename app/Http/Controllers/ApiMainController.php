@@ -28,7 +28,7 @@ class ApiMainController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            $this->partnerAdmin = Auth::guard('api')->user();
+            $this->partnerAdmin = Auth::guard('admin')->user();
             //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
             try {
                 $this->currentPlatformEloq = $this->partnerAdmin->platform;//获取目前账号用户属于平台的对象

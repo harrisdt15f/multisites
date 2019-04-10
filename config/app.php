@@ -182,6 +182,8 @@ return [
         Barryvdh\Cors\ServiceProvider::class,
         //Iseeds
         Orangehill\Iseed\IseedServiceProvider::class,
+        //multiauth
+        SMartins\PassportMultiauth\Providers\MultiauthServiceProvider::class,
     ],
 
     /*

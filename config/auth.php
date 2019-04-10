@@ -44,7 +44,11 @@ return [
         'api' => [
             'driver' => 'passport',
             'provider' => 'users',
-//            'hash' => true,
+        ],
+        // ** New guard **
+        'admin' => [
+            'driver' => 'passport',
+            'provider' => 'admins',
         ],
     ],
 
@@ -67,6 +71,12 @@ return [
 
     'providers' => [
         'users' => [
+            'driver' => 'eloquent',
+            'model' => \App\models\PartnerAdminUsers::class,
+        ],
+
+        // ** New provider**
+        'admins' => [
             'driver' => 'eloquent',
             'model' => \App\models\PartnerAdminUsers::class,
         ],

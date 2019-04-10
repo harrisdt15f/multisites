@@ -5,11 +5,11 @@ namespace App\models;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Laravel\Passport\HasApiTokens;
+use SMartins\PassportMultiauth\HasMultiAuthApiTokens;
 
 class PartnerAdminUsers extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+    use Notifiable, HasMultiAuthApiTokens;
     protected $table = 'partner_admin_users';
 
     /**
