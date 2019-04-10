@@ -57,8 +57,8 @@ class CreateProjectsTable extends Migration {
 			$table->integer('time_trace')->default(0);
 			$table->integer('time_cancel')->default(0);
 			$table->integer('time_stat')->default(0);
-			$table->index(['sign','issue']);
 			$table->index(['sign','lottery_id','time_bought']);
+			$table->index(['sign','issue']);
 			$table->index(['sign','user_id','lottery_id','time_bought']);
 		});
 	}

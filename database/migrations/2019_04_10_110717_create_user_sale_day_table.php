@@ -33,9 +33,9 @@ class CreateUserSaleDayTable extends Migration {
 			$table->integer('day');
 			$table->timestamps();
 			$table->index(['top_id','parent_id','day']);
+			$table->index(['top_id','rid','day']);
 			$table->index(['top_id','day']);
 			$table->index(['top_id','user_id','day']);
-			$table->index(['top_id','rid','day']);
 		});
 	}
 

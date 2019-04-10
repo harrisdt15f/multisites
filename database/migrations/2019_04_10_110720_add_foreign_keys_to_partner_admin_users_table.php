@@ -14,6 +14,7 @@ class AddForeignKeysToPartnerAdminUsersTable extends Migration {
 	{
 		Schema::table('partner_admin_users', function(Blueprint $table)
 		{
+			$table->foreign('group_id', 'partner_admin_users_group_id_fk')->references('id')->on('partner_access_group')->onUpdate('CASCADE')->onDelete('NO ACTION');
 			$table->foreign('platform_id', 'partner_admin_users_status_foreign')->references('platform_id')->on('platforms')->onUpdate('CASCADE')->onDelete('CASCADE');
 			$table->foreign('super_id')->references('id')->on('partner_admin_users')->onUpdate('NO ACTION')->onDelete('CASCADE');
 		});
@@ -29,6 +30,7 @@ class AddForeignKeysToPartnerAdminUsersTable extends Migration {
 	{
 		Schema::table('partner_admin_users', function(Blueprint $table)
 		{
+			$table->dropForeign('partner_admin_users_group_id_fk');
 			$table->dropForeign('partner_admin_users_status_foreign');
 			$table->dropForeign('partner_admin_users_super_id_foreign');
 		});

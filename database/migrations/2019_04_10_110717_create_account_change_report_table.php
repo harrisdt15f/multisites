@@ -42,13 +42,13 @@ class CreateAccountChangeReportTable extends Migration {
 			$table->integer('process_time')->default(0);
 			$table->string('desc', 256);
 			$table->timestamps();
-			$table->index(['sign','issue','project_id']);
 			$table->index(['sign','type_sign','process_time']);
-			$table->index(['sign','process_time']);
-			$table->index(['user_id','type_sign','process_time']);
+			$table->index(['sign','project_id','day']);
 			$table->index(['sign','lottery_id','method_id']);
 			$table->index(['sign','user_id','process_time']);
-			$table->index(['sign','project_id','day']);
+			$table->index(['sign','process_time']);
+			$table->index(['user_id','type_sign','process_time']);
+			$table->index(['sign','issue','project_id']);
 		});
 	}
 

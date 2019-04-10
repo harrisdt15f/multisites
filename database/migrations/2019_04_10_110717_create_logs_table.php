@@ -21,7 +21,7 @@ class CreateLogsTable extends Migration {
 			$table->enum('result', array('success','neutral','failure'));
 			$table->enum('level', array('emergency','alert','critical','error','warning','notice','info','debug'));
 			$table->string('token', 100)->nullable();
-            $table->ipAddress('ip');
+			$table->string('ip', 45);
 			$table->string('ips', 200)->nullable();
 			$table->integer('user_id')->nullable();
 			$table->string('session', 100)->nullable();
