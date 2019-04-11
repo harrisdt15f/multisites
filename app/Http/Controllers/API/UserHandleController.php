@@ -10,7 +10,17 @@ use Illuminate\Support\Facades\Validator;
 
 class UserHandleController extends ApiMainController
 {
-    //
+    /**
+     * 创建总代时获取当前平台的奖金组
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getUserPrizeGroup()
+    {
+        $data['min'] = $this->currentPlatformEloq->prize_group_min;
+        $data['max'] = $this->currentPlatformEloq->prize_group_max;
+        return $this->msgout(true, $data);
+    }
+
     /**
      * Register api
      *
@@ -42,7 +52,9 @@ class UserHandleController extends ApiMainController
         $user->rid = $user->id;
         $user->save();
 //        $success['token'] = $user->createToken('前端')->accessToken;
-        $success['name'] = $user->username;
-        return $this->msgout(true, $success);
+        $data['name'] = $user->username;
+        return $this->msgout(true, $data);
     }
+
+
 }
