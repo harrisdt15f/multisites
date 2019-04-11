@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 Route::group(['middleware' => 'api', 'namespace' => 'API'], function () {
     Route::match(['post', 'options'], 'login', ['as' => 'login', 'uses' => 'AuthController@login']);
 });
-Route::group(['middleware' => ['api', 'auth:api'], 'namespace' => 'API'], function () {
+Route::group(['middleware' => ['api', 'auth:admin'], 'namespace' => 'API'], function () {
 
     //商户用户相关
     Route::post('details', ['as' => 'detail', 'uses' => 'AuthController@details']);
