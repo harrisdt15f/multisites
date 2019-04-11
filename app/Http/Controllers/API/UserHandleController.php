@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 
 class UserHandleController extends ApiMainController
 {
+    protected $eloqM = 'UserHandleModel';
     /**
      * 创建总代时获取当前平台的奖金组
      * @return \Illuminate\Http\JsonResponse
@@ -48,7 +49,7 @@ class UserHandleController extends ApiMainController
         $this->inputs['sign'] = $this->currentPlatformEloq->platform_sign;
         $this->inputs['vip_level'] = 0;
         $this->inputs['register_ip'] = request()->ip();
-        $user = UserHandleModel::create($this->inputs);
+        $user = $this->eloqM::create($this->inputs);
         $user->rid = $user->id;
         $user->save();
 //        $success['token'] = $user->createToken('前端')->accessToken;
@@ -59,7 +60,7 @@ class UserHandleController extends ApiMainController
     public function usersInfo()
     {
         $pageSize = $this->inputs['page_size'] ?? 20;
-        return UserHandleModel::select('id', 'username', 'nickname', 'top_id', 'parent_id', 'rid', 'sign', 'platform_id', 'type', 'vip_level', 'is_tester', 'frozen_type', 'prize_group', 'level_deep', 'register_ip', 'last_login_ip', 'register_time', 'last_login_time', 'status', 'created_at')->paginate($pageSize);
+        return $this->eloqM::select('id', 'username', 'nickname', 'top_id', 'parent_id', 'rid', 'sign', 'platform_id', 'type', 'vip_level', 'is_tester', 'frozen_type', 'prize_group', 'level_deep', 'register_ip', 'last_login_ip', 'register_time', 'last_login_time', 'status', 'created_at')->paginate($pageSize);
     }
 
 

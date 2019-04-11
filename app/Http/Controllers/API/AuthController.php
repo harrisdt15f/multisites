@@ -255,22 +255,6 @@ class AuthController extends ApiMainController
         } else {
             return $this->msgout(false, [], '没有此用户', '0002');
         }
-        /*$this->validate($request, [
-            'current' => 'required',
-            'password' => 'required|confirmed',
-            'password_confirmation' => 'required'
-        ]);
-
-        $user = User::find(Auth::id());
-
-        if (!Hash::check($request->current, $user->password)) {
-            return response()->json(['errors' => ['current'=> ['Current password does not match']]], 422);
-        }
-
-        $user->password = Hash::make($request->password);
-        $user->save();
-
-        return $user;*/
     }
 
 

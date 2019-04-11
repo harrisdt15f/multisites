@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\ApiMainController;
-use App\models\PartnerAdminGroupAccess;
 use App\models\PartnerMenus;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 
 class PartnerAdminGroupController extends ApiMainController
@@ -65,27 +63,6 @@ class PartnerAdminGroupController extends ApiMainController
         $column = $partnerAdminAccess->getTableColumns();
         $column = array_values(array_diff($column, $this->postUnaccess));
         return $column;
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
-    public function store(Request $request)
-    {
-
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param int $id
-     * @return Response
-     */
-    public function show($id)
-    {
-
     }
 
     /**
