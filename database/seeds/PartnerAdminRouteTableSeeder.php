@@ -147,6 +147,26 @@ class PartnerAdminRouteTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => NULL,
             ),
+            13 => 
+            array (
+                'id' => 14,
+                'route_name' => 'userhandle.create-user',
+                'menu_group_id' => 71,
+                'title' => '创建总代接口',
+                'description' => NULL,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+            ),
+            14 => 
+            array (
+                'id' => 15,
+                'route_name' => 'userhandle.prizegroup',
+                'menu_group_id' => 71,
+                'title' => '创建总代时获取平台的最低与最高的奖金组',
+                'description' => NULL,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+            ),
         ));
         
         
