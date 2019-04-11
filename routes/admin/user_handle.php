@@ -14,4 +14,6 @@ Route::group(['prefix' => 'user-handle'], function () {
     Route::match(['post', 'options'], 'create-user', ['as' => $namePrefix . 'create-user', 'uses' => $controller . 'createUser']);
     //创建总代时获取当前平台的奖金组
     Route::match(['get', 'options'], 'prizegroup', ['as' => $namePrefix . 'prizegroup', 'uses' => $controller . 'getUserPrizeGroup']);
+    //用户信息表
+    Route::match(['get', 'options'], 'users-info', ['as' => $namePrefix . 'users-info', 'uses' => $controller . 'usersInfo']);
 });

@@ -56,5 +56,11 @@ class UserHandleController extends ApiMainController
         return $this->msgout(true, $data);
     }
 
+    public function usersInfo()
+    {
+        $pageSize = $this->inputs['page_size'] ?? 20;
+        return UserHandleModel::select('id', 'username', 'nickname', 'top_id', 'parent_id', 'rid', 'sign', 'platform_id', 'type', 'vip_level', 'is_tester', 'frozen_type', 'prize_group', 'level_deep', 'register_ip', 'last_login_ip', 'register_time', 'last_login_time', 'status', 'created_at')->paginate($pageSize);
+    }
+
 
 }
