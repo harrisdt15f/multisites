@@ -96,17 +96,6 @@ class PartnerAdminGroupController extends ApiMainController
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param int $id
-     * @return Response
-     */
-    public function update($id)
-    {
-
-    }
-
-    /**
      * 删除组管理员角色
      * @return \Illuminate\Http\JsonResponse
      */

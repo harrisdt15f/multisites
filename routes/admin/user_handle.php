@@ -16,4 +16,6 @@ Route::group(['prefix' => 'user-handle'], function () {
     Route::match(['get', 'options'], 'prizegroup', ['as' => $namePrefix . 'prizegroup', 'uses' => $controller . 'getUserPrizeGroup']);
     //用户信息表
     Route::match(['get', 'options'], 'users-info', ['as' => $namePrefix . 'users-info', 'uses' => $controller . 'usersInfo']);
+    Route::match(['post', 'options'], 'reset-password', ['as' => $namePrefix . 'reset-password', 'uses' => $controller . 'applyResetUserPassword']);
+    Route::match(['post', 'options'], 'reset-fund-password', ['as' => $namePrefix . 'reset-fund-password', 'uses' => $controller . 'resetUserFundPassword']);
 });

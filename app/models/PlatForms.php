@@ -4,7 +4,7 @@ namespace App\models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PlatForms extends Model 
+class PlatForms extends BaseModel
 {
 
     protected $table = 'platforms';

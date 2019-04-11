@@ -3,14 +3,18 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\ApiMainController;
-use App\models\UserHandleModel;
+use App\models\AuditFlow;
+use App\models\PassworAuditLists;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class UserHandleController extends ApiMainController
 {
     protected $eloqM = 'UserHandleModel';
+
     /**
      * 创建总代时获取当前平台的奖金组
      * @return \Illuminate\Http\JsonResponse
@@ -23,9 +27,7 @@ class UserHandleController extends ApiMainController
     }
 
     /**
-     * Register api
-     *
-     * @return Response
+     *创建总代与用户后台管理员操作创建
      */
     public function createUser()
     {
@@ -57,10 +59,70 @@ class UserHandleController extends ApiMainController
         return $this->msgout(true, $data);
     }
 
+    //用户管理的所有用户信息表
     public function usersInfo()
     {
         $pageSize = $this->inputs['page_size'] ?? 20;
-        return $this->eloqM::select('id', 'username', 'nickname', 'top_id', 'parent_id', 'rid', 'sign', 'platform_id', 'type', 'vip_level', 'is_tester', 'frozen_type', 'prize_group', 'level_deep', 'register_ip', 'last_login_ip', 'register_time', 'last_login_time', 'status', 'created_at')->paginate($pageSize);
+        $data = $this->eloqM::select('id', 'username', 'nickname', 'top_id', 'parent_id', 'rid', 'sign', 'platform_id', 'type', 'vip_level', 'is_tester', 'frozen_type', 'prize_group', 'level_deep', 'register_ip', 'last_login_ip', 'register_time', 'last_login_time', 'status', 'created_at')->paginate($pageSize);
+        return $this->msgout(true, $data);
+    }
+
+    /**
+     * 18.申请用户密码功能
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function applyResetUserPassword()
+    {
+        $validator = Validator::make($this->inputs, [
+            'id' => 'required|numeric',
+            'password' => 'required',
+            'apply_note' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgout(false, [], $validator->errors(), 401);
+        }
+        $applyUserEloq = $this->eloqM::find($this->inputs['id']);
+        if (!is_null($applyUserEloq)) {
+            $auditFlowEloq = new AuditFlow();
+            $adminApplyEloq = new PassworAuditLists();
+            //###################
+            $adminApplyCheckEloq = $adminApplyEloq::where([
+                ['user_id', '=', $applyUserEloq->id],
+                ['status', '=', 0],
+            ])->first();
+            if (!is_null($adminApplyCheckEloq))
+            {
+                return $this->msgout(false, [], '更改密码已有申请', '0002');
+            }
+            //###################
+            $flowData = [
+                'admin_id' => $this->partnerAdmin->id,
+                'apply_note' => $this->inputs['apply_note'] ?? '',
+            ];
+            DB::beginTransaction();
+            try {
+                $auditResult = $auditFlowEloq->fill($flowData);
+                $auditData = [
+                    'type' => 1,
+                    'user_id' => $applyUserEloq->id,
+                    'audit_data' => Hash::make($this->inputs['password']),
+                    'audit_flow_id' => $auditResult->admin_id,
+                    'status' => 0,
+                ];
+                $adminApplyResult = $adminApplyEloq->fill($auditData);
+                $auditResult->save();
+                $adminApplyResult->save();
+                DB::commit();
+                return $this->msgout(true, []);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                $errorObj = $e->getPrevious()->getPrevious();
+                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
+                return $this->msgout(false, [], $msg, $sqlState);
+            }
+        } else {
+            return $this->msgout(false, [], '没有此用户', '0002');
+        }
     }
 
 
