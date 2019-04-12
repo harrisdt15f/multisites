@@ -64,9 +64,9 @@ class UserHandleController extends ApiMainController
                 'status' => 1
             ];
             $userAccountEloq = $userAccountEloq->fill($userAccountData);
+            $userAccountEloq->save();
             $user->account_id = $userAccountEloq->id;
             $user->save();
-            $userAccountEloq->save();
             DB::commit();
             $data['name'] = $user->username;
             return $this->msgout(true, $data);

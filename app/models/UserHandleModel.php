@@ -22,7 +22,7 @@ class UserHandleModel extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'top_id', 'parent_id', 'rid', 'sign', 'platform_id', 'type', 'vip_level', 'is_tester', 'frozen_type', 'username', 'nickname', 'password', 'fund_password', 'prize_group', 'remember_token', 'level_deep', 'register_ip', 'last_login_ip', 'register_time', 'last_login_time', 'extend_info', 'status'
+        'top_id', 'parent_id', 'rid', 'sign', 'platform_id','account_id', 'type', 'vip_level', 'is_tester', 'frozen_type', 'username', 'nickname', 'password', 'fund_password', 'prize_group', 'remember_token', 'level_deep', 'register_ip', 'last_login_ip', 'register_time', 'last_login_time', 'extend_info', 'status'
     ];
 
     /**
