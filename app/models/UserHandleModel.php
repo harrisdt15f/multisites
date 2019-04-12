@@ -54,4 +54,9 @@ class UserHandleModel extends Authenticatable
     {
         return $this->hasOne(HandleUserAccounts::class,'id','account_id');
     }
+
+    public function getAccountAttribute()
+    {
+        return $this->account->first(); // not addresses()->first(); as it would run the query everytime
+    }
 }

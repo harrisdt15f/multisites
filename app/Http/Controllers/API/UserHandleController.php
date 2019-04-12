@@ -84,7 +84,7 @@ class UserHandleController extends ApiMainController
     public function usersInfo()
     {
         $pageSize = $this->inputs['page_size'] ?? 20;
-        $data = $this->eloqM::select('id', 'username', 'nickname', 'top_id', 'parent_id', 'rid', 'sign', 'platform_id', 'type', 'vip_level', 'is_tester', 'frozen_type', 'prize_group', 'level_deep', 'register_ip', 'last_login_ip', 'register_time', 'last_login_time', 'status', 'created_at')->paginate($pageSize);
+        $data = $this->eloqM::with('account:id,balance,frozen')->paginate($pageSize);
         return $this->msgout(true, $data);
     }
 
