@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\ApiMainController;
 use App\models\AuditFlow;
+use App\models\HandleUserAccounts;
 use App\models\PassworAuditLists;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -51,12 +52,32 @@ class UserHandleController extends ApiMainController
         $this->inputs['sign'] = $this->currentPlatformEloq->platform_sign;
         $this->inputs['vip_level'] = 0;
         $this->inputs['register_ip'] = request()->ip();
-        $user = $this->eloqM::create($this->inputs);
-        $user->rid = $user->id;
-        $user->save();
+        DB::beginTransaction();
+        try {
+            $user = $this->eloqM::create($this->inputs);
+            $user->rid = $user->id;
+            $userAccountEloq = new HandleUserAccounts();
+            $userAccountData = [
+                'user_id' => $user->id,
+                'balance' => 0,
+                'frozen' => 0,
+                'status' => 1
+            ];
+            $userAccountEloq = $userAccountEloq->fill($userAccountData);
+            $user->account_id = $userAccountEloq->id;
+            $user->save();
+            $userAccountEloq->save();
+            DB::commit();
+            $data['name'] = $user->username;
+            return $this->msgout(true, $data);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
+            return $this->msgout(false, [], $msg, $sqlState);
+        }
 //        $success['token'] = $user->createToken('前端')->accessToken;
-        $data['name'] = $user->username;
-        return $this->msgout(true, $data);
+
     }
 
     //用户管理的所有用户信息表

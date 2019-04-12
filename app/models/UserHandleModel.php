@@ -49,4 +49,9 @@ class UserHandleModel extends Authenticatable
     {
         return $this->hasOne(PlatForms::class,'platform_id', 'platform_id');
     }
+
+    public function account()
+    {
+        return $this->hasOne(HandleUserAccounts::class,'id','account_id');
+    }
 }
