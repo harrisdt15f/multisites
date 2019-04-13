@@ -7,7 +7,7 @@ class AuditFlow extends BaseModel
     protected $table = 'audit_flow';
 
     protected $fillable = [
-        'admin_id', 'auditor_id', 'apply_note', 'auditor_note','admin_name','auditor_name','user_name',
+        'admin_id', 'auditor_id', 'apply_note', 'auditor_note','admin_name','auditor_name','username',
     ];
 
     public function admin()

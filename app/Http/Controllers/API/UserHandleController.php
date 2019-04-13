@@ -119,7 +119,7 @@ class UserHandleController extends ApiMainController
             $flowData = [
                 'admin_id' => $this->partnerAdmin->id,
                 'admin_name' => $this->partnerAdmin->name,
-                'user_name' =>$applyUserEloq->username,
+                'username' =>$applyUserEloq->username,
                 'apply_note' => $this->inputs['apply_note'] ?? '',
             ];
             DB::beginTransaction();
@@ -159,7 +159,7 @@ class UserHandleController extends ApiMainController
         //target model to join
         $fixedJoin = 1;//number of joining tables
         $withTable = 'auditFlow';
-        $witTableCriterias = $withTable.':id,admin_id,auditor_id,apply_note,auditor_note,updated_at,admin_name,auditor_name,user_name';
+        $witTableCriterias = $withTable.':id,admin_id,auditor_id,apply_note,auditor_note,updated_at,admin_name,auditor_name,username';
 //        $witTableCriterias = 'id,admin_id,auditor_id,apply_note,auditor_note,updated_at';
         $searchAbleFields = ['type', 'user_id', 'status', 'created_at', 'updated_at'];
         $data = $this->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable);
