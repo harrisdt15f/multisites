@@ -91,6 +91,8 @@ class UserHandleController extends ApiMainController
                 foreach ($searchCriterias as $key => $value) {
                     $queryEloq = $this->eloqM::where($key, $value)->with('account:id,balance,frozen');
                 }
+            } else {
+                $queryEloq = $this->eloqM::with('account:id,balance,frozen');
             }
         } else if ($size > 2) {
             if (!empty($searchCriterias)) {
@@ -102,6 +104,8 @@ class UserHandleController extends ApiMainController
                     $whereData[] = $whereCriteria;
                 }
                 $queryEloq = $this->eloqM::where($whereData)->with('account:id,balance,frozen');
+            } else {
+                $queryEloq = $this->eloqM::with('account:id,balance,frozen');
             }
         } else {
             $queryEloq = $this->eloqM::with('account:id,balance,frozen');
