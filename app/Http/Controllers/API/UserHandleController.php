@@ -159,7 +159,7 @@ class UserHandleController extends ApiMainController
         //target model to join
         $fixedJoin = 1;//number of joining tables
         $withTable = 'auditFlow';
-        $witTableCriterias = $withTable.':id,admin_id,auditor_id,apply_note,auditor_note,updated_at,admin_name,auditor_name';
+        $witTableCriterias = $withTable.':id,admin_id,auditor_id,apply_note,auditor_note,updated_at,admin_name,auditor_name,user_name';
 //        $witTableCriterias = 'id,admin_id,auditor_id,apply_note,auditor_note,updated_at';
         $searchAbleFields = ['type', 'user_id', 'status', 'created_at', 'updated_at'];
         $data = $this->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable);
