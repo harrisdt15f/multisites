@@ -41,7 +41,7 @@ class ApiMainController extends Controller
                 $this->menuAccess();
                 $this->routeAccessCheck();
                 if ($this->routeAccessable === false) {
-                    return $this->msgout($this->routeAccessable, [],'您没有访问权限','404');
+                    return $this->msgout($this->routeAccessable, [], '您没有访问权限', '404');
                 }
             }
             $this->adminOperateLog();
@@ -58,6 +58,11 @@ class ApiMainController extends Controller
         $partnerEloq = new PartnerMenus();
         $this->fullMenuLists = $partnerEloq->forStar();//所有的菜单
         $this->partnerMenulists = $partnerEloq->menuLists($this->currentPartnerAccessGroup);//目前所有的菜单为前端展示用的
+    }
+
+    protected function modelWithNameSpace($eloqM = null)
+    {
+        return !is_null($eloqM) ? 'App\\models\\' . $eloqM : $eloqM;
     }
 
     /**

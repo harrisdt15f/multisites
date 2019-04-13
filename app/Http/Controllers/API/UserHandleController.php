@@ -171,5 +171,42 @@ class UserHandleController extends ApiMainController
         }
     }
 
-
+    /**
+     * 用户已申请的密码列表
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function appliedResetUserPasswordLists()
+    {
+        $size = sizeof($this->inputs);
+        $pageSize = $this->inputs['page_size'] ?? 20;
+        $eloqM = $this->modelWithNameSpace('PassworAuditLists');
+        $witTableCriterias = 'auditFlow:id,admin_id,auditor_id,apply_note,auditor_note,updated_at';
+        $searchCriterias = Input::only('type', 'user_id', 'status', 'created_at', 'updated_at');
+        if ($size == 2) {
+            if (!empty($searchCriterias)) {
+                foreach ($searchCriterias as $key => $value) {
+                    $queryEloq = $eloqM::where($key, $value)->with($witTableCriterias);
+                }
+            } else {
+                $queryEloq = $eloqM::with($witTableCriterias);
+            }
+        } else if ($size > 2) {
+            if (!empty($searchCriterias)) {
+                foreach ($searchCriterias as $key => $value) {
+                    $whereCriteria = [];
+                    $whereCriteria[] = $key;
+                    $whereCriteria[] = '=';
+                    $whereCriteria[] = $value;
+                    $whereData[] = $whereCriteria;
+                }
+                $queryEloq = $eloqM::where($whereData)->with($witTableCriterias);
+            } else {
+                $queryEloq = $eloqM::with($witTableCriterias);
+            }
+        } else {
+            $queryEloq = $eloqM::with($witTableCriterias);
+        }
+        $data = $queryEloq->paginate($pageSize);
+        return $this->msgout(true, $data);
+    }
 }
