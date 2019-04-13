@@ -7,9 +7,9 @@ use App\models\AuditFlow;
 use App\models\HandleUserAccounts;
 use App\models\PassworAuditLists;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 
 class UserHandleController extends ApiMainController
@@ -83,8 +83,30 @@ class UserHandleController extends ApiMainController
     //用户管理的所有用户信息表
     public function usersInfo()
     {
+        $size = sizeof($this->inputs);
         $pageSize = $this->inputs['page_size'] ?? 20;
-        $data = $this->eloqM::with('account:id,balance,frozen')->paginate($pageSize);
+        $searchCriterias = Input::only('username', 'type', 'vip_level', 'is_tester', 'frozen_type', 'prize_group', 'level_deep', 'register_ip');
+        if ($size == 2) {
+            if (!empty($searchCriterias)) {
+                foreach ($searchCriterias as $key => $value) {
+                    $queryEloq = $this->eloqM::where($key, $value)->with('account:id,balance,frozen');
+                }
+            }
+        } else if ($size > 2) {
+            if (!empty($searchCriterias)) {
+                foreach ($searchCriterias as $key => $value) {
+                    $whereCriteria = [];
+                    $whereCriteria[] = $key;
+                    $whereCriteria[] = '=';
+                    $whereCriteria[] = $value;
+                    $whereData[] = $whereCriteria;
+                }
+                $queryEloq = $this->eloqM::where($whereData)->with('account:id,balance,frozen');
+            }
+        } else {
+            $queryEloq = $this->eloqM::with('account:id,balance,frozen');
+        }
+        $data = $queryEloq->paginate($pageSize);
         return $this->msgout(true, $data);
     }
 
@@ -111,8 +133,7 @@ class UserHandleController extends ApiMainController
                 ['user_id', '=', $applyUserEloq->id],
                 ['status', '=', 0],
             ])->first();
-            if (!is_null($adminApplyCheckEloq))
-            {
+            if (!is_null($adminApplyCheckEloq)) {
                 return $this->msgout(false, [], '更改密码已有申请', '0002');
             }
             //###################
