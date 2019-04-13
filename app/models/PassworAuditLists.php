@@ -12,6 +12,8 @@ class PassworAuditLists extends BaseModel
 
     public function auditFlow()
     {
-        return $this->hasOne(AuditFlow::class,'id','audit_flow_id');
+        $data = $this->hasOne(AuditFlow::class,'id','audit_flow_id');
+        return $data;
     }
+
 }
