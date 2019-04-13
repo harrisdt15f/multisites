@@ -7,6 +7,7 @@ use App\models\AuditFlow;
 use App\models\HandleUserAccounts;
 use App\models\PassworAuditLists;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Input;
@@ -83,34 +84,11 @@ class UserHandleController extends ApiMainController
     //用户管理的所有用户信息表
     public function usersInfo()
     {
-        $size = sizeof($this->inputs);
-        $pageSize = $this->inputs['page_size'] ?? 20;
-        $searchCriterias = Input::only('username', 'type', 'vip_level', 'is_tester', 'frozen_type', 'prize_group', 'level_deep', 'register_ip');
-        if ($size == 2) {
-            if (!empty($searchCriterias)) {
-                foreach ($searchCriterias as $key => $value) {
-                    $queryEloq = $this->eloqM::where($key, $value)->with('account:id,balance,frozen');
-                }
-            } else {
-                $queryEloq = $this->eloqM::with('account:id,balance,frozen');
-            }
-        } else if ($size > 2) {
-            if (!empty($searchCriterias)) {
-                foreach ($searchCriterias as $key => $value) {
-                    $whereCriteria = [];
-                    $whereCriteria[] = $key;
-                    $whereCriteria[] = '=';
-                    $whereCriteria[] = $value;
-                    $whereData[] = $whereCriteria;
-                }
-                $queryEloq = $this->eloqM::where($whereData)->with('account:id,balance,frozen');
-            } else {
-                $queryEloq = $this->eloqM::with('account:id,balance,frozen');
-            }
-        } else {
-            $queryEloq = $this->eloqM::with('account:id,balance,frozen');
-        }
-        $data = $queryEloq->paginate($pageSize);
+        //target model to join
+        $fixedJoin = 1;//number of joining tables
+        $witTableCriterias = 'account:id,balance,frozen';
+        $searchAbleFields = ['username', 'type', 'vip_level', 'is_tester', 'frozen_type', 'prize_group', 'level_deep', 'register_ip'];
+        $data = $this->generateSearchQuery($this->eloqM, $searchAbleFields, $fixedJoin, $witTableCriterias);
         return $this->msgout(true, $data);
     }
 
@@ -183,7 +161,7 @@ class UserHandleController extends ApiMainController
         $fixedJoin = 1;//number of joining tables
         $witTableCriterias = 'auditFlow:id,admin_id,auditor_id,apply_note,auditor_note,updated_at';
         $searchAbleFields = ['type', 'user_id', 'status', 'created_at', 'updated_at'];
-        $data = $this->generateSearchQuery($eloqM,$searchAbleFields,$fixedJoin,$witTableCriterias);
+        $data = $this->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $witTableCriterias);
         return $this->msgout(true, $data);
     }
 
@@ -198,17 +176,20 @@ class UserHandleController extends ApiMainController
     public function generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $witTableCriterias)
     {
         $searchCriterias = Input::only($searchAbleFields);
+        $queryConditionField = Input::get('query_conditions');
+        $query_conditions = Arr::wrap(json_decode($queryConditionField, true));
         $queryEloq = new $eloqM;
-        $sizeOfInputs = sizeof($this->inputs);
+        $sizeOfInputs = sizeof($searchCriterias);
         $pageSize = $this->inputs['page_size'] ?? 20;
-        if ($sizeOfInputs == 2) {
+        if ($sizeOfInputs == 1) {
             //for single where condition searching
             if (!empty($searchCriterias)) {
                 foreach ($searchCriterias as $key => $value) {
                     if ($fixedJoin > 0) {
                         $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $witTableCriterias);
                     } else {
-                        $queryEloq = $queryEloq->where($key, $value);
+                        $sign = array_key_exists($key, $query_conditions) ? $query_conditions[$key] : '=';
+                        $queryEloq = $queryEloq->where($key,$sign,$value);
                     }
                 }
             } else { //for default
@@ -216,13 +197,13 @@ class UserHandleController extends ApiMainController
                     $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $witTableCriterias);
                 }
             }
-        } else if ($sizeOfInputs > 2) {
+        } else if ($sizeOfInputs > 1) {
             //for multiple where condition searching
             if (!empty($searchCriterias)) {
                 foreach ($searchCriterias as $key => $value) {
                     $whereCriteria = [];
                     $whereCriteria[] = $key;
-                    $whereCriteria[] = '=';
+                    $whereCriteria[] = array_key_exists($key, $query_conditions) ? $query_conditions[$key] : '=';
                     $whereCriteria[] = $value;
                     $whereData[] = $whereCriteria;
                 }
