@@ -119,6 +119,7 @@ class UserHandleController extends ApiMainController
             $flowData = [
                 'admin_id' => $this->partnerAdmin->id,
                 'admin_name' => $this->partnerAdmin->name,
+                'user_name' =>$applyUserEloq->username,
                 'apply_note' => $this->inputs['apply_note'] ?? '',
             ];
             DB::beginTransaction();
