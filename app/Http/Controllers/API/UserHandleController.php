@@ -177,20 +177,47 @@ class UserHandleController extends ApiMainController
      */
     public function appliedResetUserPasswordLists()
     {
-        $size = sizeof($this->inputs);
-        $pageSize = $this->inputs['page_size'] ?? 20;
+        //main model
         $eloqM = $this->modelWithNameSpace('PassworAuditLists');
+        //target model to join
+        $fixedJoin = 1;//number of joining tables
         $witTableCriterias = 'auditFlow:id,admin_id,auditor_id,apply_note,auditor_note,updated_at';
-        $searchCriterias = Input::only('type', 'user_id', 'status', 'created_at', 'updated_at');
-        if ($size == 2) {
+        $searchAbleFields = ['type', 'user_id', 'status', 'created_at', 'updated_at'];
+        $data = $this->generateSearchQuery($eloqM,$searchAbleFields,$fixedJoin,$witTableCriterias);
+        return $this->msgout(true, $data);
+    }
+
+    /**
+     * Generate Search Query
+     * @param $eloqM
+     * @param $searchAbleFields
+     * @param $fixedJoin
+     * @param $witTableCriterias
+     * @return mixed
+     */
+    public function generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $witTableCriterias)
+    {
+        $searchCriterias = Input::only($searchAbleFields);
+        $queryEloq = new $eloqM;
+        $sizeOfInputs = sizeof($this->inputs);
+        $pageSize = $this->inputs['page_size'] ?? 20;
+        if ($sizeOfInputs == 2) {
+            //for single where condition searching
             if (!empty($searchCriterias)) {
                 foreach ($searchCriterias as $key => $value) {
-                    $queryEloq = $eloqM::where($key, $value)->with($witTableCriterias);
+                    if ($fixedJoin > 0) {
+                        $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $witTableCriterias);
+                    } else {
+                        $queryEloq = $queryEloq->where($key, $value);
+                    }
                 }
-            } else {
-                $queryEloq = $eloqM::with($witTableCriterias);
+            } else { //for default
+                if ($fixedJoin > 0) {
+                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $witTableCriterias);
+                }
             }
-        } else if ($size > 2) {
+        } else if ($sizeOfInputs > 2) {
+            //for multiple where condition searching
             if (!empty($searchCriterias)) {
                 foreach ($searchCriterias as $key => $value) {
                     $whereCriteria = [];
@@ -199,14 +226,38 @@ class UserHandleController extends ApiMainController
                     $whereCriteria[] = $value;
                     $whereData[] = $whereCriteria;
                 }
-                $queryEloq = $eloqM::where($whereData)->with($witTableCriterias);
+                $queryEloq = $eloqM::where($whereData);
+                if ($fixedJoin > 0) {
+                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $witTableCriterias);
+                }
             } else {
-                $queryEloq = $eloqM::with($witTableCriterias);
+                if ($fixedJoin > 0) {
+                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $witTableCriterias);
+                }
             }
         } else {
-            $queryEloq = $eloqM::with($witTableCriterias);
+            if ($fixedJoin > 0) {
+                $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $witTableCriterias);
+            }
         }
         $data = $queryEloq->paginate($pageSize);
-        return $this->msgout(true, $data);
+        return $data;
+    }
+
+    /**
+     * Join Table with Eloquent
+     * @param $queryEloq
+     * @param $fixedJoin
+     * @param $witTableCriterias
+     * @return mixed
+     */
+    public function eloqToJoin($queryEloq, $fixedJoin, $witTableCriterias)
+    {
+        switch ($fixedJoin) {
+            case 1://有一个连表查询的情况下
+                $queryEloq = $queryEloq->with($witTableCriterias);
+                break;
+        }
+        return $queryEloq;
     }
 }
