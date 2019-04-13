@@ -6,11 +6,8 @@ use App\Http\Controllers\ApiMainController;
 use App\models\AuditFlow;
 use App\models\HandleUserAccounts;
 use App\models\PassworAuditLists;
-use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 
 class UserHandleController extends ApiMainController
@@ -163,82 +160,5 @@ class UserHandleController extends ApiMainController
         $searchAbleFields = ['type', 'user_id', 'status', 'created_at', 'updated_at'];
         $data = $this->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $witTableCriterias);
         return $this->msgout(true, $data);
-    }
-
-    /**
-     * Generate Search Query
-     * @param $eloqM
-     * @param $searchAbleFields
-     * @param $fixedJoin
-     * @param $witTableCriterias
-     * @return mixed
-     */
-    public function generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $witTableCriterias)
-    {
-        $searchCriterias = Input::only($searchAbleFields);
-        $queryConditionField = Input::get('query_conditions');
-        $query_conditions = Arr::wrap(json_decode($queryConditionField, true));
-        $queryEloq = new $eloqM;
-        $sizeOfInputs = sizeof($searchCriterias);
-        $pageSize = $this->inputs['page_size'] ?? 20;
-        if ($sizeOfInputs == 1) {
-            //for single where condition searching
-            if (!empty($searchCriterias)) {
-                foreach ($searchCriterias as $key => $value) {
-                    if ($fixedJoin > 0) {
-                        $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $witTableCriterias);
-                    } else {
-                        $sign = array_key_exists($key, $query_conditions) ? $query_conditions[$key] : '=';
-                        $queryEloq = $queryEloq->where($key,$sign,$value);
-                    }
-                }
-            } else { //for default
-                if ($fixedJoin > 0) {
-                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $witTableCriterias);
-                }
-            }
-        } else if ($sizeOfInputs > 1) {
-            //for multiple where condition searching
-            if (!empty($searchCriterias)) {
-                foreach ($searchCriterias as $key => $value) {
-                    $whereCriteria = [];
-                    $whereCriteria[] = $key;
-                    $whereCriteria[] = array_key_exists($key, $query_conditions) ? $query_conditions[$key] : '=';
-                    $whereCriteria[] = $value;
-                    $whereData[] = $whereCriteria;
-                }
-                $queryEloq = $eloqM::where($whereData);
-                if ($fixedJoin > 0) {
-                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $witTableCriterias);
-                }
-            } else {
-                if ($fixedJoin > 0) {
-                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $witTableCriterias);
-                }
-            }
-        } else {
-            if ($fixedJoin > 0) {
-                $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $witTableCriterias);
-            }
-        }
-        $data = $queryEloq->paginate($pageSize);
-        return $data;
-    }
-
-    /**
-     * Join Table with Eloquent
-     * @param $queryEloq
-     * @param $fixedJoin
-     * @param $witTableCriterias
-     * @return mixed
-     */
-    public function eloqToJoin($queryEloq, $fixedJoin, $witTableCriterias)
-    {
-        switch ($fixedJoin) {
-            case 1://有一个连表查询的情况下
-                $queryEloq = $queryEloq->with($witTableCriterias);
-                break;
-        }
-        return $queryEloq;
     }
 }
