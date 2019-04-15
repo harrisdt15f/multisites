@@ -85,8 +85,8 @@ class UserHandleController extends ApiMainController
         $fixedJoin = 1;//number of joining tables
         $withTable = 'account';
         $searchAbleFields = ['username', 'type', 'vip_level', 'is_tester', 'frozen_type', 'prize_group', 'level_deep', 'register_ip'];
-        $withSearchAbleFields= ['balance'];
-        $data = $this->generateSearchQuery($this->eloqM, $searchAbleFields, $fixedJoin, $withTable,$withSearchAbleFields);
+        $withSearchAbleFields = ['balance'];
+        $data = $this->generateSearchQuery($this->eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields);
         return $this->msgout(true, $data);
     }
 
@@ -96,11 +96,27 @@ class UserHandleController extends ApiMainController
      */
     public function applyResetUserPassword()
     {
-        $validator = Validator::make($this->inputs, [
+        $rule = [
             'id' => 'required|numeric',
             'password' => 'required',
             'apply_note' => 'required',
-        ]);
+        ];
+        return $this->commonHandleUserPassword($rule, 1);
+    }
+
+    public function applyResetUserFundPassword()
+    {
+        $rule = [
+            'id' => 'required|numeric',
+            'password' => 'required',
+            'apply_note' => 'required',
+        ];
+        return $this->commonHandleUserPassword($rule, 2);
+    }
+
+    public function commonHandleUserPassword($rule, $type)
+    {
+        $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
             return $this->msgout(false, [], $validator->errors(), 401);
         }
@@ -112,22 +128,28 @@ class UserHandleController extends ApiMainController
             $adminApplyCheckEloq = $adminApplyEloq::where([
                 ['user_id', '=', $applyUserEloq->id],
                 ['status', '=', 0],
+                ['type', '=', $type],
             ])->first();
             if (!is_null($adminApplyCheckEloq)) {
-                return $this->msgout(false, [], '更改密码已有申请', '0002');
+                if ($type === 1) {
+                    $message = '更改密码已有申请';
+                } else if ($type === 2) {
+                    $message = '更改资金密码已有申请';
+                }
+                return $this->msgout(false, [], $message, '0002');
             }
             //###################
             $flowData = [
                 'admin_id' => $this->partnerAdmin->id,
                 'admin_name' => $this->partnerAdmin->name,
-                'username' =>$applyUserEloq->username,
+                'username' => $applyUserEloq->username,
                 'apply_note' => $this->inputs['apply_note'] ?? '',
             ];
             DB::beginTransaction();
             try {
                 $auditResult = $auditFlowEloq->fill($flowData);
                 $auditData = [
-                    'type' => 1,
+                    'type' => $type,
                     'user_id' => $applyUserEloq->id,
                     'audit_data' => Hash::make($this->inputs['password']),
                     'audit_flow_id' => $auditResult->admin_id,
@@ -160,10 +182,10 @@ class UserHandleController extends ApiMainController
         //target model to join
         $fixedJoin = 1;//number of joining tables
         $withTable = 'auditFlow';
-        $witTableCriterias = $withTable.':id,admin_id,auditor_id,apply_note,auditor_note,updated_at,admin_name,auditor_name,username';
+        $witTableCriterias = $withTable . ':id,admin_id,auditor_id,apply_note,auditor_note,updated_at,admin_name,auditor_name,username';
         $searchAbleFields = ['type', 'status', 'created_at', 'updated_at'];
         $withSearchAbleFields = ['username'];
-        $data = $this->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable,$withSearchAbleFields);
+        $data = $this->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields);
         return $this->msgout(true, $data);
     }
 }

@@ -21,5 +21,5 @@ Route::group(['prefix' => 'user-handle'], function () {
     //用户密码已申请列表
     Route::match(['get', 'options'], 'reset-password-list', ['as' => $namePrefix . 'reset-password-list', 'uses' => $controller . 'appliedResetUserPasswordLists']);
     //给用户申请资金密码更换
-    Route::match(['post', 'options'], 'reset-fund-password', ['as' => $namePrefix . 'reset-fund-password', 'uses' => $controller . 'resetUserFundPassword']);
+    Route::match(['post', 'options'], 'reset-fund-password', ['as' => $namePrefix . 'reset-fund-password', 'uses' => $controller . 'applyResetUserFundPassword']);
 });
