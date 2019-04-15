@@ -216,6 +216,16 @@ class UserHandleController extends ApiMainController
 
     public function auditApplyUserPassword()
     {
+        return $this->commonAuditPassword();
+    }
+
+    public function auditApplyUserFundPassword()
+    {
+        return $this->commonAuditPassword();
+    }
+
+    public function commonAuditPassword()
+    {
         $rule = [
             'id' => 'required|numeric',
             'type' => 'required|numeric',//1登录密码 2 资金密码
@@ -264,10 +274,7 @@ class UserHandleController extends ApiMainController
                 return $this->msgout(false, [], $msg, $sqlState);
             }
         } else {
-            return $this->msgout(false, [], '没有此用户', '0002');
+            return $this->msgout(false, [], '没有此条信息', '0002');
         }
-
     }
-
-
 }
