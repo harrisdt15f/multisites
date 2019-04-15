@@ -11,5 +11,5 @@ Route::group(['prefix' => 'log'], function () {
     $namePrefix = 'loghandle.';
     $controller = 'HandleLogController@';
     //搜索日志列表
-    Route::match(['get', 'options'], 'list', ['as' => $namePrefix . 'list', 'uses' => $controller . 'details']);
+    Route::match(['post', 'options'], 'list', ['as' => $namePrefix . 'list', 'uses' => $controller . 'details']);
 });
