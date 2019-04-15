@@ -134,7 +134,7 @@ class ApiMainController extends Controller
      * @param $withSearchAbleFields
      * @return mixed
      */
-    public function generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields)
+    public function generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin=0, $withTable=null, $withSearchAbleFields=null)
     {
         $searchCriterias = Input::only($searchAbleFields);
         $queryConditionField = Input::get('query_conditions');
