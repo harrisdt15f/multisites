@@ -104,6 +104,10 @@ class UserHandleController extends ApiMainController
         return $this->commonHandleUserPassword($rule, 1);
     }
 
+    /**
+     * 20.申请资金密码
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function applyResetUserFundPassword()
     {
         $rule = [
@@ -114,6 +118,12 @@ class UserHandleController extends ApiMainController
         return $this->commonHandleUserPassword($rule, 2);
     }
 
+    /**
+     * 申请资金密码跟密码共用功能
+     * @param $rule
+     * @param $type
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function commonHandleUserPassword($rule, $type)
     {
         $validator = Validator::make($this->inputs, $rule);
