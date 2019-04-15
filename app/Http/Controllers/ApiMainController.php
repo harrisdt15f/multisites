@@ -134,11 +134,13 @@ class ApiMainController extends Controller
      * @param $withSearchAbleFields
      * @return mixed
      */
-    public function generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin=0, $withTable=null, $withSearchAbleFields=null)
+    public function generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin = 0, $withTable = null, $withSearchAbleFields = null)
     {
         $searchCriterias = Input::only($searchAbleFields);
         $queryConditionField = Input::get('query_conditions');
-        $query_conditions = Arr::wrap(json_decode($queryConditionField, true));
+        $queryConditions = Arr::wrap(json_decode($queryConditionField, true));
+        $timeConditionField = Input::get('time_condtions');
+        $timeConditions = Arr::wrap(json_decode($timeConditionField, true));
         $queryEloq = new $eloqM;
         $sizeOfInputs = sizeof($searchCriterias);
 
@@ -152,40 +154,65 @@ class ApiMainController extends Controller
             //for single where condition searching
             if (!empty($searchCriterias)) {
                 foreach ($searchCriterias as $key => $value) {
-                    $sign = array_key_exists($key, $query_conditions) ? $query_conditions[$key] : '=';
-                    $queryEloq = $queryEloq->where($key, $sign, $value);
-                    if ($fixedJoin > 0) {
-
-                        $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $query_conditions);
+                    $sign =array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
+                    if ($sign == 'LIKE') {
+                        $sign = strtolower($sign);
+                        $value = '%' . $value . '%';
                     }
+                    $whereCriteria = [];
+                    $whereCriteria[] = $key;
+                    $whereCriteria[] = $sign;
+                    $whereCriteria[] = $value;
+                    $whereData[] = $whereCriteria;
+                }
+                if (!empty($timeConditions)) {
+                    $whereData = array_merge($whereData, $timeConditions);
+                }
+                $queryEloq = $eloqM::where($whereData);
+                if ($fixedJoin > 0) {
+                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $queryConditions);
                 }
             } else { //for default
                 if ($fixedJoin > 0) {
-                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $query_conditions);
+                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $queryConditions);
                 }
             }
         } else if ($sizeOfInputs > 1) {
             //for multiple where condition searching
             if (!empty($searchCriterias)) {
+                $whereData = [];
                 foreach ($searchCriterias as $key => $value) {
+                    $sign =array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
+                    if ($sign == 'LIKE') {
+                        $sign = strtolower($sign);
+                        $value = '%' . $value . '%';
+                    }
                     $whereCriteria = [];
                     $whereCriteria[] = $key;
-                    $whereCriteria[] = array_key_exists($key, $query_conditions) ? $query_conditions[$key] : '=';
+
+                    $whereCriteria[] = $sign;
                     $whereCriteria[] = $value;
                     $whereData[] = $whereCriteria;
                 }
+                if (!empty($timeConditions)) {
+                    $whereData = array_merge($whereData, $timeConditions);
+                }
                 $queryEloq = $eloqM::where($whereData);
                 if ($fixedJoin > 0) {
-                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $query_conditions);
+                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $queryConditions);
                 }
             } else {
                 if ($fixedJoin > 0) {
-                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $query_conditions);
+                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $queryConditions);
                 }
             }
         } else {
+            if (!empty($timeConditions)) {
+                $whereData = $timeConditions;
+                $queryEloq = $eloqM::where($whereData);
+            }
             if ($fixedJoin > 0) {
-                $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $query_conditions);
+                $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $queryConditions);
             }
         }
         $data = $queryEloq->paginate($pageSize);
@@ -199,10 +226,10 @@ class ApiMainController extends Controller
      * @param $withTable
      * @param $sizeOfWithInputs
      * @param $withSearchCriterias
-     * @param $query_conditions
+     * @param $queryConditions
      * @return mixed
      */
-    public function eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $query_conditions)
+    public function eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $queryConditions)
     {
         if (empty($sizeOfWithInputs)) //如果with 没有参数可以查询时查询全部
         {
@@ -214,14 +241,14 @@ class ApiMainController extends Controller
         } else {
             switch ($fixedJoin) {
                 case 1://有一个连表查询的情况下
-                    $queryEloq = $queryEloq->with($withTable)->whereHas($withTable, function ($query) use ($sizeOfWithInputs, $withSearchCriterias, $query_conditions) {
+                    $queryEloq = $queryEloq->with($withTable)->whereHas($withTable, function ($query) use ($sizeOfWithInputs, $withSearchCriterias, $queryConditions) {
                         if ($sizeOfWithInputs > 1) {
 
                             if (!empty($withSearchCriterias)) {
                                 foreach ($withSearchCriterias as $key => $value) {
                                     $whereCriteria = [];
                                     $whereCriteria[] = $key;
-                                    $whereCriteria[] = array_key_exists($key, $query_conditions) ? $query_conditions[$key] : '=';
+                                    $whereCriteria[] = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
                                     $whereCriteria[] = $value;
                                     $whereData[] = $whereCriteria;
                                 }
@@ -230,12 +257,12 @@ class ApiMainController extends Controller
                         } else if ($sizeOfWithInputs == 1) {
                             if (!empty($withSearchCriterias)) {
                                 foreach ($withSearchCriterias as $key => $value) {
-                                    $sign = array_key_exists($key, $query_conditions) ? $query_conditions[$key] : '=';
+                                    $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
                                     if ($sign == 'LIKE') {
-                                        $sing = strtolower($sign);
+                                        $sign = strtolower($sign);
                                         $value = '%' . $value . '%';
                                     }
-                                    $query->where($key, $sing, $value);
+                                    $query->where($key, $sign, $value);
                                 }
                             }
                         }
