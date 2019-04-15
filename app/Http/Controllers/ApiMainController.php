@@ -148,7 +148,6 @@ class ApiMainController extends Controller
         $withSearchCriterias = Input::only($withSearchAbleFields);
         $sizeOfWithInputs = sizeof($withSearchCriterias);
 
-
         $pageSize = $this->inputs['page_size'] ?? 20;
         if ($sizeOfInputs == 1) {
             //for single where condition searching
