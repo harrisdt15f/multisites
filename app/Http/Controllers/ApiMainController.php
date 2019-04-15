@@ -211,11 +211,10 @@ class ApiMainController extends Controller
                     $queryEloq = $queryEloq->with($withTable);
                     break;
             }
-        }
-        else{
+        } else {
             switch ($fixedJoin) {
                 case 1://有一个连表查询的情况下
-                    $queryEloq = $queryEloq->whereHas($withTable, function ($query) use ($sizeOfWithInputs, $withSearchCriterias, $query_conditions) {
+                    $queryEloq = $queryEloq->with($withTable)->whereHas($withTable, function ($query) use ($sizeOfWithInputs, $withSearchCriterias, $query_conditions) {
                         if ($sizeOfWithInputs > 1) {
 
                             if (!empty($withSearchCriterias)) {
@@ -232,7 +231,11 @@ class ApiMainController extends Controller
                             if (!empty($withSearchCriterias)) {
                                 foreach ($withSearchCriterias as $key => $value) {
                                     $sign = array_key_exists($key, $query_conditions) ? $query_conditions[$key] : '=';
-                                    $query->where($key, $sign, $value);
+                                    if ($sign == 'LIKE') {
+                                        $sing = strtolower($sign);
+                                        $value = '%' . $value . '%';
+                                    }
+                                    $query->where($key, $sing, $value);
                                 }
                             }
                         }

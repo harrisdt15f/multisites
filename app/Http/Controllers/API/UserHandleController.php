@@ -163,7 +163,7 @@ class UserHandleController extends ApiMainController
                     'type' => $type,
                     'user_id' => $applyUserEloq->id,
                     'audit_data' => Hash::make($this->inputs['password']),
-                    'audit_flow_id' => $auditResult->admin_id,
+                    'audit_flow_id' => $auditResult->id,
                     'status' => 0,
                 ];
                 $adminApplyResult = $adminApplyEloq->fill($auditData);
