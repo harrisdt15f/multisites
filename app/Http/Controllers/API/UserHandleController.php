@@ -83,9 +83,10 @@ class UserHandleController extends ApiMainController
     {
         //target model to join
         $fixedJoin = 1;//number of joining tables
-        $witTableCriterias = 'account:id,balance,frozen';
+        $withTable = 'account';
         $searchAbleFields = ['username', 'type', 'vip_level', 'is_tester', 'frozen_type', 'prize_group', 'level_deep', 'register_ip'];
-        $data = $this->generateSearchQuery($this->eloqM, $searchAbleFields, $fixedJoin, $witTableCriterias);
+        $withSearchAbleFields= ['balance'];
+        $data = $this->generateSearchQuery($this->eloqM, $searchAbleFields, $fixedJoin, $withTable,$withSearchAbleFields);
         return $this->msgout(true, $data);
     }
 
@@ -160,7 +161,6 @@ class UserHandleController extends ApiMainController
         $fixedJoin = 1;//number of joining tables
         $withTable = 'auditFlow';
         $witTableCriterias = $withTable.':id,admin_id,auditor_id,apply_note,auditor_note,updated_at,admin_name,auditor_name,username';
-//        $witTableCriterias = 'id,admin_id,auditor_id,apply_note,auditor_note,updated_at';
         $searchAbleFields = ['type', 'status', 'created_at', 'updated_at'];
         $withSearchAbleFields = ['username'];
         $data = $this->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable,$withSearchAbleFields);
