@@ -204,32 +204,11 @@ class ApiMainController extends Controller
      */
     public function eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $query_conditions)
     {
-        if (empty($sizeOfWithInputs))
+        if (empty($sizeOfWithInputs)) //如果with 没有参数可以查询时查询全部
         {
             switch ($fixedJoin) {
                 case 1://有一个连表查询的情况下
-                    $queryEloq = $queryEloq->with([$withTable => function ($query) use ($sizeOfWithInputs, $withSearchCriterias, $query_conditions) {
-                        if ($sizeOfWithInputs > 1) {
-
-                            if (!empty($withSearchCriterias)) {
-                                foreach ($withSearchCriterias as $key => $value) {
-                                    $whereCriteria = [];
-                                    $whereCriteria[] = $key;
-                                    $whereCriteria[] = array_key_exists($key, $query_conditions) ? $query_conditions[$key] : '=';
-                                    $whereCriteria[] = $value;
-                                    $whereData[] = $whereCriteria;
-                                }
-                                $query->where($whereData);
-                            }
-                        } else if ($sizeOfWithInputs == 1) {
-                            if (!empty($withSearchCriterias)) {
-                                foreach ($withSearchCriterias as $key => $value) {
-                                    $sign = array_key_exists($key, $query_conditions) ? $query_conditions[$key] : '=';
-                                    $query->where($key, $sign, $value);
-                                }
-                            }
-                        }
-                    }]);
+                    $queryEloq = $queryEloq->with($withTable);
                     break;
             }
         }
