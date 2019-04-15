@@ -42,4 +42,10 @@ class Logs extends BaseModel
      * @var array $guarded
      */
     protected $guarded = ['id'];
+
+
+    public function route()
+    {
+        return $this->hasOne(PartnerAdminRoute::class,'id','rout_id');
+    }
 }

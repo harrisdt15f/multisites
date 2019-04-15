@@ -19,4 +19,9 @@ class AuditFlow extends BaseModel
     {
         return $this->hasOne(PartnerAdminUsers::class,'id','auditor_id');
     }
+
+    public function auditlist()
+    {
+        return $this->belongsTo(PassworAuditLists::class,'audit_flow_id','id');
+    }
 }

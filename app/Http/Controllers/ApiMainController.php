@@ -130,31 +130,38 @@ class ApiMainController extends Controller
      * @param $eloqM
      * @param $searchAbleFields
      * @param $fixedJoin
-     * @param $witTableCriterias
+     * @param $withTable
+     * @param $withSearchAbleFields
      * @return mixed
      */
-    public function generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $witTableCriterias)
+    public function generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields)
     {
         $searchCriterias = Input::only($searchAbleFields);
         $queryConditionField = Input::get('query_conditions');
         $query_conditions = Arr::wrap(json_decode($queryConditionField, true));
         $queryEloq = new $eloqM;
         $sizeOfInputs = sizeof($searchCriterias);
+
+        //with Criterias
+        $withSearchCriterias = Input::only($withSearchAbleFields);
+        $sizeOfWithInputs = sizeof($withSearchCriterias);
+
+
         $pageSize = $this->inputs['page_size'] ?? 20;
         if ($sizeOfInputs == 1) {
             //for single where condition searching
             if (!empty($searchCriterias)) {
                 foreach ($searchCriterias as $key => $value) {
                     if ($fixedJoin > 0) {
-                        $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $witTableCriterias);
+                        $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $query_conditions);
                     } else {
                         $sign = array_key_exists($key, $query_conditions) ? $query_conditions[$key] : '=';
-                        $queryEloq = $queryEloq->where($key,$sign,$value);
+                        $queryEloq = $queryEloq->where($key, $sign, $value);
                     }
                 }
             } else { //for default
                 if ($fixedJoin > 0) {
-                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $witTableCriterias);
+                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $query_conditions);
                 }
             }
         } else if ($sizeOfInputs > 1) {
@@ -169,16 +176,16 @@ class ApiMainController extends Controller
                 }
                 $queryEloq = $eloqM::where($whereData);
                 if ($fixedJoin > 0) {
-                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $witTableCriterias);
+                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $query_conditions);
                 }
             } else {
                 if ($fixedJoin > 0) {
-                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $witTableCriterias);
+                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $query_conditions);
                 }
             }
         } else {
             if ($fixedJoin > 0) {
-                $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $witTableCriterias);
+                $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $query_conditions);
             }
         }
         $data = $queryEloq->paginate($pageSize);
@@ -189,16 +196,72 @@ class ApiMainController extends Controller
      * Join Table with Eloquent
      * @param $queryEloq
      * @param $fixedJoin
-     * @param $witTableCriterias
+     * @param $withTable
+     * @param $sizeOfWithInputs
+     * @param $withSearchCriterias
+     * @param $query_conditions
      * @return mixed
      */
-    public function eloqToJoin($queryEloq, $fixedJoin, $witTableCriterias)
+    public function eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $query_conditions)
     {
-        switch ($fixedJoin) {
-            case 1://有一个连表查询的情况下
-                $queryEloq = $queryEloq->with($witTableCriterias);
-                break;
+        if (empty($sizeOfWithInputs))
+        {
+            switch ($fixedJoin) {
+                case 1://有一个连表查询的情况下
+                    $queryEloq = $queryEloq->with([$withTable => function ($query) use ($sizeOfWithInputs, $withSearchCriterias, $query_conditions) {
+                        if ($sizeOfWithInputs > 1) {
+
+                            if (!empty($withSearchCriterias)) {
+                                foreach ($withSearchCriterias as $key => $value) {
+                                    $whereCriteria = [];
+                                    $whereCriteria[] = $key;
+                                    $whereCriteria[] = array_key_exists($key, $query_conditions) ? $query_conditions[$key] : '=';
+                                    $whereCriteria[] = $value;
+                                    $whereData[] = $whereCriteria;
+                                }
+                                $query->where($whereData);
+                            }
+                        } else if ($sizeOfWithInputs == 1) {
+                            if (!empty($withSearchCriterias)) {
+                                foreach ($withSearchCriterias as $key => $value) {
+                                    $sign = array_key_exists($key, $query_conditions) ? $query_conditions[$key] : '=';
+                                    $query->where($key, $sign, $value);
+                                }
+                            }
+                        }
+                    }]);
+                    break;
+            }
         }
+        else{
+            switch ($fixedJoin) {
+                case 1://有一个连表查询的情况下
+                    $queryEloq = $queryEloq->whereHas($withTable, function ($query) use ($sizeOfWithInputs, $withSearchCriterias, $query_conditions) {
+                        if ($sizeOfWithInputs > 1) {
+
+                            if (!empty($withSearchCriterias)) {
+                                foreach ($withSearchCriterias as $key => $value) {
+                                    $whereCriteria = [];
+                                    $whereCriteria[] = $key;
+                                    $whereCriteria[] = array_key_exists($key, $query_conditions) ? $query_conditions[$key] : '=';
+                                    $whereCriteria[] = $value;
+                                    $whereData[] = $whereCriteria;
+                                }
+                                $query->where($whereData);
+                            }
+                        } else if ($sizeOfWithInputs == 1) {
+                            if (!empty($withSearchCriterias)) {
+                                foreach ($withSearchCriterias as $key => $value) {
+                                    $sign = array_key_exists($key, $query_conditions) ? $query_conditions[$key] : '=';
+                                    $query->where($key, $sign, $value);
+                                }
+                            }
+                        }
+                    });
+                    break;
+            }
+        }
+
         return $queryEloq;
     }
 }

@@ -161,8 +161,9 @@ class UserHandleController extends ApiMainController
         $withTable = 'auditFlow';
         $witTableCriterias = $withTable.':id,admin_id,auditor_id,apply_note,auditor_note,updated_at,admin_name,auditor_name,username';
 //        $witTableCriterias = 'id,admin_id,auditor_id,apply_note,auditor_note,updated_at';
-        $searchAbleFields = ['type', 'user_id', 'status', 'created_at', 'updated_at'];
-        $data = $this->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable);
+        $searchAbleFields = ['type', 'status', 'created_at', 'updated_at'];
+        $withSearchAbleFields = ['username'];
+        $data = $this->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable,$withSearchAbleFields);
         return $this->msgout(true, $data);
     }
 }
