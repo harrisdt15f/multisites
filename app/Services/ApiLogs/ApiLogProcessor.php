@@ -8,6 +8,7 @@
 
 namespace App\Services\ApiLogs;
 
+use App\models\PartnerAdminRoute;
 use App\models\PartnerLogsApi;
 use Jenssegers\Agent\Agent;
 
@@ -37,9 +38,11 @@ class ApiLogProcessor
         } else {
             $type = PartnerLogsApi::OTHER;
         }
-        $messageArr = json_decode($record['message'],true);
+        $messageArr = json_decode($record['message'], true);
+        $adminUser = auth()->user() ? auth()->user()->id : NULL;
         $record['extra'] = [
-            'user_id' => auth()->user() ? auth()->user()->id : NULL,
+            'admin_id' => $adminUser,
+            'admin_name' => !is_null($adminUser) ? auth()->user()->name : NULL,
             'origin' => request()->headers->get('origin'),
             'ip' => request()->ip(),
             'ips' => json_encode(request()->ips()),
@@ -62,6 +65,13 @@ class ApiLogProcessor
         }
         if (isset($messageArr['route'])) {
             $record['extra']['route'] = json_encode($messageArr['route']);
+            $routeEloq = PartnerAdminRoute::where('route_name', $messageArr['route']['action']['as'])->first();
+            if (!is_null($routeEloq)) {
+                $record['extra']['route_id'] = $routeEloq->id;
+                $record['extra']['menu_id'] = $routeEloq->menu->id;
+                $record['extra']['menu_label'] = $routeEloq->menu->label;
+                $record['extra']['menu_path'] = $routeEloq->menu->route;
+            }
             $record['message'] = '网络操作信息';
         }
         return $record;

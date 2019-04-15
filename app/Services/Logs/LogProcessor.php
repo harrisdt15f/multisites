@@ -39,7 +39,7 @@ class LogProcessor
         } else {
             $type = Logs::OTHER;
         }
-        $messageArr = json_decode($record['message'], true);
+        $messageArr = json_decode($record['message'],true);
         $record['extra'] = [
             'user_id' => auth()->user() ? auth()->user()->id : NULL,
             'origin' => request()->headers->get('origin'),
@@ -64,10 +64,6 @@ class LogProcessor
         }
         if (isset($messageArr['route'])) {
             $record['extra']['route'] = json_encode($messageArr['route']);
-            $logEloq = Logs::where('route_name', $messageArr['route']['action']['as'])->first();
-            if (!is_null($logEloq)) {
-                $record['extra']['rout_id'] = $logEloq->id;
-            }
             $record['message'] = '网络操作信息';
         }
         return $record;
