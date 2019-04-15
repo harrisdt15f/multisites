@@ -6,6 +6,7 @@ use App\Http\Controllers\ApiMainController;
 use App\models\AuditFlow;
 use App\models\HandleUserAccounts;
 use App\models\PassworAuditLists;
+use App\models\UserHandleModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -211,10 +212,62 @@ class UserHandleController extends ApiMainController
         $withSearchAbleFields = ['username'];
         $data = $this->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields);
         return $this->msgout(true, $data);
-
     }
 
+    public function auditApplyUserPassword()
+    {
+        $rule = [
+            'id' => 'required|numeric',
+            'type' => 'required|numeric',//1登录密码 2 资金密码
+            'status'=> 'required|numeric',//1 通过 2 拒绝
+            'auditor_note' => 'required',//密码审核备注
+        ];
+        $validator = Validator::make($this->inputs, $rule);
+        if ($validator->fails()) {
+            return $this->msgout(false, [], $validator->errors(), 200);
+        }
+        $eloqM = $this->modelWithNameSpace('PassworAuditLists');
+        $applyUserEloq = $eloqM::where([
+            ['id', '=', $this->inputs['id']],
+            ['type', '=', $this->inputs['type']],
+            ['status', '=', 0],
+        ])->first();
+        if (!is_null($applyUserEloq)) {
+            $auditFlowEloq = $applyUserEloq->auditFlow;
+            //handle User
+            $user = UserHandleModel::find($applyUserEloq->user_id);
+            if ($applyUserEloq->type ==1)
+            {
+                $user->password = $applyUserEloq->audit_data;
+            }
+            else{
+                $user->fund_password = $applyUserEloq->audit_data;
+            }
+            DB::beginTransaction();
+            try {
+                if ($this->inputs['status']==1)
+                {
+                    $user->save();
+                }
+                $auditFlowEloq->auditor_id = $this->partnerAdmin->id;
+                $auditFlowEloq->auditor_note = $this->inputs['auditor_note'];
+                $auditFlowEloq->auditor_name= $this->partnerAdmin->name;
+                $auditFlowEloq->save();
+                $applyUserEloq->status =$this->inputs['status'];
+                $applyUserEloq->save();
+                DB::commit();
+                return $this->msgout(true, []);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                $errorObj = $e->getPrevious()->getPrevious();
+                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
+                return $this->msgout(false, [], $msg, $sqlState);
+            }
+        } else {
+            return $this->msgout(false, [], '没有此用户', '0002');
+        }
 
+    }
 
 
 }
