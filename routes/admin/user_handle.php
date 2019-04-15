@@ -18,8 +18,11 @@ Route::group(['prefix' => 'user-handle'], function () {
     Route::match(['get', 'options'], 'users-info', ['as' => $namePrefix . 'users-info', 'uses' => $controller . 'usersInfo']);
     //给用户申请密码更换
     Route::match(['post', 'options'], 'reset-password', ['as' => $namePrefix . 'reset-password', 'uses' => $controller . 'applyResetUserPassword']);
-    //用户密码已申请列表
-    Route::match(['get', 'options'], 'reset-password-list', ['as' => $namePrefix . 'reset-password-list', 'uses' => $controller . 'appliedResetUserPasswordLists']);
     //给用户申请资金密码更换
     Route::match(['post', 'options'], 'reset-fund-password', ['as' => $namePrefix . 'reset-fund-password', 'uses' => $controller . 'applyResetUserFundPassword']);
+    //用户密码已申请列表
+    Route::match(['get', 'options'], 'reset-password-list', ['as' => $namePrefix . 'reset-password-list', 'uses' => $controller . 'appliedResetUserPasswordLists']);
+    //用户资金密码已申请列表
+    Route::match(['get', 'options'], 'reset-fund-password-list', ['as' => $namePrefix . 'reset-fund-password-list', 'uses' => $controller . 'appliedResetUserFundPasswordLists']);
+
 });

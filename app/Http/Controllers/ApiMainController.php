@@ -152,11 +152,11 @@ class ApiMainController extends Controller
             //for single where condition searching
             if (!empty($searchCriterias)) {
                 foreach ($searchCriterias as $key => $value) {
+                    $sign = array_key_exists($key, $query_conditions) ? $query_conditions[$key] : '=';
+                    $queryEloq = $queryEloq->where($key, $sign, $value);
                     if ($fixedJoin > 0) {
+
                         $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $query_conditions);
-                    } else {
-                        $sign = array_key_exists($key, $query_conditions) ? $query_conditions[$key] : '=';
-                        $queryEloq = $queryEloq->where($key, $sign, $value);
                     }
                 }
             } else { //for default

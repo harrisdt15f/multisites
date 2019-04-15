@@ -182,10 +182,24 @@ class UserHandleController extends ApiMainController
     }
 
     /**
-     * 用户已申请的密码列表
+ * 用户已申请的密码列表
+ * @return \Illuminate\Http\JsonResponse
+ */
+    public function appliedResetUserPasswordLists()
+    {
+        return $this->commonAppliedPasswordHandle();
+    }
+
+    /**
+     * 用户资金密码已申请列表
      * @return \Illuminate\Http\JsonResponse
      */
-    public function appliedResetUserPasswordLists()
+    public function appliedResetUserFundPasswordLists()
+    {
+        return $this->commonAppliedPasswordHandle();
+    }
+
+    private function commonAppliedPasswordHandle()
     {
         //main model
         $eloqM = $this->modelWithNameSpace('PassworAuditLists');
@@ -197,5 +211,10 @@ class UserHandleController extends ApiMainController
         $withSearchAbleFields = ['username'];
         $data = $this->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields);
         return $this->msgout(true, $data);
+
     }
+
+
+
+
 }
