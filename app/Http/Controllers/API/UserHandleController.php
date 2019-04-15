@@ -158,6 +158,7 @@ class UserHandleController extends ApiMainController
             DB::beginTransaction();
             try {
                 $auditResult = $auditFlowEloq->fill($flowData);
+                $auditResult->save();
                 $auditData = [
                     'type' => $type,
                     'user_id' => $applyUserEloq->id,
@@ -166,7 +167,6 @@ class UserHandleController extends ApiMainController
                     'status' => 0,
                 ];
                 $adminApplyResult = $adminApplyEloq->fill($auditData);
-                $auditResult->save();
                 $adminApplyResult->save();
                 DB::commit();
                 return $this->msgout(true, []);
