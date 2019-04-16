@@ -54,6 +54,11 @@ class UserHandleModel extends Authenticatable
     {
         return $this->hasOne(HandleUserAccounts::class,'id','account_id');
     }
+    //用户冻结历史
+    public function userAdmitedFlow()
+    {
+        return $this->hasMany(UserAdmitedFlowsModel::class,'user_id','id')->orderBy('created_at', 'desc');
+    }
 
     public function getAccountAttribute()
     {
