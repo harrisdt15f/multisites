@@ -28,7 +28,6 @@ Route::group(['prefix' => 'user-handle'], function () {
     Route::match(['post', 'options'], 'audit-applied-password', ['as' => $namePrefix . 'audit-applied-password', 'uses' => $controller . 'auditApplyUserPassword']);
     //给用户审核资金密码
     Route::match(['post', 'options'], 'audit-applied-fund-password', ['as' => $namePrefix . 'audit-applied-fund-password', 'uses' => $controller . 'auditApplyUserFundPassword']);
-
     //给用户冻结操作
     Route::match(['post', 'options'], 'deactivate', ['as' => $namePrefix . 'deactivate', 'uses' => $controller . 'deactivate']);
 

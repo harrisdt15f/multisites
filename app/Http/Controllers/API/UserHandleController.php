@@ -6,6 +6,7 @@ use App\Http\Controllers\ApiMainController;
 use App\models\AuditFlow;
 use App\models\HandleUserAccounts;
 use App\models\PassworAuditLists;
+use App\models\UserAdmitedFlowsModel;
 use App\models\UserHandleModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -277,4 +278,48 @@ class UserHandleController extends ApiMainController
             return $this->msgout(false, [], '没有此条信息', '0002');
         }
     }
+
+    /**
+     * 用户冻结账号功能
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deactivate()
+    {
+        $rule = [
+            'user_id' => 'required|numeric',
+            'frozen_type' => 'required|numeric',//冻结类型
+            'comment'=> 'required',//备注
+        ];
+        $validator = Validator::make($this->inputs, $rule);
+        if ($validator->fails()) {
+            return $this->msgout(false, [], $validator->errors(), 200);
+        }
+        $userEloq = $this->eloqM::find($this->inputs['user_id']);
+        if (!is_null($userEloq)) {
+            DB::beginTransaction();
+            try {
+                $userEloq->frozen_type = $this->inputs['frozen_type'];
+                $userEloq->save();
+                $userAdmitFlowLog = new UserAdmitedFlowsModel();
+                $data = [
+                    'admin_id' => $this->partnerAdmin->id,
+                    'admin_name' => $this->partnerAdmin->name,
+                    'user_id' => $userEloq->id,
+                    'username' => $userEloq->username,
+                    'comment' => $this->inputs['comment'],
+                ];
+                $userAdmitFlowLog->fill($data);
+                $userAdmitFlowLog->save();
+                DB::commit();
+                return $this->msgout(true, []);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                $errorObj = $e->getPrevious()->getPrevious();
+                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
+                return $this->msgout(false, [], $msg, $sqlState);
+            }
+        }
+    }
+
+
 }
