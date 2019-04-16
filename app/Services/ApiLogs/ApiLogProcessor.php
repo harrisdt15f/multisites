@@ -68,9 +68,9 @@ class ApiLogProcessor
             $routeEloq = PartnerAdminRoute::where('route_name', $messageArr['route']['action']['as'])->first();
             if (!is_null($routeEloq)) {
                 $record['extra']['route_id'] = $routeEloq->id;
-                $record['extra']['menu_id'] = $routeEloq->menu->id;
-                $record['extra']['menu_label'] = $routeEloq->menu->label;
-                $record['extra']['menu_path'] = $routeEloq->menu->route;
+                $record['extra']['menu_id'] = $routeEloq->menu->id ?? null;
+                $record['extra']['menu_label'] = $routeEloq->menu->label ?? null;
+                $record['extra']['menu_path'] = $routeEloq->menu->route ?? null;
             }
             $record['message'] = '网络操作信息';
         }
