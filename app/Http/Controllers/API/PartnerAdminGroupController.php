@@ -40,7 +40,8 @@ class PartnerAdminGroupController extends ApiMainController
         }
 //        unique:books,label
         $data['platform_id'] = $this->currentPlatformEloq->platform_id;
-        $role = json_decode($data['role']); //[1,2,3,4,5]
+        $data['group_name']=$this->inputs['group_name'];
+        $role = json_decode($this->inputs['role']); //[1,2,3,4,5]
         $objPartnerAdminGroup = new $this->eloqM;
         $objPartnerAdminGroup->fill($data);
         try {
