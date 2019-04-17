@@ -67,6 +67,7 @@ class Handler extends ExceptionHandler
                 $result = [
                     'success' => false,
                     'code' => $exception->getCode(),
+                    'data' => [],
                     'message' => '您没有权限操作 请尝试先登录',
                 ];
             } else {
