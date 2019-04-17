@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\ApiMainController;
+use App\models\PartnerAdminUsers;
 use App\models\PartnerMenus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -116,6 +117,7 @@ class PartnerAdminGroupController extends ApiMainController
         ])->first();
         if (!is_null($datas)) {
             try {
+                PartnerAdminUsers::where('group_id',$datas->id)->update(['group_id'=> null]);
                 $datas->delete();
                 return $this->msgout(true, []);
             } catch (\Exception $e) {
