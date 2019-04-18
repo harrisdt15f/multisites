@@ -6,6 +6,7 @@ use App\Http\Controllers\ApiMainController;
 use App\models\AuditFlow;
 use App\models\HandleUserAccounts;
 use App\models\PassworAuditLists;
+use App\models\UserAdmitedFlowsModel;
 use App\models\UserHandleModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -183,9 +184,9 @@ class UserHandleController extends ApiMainController
     }
 
     /**
- * 用户已申请的密码列表
- * @return \Illuminate\Http\JsonResponse
- */
+     * 用户已申请的密码列表
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function appliedResetUserPasswordLists()
     {
         return $this->commonAppliedPasswordHandle();
@@ -229,7 +230,7 @@ class UserHandleController extends ApiMainController
         $rule = [
             'id' => 'required|numeric',
             'type' => 'required|numeric',//1登录密码 2 资金密码
-            'status'=> 'required|numeric',//1 通过 2 拒绝
+            'status' => 'required|numeric',//1 通过 2 拒绝
             'auditor_note' => 'required',//密码审核备注
         ];
         $validator = Validator::make($this->inputs, $rule);
@@ -246,24 +247,21 @@ class UserHandleController extends ApiMainController
             $auditFlowEloq = $applyUserEloq->auditFlow;
             //handle User
             $user = UserHandleModel::find($applyUserEloq->user_id);
-            if ($applyUserEloq->type ==1)
-            {
+            if ($applyUserEloq->type == 1) {
                 $user->password = $applyUserEloq->audit_data;
-            }
-            else{
+            } else {
                 $user->fund_password = $applyUserEloq->audit_data;
             }
             DB::beginTransaction();
             try {
-                if ($this->inputs['status']==1)
-                {
+                if ($this->inputs['status'] == 1) {
                     $user->save();
                 }
                 $auditFlowEloq->auditor_id = $this->partnerAdmin->id;
                 $auditFlowEloq->auditor_note = $this->inputs['auditor_note'];
-                $auditFlowEloq->auditor_name= $this->partnerAdmin->name;
+                $auditFlowEloq->auditor_name = $this->partnerAdmin->name;
                 $auditFlowEloq->save();
-                $applyUserEloq->status =$this->inputs['status'];
+                $applyUserEloq->status = $this->inputs['status'];
                 $applyUserEloq->save();
                 DB::commit();
                 return $this->msgout(true, []);
@@ -277,4 +275,65 @@ class UserHandleController extends ApiMainController
             return $this->msgout(false, [], '没有此条信息', '0002');
         }
     }
+
+    /**
+     * 用户冻结账号功能
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deactivate()
+    {
+        $rule = [
+            'user_id' => 'required|numeric',
+            'frozen_type' => 'required|numeric',//冻结类型
+            'comment' => 'required',//备注
+        ];
+        $validator = Validator::make($this->inputs, $rule);
+        if ($validator->fails()) {
+            return $this->msgout(false, [], $validator->errors(), 200);
+        }
+        $userEloq = $this->eloqM::find($this->inputs['user_id']);
+        if (!is_null($userEloq)) {
+            DB::beginTransaction();
+            try {
+                $userEloq->frozen_type = $this->inputs['frozen_type'];
+                $userEloq->save();
+                $userAdmitFlowLog = new UserAdmitedFlowsModel();
+                $data = [
+                    'admin_id' => $this->partnerAdmin->id,
+                    'admin_name' => $this->partnerAdmin->name,
+                    'user_id' => $userEloq->id,
+                    'username' => $userEloq->username,
+                    'comment' => $this->inputs['comment'],
+                ];
+                $userAdmitFlowLog->fill($data);
+                $userAdmitFlowLog->save();
+                DB::commit();
+                return $this->msgout(true, []);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                $errorObj = $e->getPrevious()->getPrevious();
+                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
+                return $this->msgout(false, [], $msg, $sqlState);
+            }
+        }
+    }
+
+    public function deactivateDetail()
+    {
+        $rule = [
+            'user_id' => 'required|numeric',
+        ];
+        $validator = Validator::make($this->inputs, $rule);
+        if ($validator->fails()) {
+            return $this->msgout(false, [], $validator->errors(), 200);
+        }
+        $userEloq = $this->eloqM::find($this->inputs['user_id']);
+        if (!is_null($userEloq)) {
+            $data = $userEloq->userAdmitedFlow->toArray();
+            return $this->msgout(true, $data);
+        }
+
+    }
+
+
 }

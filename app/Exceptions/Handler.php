@@ -59,7 +59,7 @@ class Handler extends ExceptionHandler
     }
 
 
-    /*protected function unauthenticated($request, AuthenticationException $exception)
+    protected function unauthenticated($request, AuthenticationException $exception)
     {
         if ($request->expectsJson()) {
             $msg = $exception->getMessage();
@@ -67,7 +67,8 @@ class Handler extends ExceptionHandler
                 $result = [
                     'success' => false,
                     'code' => $exception->getCode(),
-                    'message' => '您没有权限操作',
+                    'data' => [],
+                    'message' => '您没有权限操作 请尝试先登录',
                 ];
             } else {
                 $result = ['message' => $msg];
@@ -76,5 +77,5 @@ class Handler extends ExceptionHandler
         } else {
             return redirect()->guest($exception->redirectTo() ?? route('login'));
         }
-    }*/
+    }
 }

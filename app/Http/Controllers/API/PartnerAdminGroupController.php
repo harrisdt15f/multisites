@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\ApiMainController;
+use App\models\PartnerAdminUsers;
 use App\models\PartnerMenus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -40,7 +41,9 @@ class PartnerAdminGroupController extends ApiMainController
         }
 //        unique:books,label
         $data['platform_id'] = $this->currentPlatformEloq->platform_id;
-        $role = json_decode($data['role']); //[1,2,3,4,5]
+        $data['group_name']=$this->inputs['group_name'];
+        $data['role']=$this->inputs['role'];
+        $role = json_decode($this->inputs['role']); //[1,2,3,4,5]
         $objPartnerAdminGroup = new $this->eloqM;
         $objPartnerAdminGroup->fill($data);
         try {
@@ -115,6 +118,7 @@ class PartnerAdminGroupController extends ApiMainController
         ])->first();
         if (!is_null($datas)) {
             try {
+                PartnerAdminUsers::where('group_id',$datas->id)->update(['group_id'=> null]);
                 $datas->delete();
                 return $this->msgout(true, []);
             } catch (\Exception $e) {

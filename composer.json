@@ -43,7 +43,13 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": []
+            "dont-discover": [],
+            "providers": [
+                "Barryvdh\\Cors\\ServiceProvider"
+            ],
+            "aliases": {
+                "Cors": "Barryvdh\\Cors\\HandleCors"
+            }
         }
     },
     "autoload": {
