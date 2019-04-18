@@ -32,7 +32,7 @@ class PartnerMenus extends BaseModel
 
     public function forStar()
     {
-        $redisKey = $this->redisFirstTag. '*';
+        $redisKey = $this->redisFirstTag . '*';
         if (Cache::has($redisKey)) {
             $parent_menu = Cache::get($redisKey);
         } else {
@@ -48,7 +48,7 @@ class PartnerMenus extends BaseModel
      */
     public function getUserMenuDatas(PartnerAdminGroupAccess $accessGroupEloq)
     {
-        $redisKey = $this->redisFirstTag. $accessGroupEloq->id;
+        $redisKey = $this->redisFirstTag . $accessGroupEloq->id;
         if (Cache::has($redisKey)) {
             $parent_menu = Cache::get($redisKey);
         } else {
@@ -72,17 +72,31 @@ class PartnerMenus extends BaseModel
             if ($value->pid === 0) {
                 $menuForFE[$value->id]['label'] = $value->label;
                 $menuForFE[$value->id]['route'] = $value->route;
-                $menuForFE[$value->id]['class'] = $value->class;
+                $menuForFE[$value->id]['display'] = $value->display;
                 $menuForFE[$value->id]['icon'] = $value->icon;
                 $menuForFE[$value->id]['en_name'] = $value->en_name;
                 $menuForFE[$value->id]['pid'] = $value->pid;
             } else {
                 $menuForFE[$value->pid]['child'][$value->id]['label'] = $value->label;
                 $menuForFE[$value->pid]['child'][$value->id]['route'] = $value->route;
-                $menuForFE[$value->pid]['child'][$value->id]['class'] = $value->class;
+                $menuForFE[$value->pid]['child'][$value->id]['display'] = $value->display;
                 $menuForFE[$value->pid]['child'][$value->id]['icon'] = $value->icon;
                 $menuForFE[$value->pid]['child'][$value->id]['en_name'] = $value->en_name;
                 $menuForFE[$value->pid]['child'][$value->id]['pid'] = $value->pid;
+                $secondEloq = Self::find($value->id);
+                $thirdChildArr = $secondEloq->thirdChild->toArray();
+                if (!empty($thirdChildArr)) {
+                    foreach ($thirdChildArr as $tcvalue) {
+                        $thirdChildMenuIndex = [];
+                        $thirdChildMenuIndex[$tcvalue['id']]['label'] = $tcvalue['label'];
+                        $thirdChildMenuIndex[$tcvalue['id']]['route'] = $tcvalue['route'];
+                        $thirdChildMenuIndex[$tcvalue['id']]['display'] = $tcvalue['display'];
+                        $thirdChildMenuIndex[$tcvalue['id']]['icon'] = $tcvalue['icon'];
+                        $thirdChildMenuIndex[$tcvalue['id']]['en_name'] = $tcvalue['en_name'];
+                        $thirdChildMenuIndex[$tcvalue['id']]['pid'] = $tcvalue['pid'];
+                        $menuForFE[$value->pid]['child'][$value->id]['child'] = $thirdChildMenuIndex;
+                    }
+                }
             }
         }
         //            $hourToStore = 24;
@@ -104,5 +118,11 @@ class PartnerMenus extends BaseModel
     public static function getFirstLevelList()
     {
         return self::where('pid', 0)->get();
+    }
+
+    public function thirdChild()
+    {
+        $data = $this->hasMany(__CLASS__, 'pid', 'id');
+        return $data;
     }
 }
