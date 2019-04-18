@@ -76,7 +76,7 @@ class PartnerMenus extends BaseModel
                 $menuForFE[$value->id]['icon'] = $value->icon;
                 $menuForFE[$value->id]['en_name'] = $value->en_name;
                 $menuForFE[$value->id]['pid'] = $value->pid;
-            } else {
+            } else if ($value->level === 2) {
                 $menuForFE[$value->pid]['child'][$value->id]['label'] = $value->label;
                 $menuForFE[$value->pid]['child'][$value->id]['route'] = $value->route;
                 $menuForFE[$value->pid]['child'][$value->id]['display'] = $value->display;
@@ -95,7 +95,9 @@ class PartnerMenus extends BaseModel
                         $thirdChildMenuIndex[$tcvalue['id']]['en_name'] = $tcvalue['en_name'];
                         $thirdChildMenuIndex[$tcvalue['id']]['pid'] = $tcvalue['pid'];
                         $menuForFE[$value->pid]['child'][$value->id]['child'] = $thirdChildMenuIndex;
+
                     }
+
                 }
             }
         }
