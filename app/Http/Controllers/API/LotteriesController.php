@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\ApiMainController;
+use App\models\MethodsModel;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Validator;
 
@@ -32,6 +33,16 @@ class LotteriesController extends ApiMainController
             ['status', '=', 1],
         ])->get()->toArray();
         return $this->msgout(true,$lotteriesEloq);
+    }
+
+    public function lotteriesMethodLists()
+    {
+        $methodEloq = MethodsModel::where([
+            ['series_id', '=', 'ssc'],
+        ])->first();
+        $method =[];
+        $m[$methodEloq->series_id] =$methodEloq->lotteriesIds->toArray();
+        return $m;
     }
 
 
