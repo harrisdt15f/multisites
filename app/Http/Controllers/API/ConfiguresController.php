@@ -41,7 +41,7 @@ class ConfiguresController extends ApiMainController
             return $this->msgout(false, [], $validator->errors()->first(), 200);
         }
         $addDatas = [
-            'parent_id' => $this->inputs['parent_id'] ?? 0,
+            'parent_id' => $this->inputs['parent_id'],
             'sign' => $this->inputs['sign'],
             'name' => $this->inputs['name'],
             'description' => $this->inputs['description'],
