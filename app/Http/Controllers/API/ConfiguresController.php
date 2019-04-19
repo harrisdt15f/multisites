@@ -116,7 +116,7 @@ class ConfiguresController extends ApiMainController {
 		if (!is_null($pastData)) {
 			try {
 				$this->eloqM::where('id', $this->inputs['id'])->delete();
-				return $this->msgout(true, [], '删除配置成功', '200');
+				return $this->msgout(true, [], '删除配置成功');
 			} catch (\Exception $e) {
 				$errorObj = $e->getPrevious()->getPrevious();
 				[$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -126,4 +126,39 @@ class ConfiguresController extends ApiMainController {
 			return $this->msgout(false, [], '该数据不存在', '0009');
 		}
 	}
+
+	//配置状态开关 0关  1开
+	public function switch () {
+		$validator = Validator::make($this->inputs, [
+			'id' => 'required|numeric',
+			'parent_id' => 'required|numeric',
+			'status' => 'required|in:0,1',
+		]);
+		if ($validator->fails()) {
+			return $this->msgout(false, [], $validator->errors()->first(), 200);
+		}
+		if ($this->inputs['parent_id'] == 0) {
+			return $this->msgout(false, [], '主级配置不可修改状态', '0009');
+		}
+		$pastData = $this->eloqM::find($this->inputs['id']);
+		if (!is_null($pastData)) {
+			if ($this->inputs['status'] == 0) {
+				$editStatus = 1;
+			} else {
+				$editStatus = 0;
+			}
+			$pastData->status = $editStatus;
+			try {
+				$pastData->save();
+				return $this->msgout(true, [], '修改配置状态成功');
+			} catch (\Exception $e) {
+				$errorObj = $e->getPrevious()->getPrevious();
+				[$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+				return $this->msgout(false, [], $msg, $sqlState);
+			}
+		} else {
+			return $this->msgout(false, [], '该配置不存在', '0009');
+		}
+	}
+
 }
