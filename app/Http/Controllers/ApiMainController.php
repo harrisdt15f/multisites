@@ -6,6 +6,7 @@ use App\models\PartnerAdminRoute;
 use App\models\PartnerMenus;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
@@ -80,6 +81,8 @@ class ApiMainController extends Controller
                     $currentRouteGroup = json_decode($this->currentPartnerAccessGroup->role, true);
                     if (in_array($partnerMenuEloq->id, $currentRouteGroup)) {
                         $this->routeAccessable = true;
+                    } elseif (in_array($this->currentRouteName, Config::get('routelistexclude'))) {
+                        $this->routeAccessable = true;
                     }
                 }
             }
@@ -153,7 +156,7 @@ class ApiMainController extends Controller
             //for single where condition searching
             if (!empty($searchCriterias)) {
                 foreach ($searchCriterias as $key => $value) {
-                    $sign =array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
+                    $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
                     if ($sign == 'LIKE') {
                         $sign = strtolower($sign);
                         $value = '%' . $value . '%';
@@ -181,7 +184,7 @@ class ApiMainController extends Controller
             if (!empty($searchCriterias)) {
                 $whereData = [];
                 foreach ($searchCriterias as $key => $value) {
-                    $sign =array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
+                    $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
                     if ($sign == 'LIKE') {
                         $sign = strtolower($sign);
                         $value = '%' . $value . '%';

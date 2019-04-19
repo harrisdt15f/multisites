@@ -54,7 +54,7 @@ class PartnerMenus extends BaseModel
         } else {
             $role = json_decode($accessGroupEloq->role); //[1,2,3,4,5]
             $menuLists = self::whereIn('id', $role)->get();
-            $parent_menu = self::createMenuDatas($menuLists);
+            $parent_menu = self::createMenuDatas($menuLists,$accessGroupEloq->id);
         }
         return $parent_menu;
     }
