@@ -32,8 +32,12 @@ class ConfiguresController extends ApiMainController {
 			'sign' => 'required',
 			'name' => 'required',
 			'description' => 'required',
-			'value' => 'required',
 		]);
+		if ($this->inputs['parent_id'] != 0) {
+			$validator = Validator::make($this->inputs, [
+				'value' => 'required',
+			]);
+		}
 		if ($validator->fails()) {
 			return $this->msgout(false, [], $validator->errors()->first(), 200);
 		}
@@ -61,7 +65,7 @@ class ConfiguresController extends ApiMainController {
 				return $this->msgout(false, [], $msg, $sqlState);
 			}
 		} else {
-			return $this->msgout(false, [], '该配置已有请', '0009');
+			return $this->msgout(false, [], '该配置键名已存在', '0009');
 		}
 	}
 
@@ -96,7 +100,7 @@ class ConfiguresController extends ApiMainController {
 				return $this->msgout(false, [], $msg, $sqlState);
 			}
 		} else {
-			return $this->msgout(false, [], '该配置已有请', '0009');
+			return $this->msgout(false, [], '该配置键名已存在', '0009');
 		}
 	}
 
