@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 use App\Http\Controllers\ApiMainController;
+use Illuminate\Support\Facades\Validator;
 
 class MenuController extends ApiMainController
 {
@@ -15,11 +16,16 @@ class MenuController extends ApiMainController
         return response()->json($data);
     }
 
-    public function addPartnerMenu()
+    public function currentPartnerMenu()
     {
-
-
+        $data = [
+            'success' => true,
+            'data' => $this->partnerMenulists,
+        ];
+        return response()->json($data);
     }
+
+
 
 
 }
