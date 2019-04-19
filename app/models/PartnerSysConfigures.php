@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class PartnerSysConfigures extends BaseModel
 {
-    protected $table = 'partner-sys-configures';
+    protected $table = 'partner_sys_configures';
 }
