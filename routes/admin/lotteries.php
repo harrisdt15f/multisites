@@ -14,4 +14,6 @@ Route::group(['prefix' => 'lotteries'], function () {
     Route::match(['get', 'options'], 'series-lists', ['as' => $namePrefix . 'series-lists', 'uses' => $controller . 'seriesLists']);
     //彩种列表获取接口
     Route::match(['post', 'options'], 'lotteries-lists', ['as' => $namePrefix . 'lotteries-lists', 'uses' => $controller . 'lotteriesLists']);
+    //彩种玩法展示接口
+    Route::match(['get', 'options'], 'lotteries-method-lists', ['as' => $namePrefix . 'lotteries-method-lists', 'uses' => $controller . 'lotteriesMethodLists']);
 });

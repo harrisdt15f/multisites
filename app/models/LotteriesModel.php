@@ -5,7 +5,7 @@ namespace App\models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
-class LotteriesModel extends Model
+class LotteriesModel extends BaseModel
 {
     protected $table = 'lotteries';
 
