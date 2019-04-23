@@ -47,27 +47,25 @@ class LotteriesController extends ApiMainController
             $seriesList = array_keys(Config::get('game.main.series'));
             foreach ($seriesList as $seriesIthem)
             {
-                $methodEloq = MethodsModel::where([
-                    ['series_id', '=', $seriesIthem],
-                ])->first();
-                $lotteriesIds = $methodEloq->lotteriesIds;
-//        dd($lotteriesIds);
-                foreach ($lotteriesIds as $litems)
-                {
-                    $temp[$methodEloq->series_id][$litems->lottery_id] = [];
-                    $methodGrops = $litems->methodGroups;
-                    foreach ($methodGrops as $mgitems)
-                    {
-                        $temp[$methodEloq->series_id][$litems->lottery_id][$mgitems->method_group] =[];
-                        $methodRows = $mgitems->methodRows;
-                        foreach ($methodRows as $rowitems)
-                        {
-                            $temp[$methodEloq->series_id][$litems->lottery_id][$mgitems->method_group][$rowitems->method_row] =$rowitems->methodDetails->toArray();
+                    $methodEloq = MethodsModel::where([
+                        ['series_id', '=', $seriesIthem],
+                    ])->first();
+                    $lotteriesIds = $methodEloq->lotteriesIds;//        dd($lotteriesIds);
+                    foreach ($lotteriesIds as $litems) {
+                        $currentLotteryId = $litems->lottery_id;
+                        $temp[$seriesIthem][$currentLotteryId] = [];
+                        $methodGrops = $litems->methodGroups;
+                        foreach ($methodGrops as $mgitems) {
+                            $curentMethodGroup = $mgitems->method_group;
+                            $temp[$seriesIthem][$currentLotteryId][$curentMethodGroup] = [];
+                            $methodRows = $mgitems->methodRows;
+                            foreach ($methodRows as $rowitems) {
+                                $temp[$seriesIthem][$currentLotteryId][$curentMethodGroup][$rowitems->method_row] = $rowitems->methodDetails->toArray();
+                            }
                         }
-                    }
 
-                }
-                $method= array_merge($method,$temp);
+                    }
+                    $method = array_merge($method, $temp);
             }
             $hourToStore = 24;
             $expiresAt = Carbon::now()->addHours($hourToStore)->diffInMinutes();
