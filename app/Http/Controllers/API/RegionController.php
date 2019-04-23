@@ -55,4 +55,68 @@ class RegionController extends ApiMainController {
 		}
 		return $this->msgout(true, $datas);
 	}
+	//添加行政区
+	public function add() {
+		$validator = Validator::make($this->inputs, [
+			'region_id' => 'required|numeric',
+			'region_parent_id' => 'required|numeric',
+			'region_name' => 'required',
+			'region_level' => 'required|in:1,2,3,4',
+		]);
+		if ($validator->fails()) {
+			return $this->msgout(false, [], $validator->errors()->first());
+		}
+		$addDatas = [
+			'region_id' => $this->inputs['region_id'],
+			'region_parent_id' => $this->inputs['region_parent_id'],
+			'region_name' => $this->inputs['region_name'],
+			'region_level' => $this->inputs['region_level'],
+		];
+		$pastData = $this->eloqM::where(['region_parent_id' => $this->inputs['region_parent_id'], 'region_name' => $this->inputs['region_name']])->orwhere('region_id', $this->inputs['region_id'])->first();
+		if (is_null($pastData)) {
+			try {
+				$configure = new $this->eloqM();
+				$configure->fill($addDatas);
+				$configure->save();
+				return $this->msgout(true, [], '添加行政区成功');
+			} catch (\Exception $e) {
+				$errorObj = $e->getPrevious()->getPrevious();
+				[$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
+				return $this->msgout(false, [], $msg, $sqlState);
+			}
+		} else {
+			return $this->msgout(false, [], '该行政区已经存在', '0009');
+		}
+	}
+	//编辑行政区
+	public function edit() {
+		$validator = Validator::make($this->inputs, [
+			'id' => 'required|numeric',
+			'region_id' => 'required|numeric',
+			'region_name' => 'required',
+			'region_level' => 'required|in:1,2,3,4',
+		]);
+		if ($validator->fails()) {
+			return $this->msgout(false, [], $validator->errors()->first(), 200);
+		}
+		$pastData = $this->eloqM::where(function ($query) {
+			$query->where('region_id', '=', $this->inputs['region_id'])
+				->where('id', '!=', $this->inputs['id']);
+		})->first();
+		if (is_null($pastData)) {
+			$editDataEloq = $this->eloqM::find($this->inputs['id']);
+			$editDataEloq->region_id = $this->inputs['region_id'];
+			$editDataEloq->region_name = $this->inputs['region_name'];
+			try {
+				$editDataEloq->save();
+				return $this->msgout(true, [], '修改行政区成功');
+			} catch (\Exception $e) {
+				$errorObj = $e->getPrevious()->getPrevious();
+				[$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+				return $this->msgout(false, [], $msg, $sqlState);
+			}
+		} else {
+			return $this->msgout(false, [], '该行政区ID已存在', '0009');
+		}
+	}
 }
