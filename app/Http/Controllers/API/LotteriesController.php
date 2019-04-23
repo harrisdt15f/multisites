@@ -74,6 +74,6 @@ class LotteriesController extends ApiMainController
             Cache::put($redisKey, $method, $expiresAt);
 //            Cache::forever($redisKey, $method);
         }
-        return $method;
+        return $this->msgout(true,$method);
     }
 }
