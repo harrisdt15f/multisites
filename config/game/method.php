@@ -50,7 +50,6 @@ return [
         'santonghao'    => '三同号',
         'sanlianhao'    => '三连号',
         'hezhi'         => '和值',
-        'sanlianhao'    => '三连号',
 
         'diyiming'      => '第一名',
         'dierming'      => '第二名',

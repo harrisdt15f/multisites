@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\ApiMainController;
+use App\models\MethodsModel;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Validator;
 
@@ -34,5 +37,43 @@ class LotteriesController extends ApiMainController
         return $this->msgout(true,$lotteriesEloq);
     }
 
+    public function lotteriesMethodLists()
+    {
+        $method =[];
+        $redisKey = 'play_method_list';
+        if (Cache::has($redisKey)) {
+            $method = Cache::get($redisKey);
+        } else {
+            $seriesList = array_keys(Config::get('game.main.series'));
+            foreach ($seriesList as $seriesIthem)
+            {
+                $methodEloq = MethodsModel::where([
+                    ['series_id', '=', $seriesIthem],
+                ])->first();
+                $lotteriesIds = $methodEloq->lotteriesIds;
+//        dd($lotteriesIds);
+                foreach ($lotteriesIds as $litems)
+                {
+                    $temp[$methodEloq->series_id][$litems->lottery_id] = [];
+                    $methodGrops = $litems->methodGroups;
+                    foreach ($methodGrops as $mgitems)
+                    {
+                        $temp[$methodEloq->series_id][$litems->lottery_id][$mgitems->method_group] =[];
+                        $methodRows = $mgitems->methodRows;
+                        foreach ($methodRows as $rowitems)
+                        {
+                            $temp[$methodEloq->series_id][$litems->lottery_id][$mgitems->method_group][$rowitems->method_row] =$rowitems->methodDetails->toArray();
+                        }
+                    }
 
+                }
+                $method= array_merge($method,$temp);
+            }
+            $hourToStore = 24;
+            $expiresAt = Carbon::now()->addHours($hourToStore)->diffInMinutes();
+            Cache::put($redisKey, $method, $expiresAt);
+//            Cache::forever($redisKey, $method);
+        }
+        return $method;
+    }
 }
