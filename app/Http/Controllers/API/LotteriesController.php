@@ -19,6 +19,9 @@ class LotteriesController extends ApiMainController
         return $this->msgout(true,$seriesData);
     }
 
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function lotteriesLists()
     {
         $series = array_keys(Config::get('game.main.series'));
@@ -33,10 +36,15 @@ class LotteriesController extends ApiMainController
         $lotteriesEloq = $this->eloqM::where([
             ['series_id', '=', $this->inputs['series_id']],
             ['status', '=', 1],
-        ])->get()->toArray();
+        ])->with(['issueRule' => function ($query) {
+            $query->select('id','lottery_id', 'lottery_name', 'begin_time', 'end_time', 'issue_seconds', 'first_time', 'adjust_time', 'encode_time', 'issue_count', 'status','created_at','updated_at');
+        }])->get()->toArray();
         return $this->msgout(true,$lotteriesEloq);
     }
 
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function lotteriesMethodLists()
     {
         $method =[];
