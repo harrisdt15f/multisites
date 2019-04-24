@@ -18,8 +18,8 @@ class LotteriesModel extends BaseModel
         'cn_name', 'en_name', 'series_id', 'is_fast', 'auto_open', 'max_trace_number', 'day_issue', 'issue_format', 'issue_type', 'valid_code', 'code_length', 'positions', 'min_prize_group', 'max_prize_group', 'min_times', 'max_times', 'valid_modes', 'status',
     ];
 
-//    public function getIssueFormatAttribute()
-//    {
-//        return  Carbon::now()->format($this->attributes['issue_format']);
-//    }
+    public function issueRule()
+    {
+        return  $this->hasOne(IssueRulesModel::class,'lottery_id','en_name');
+    }
 }
