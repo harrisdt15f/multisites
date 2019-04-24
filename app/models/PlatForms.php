@@ -2,8 +2,6 @@
 
 namespace App\models;
 
-use Illuminate\Database\Eloquent\Model;
-
 class PlatForms extends BaseModel
 {
 

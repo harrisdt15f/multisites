@@ -2,9 +2,7 @@
 
 namespace App\models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class IssueRulesModel extends Model
+class IssueRulesModel extends BaseModel
 {
     protected $table = 'issue_rules';
 
