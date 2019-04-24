@@ -9,7 +9,8 @@ class ActivityInfosController extends ApiMainController {
 	protected $eloqM = 'ActivityInfos';
 	//活动列表
 	public function detail() {
-		$datas = $this->eloqM::all()->toArray();
+		$searchAbleFields = ['title', 'type', 'status', 'admin_name', 'is_time_interval'];
+		$datas = $this->generateSearchQuery($this->eloqM, $searchAbleFields);
 		if (empty($datas)) {
 			return $this->msgout(false, [], '没有获取到数据', '0009');
 		}
@@ -40,9 +41,9 @@ class ActivityInfosController extends ApiMainController {
 		$path = 'uploaded_files/mobile_activity_' . $this->currentPlatformEloq->platform_id . '_' . $this->currentPlatformEloq->platform_name;
 		$rule = ['jpg', 'png', 'gif'];
 		//进行上传
-		$pic = $this->upload_img($file, $path, $rule);
-		if (!$pic['path'] || is_null($pic['path'])) {
-			return $this->msgout(false, [], '图片上传失败', '0009');
+		$pic = $this->uploadImg($file, $path, $rule);
+		if ($pic['success'] === false) {
+			return $this->msgout(false, [], $pic['message'], '0009');
 		}
 		$addDatas = [
 			'title' => $this->inputs['title'],
@@ -67,8 +68,6 @@ class ActivityInfosController extends ApiMainController {
 			[$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
 			return $this->msgout(false, [], $msg, $sqlState);
 		}
-
-		exit;
 	}
 	//编辑活动
 	public function edit() {
@@ -107,16 +106,16 @@ class ActivityInfosController extends ApiMainController {
 			$path = 'uploaded_files/mobile_activity_' . $this->currentPlatformEloq->platform_id . '_' . $this->currentPlatformEloq->platform_name;
 			$rule = ['jpg', 'png', 'gif'];
 			//进行上传
-			$pic = $this->upload_img($file, $path, $rule);
-			if (!$pic['path'] || is_null($pic['path'])) {
-				return $this->msgout(false, [], '图片上传失败', '0009');
+			$pic = $this->uploadImg($file, $path, $rule);
+			if ($pic['success'] === false) {
+				return $this->msgout(false, [], $pic['message'], '0009');
 			}
 			$editDataEloq->pic_url = '/' . $pic['path'];
 		}
 		try {
 			$editDataEloq->save();
 			if (isset($this->inputs['pic']) && !is_null($this->inputs['pic'])) {
-				$this->delete_file(substr($pastpic, 1));
+				$this->deleteFile(substr($pastpic, 1));
 			}
 			return $this->msgout(true, [], '修改活动成功');
 		} catch (\Exception $e) {
@@ -137,7 +136,7 @@ class ActivityInfosController extends ApiMainController {
 		if (!is_null($pastData)) {
 			try {
 				$this->eloqM::where('id', $this->inputs['id'])->delete();
-				$this->delete_file(substr($pastData['pic_url'], 1));
+				$this->deleteFile(substr($pastData['pic_url'], 1));
 				return $this->msgout(true, [], '删除活动成功');
 			} catch (\Exception $e) {
 				$errorObj = $e->getPrevious()->getPrevious();
@@ -149,40 +148,39 @@ class ActivityInfosController extends ApiMainController {
 		}
 	}
 	//图片上传
-	public function upload_img($file, $url_path, $rule) {
+	public function uploadImg($file, $url_path, $rule) {
 		// 检验一下上传的文件是否有效.
 		if ($file->isValid()) {
 			// 缓存在tmp文件夹中的文件名 例如 php8933.tmp 这种类型的.
 			$clientName = $file->getClientOriginalName();
-			$tmpName = $file->getFileName();
-			// 这个表示的是缓存在tmp文件夹下的文件的绝对路径(这里要注意,如果我使用接下来的move方法之后, getRealPath() 就找不到文件的路径了.因为文件已经被移走了.所以这里道出了文件上传的原理,将文件上传的某个临时目录中,然后使用Php的函数将文件移动到指定的文件夹.)
-			$realPath = $file->getRealPath();
 			// 上传文件的后缀.
 			$entension = $file->getClientOriginalExtension();
-
 			if (!in_array($entension, $rule)) {
-
-				return '图片格式为jpg,png,gif';
+				return ['success' => false, 'message' => '图片格式为jpg,png,gif'];
 			}
-			// 大家对mimeType应该不陌生了. 我得到的结果是 image/jpeg.(这里要注意一点,以前我们使用 mime_content_type() ,在php5.3 之后,开始使用 fileinfo 来获取文件的mime类型.所以要加入 php_fileinfo的php拓展.windows下是 php_fileinfo.dll,在php.ini文件中将 extension=php_fileinfo.dll前面的分号去掉即可.当然要重启服务器. )
-			$mimeTye = $file->getMimeType();
-			// (第一种)最后我们使用
-			//$path = $file -> move('storage/uploads');
-			// 如果你这样写的话,默认是会放置在 我们 public/storage/uploads/php79DB.tmp
-			// 貌似不是我们希望的,如果我们希望将其放置在app的storage目录下的uploads目录中,并且需要改名的话..
-			//(第二种)
 			$newName = md5(date("Y-m-d H:i:s") . $clientName) . "." . $entension;
-			$path = $file->move($url_path, $newName);
+			if (!file_exists($url_path)) {
+				mkdir($url_path, 0777, true);
+			}
+			if (!is_writable(dirname($url_path))) {
+				return ['success' => false, 'message' => dirname($url_path) . ' 请设置权限!!!'];
+			} else {
+				$file->move($url_path, $newName);
+			}
 			// 这里public_path()就是public文件夹所在的路径.$newName 通过算法获得的文件的名称.主要是不能重复产生冲突即可.
 			// 利用日期和客户端文件名结合 使用md5 算法加密得到结果.后面加上文件原始的拓展名.
 			//文件名
 			$namePath = $url_path . '/' . $newName;
-			return ['name' => $newName, 'path' => $namePath];
+			return ['success' => true, 'name' => $newName, 'path' => $namePath];
 		}
 	}
-	public function delete_file($path) {
+	public function deleteFile($path) {
 		if (file_exists($path)) {
-			return unlink($path);
+			if (!is_writable(dirname($path))) {
+				return $this->msgout(true, [], dirname($path) . ' 请设置权限!!!');
+			} else {
+				return unlink($path);
+			}
 		}
 	}
 }
