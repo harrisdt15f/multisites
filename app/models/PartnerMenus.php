@@ -88,14 +88,13 @@ class PartnerMenus extends BaseModel
                 if (!empty($thirdChildArr)) {
                     foreach ($thirdChildArr as $tcvalue) {
                         $thirdChildMenuIndex = [];
-                        $thirdChildMenuIndex[$tcvalue['id']]['label'] = $tcvalue['label'];
-                        $thirdChildMenuIndex[$tcvalue['id']]['route'] = $tcvalue['route'];
-                        $thirdChildMenuIndex[$tcvalue['id']]['display'] = $tcvalue['display'];
-                        $thirdChildMenuIndex[$tcvalue['id']]['icon'] = $tcvalue['icon'];
-                        $thirdChildMenuIndex[$tcvalue['id']]['en_name'] = $tcvalue['en_name'];
-                        $thirdChildMenuIndex[$tcvalue['id']]['pid'] = $tcvalue['pid'];
-                        $menuForFE[$value->pid]['child'][$value->id]['child'] = $thirdChildMenuIndex;
-
+                        $thirdChildMenuIndex['label'] = $tcvalue['label'];
+                        $thirdChildMenuIndex['route'] = $tcvalue['route'];
+                        $thirdChildMenuIndex['display'] = $tcvalue['display'];
+                        $thirdChildMenuIndex['icon'] = $tcvalue['icon'];
+                        $thirdChildMenuIndex['en_name'] = $tcvalue['en_name'];
+                        $thirdChildMenuIndex['pid'] = $tcvalue['pid'];
+                        $menuForFE[$value->pid]['child'][$value->id]['child'][$tcvalue['id']] = $thirdChildMenuIndex;
                     }
 
                 }
