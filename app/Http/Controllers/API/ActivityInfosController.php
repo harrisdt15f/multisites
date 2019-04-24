@@ -6,33 +6,149 @@ use App\Http\Controllers\ApiMainController;
 use Illuminate\Support\Facades\Validator;
 
 class ActivityInfosController extends ApiMainController {
-	protected $eloqM = 'partner_activity_infos';
-	public function add_info() {
+	protected $eloqM = 'ActivityInfos';
+	//活动列表
+	public function detail() {
+		$datas = $this->eloqM::all()->toArray();
+		if (empty($datas)) {
+			return $this->msgout(false, [], '没有获取到数据', '0009');
+		}
+		return $this->msgout(true, $datas);
+	}
+	//添加活动
+	public function add() {
 		$validator = Validator::make($this->inputs, [
 			'title' => 'required',
 			'type' => 'required|numeric',
 			'content' => 'required',
 			'pic' => 'required',
+			'start_time' => 'required',
+			'end_time' => 'required',
 			'status' => 'required',
 			'redirect_url' => 'required',
 			'is_time_interval' => 'required|numeric',
-			'start_time' => 'required',
-			'end_time' => 'required',
 		]);
 		if ($validator->fails()) {
 			return $this->msgout(false, [], $validator->errors()->first());
 		}
+		$pastData = $this->eloqM::where('title', $this->inputs['title'])->first();
+		if (!is_null($pastData)) {
+			return $this->msgout(false, [], '该活动名已存在', '0009');
+		}
 		//接收文件信息
-		// $file = $this->inputs['pic'];
-		// $path = 'uploaded_files/mobile_activity_' . $this->currentPlatformEloq->platform_id . '_' . $this->currentPlatformEloq->platform_name;
-		// $rule = ['jpg', 'png', 'gif'];
-		// //进行上传
-		// $pic = $this->upload_img($file, $path, $rule);
-		// return $pic; //图片名称加保存路径
-		$pic = '{"name":"0af57e462b131bf95d81d5a1430a99d3.png","path":"uploaded_files\/mobile_activity_1_aa\/0af57e462b131bf95d81d5a1430a99d3.png"}';
+		$file = $this->inputs['pic'];
+		$path = 'uploaded_files/mobile_activity_' . $this->currentPlatformEloq->platform_id . '_' . $this->currentPlatformEloq->platform_name;
+		$rule = ['jpg', 'png', 'gif'];
+		//进行上传
+		$pic = $this->upload_img($file, $path, $rule);
+		if (!$pic['path'] || is_null($pic['path'])) {
+			return $this->msgout(false, [], '图片上传失败', '0009');
+		}
+		$addDatas = [
+			'title' => $this->inputs['title'],
+			'type' => $this->inputs['type'],
+			'content' => $this->inputs['content'],
+			'pic_url' => '/' . $pic['path'],
+			'start_time' => $this->inputs['start_time'],
+			'end_time' => $this->inputs['end_time'],
+			'status' => $this->inputs['status'],
+			'admin_id' => $this->partnerAdmin['id'],
+			'admin_name' => $this->partnerAdmin['name'],
+			'redirect_url' => $this->inputs['redirect_url'],
+			'is_time_interval' => $this->inputs['is_time_interval'],
+		];
+		try {
+			$configure = new $this->eloqM();
+			$configure->fill($addDatas);
+			$configure->save();
+			return $this->msgout(true, [], '添加活动成功');
+		} catch (\Exception $e) {
+			$errorObj = $e->getPrevious()->getPrevious();
+			[$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
+			return $this->msgout(false, [], $msg, $sqlState);
+		}
 
 		exit;
 	}
+	//编辑活动
+	public function edit() {
+		$validator = Validator::make($this->inputs, [
+			'id' => 'required|numeric',
+			'title' => 'required',
+			'type' => 'required|numeric',
+			'content' => 'required',
+			'start_time' => 'required',
+			'end_time' => 'required',
+			'status' => 'required',
+			'redirect_url' => 'required',
+			'is_time_interval' => 'required|numeric',
+		]);
+		if ($validator->fails()) {
+			return $this->msgout(false, [], $validator->errors()->first());
+		}
+		$pastData = $this->eloqM::where('title', $this->inputs['title'])->where('id', '!=', $this->inputs['id'])->first();
+		if (!is_null($pastData)) {
+			return $this->msgout(false, [], '该活动名已存在', '0009');
+		}
+		$editDataEloq = $this->eloqM::find($this->inputs['id']);
+		$editDataEloq->title = $this->inputs['title'];
+		$editDataEloq->type = $this->inputs['type'];
+		$editDataEloq->content = $this->inputs['content'];
+		$editDataEloq->start_time = $this->inputs['start_time'];
+		$editDataEloq->end_time = $this->inputs['end_time'];
+		$editDataEloq->status = $this->inputs['status'];
+		$editDataEloq->redirect_url = $this->inputs['redirect_url'];
+		$editDataEloq->is_time_interval = $this->inputs['is_time_interval'];
+		//如果修改了图片
+		if (isset($this->inputs['pic']) && !is_null($this->inputs['pic'])) {
+			$pastpic = $editDataEloq->pic_url;
+			//接收文件信息
+			$file = $this->inputs['pic'];
+			$path = 'uploaded_files/mobile_activity_' . $this->currentPlatformEloq->platform_id . '_' . $this->currentPlatformEloq->platform_name;
+			$rule = ['jpg', 'png', 'gif'];
+			//进行上传
+			$pic = $this->upload_img($file, $path, $rule);
+			if (!$pic['path'] || is_null($pic['path'])) {
+				return $this->msgout(false, [], '图片上传失败', '0009');
+			}
+			$editDataEloq->pic_url = '/' . $pic['path'];
+		}
+		try {
+			$editDataEloq->save();
+			if (isset($this->inputs['pic']) && !is_null($this->inputs['pic'])) {
+				$this->delete_file(substr($pastpic, 1));
+			}
+			return $this->msgout(true, [], '修改活动成功');
+		} catch (\Exception $e) {
+			$errorObj = $e->getPrevious()->getPrevious();
+			[$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+			return $this->msgout(false, [], $msg, $sqlState);
+		}
+	}
+	//删除活动
+	public function delete() {
+		$validator = Validator::make($this->inputs, [
+			'id' => 'required|numeric',
+		]);
+		if ($validator->fails()) {
+			return $this->msgout(false, [], $validator->errors()->first(), 200);
+		}
+		$pastData = $this->eloqM::find($this->inputs['id']);
+		if (!is_null($pastData)) {
+			try {
+				$this->eloqM::where('id', $this->inputs['id'])->delete();
+				$this->delete_file(substr($pastData['pic_url'], 1));
+				return $this->msgout(true, [], '删除活动成功');
+			} catch (\Exception $e) {
+				$errorObj = $e->getPrevious()->getPrevious();
+				[$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+				return $this->msgout(false, [], $msg, $sqlState);
+			}
+		} else {
+			return $this->msgout(false, [], '该活动不存在', '0009');
+		}
+	}
+	//图片上传
 	public function upload_img($file, $url_path, $rule) {
 		// 检验一下上传的文件是否有效.
 		if ($file->isValid()) {
@@ -62,6 +178,11 @@ class ActivityInfosController extends ApiMainController {
 			//文件名
 			$namePath = $url_path . '/' . $newName;
 			return ['name' => $newName, 'path' => $namePath];
+		}
+	}
+	public function delete_file($path) {
+		if (file_exists($path)) {
+			return unlink($path);
 		}
 	}
 }

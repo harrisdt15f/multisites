@@ -4,8 +4,10 @@
 Route::group(['prefix' => 'activity'], function () {
 	$namePrefix = 'activity.';
 	$controller = 'ActivityInfosController@';
-	// Route::get('get_sub_configures', ['as' => $namePrefix, 'uses' => $controller.'get_sub_configures']);
-	// echo $controller . 'get_sub_configures';exit;
-	Route::match(['post', 'options'], 'add_info', ['as' => $namePrefix . 'add_info', 'uses' => $controller . 'add_info']);
-	// Route::match(['post', 'options'], 'get_town', ['as' => $namePrefix . 'get_town', 'uses' => $controller . 'get_town']);
+	Route::match(['get', 'options'], 'detail', ['as' => $namePrefix . 'detail', 'uses' => $controller . 'detail']);
+	Route::match(['post', 'options'], 'add', ['as' => $namePrefix . 'add', 'uses' => $controller . 'add']);
+	Route::match(['post', 'options'], 'edit', ['as' => $namePrefix . 'edit', 'uses' => $controller . 'edit']);
+	Route::match(['post', 'options'], 'delete', ['as' => $namePrefix . 'delete', 'uses' => $controller . 'delete']);
+	//活动类型列表
+	Route::match(['get', 'options'], 'type', ['as' => $namePrefix . 'type', 'uses' => 'ActivityTypeController@detail']);
 });
