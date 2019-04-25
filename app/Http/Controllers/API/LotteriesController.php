@@ -82,4 +82,15 @@ class LotteriesController extends ApiMainController
         }
         return $this->msgout(true,$method);
     }
+
+    public function lotteryIssueLists()
+    {
+        $modelName = 'IssueModel';
+        $eloqM = $this->modelWithNameSpace($modelName);
+        $searchAbleFields = ['lottery_id','issue'];
+        $data = $this->generateSearchQuery($eloqM, $searchAbleFields);
+        return $this->msgout(true, $data);
+    }
+
+
 }
