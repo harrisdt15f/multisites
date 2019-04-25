@@ -132,12 +132,14 @@ class ApiMainController extends Controller
      * Generate Search Query
      * @param $eloqM
      * @param $searchAbleFields
-     * @param $fixedJoin
+     * @param int $fixedJoin
      * @param $withTable
      * @param $withSearchAbleFields
+     * @param string $orderFields
+     * @param string $orderFlow
      * @return mixed
      */
-    public function generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin = 0, $withTable = null, $withSearchAbleFields = null)
+    public function generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin = 0, $withTable = null, $withSearchAbleFields = null, $orderFields = 'updated_at', $orderFlow = 'desc')
     {
         $searchCriterias = Input::only($searchAbleFields);
         $queryConditionField = Input::get('query_conditions');
@@ -217,7 +219,7 @@ class ApiMainController extends Controller
                 $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $queryConditions);
             }
         }
-        $data = $queryEloq->paginate($pageSize);
+        $data = $queryEloq->orderBy($orderFields, $orderFlow)->paginate($pageSize);
         return $data;
     }
 
