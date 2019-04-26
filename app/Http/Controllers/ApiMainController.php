@@ -141,16 +141,17 @@ class ApiMainController extends Controller
      */
     public function generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin = 0, $withTable = null, $withSearchAbleFields = null, $orderFields = 'updated_at', $orderFlow = 'desc')
     {
-        $searchCriterias = Input::only($searchAbleFields);
-        $queryConditionField = Input::get('query_conditions');
+        $searchCriterias = Arr::only($this->inputs, $searchAbleFields);
+        $queryConditionField = $this->inputs['query_conditions'] ?? '';
         $queryConditions = Arr::wrap(json_decode($queryConditionField, true));
-        $timeConditionField = Input::get('time_condtions');
+        $timeConditionField = $this->inputs['time_condtions'] ?? '';
         $timeConditions = Arr::wrap(json_decode($timeConditionField, true));
+        $extraWhereContitions = $this->inputs['extra_where'] ?? [];
+        $extraContitions = $this->inputs['extra_column'] ?? [];
         $queryEloq = new $eloqM;
         $sizeOfInputs = sizeof($searchCriterias);
-
         //with Criterias
-        $withSearchCriterias = Input::only($withSearchAbleFields);
+        $withSearchCriterias = Arr::only($this->inputs, $withSearchAbleFields);
         $sizeOfWithInputs = sizeof($withSearchCriterias);
 
         $pageSize = $this->inputs['page_size'] ?? 20;
@@ -171,6 +172,9 @@ class ApiMainController extends Controller
                 }
                 if (!empty($timeConditions)) {
                     $whereData = array_merge($whereData, $timeConditions);
+                }
+                if (!empty($extraContitions)) {
+                    $whereData = array_merge($whereData, $extraContitions);
                 }
                 $queryEloq = $eloqM::where($whereData);
                 if ($fixedJoin > 0) {
@@ -201,6 +205,9 @@ class ApiMainController extends Controller
                 if (!empty($timeConditions)) {
                     $whereData = array_merge($whereData, $timeConditions);
                 }
+                if (!empty($extraContitions)) {
+                    $whereData = array_merge($whereData, $extraContitions);
+                }
                 $queryEloq = $eloqM::where($whereData);
                 if ($fixedJoin > 0) {
                     $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $queryConditions);
@@ -211,13 +218,25 @@ class ApiMainController extends Controller
                 }
             }
         } else {
+            $whereData=[];
             if (!empty($timeConditions)) {
                 $whereData = $timeConditions;
-                $queryEloq = $eloqM::where($whereData);
+            }
+            if (!empty($extraContitions)) {
+                $whereData = array_merge($whereData, $extraContitions);
+            }
+            if (!empty($whereData)) {
+                $queryEloq = $eloqM::where($whereData); //$extraContitions
             }
             if ($fixedJoin > 0) {
                 $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $queryConditions);
             }
+        }
+        //extra wherein condition
+        if (!empty($extraWhereContitions))
+        {
+            $method = $extraWhereContitions['method'];
+            $queryEloq = $queryEloq->$method($extraWhereContitions['key'],$extraWhereContitions['value']);
         }
         $data = $queryEloq->orderBy($orderFields, $orderFlow)->paginate($pageSize);
         return $data;
