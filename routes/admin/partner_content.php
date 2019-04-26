@@ -3,12 +3,14 @@
 //内容管理
 Route::group(['prefix' => 'content'], function () {
     $namePrefix = 'content.';
-    // $controller = 'ConfiguresController@';
-    // Route::match(['get', 'options'], 'detail', ['as' => $namePrefix . 'detail', 'uses' => $controller . 'getConfiguresList']);
-    // Route::match(['post', 'options'], 'add', ['as' => $namePrefix . 'add', 'uses' => $controller . 'add']);
-    // Route::match(['post', 'options'], 'edit', ['as' => $namePrefix . 'edit', 'uses' => $controller . 'edit']);
-    // Route::match(['post', 'options'], 'delete', ['as' => $namePrefix . 'delete', 'uses' => $controller . 'delete']);
-    // Route::match(['post', 'options'], 'switch', ['as' => $namePrefix . 'switch', 'uses' => $controller . 'switch']);
+    $controller = 'ArticlesController@';
+    Route::match(['post', 'options'], 'detail', ['as' => $namePrefix . 'detail', 'uses' => $controller . 'detail']);
+    Route::match(['post', 'options'], 'add-articles', ['as' => $namePrefix . 'add-articles', 'uses' => $controller . 'addArticles']);
+    Route::match(['post', 'options'], 'edit-articles', ['as' => $namePrefix . 'edit-articles', 'uses' => $controller . 'editArticles']);
+    Route::match(['post', 'options'], 'delete-articles', ['as' => $namePrefix . 'delete-articles', 'uses' => $controller . 'deleteArticles']);
+    Route::match(['post', 'options'], 'sort-articles', ['as' => $namePrefix . 'sort-articles', 'uses' => $controller . 'sortArticles']);
+    Route::match(['post', 'options'], 'top-articles', ['as' => $namePrefix . 'top-articles', 'uses' => $controller . 'topArticles']);
     //分类管理
     Route::match(['get', 'options'], 'category', ['as' => $namePrefix . 'category', 'uses' => 'CategoryController@detail']);
+    Route::match(['get', 'options'], 'category-select', ['as' => $namePrefix . 'category-select', 'uses' => 'CategoryController@select']);
 });
