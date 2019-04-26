@@ -218,7 +218,7 @@ class ApiMainController extends Controller
                 }
             }
         } else {
-            $whereData=[];
+            $whereData = [];
             if (!empty($timeConditions)) {
                 $whereData = $timeConditions;
             }
@@ -233,10 +233,9 @@ class ApiMainController extends Controller
             }
         }
         //extra wherein condition
-        if (!empty($extraWhereContitions))
-        {
+        if (!empty($extraWhereContitions)) {
             $method = $extraWhereContitions['method'];
-            $queryEloq = $queryEloq->$method($extraWhereContitions['key'],$extraWhereContitions['value']);
+            $queryEloq = $queryEloq->$method($extraWhereContitions['key'], $extraWhereContitions['value']);
         }
         $data = $queryEloq->orderBy($orderFields, $orderFlow)->paginate($pageSize);
         return $data;
