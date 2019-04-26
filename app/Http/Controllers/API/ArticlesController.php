@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\ApiMainController;
+use App\models\AuditFlow;
 use Illuminate\Support\Facades\Validator;
 
 class ArticlesController extends ApiMainController
@@ -11,8 +12,10 @@ class ArticlesController extends ApiMainController
     //文章列表
     public function detail()
     {
+        $field = 'sort';
+        $type = 'asc';
         $searchAbleFields = ['title', 'type', 'search_text', 'is_for_agent'];
-        $datas = $this->generateSearchQuery($this->eloqM, $searchAbleFields);
+        $datas = $this->generateSearchQuery($this->eloqM, $searchAbleFields, 0, null, null, $field, $type);
         if (empty($datas)) {
             return $this->msgout(false, [], '没有获取到数据', '0009');
         }
@@ -27,8 +30,8 @@ class ArticlesController extends ApiMainController
             'summary' => 'required|string',
             'content' => 'required|string',
             'search_text' => 'required|string',
-            'status' => 'required|in:0,1,2,3',
             'is_for_agent' => 'required|in:0,1',
+            'apply_note' => 'required|string',
         ]);
         if ($validator->fails()) {
             return $this->msgout(false, [], $validator->errors()->first());
@@ -50,13 +53,22 @@ class ArticlesController extends ApiMainController
             'content' => $this->inputs['content'],
             'search_text' => $this->inputs['search_text'],
             'is_for_agent' => $this->inputs['is_for_agent'],
-            'status' => $this->inputs['status'],
+            'status' => 0,
             'add_admin_id' => $this->partnerAdmin['id'],
             'last_update_admin_id' => $this->partnerAdmin['id'],
             'sort' => $sort,
         ];
+        $flowDatas = [
+            'admin_id' => $this->partnerAdmin['id'],
+            'apply_note' => $this->inputs['apply_note'],
+            'admin_name' => $this->partnerAdmin['name'],
+        ];
         try {
+            $flowConfigure = new AuditFlow;
+            $flowConfigure->fill($flowDatas);
+            $flowConfigure->save();
             $configure = new $this->eloqM();
+            $addDatas['audit_flow_id'] = $flowConfigure->id;
             $configure->fill($addDatas);
             $configure->save();
             return $this->msgout(true, [], '发布文章成功');
@@ -76,8 +88,8 @@ class ArticlesController extends ApiMainController
             'summary' => 'required|string',
             'content' => 'required|string',
             'search_text' => 'required|string',
-            'status' => 'required|in:0,1,2,3',
             'is_for_agent' => 'required|in:0,1',
+            'apply_note' => 'required|string',
         ]);
         if ($validator->fails()) {
             return $this->msgout(false, [], $validator->errors()->first());
@@ -92,10 +104,19 @@ class ArticlesController extends ApiMainController
         $editDataEloq->summary = $this->inputs['summary'];
         $editDataEloq->content = $this->inputs['content'];
         $editDataEloq->search_text = $this->inputs['search_text'];
-        $editDataEloq->status = $this->inputs['status'];
         $editDataEloq->is_for_agent = $this->inputs['is_for_agent'];
         $editDataEloq->last_update_admin_id = $this->partnerAdmin['id'];
+        $editDataEloq->status = 0;
+        $flowDatas = [
+            'admin_id' => $this->partnerAdmin['id'],
+            'apply_note' => $this->inputs['apply_note'],
+            'admin_name' => $this->partnerAdmin['name'],
+        ];
         try {
+            $flowConfigure = new AuditFlow;
+            $flowConfigure->fill($flowDatas);
+            $flowConfigure->save();
+            $editDataEloq->audit_flow_id = $flowConfigure->id;
             $editDataEloq->save();
             return $this->msgout(true, [], '修改文章成功');
         } catch (\Exception $e) {
