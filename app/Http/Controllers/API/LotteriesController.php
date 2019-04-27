@@ -5,7 +5,6 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\ApiMainController;
 use App\models\LotteriesModel;
 use App\models\MethodsModel;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
@@ -96,8 +95,8 @@ class LotteriesController extends ApiMainController
             foreach ($lotteryEnNames as $lotteryIthems) {
                 $tempLotteryId[] = $lotteryIthems->en_name;
             }
-            $this->inputs['extra_where']['method'] ='whereIn';
-            $this->inputs['extra_where']['key'] ='lottery_id';
+            $this->inputs['extra_where']['method'] = 'whereIn';
+            $this->inputs['extra_where']['key'] = 'lottery_id';
             $this->inputs['extra_where']['value'] = $tempLotteryId;
         }
         $searchAbleFields = ['lottery_id', 'issue'];
@@ -108,6 +107,16 @@ class LotteriesController extends ApiMainController
     // 生成奖期
     public function generateIssue()
     {
+        $rule = [
+            'lottery_id' => 'required',
+            'start_time' => 'required|date_format:Y-m-d',
+            'end_time' => 'required|date_format:Y-m-d',
+//            'start_issue' => 'required|numeric',//
+        ];
+        $validator = Validator::make($this->inputs, $rule);
+        if ($validator->fails()) {
+            return $this->msgout(false, [], $validator->errors(), 200);
+        }
         $lotteryId = $this->inputs['lottery_id'];
         $lottery = LotteriesModel::where('en_name', $lotteryId)->first();
         if (!$lottery) {
@@ -116,7 +125,7 @@ class LotteriesController extends ApiMainController
         // 生成
         $res = $lottery->genIssue($this->inputs['start_time'], $this->inputs['end_time'], $this->inputs['start_issue']);
         if (!is_array($res) || count($res) === 0) {
-            return $this->msgout(false, [], '您好, 奖期部分完成!', '0002');
+            return $this->msgout(false, [], '', '0002');
         } else {
             // 成功一部分
             $genRes = true;
@@ -127,6 +136,8 @@ class LotteriesController extends ApiMainController
             }
             if (!$genRes) {
                 return $this->msgout(false, [], '您好, 奖期部分完成!', '0002');
+            } else {
+                return $this->msgout(true, $res);
             }
         }
     }
