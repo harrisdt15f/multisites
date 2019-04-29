@@ -77,7 +77,7 @@ class LotteriesModel extends BaseModel
         if (!$dtStartTime->lessThan($today) && !$dtEndTime->lessThan($today)) {
             do {
                 $data[] = $dtStartTime->format('Y-m-d');
-            } while ($dtStartTime->addDay()->lessThan($dtEndTime));
+            } while ($dtStartTime->addDay()->lessThanOrEqualTo($dtEndTime));
         }
         return $data;
     }
