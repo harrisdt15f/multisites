@@ -2,8 +2,6 @@
 
 namespace App\models;
 
-use Illuminate\Database\Eloquent\Model;
-
 class MethodsModel extends BaseModel
 {
     protected $table = 'methods';
@@ -24,16 +22,16 @@ class MethodsModel extends BaseModel
 
     public function methodGroups()
     {
-        return  $this->hasMany(__CLASS__,'lottery_id','lottery_id');
+        return  $this->hasMany(__CLASS__,'lottery_id','lottery_id')->select(['method_group'])->groupBy('method_group');
     }
 
     public function methodRows()
     {
-        return  $this->hasMany(__CLASS__,'method_group','method_group');
+        return  $this->hasMany(__CLASS__,'method_group','method_group')->select(['method_row'])->groupBy('method_row');
     }
 
     public function methodDetails()
     {
-        return  $this->hasMany(__CLASS__,'method_row','method_row');
+        return  $this->hasMany(__CLASS__,'method_row','method_row')->select(['id','lottery_name','method_id','method_name','status','created_at','updated_at']);
     }
 }

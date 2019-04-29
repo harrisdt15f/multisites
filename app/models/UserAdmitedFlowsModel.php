@@ -2,9 +2,7 @@
 
 namespace App\models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class UserAdmitedFlowsModel extends Model
+class UserAdmitedFlowsModel extends BaseModel
 {
     protected $table = 'user_admited_flows';
 
