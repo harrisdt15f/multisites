@@ -64,7 +64,7 @@ class CachePicControl extends Command
                     }
                 }
             }
-            $minutes = 1440;
+            $minutes = 2*24*60;
             Cache::put('CachePic', $CachePic, $minutes);
         }
     }
