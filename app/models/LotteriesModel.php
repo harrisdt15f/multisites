@@ -156,8 +156,9 @@ class LotteriesModel extends BaseModel
                     'begin_time' => $beginTime->timestamp,
                     'end_time' => $issueEndTime->timestamp,
                     'official_open_time' => $officialOpenTime->timestamp,
-                    'allow_encode_time' => $officialOpenTime->timestamp+$rule['encode_time'],
+                    'allow_encode_time' => $officialOpenTime->timestamp + $rule['encode_time'],
                     'day' => $intDay,
+                    'created_at' => Carbon::now(),
                 ];
 //                dd($issueEndTime, $issueEndTime->timestamp, $index);
                 if ($firstIssueNo) {
@@ -178,13 +179,17 @@ class LotteriesModel extends BaseModel
             return "生成的期数不正确, 应该：{$this->day_issue} - 实际:{$totalGenCount}";
         }
 
-        // 插入
-        $res = IssueModel::insert($data);
-
-        if ($res) {
+        try {
+            $insert_data = collect($data);
+            $chunks = $insert_data->chunk(10);
+            foreach ($chunks as $chunk) {
+                // 插入
+                $res = IssueModel::insert($chunk->toArray());
+            }
             return true;
+        } catch (\Exception $e) {
+            return '插入数据失败!!' . $e->getMessage();
         }
-        return '插入数据失败!!';
     }
 
     /**
