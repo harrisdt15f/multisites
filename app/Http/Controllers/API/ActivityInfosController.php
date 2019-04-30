@@ -41,7 +41,7 @@ class ActivityInfosController extends ApiMainController
         }
         //接收文件信息
         $file = $this->inputs['pic'];
-        $path = 'uploaded_files/mobile_activity_' . $this->currentPlatformEloq->platform_id . '_' . $this->currentPlatformEloq->platform_name;
+        $path = 'uploaded_files/' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id . '/mobile_activity_' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id;
         $rule = ['jpg', 'png', 'gif'];
         //进行上传
         $pic = $this->uploadImg($file, $path, $rule);
