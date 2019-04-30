@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
-class CachePicConsole extends Command
+class CachePicControl extends Command
 {
     /**
      * The name and signature of the console command.

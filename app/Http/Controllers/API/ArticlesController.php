@@ -144,7 +144,7 @@ class ArticlesController extends ApiMainController
                 Cache::put('CachePic', $CachePic, $minutes);
                 //删除原图
                 foreach ($past_pic_path as $k => $v) {
-                    $this->deleteFile($v);
+                    $this->deleteArticlePic($v);
                 }
             }
             $flowConfigure = new AuditFlow;
@@ -175,7 +175,7 @@ class ArticlesController extends ApiMainController
             try {
                 $this->eloqM::where('id', $this->inputs['id'])->delete();
                 foreach ($pic_path as $k => $v) {
-                    $this->deleteFile($v);
+                    $this->deleteArticlePic($v);
                 }
                 return $this->msgout(true, [], '删除文章成功');
             } catch (\Exception $e) {
@@ -245,7 +245,7 @@ class ArticlesController extends ApiMainController
         }
     }
     //图片上传
-    public function updatePic()
+    public function uploadPic()
     {
         $validator = Validator::make($this->inputs, [
             'pic' => 'required|file',
@@ -304,7 +304,7 @@ class ArticlesController extends ApiMainController
             return ['success' => true, 'name' => $newName, 'path' => $namePath];
         }
     }
-    public function deleteFile($path)
+    public function deleteArticlePic($path)
     {
         if (file_exists($path)) {
             if (!is_writable(dirname($path))) {
