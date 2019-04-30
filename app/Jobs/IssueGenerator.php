@@ -13,11 +13,13 @@ use Illuminate\Support\Facades\Log;
 class IssueGenerator implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
     protected $datas;
+
     /**
      * Create a new job instance.
      *
-     * @return void
+     * @param $datas
      */
     public function __construct($datas)
     {

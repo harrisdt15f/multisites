@@ -2,6 +2,7 @@
 
 namespace App\models;
 
+use App\Jobs\IssueInserter;
 use Illuminate\Support\Carbon;
 
 class LotteriesModel extends BaseModel
@@ -184,7 +185,7 @@ class LotteriesModel extends BaseModel
             $chunks = $insert_data->chunk(10);
             foreach ($chunks as $chunk) {
                 // 插入
-                $res = IssueModel::insert($chunk->toArray());
+                dispatch(new IssueInserter($chunk->toArray()))->onQueue('issues');
             }
             return true;
         } catch (\Exception $e) {
