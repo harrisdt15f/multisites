@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\ApiMainController;
 use App\models\AuditFlow;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
@@ -248,22 +249,21 @@ class ArticlesController extends ApiMainController
     public function uploadPic()
     {
         $validator = Validator::make($this->inputs, [
-            'pic' => 'required|file',
+            'upfile' => 'required|image|mimes:jpg,png,jpeg',
         ]);
         if ($validator->fails()) {
             return $this->msgout(false, [], $validator->errors()->first());
         }
         //接收文件信息
-        $file = $this->inputs['pic'];
+        $file = $this->inputs['upfile'];
         $path = 'uploaded_files/' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id . '/articles_' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id;
-        $rule = ['jpg', 'png', 'gif'];
         //进行上传
-        $pic = $this->uploadImg($file, $path, $rule);
+        $pic = $this->uploadImg($file, $path);
         if ($pic['success'] === false) {
             return $this->msgout(false, [], $pic['message'], '0009');
         }
-        $minutes = 1440;
-        $pic['expire_time'] = (time() + 60 * 3) . '';
+        $minutes = 2*24*60;
+        $pic['expire_time'] = Carbon::now()->addMinutes(30)->timestamp;
         if (Cache::has('CachePic')) {
             $CachePic = Cache::get('CachePic');
             $CachePic[$pic['name']] = $pic;
@@ -271,13 +271,10 @@ class ArticlesController extends ApiMainController
             $CachePic[$pic['name']] = $pic;
         }
         Cache::put('CachePic', $CachePic, $minutes);
-        //----------------------------------------
-        $CachePicInfo = Cache::get('CachePic');
-        var_dump($CachePicInfo);
-        //----------------------------------------
         return $this->msgout(true, $pic, '图片上传成功');
     }
-    public function uploadImg($file, $url_path, $rule)
+
+    public function uploadImg($file, $url_path)
     {
         // 检验一下上传的文件是否有效.
         if ($file->isValid()) {
@@ -285,10 +282,7 @@ class ArticlesController extends ApiMainController
             $clientName = $file->getClientOriginalName();
             // 上传文件的后缀.
             $entension = $file->getClientOriginalExtension();
-            if (!in_array($entension, $rule)) {
-                return ['success' => false, 'message' => '图片格式为jpg,png,gif'];
-            }
-            $newName = md5(date("Y-m-d H:i:s") . $clientName) . "." . $entension;
+            $newName = md5(date('Y-m-d H:i:s') . $clientName) . '.' . $entension;
             if (!file_exists($url_path)) {
                 mkdir($url_path, 0777, true);
             }
