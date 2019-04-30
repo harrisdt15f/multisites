@@ -119,5 +119,6 @@ class LotteriesController extends ApiMainController
             return $this->msgout(false, [], $validator->errors(), 200);
         }
         event(new IssueGenerateEvent($this->inputs));
+        return $this->msgout(true);
     }
 }

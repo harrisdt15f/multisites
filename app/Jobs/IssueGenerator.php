@@ -40,22 +40,8 @@ class IssueGenerator implements ShouldQueue
         }
         // 生成
         $res = $lottery->genIssue($this->datas['start_time'], $this->datas['end_time'], $this->datas['start_issue']);
-        if (!is_array($res) || count($res) === 0) {
-            Log::channel('issues')->error('奖期数据无法生成');
-        } else {
-            // 成功一部分
-            $genRes = true;
-            foreach ($res as $day => $_r) {
-                if ($_r !== true) {
-                    $genRes = false;
-                    $message = $_r;
-                }
-            }
-            if (!$genRes) {
-                Log::channel('issues')->error($message);
-            } else {
-                Log::channel('issues')->info($res);
-            }
+        if ($res === true) {
+            Log::channel('issues')->info('添加到 分开生成奖期队列完成');
         }
     }
 }
