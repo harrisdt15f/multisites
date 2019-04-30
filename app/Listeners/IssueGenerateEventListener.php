@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Jobs\IssueGenerator;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
@@ -25,6 +26,7 @@ class IssueGenerateEventListener
      */
     public function handle($event)
     {
-        //
+
+        dispatch(new IssueGenerator($event->inputs))->onQueue('issues');
     }
 }

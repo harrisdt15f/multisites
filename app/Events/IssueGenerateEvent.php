@@ -9,6 +9,7 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Support\Facades\Request;
 
 class IssueGenerateEvent
 {
@@ -17,11 +18,11 @@ class IssueGenerateEvent
     /**
      * Create a new event instance.
      *
-     * @return void
+     * @param $inputs
      */
-    public function __construct()
+    public function __construct($inputs)
     {
-        //
+        $this->inputs = $inputs;
     }
 
     /**
