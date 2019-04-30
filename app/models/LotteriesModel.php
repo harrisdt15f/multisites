@@ -67,17 +67,18 @@ class LotteriesModel extends BaseModel
     public function getDaySet($startDay, $endDay)
     {
         $data = [];
-        $dtStart = strtotime($startDay);
-        $dtEnd = strtotime($endDay);
+        $today = Carbon::today();
+        $dtStartTime = Carbon::parse($startDay);
+        $dtEndTime = Carbon::parse($endDay);
 
-        if ($dtStart > $dtEnd) {
+        if ($dtStartTime->greaterThan($dtEndTime)) {
             return $data;
         }
-
-        do {
-            $data[] = date('Y-m-d', $dtStart);
-        } while (($dtStart += 86400) <= $dtEnd);
-
+        if (!$dtStartTime->lessThan($today) && !$dtEndTime->lessThan($today)) {
+            do {
+                $data[] = $dtStartTime->format('Y-m-d');
+            } while ($dtStartTime->addDay()->lessThanOrEqualTo($dtEndTime));
+        }
         return $data;
     }
 
@@ -104,9 +105,9 @@ class LotteriesModel extends BaseModel
             $config = config('game.issue.issue_fix');
             if (isset($config[$this->en_name])) {
                 $_config = $config[$this->en_name];
-                $_day = (strtotime($day) - strtotime($_config['day'])) / 86400;
-                $_day = floor($_day);
-
+                $dayTime = Carbon::parse($day);
+                $configTime = Carbon::parse($_config['day']);
+                $_day = $dayTime->diff($configTime)->days;
                 if (isset($_config['zero_start'])) {
                     $firstIssueNo = intval($_config['start_issue']) + $_day * $this->day_issue;
                     $firstIssueNo = $_config['zero_start'] . $firstIssueNo;
@@ -118,40 +119,48 @@ class LotteriesModel extends BaseModel
 
         // 生成
         $issueNo = $firstIssueNo ?: '';
-        foreach ($rules as $index => $rule) {
+        foreach ($rules as $rule) {
             $adjustTime = $rule->adjust_time;
-            $beginTime = strtotime($day . ' ' . $rule['begin_time']);
+            $beginTimeString = $day . ' ' . $rule['begin_time'];
+            $beginTime = Carbon::parse($beginTimeString);
             // 结束时间的修正
+            $endTimeString = $day . ' ' . $rule['end_time'];
+            $endTimeOrigin = Carbon::parse($endTimeString);
+            $endTime = $endTimeOrigin->copy();
             if ($rule['end_time'] == '00:00:00') {
-                $endTime = strtotime($day . " " . $rule['end_time']) + 86400 - $adjustTime;
-            } else {
-                $endTime = strtotime($day . " " . $rule['end_time']) - $adjustTime;
-                // 如果跨天
-                if (strtotime($day . " " . $rule['begin_time']) > strtotime($day . " " . $rule['end_time'])) {
-                    $endTime = $endTime + 86400;
-                }
+                $endTime = $endTime->addDay();
+
+            } else if ($beginTime->greaterThan($endTimeOrigin)) {
+                $endTime = $endTime->addDay();
             }
-            $issueTime = $rule['issue_seconds'];
+            $endTime = $endTime->subSeconds($adjustTime);
+            $issueTimeInSeconds = $rule['issue_seconds'];
             $index = 1;
             do {
-                if (1 == $index) {
-                    $issueEnd = strtotime($day . ' ' . $rule['first_time']) - $adjustTime;
-                    $officialOpenTime = strtotime($day . ' ' . $rule['first_time']);
+                if (1 === $index) {
+                    $issueTimeString = $day . ' ' . $rule['first_time'];
+                    $issueTime = Carbon::parse($issueTimeString);
+                    $officialOpenTime = $issueTime->copy();
+                    $issueEndTime = $issueTime->copy();
+                    $issueEndTime = $issueEndTime->subSeconds($adjustTime);
                 } else {
-                    $issueEnd = $beginTime + $issueTime;
-                    $officialOpenTime = $beginTime + $issueTime + $adjustTime;
+                    $issueEndTime = $beginTime->copy();
+                    $issueEndTime = $issueEndTime->addSeconds($issueTimeInSeconds);
+                    $officialOpenTime = $beginTime->copy();
+                    $officialOpenTime = $officialOpenTime->addSeconds($issueTimeInSeconds)->addSeconds($adjustTime);
                 }
                 $item = [
                     'lottery_id' => $this->en_name,
                     'issue_rule_id' => $rule->id,
                     'lottery_name' => $this->cn_name,
-                    'begin_time' => $beginTime,
-                    'end_time' => $issueEnd,
-                    'official_open_time' => $officialOpenTime,
-                    'allow_encode_time' => $officialOpenTime + $rule['encode_time'],
+                    'begin_time' => $beginTime->timestamp,
+                    'end_time' => $issueEndTime->timestamp,
+                    'official_open_time' => $officialOpenTime->timestamp,
+                    'allow_encode_time' => $officialOpenTime->timestamp + $rule['encode_time'],
                     'day' => $intDay,
+                    'created_at' => Carbon::now(),
                 ];
-
+//                dd($issueEndTime, $issueEndTime->timestamp, $index);
                 if ($firstIssueNo) {
                     $item['issue'] = $issueNo;
                     $issueNo = $this->getNextIssueNo($issueNo, $this, $rule, $day);
@@ -159,29 +168,28 @@ class LotteriesModel extends BaseModel
                     $issueNo = $this->getNextIssueNo($issueNo, $this, $rule, $day);
                     $item['issue'] = $issueNo;
                 }
-
                 $data[] = $item;
-
-                $beginTime = $issueEnd;
+                $beginTime = $issueEndTime->copy();
                 $index++;
-
-            } while ($beginTime < $endTime);
+            } while ($beginTime->lessThan($endTime));
 
         }
-
         $totalGenCount = count($data);
-
         if ($totalGenCount != $this->day_issue) {
             return "生成的期数不正确, 应该：{$this->day_issue} - 实际:{$totalGenCount}";
         }
 
-        // 插入
-        $res = IssueModel::insert($data);
-
-        if ($res) {
+        try {
+            $insert_data = collect($data);
+            $chunks = $insert_data->chunk(10);
+            foreach ($chunks as $chunk) {
+                // 插入
+                $res = IssueModel::insert($chunk->toArray());
+            }
             return true;
+        } catch (\Exception $e) {
+            return '插入数据失败!!' . $e->getMessage();
         }
-        return '插入数据失败!!';
     }
 
     /**
@@ -193,11 +201,9 @@ class LotteriesModel extends BaseModel
      */
     public function getNextIssueNo($issueNo, $lottery, $rule, $day)
     {
-        $dayTime = strtotime($day);
+        $dayTime = Carbon::parse($day);
         $issueFormat = $lottery->issue_format;
-
         $formats = explode('|', $issueFormat);
-
         // C 开头
         if (count($formats) == 1 and strpos($formats[0], 'C') !== false) {
             $currentIssueNo = intval($issueNo);
@@ -208,13 +214,12 @@ class LotteriesModel extends BaseModel
                 return str_pad($nextIssue, strlen($issueNo), '0', STR_PAD_LEFT);
             }
         }
-
         // 日期型
         if (count($formats) == 2) {
             $numberLength = substr($formats[1], -1);
             // 时时彩 / 乐透
             if (strpos($formats[1], 'N') !== false) {
-                $suffix = date($formats[0], $dayTime);
+                $suffix = $dayTime->format($formats[0]);
                 if ($issueNo) {
                     return $suffix . $this->getNextNumber($issueNo, $numberLength);
                 } else {
@@ -223,7 +228,7 @@ class LotteriesModel extends BaseModel
             }
             // 特殊号
             if (strpos($formats[1], 'T') !== false) {
-                $suffix = date($formats[0], $dayTime);
+                $suffix = $dayTime->format($formats[0]);
                 if ($issueNo) {
                     return $suffix . $this->getNextNumber($issueNo, $numberLength);
                 } else {

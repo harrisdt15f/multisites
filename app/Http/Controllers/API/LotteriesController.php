@@ -132,10 +132,11 @@ class LotteriesController extends ApiMainController
             foreach ($res as $day => $_r) {
                 if ($_r !== true) {
                     $genRes = false;
+                    $message = $_r;
                 }
             }
             if (!$genRes) {
-                return $this->msgout(false, [], '您好, 奖期部分完成!', '0002');
+                return $this->msgout(false, [], $message, '0002');
             } else {
                 return $this->msgout(true, $res);
             }
