@@ -2,6 +2,8 @@
 
 namespace App\models;
 
+use App\Jobs\IssueInserter;
+use App\Jobs\IssueSeparateGenJob;
 use Illuminate\Support\Carbon;
 
 class LotteriesModel extends BaseModel
@@ -50,12 +52,10 @@ class LotteriesModel extends BaseModel
         }
         $rules = IssueRulesModel::where('lottery_id', $this->en_name)->orderBy('id', "ASC")->get();
         $daySet = $this->getDaySet($startDay, $endDay);
-
-        $return = [];
         foreach ($daySet as $day) {
-            $return[$day] = $this->_genIssue($day, $rules);
+            dispatch(new IssueSeparateGenJob($day, $rules, $this))->onQueue('issues');
         }
-        return $return;
+        return true;
     }
 
     /**
@@ -184,7 +184,7 @@ class LotteriesModel extends BaseModel
             $chunks = $insert_data->chunk(10);
             foreach ($chunks as $chunk) {
                 // 插入
-                $res = IssueModel::insert($chunk->toArray());
+                dispatch(new IssueInserter($chunk->toArray()))->onQueue('issues');
             }
             return true;
         } catch (\Exception $e) {

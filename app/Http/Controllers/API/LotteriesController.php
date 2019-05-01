@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Events\IssueGenerateEvent;
 use App\Http\Controllers\ApiMainController;
 use App\models\LotteriesModel;
 use App\models\MethodsModel;
@@ -117,29 +118,7 @@ class LotteriesController extends ApiMainController
         if ($validator->fails()) {
             return $this->msgout(false, [], $validator->errors(), 200);
         }
-        $lotteryId = $this->inputs['lottery_id'];
-        $lottery = LotteriesModel::where('en_name', $lotteryId)->first();
-        if (!$lottery) {
-            return $this->msgout(false, [], '游戏不存在!', '0002');
-        }
-        // 生成
-        $res = $lottery->genIssue($this->inputs['start_time'], $this->inputs['end_time'], $this->inputs['start_issue']);
-        if (!is_array($res) || count($res) === 0) {
-            return $this->msgout(false, [], '', '0002');
-        } else {
-            // 成功一部分
-            $genRes = true;
-            foreach ($res as $day => $_r) {
-                if ($_r !== true) {
-                    $genRes = false;
-                    $message = $_r;
-                }
-            }
-            if (!$genRes) {
-                return $this->msgout(false, [], $message, '0002');
-            } else {
-                return $this->msgout(true, $res);
-            }
-        }
+        event(new IssueGenerateEvent($this->inputs));
+        return $this->msgout(true);
     }
 }
