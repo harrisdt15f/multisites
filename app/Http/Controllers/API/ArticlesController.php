@@ -4,7 +4,6 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\ApiMainController;
 use App\models\AuditFlow;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
@@ -34,8 +33,8 @@ class ArticlesController extends ApiMainController
             'search_text' => 'required|string',
             'is_for_agent' => 'required|in:0,1',
             'apply_note' => 'required|string',
-            'pic_name' => 'required|array',
-            'pic_path' => 'required|array',
+            'pic_name' => 'array',
+            'pic_path' => 'array',
         ]);
         if ($validator->fails()) {
             return $this->msgout(false, [], $validator->errors()->first());
@@ -61,8 +60,10 @@ class ArticlesController extends ApiMainController
             'add_admin_id' => $this->partnerAdmin['id'],
             'last_update_admin_id' => $this->partnerAdmin['id'],
             'sort' => $sort,
-            'pic_path' => implode('|', $this->inputs['pic_path']),
         ];
+        if (array_key_exists('pic_path', $this->inputs) && !isset($this->inputs['pic_path'])) {
+            $addDatas['pic_path'] = implode('|', $this->inputs['pic_path']);
+        }
         $flowDatas = [
             'admin_id' => $this->partnerAdmin['id'],
             'apply_note' => $this->inputs['apply_note'],
@@ -77,14 +78,18 @@ class ArticlesController extends ApiMainController
             $configure->fill($addDatas);
             $configure->save();
             //文章发布成功  销毁缓存
-            $CachePic = Cache::get('CachePic');
-            foreach ($this->inputs['pic_name'] as $k => $v) {
-                if (array_key_exists($v, $CachePic)) {
-                    unset($CachePic[$v]);
+            if (array_key_exists('pic_path', $this->inputs)) {
+                if (Cache::has('CachePic')) {
+                    $CachePic = Cache::get('CachePic');
+                    foreach ($this->inputs['pic_name'] as $k => $v) {
+                        if (array_key_exists($v, $CachePic)) {
+                            unset($CachePic[$v]);
+                        }
+                    }
+                    $minutes = 2 * 24 * 60;
+                    Cache::put('CachePic', $CachePic, $minutes);
                 }
             }
-            $minutes = 1440;
-            Cache::put('CachePic', $CachePic, $minutes);
             return $this->msgout(true, [], '发布文章成功');
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
@@ -141,7 +146,7 @@ class ArticlesController extends ApiMainController
                         unset($CachePic[$v]);
                     }
                 }
-                $minutes = 1440;
+                $minutes = 2 * 24 * 60;
                 Cache::put('CachePic', $CachePic, $minutes);
                 //删除原图
                 foreach ($past_pic_path as $k => $v) {
@@ -175,6 +180,7 @@ class ArticlesController extends ApiMainController
         if (!is_null($pastData)) {
             try {
                 $this->eloqM::where('id', $this->inputs['id'])->delete();
+                $this->eloqM::where('sort', '>', $pastData['sort'])->decrement('sort');
                 foreach ($pic_path as $k => $v) {
                     $this->deleteArticlePic($v);
                 }
@@ -192,24 +198,34 @@ class ArticlesController extends ApiMainController
     public function sortArticles()
     {
         $validator = Validator::make($this->inputs, [
-            'front_sort' => 'required|numeric',
-            'rearways_sort' => 'required|numeric',
+            'front_id' => 'required|numeric|gt:0',
+            'rearways_id' => 'required|numeric|gt:0',
+            'front_sort' => 'required|numeric|gt:0',
+            'rearways_sort' => 'required|numeric|gt:0',
+            'sort_type' => 'required|in:1,2',
         ]);
         if ($validator->fails()) {
             return $this->msgout(false, [], $validator->errors()->first());
         }
-        if ($this->inputs['front_sort'] > $this->inputs['rearways_sort']) {
-            return $this->msgout(false, [], 'front_sort必须小于rearways_sort');
-        }
-        $frontData = $this->eloqM::where('sort', $this->inputs['front_sort'])->first()->toArray();
-        $rearways_sort = $this->eloqM::where('sort', $this->inputs['rearways_sort'])->first();
-        if (is_null($frontData) || is_null($rearways_sort)) {
-            return $this->msgout(false, [], '需要排序的sort不存在');
-        }
-        $rearways_sort->sort = $frontData['sort'];
         try {
-            $this->eloqM::where('sort', '>=', $this->inputs['front_sort'])->where('sort', '<', $this->inputs['rearways_sort'])->increment('sort');
-            $rearways_sort->save();
+            //上拉排序
+            if ($this->inputs['sort_type'] == 1) {
+                $frontData = $this->eloqM::find($this->inputs['front_id']);
+                if (!isset($frontData)) {
+                    return $this->msgout(false, [], '需要排序的文章不存在');
+                }
+                $frontData->sort = $this->inputs['front_sort'];
+                $this->eloqM::where('sort', '>=', $this->inputs['front_sort'])->where('sort', '<', $this->inputs['rearways_sort'])->increment('sort');
+                //下拉排序
+            } elseif ($this->inputs['sort_type'] == 2) {
+                $frontData = $this->eloqM::find($this->inputs['rearways_id']);
+                if (!isset($frontData)) {
+                    return $this->msgout(false, [], '需要排序的文章不存在');
+                }
+                $frontData->sort = $this->inputs['rearways_sort'];
+                $this->eloqM::where('sort', '>', $this->inputs['front_sort'])->where('sort', '<=', $this->inputs['rearways_sort'])->decrement('sort');
+            }
+            $frontData->save();
             return $this->msgout(true, [], '文章排序成功');
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
@@ -222,7 +238,6 @@ class ArticlesController extends ApiMainController
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
-            'sort' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return $this->msgout(false, [], $validator->errors()->first());
@@ -231,11 +246,8 @@ class ArticlesController extends ApiMainController
         if (is_null($topData)) {
             return $this->msgout(false, [], '需要置顶的文章不存在');
         }
-        if ($topData->sort != $this->inputs['sort']) {
-            return $this->msgout(false, [], '需要置顶的文章ID与sort不匹配');
-        }
         try {
-            $this->eloqM::where('sort', '<', $this->inputs['sort'])->increment('sort');
+            $this->eloqM::where('sort', '<', $topData['sort'])->increment('sort');
             $topData->sort = 1;
             $topData->save();
             return $this->msgout(true, [], '文章置顶成功');
@@ -249,21 +261,22 @@ class ArticlesController extends ApiMainController
     public function uploadPic()
     {
         $validator = Validator::make($this->inputs, [
-            'upfile' => 'required|image|mimes:jpg,png,jpeg',
+            'pic' => 'required|file',
         ]);
         if ($validator->fails()) {
             return $this->msgout(false, [], $validator->errors()->first());
         }
         //接收文件信息
-        $file = $this->inputs['upfile'];
+        $file = $this->inputs['pic'];
         $path = 'uploaded_files/' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id . '/articles_' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id;
+        $rule = ['jpg', 'png', 'gif'];
         //进行上传
-        $pic = $this->uploadImg($file, $path);
+        $pic = $this->uploadImg($file, $path, $rule);
         if ($pic['success'] === false) {
             return $this->msgout(false, [], $pic['message'], '0009');
         }
-        $minutes = 2*24*60;
-        $pic['expire_time'] = Carbon::now()->addMinutes(30)->timestamp;
+        $minutes = 2 * 24 * 60;
+        $pic['expire_time'] = (time() + 60 * 30) . '';
         if (Cache::has('CachePic')) {
             $CachePic = Cache::get('CachePic');
             $CachePic[$pic['name']] = $pic;
@@ -273,8 +286,7 @@ class ArticlesController extends ApiMainController
         Cache::put('CachePic', $CachePic, $minutes);
         return $this->msgout(true, $pic, '图片上传成功');
     }
-
-    public function uploadImg($file, $url_path)
+    public function uploadImg($file, $url_path, $rule)
     {
         // 检验一下上传的文件是否有效.
         if ($file->isValid()) {
@@ -282,7 +294,10 @@ class ArticlesController extends ApiMainController
             $clientName = $file->getClientOriginalName();
             // 上传文件的后缀.
             $entension = $file->getClientOriginalExtension();
-            $newName = md5(date('Y-m-d H:i:s') . $clientName) . '.' . $entension;
+            if (!in_array($entension, $rule)) {
+                return ['success' => false, 'message' => '图片格式为jpg,png,gif'];
+            }
+            $newName = md5(date("Y-m-d H:i:s") . $clientName) . "." . $entension;
             if (!file_exists($url_path)) {
                 mkdir($url_path, 0777, true);
             }
