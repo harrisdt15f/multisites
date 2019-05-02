@@ -23,10 +23,10 @@ class ActivityTypeController extends ApiMainController
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
-            'status' => 'required|in:0,1',
-            'l_size' => 'numeric|gt:0',
-            'w_size' => 'numeric|gt:0',
-            'size' => 'required|numeric|gt:0',
+            'status' => 'in:0,1',
+            'l_size' => 'gt:0',
+            'w_size' => 'gt:0',
+            'size' => 'numeric|gt:0',
         ]);
         if ($validator->fails()) {
             return $this->msgout(false, [], $validator->errors()->first());
@@ -36,15 +36,18 @@ class ActivityTypeController extends ApiMainController
             return $this->msgout(false, [], '需要修改的活动分类id不存在');
         }
         //图片类型的分类
-        if ($editData->ext_type === 1 || $editData->ext_type === 3) {
-            if (!array_key_exists('l_size', $this->inputs) || !array_key_exists('w_size', $this->inputs)) {
-                return $this->msgout(false, [], '图片类型的分类l_size和w_size不能为空');
-            }
+        if (array_key_exists('l_size', $this->inputs)) {
             $editData->l_size = $this->inputs['l_size'];
+        }
+        if (array_key_exists('w_size', $this->inputs)) {
             $editData->w_size = $this->inputs['w_size'];
         }
-        $editData->status = $this->inputs['status'];
-        $editData->size = $this->inputs['size'];
+        if (array_key_exists('status', $this->inputs)) {
+            $editData->status = $this->inputs['status'];
+        }
+        if (array_key_exists('size', $this->inputs)) {
+            $editData->size = $this->inputs['size'];
+        }
         try {
             $editData->save();
             return $this->msgout(true, [], '修改活动分类成功');
