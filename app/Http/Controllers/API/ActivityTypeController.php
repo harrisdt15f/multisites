@@ -54,11 +54,4 @@ class ActivityTypeController extends ApiMainController
             return $this->msgout(false, [], $msg, $sqlState);
         }
     }
-    //===============================================
-    //ALTER TABLE `partner_activity_lists`
-    //ADD `ext_type` TINYINT(4),
-    //ADD `l_size` INT,
-    //ADD `w_size` INT,
-    //ADD `size` INT;
-    //===============================================
 }
