@@ -36,9 +36,7 @@ class ActivityTypeController extends ApiMainController
             return $this->msgout(false, [], '需要修改的活动分类id不存在');
         }
         unset($this->inputs['id']);
-        foreach ($this->inputs as $k => $v) {
-            $editData->$k = $v;
-        }
+        $this->editAssignment($editData, $this->inputs);
         try {
             $editData->save();
             return $this->msgout(true, [], '修改活动分类成功');

@@ -49,19 +49,13 @@ class ArticlesController extends ApiMainController
         } else {
             $sort = $sortdata['sort'] + 1;
         }
-        $addDatas = [
-            'category_id' => $this->inputs['category_id'],
-            'title' => $this->inputs['title'],
-            'summary' => $this->inputs['summary'],
-            'content' => $this->inputs['content'],
-            'search_text' => $this->inputs['search_text'],
-            'is_for_agent' => $this->inputs['is_for_agent'],
-            'status' => 0,
-            'add_admin_id' => $this->partnerAdmin['id'],
-            'last_update_admin_id' => $this->partnerAdmin['id'],
-            'sort' => $sort,
-        ];
-        if (array_key_exists('pic_path', $this->inputs) && !isset($this->inputs['pic_path'])) {
+        $addDatas = $this->inputs;
+        unset($addDatas['pic_name']);
+        $addDatas['status'] = 0;
+        $addDatas['add_admin_id'] = $this->partnerAdmin['id'];
+        $addDatas['last_update_admin_id'] = $this->partnerAdmin['id'];
+        $addDatas['sort'] = $sort;
+        if (array_key_exists('pic_path', $this->inputs) && !empty($this->inputs['pic_path'])) {
             $addDatas['pic_path'] = implode('|', $this->inputs['pic_path']);
         }
         $flowDatas = [
@@ -120,14 +114,14 @@ class ArticlesController extends ApiMainController
             return $this->msgout(false, [], '该文章名已存在', '0009');
         }
         $editDataEloq = $this->eloqM::find($this->inputs['id']);
-        $editDataEloq->category_id = $this->inputs['category_id'];
-        $editDataEloq->title = $this->inputs['title'];
-        $editDataEloq->summary = $this->inputs['summary'];
-        $editDataEloq->content = $this->inputs['content'];
-        $editDataEloq->search_text = $this->inputs['search_text'];
-        $editDataEloq->is_for_agent = $this->inputs['is_for_agent'];
-        $editDataEloq->last_update_admin_id = $this->partnerAdmin['id'];
+        $past_pic_path = $editDataEloq->pic_path;
+        $editDatas = $this->inputs;
+        unset($editDatas['pic_name']);
+        unset($editDatas['pic_name']);
+        unset($editDatas['apply_note']);
+        $this->editAssignment($editDataEloq, $editDatas);
         $editDataEloq->status = 0;
+        $editDataEloq->last_update_admin_id = $this->partnerAdmin['id'];
         $flowDatas = [
             'admin_id' => $this->partnerAdmin['id'],
             'apply_note' => $this->inputs['apply_note'],
@@ -135,10 +129,8 @@ class ArticlesController extends ApiMainController
         ];
         try {
             //获取图片路径
-            $past_pic_path = explode('|', $editDataEloq->pic_path);
             $new_pic_path = $this->inputs['pic_path'];
             if ($new_pic_path != $past_pic_path) {
-                $editDataEloq->pic_path = implode('|', $new_pic_path);
                 //销毁缓存
                 $CachePic = Cache::get('CachePic');
                 foreach ($this->inputs['pic_name'] as $k => $v) {
@@ -149,16 +141,17 @@ class ArticlesController extends ApiMainController
                 $minutes = 2 * 24 * 60;
                 Cache::put('CachePic', $CachePic, $minutes);
                 //删除原图
-                foreach ($past_pic_path as $k => $v) {
+                $past_pic_path_arr = explode('|', $past_pic_path);
+                foreach ($past_pic_path_arr as $k => $v) {
                     $this->deleteArticlePic($v);
                 }
+                $editDataEloq->pic_path = implode('|', $new_pic_path);
             }
             $flowConfigure = new AuditFlow;
             $flowConfigure->fill($flowDatas);
             $flowConfigure->save();
             $editDataEloq->audit_flow_id = $flowConfigure->id;
             $editDataEloq->save();
-
             return $this->msgout(true, [], '修改文章成功');
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();

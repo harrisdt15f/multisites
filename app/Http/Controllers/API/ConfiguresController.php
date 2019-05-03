@@ -31,7 +31,6 @@ class ConfiguresController extends ApiMainController
     //添加配置
     public function add()
     {
-
         $rule = [
             'parent_id' => 'required|numeric',
             'sign' => 'required',
@@ -45,17 +44,11 @@ class ConfiguresController extends ApiMainController
         if ($validator->fails()) {
             return $this->msgout(false, [], $validator->errors()->first(), 200);
         }
-        $addDatas = [
-            'parent_id' => $this->inputs['parent_id'],
-            'sign' => $this->inputs['sign'],
-            'name' => $this->inputs['name'],
-            'description' => $this->inputs['description'],
-            'value' => $this->inputs['value'],
-            'pid' => $this->currentPlatformEloq->platform_id,
-            'add_admin_id' => $this->partnerAdmin->id,
-            'last_update_admin_id' => $this->partnerAdmin->id,
-            'status' => 1,
-        ];
+        $addDatas = $this->inputs;
+        $addDatas['pid'] = $this->currentPlatformEloq->platform_id;
+        $addDatas['add_admin_id'] = $this->partnerAdmin->id;
+        $addDatas['last_update_admin_id'] = $this->partnerAdmin->id;
+        $addDatas['status'] = 1;
         $pastData = $this->eloqM::where('sign', $this->inputs['sign'])->first();
         if (is_null($pastData)) {
             try {
@@ -86,16 +79,17 @@ class ConfiguresController extends ApiMainController
         if ($validator->fails()) {
             return $this->msgout(false, [], $validator->errors()->first(), 200);
         }
-        $pastData = $this->eloqM::where('sign', $this->inputs['sign'])->first();
+        $pastData = $this->eloqM::where('sign', $this->inputs['sign'])->where('id', '!=', $this->inputs['id'])->first();
         if (is_null($pastData)) {
             $editDataEloq = $this->eloqM::find($this->inputs['id']);
-            $editDataEloq->sign = $this->inputs['sign'];
-            $editDataEloq->name = $this->inputs['name'];
-            $editDataEloq->description = $this->inputs['description'];
+            $editDatas = $this->inputs;
+            unset($editDatas['id']);
+            unset($editDatas['parent_id']);
             //不是顶级可修改值
-            if ($this->inputs['parent_id'] != 0) {
-                $editDataEloq->value = $this->inputs['value'];
+            if ($this->inputs['parent_id'] == 0) {
+                unset($editDatas['value']);
             }
+            $this->editAssignment($editDataEloq, $editDatas);
             try {
                 $editDataEloq->save();
                 return $this->msgout(true, [], '修改配置成功');
@@ -134,7 +128,7 @@ class ConfiguresController extends ApiMainController
     }
 
     //配置状态开关 0关  1开
-    public function switch()
+    public function configSwitch()
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -167,5 +161,4 @@ class ConfiguresController extends ApiMainController
             return $this->msgout(false, [], '该配置不存在', '0009');
         }
     }
-
 }

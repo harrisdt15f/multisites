@@ -12,9 +12,6 @@ class BankController extends ApiMainController
     {
         $searchAbleFields = ['title', 'code', 'pay_type', 'status'];
         $banksDatas = $this->generateSearchQuery($this->eloqM, $searchAbleFields);
-        if (empty($banksDatas)) {
-            return $this->msgout(false, [], '没有获取到数据', '0009');
-        }
         return $this->msgout(true, $banksDatas);
     }
     public function addBank()
@@ -75,15 +72,10 @@ class BankController extends ApiMainController
             return $this->msgout(false, [], $validator->errors()->first());
         }
         $editDataEloq = $this->eloqM::find($this->inputs['id']);
-        $editDataEloq->title = $this->inputs['title'];
-        $editDataEloq->code = $this->inputs['code'];
-        $editDataEloq->status = $this->inputs['status'];
-        $editDataEloq->min_recharge = $this->inputs['min_recharge'];
-        $editDataEloq->max_recharge = $this->inputs['max_recharge'];
-        $editDataEloq->min_withdraw = $this->inputs['min_withdraw'];
-        $editDataEloq->max_withdraw = $this->inputs['max_withdraw'];
-        $editDataEloq->remarks = $this->inputs['remarks'];
-        $editDataEloq->allow_user_level = $this->inputs['allow_user_level'];
+        if (empty($editDataEloq)) {
+            return $this->msgout(false, [], '银行id不存在');
+        }
+        $this->editAssignment($editDataEloq, $this->inputs);
         try {
             $editDataEloq->save();
             return $this->msgout(true, [], '修改银行成功');
