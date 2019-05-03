@@ -56,6 +56,12 @@ return [
             'level' => 'debug',
             'days' => 14,
         ],
+        'issues' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/issues.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
         'operate' => [
             'driver' => 'daily',
             'path' => storage_path('logs/operate.log'),

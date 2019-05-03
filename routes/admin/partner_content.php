@@ -10,6 +10,7 @@ Route::group(['prefix' => 'content'], function () {
     Route::match(['post', 'options'], 'delete-articles', ['as' => $namePrefix . 'delete-articles', 'uses' => $controller . 'deleteArticles']);
     Route::match(['post', 'options'], 'sort-articles', ['as' => $namePrefix . 'sort-articles', 'uses' => $controller . 'sortArticles']);
     Route::match(['post', 'options'], 'top-articles', ['as' => $namePrefix . 'top-articles', 'uses' => $controller . 'topArticles']);
+    Route::match(['post', 'options'], 'upload-pic', ['as' => $namePrefix . 'upload-pic', 'uses' => $controller . 'uploadPic']);
     //分类管理
     Route::match(['get', 'options'], 'category', ['as' => $namePrefix . 'category', 'uses' => 'CategoryController@detail']);
     Route::match(['get', 'options'], 'category-select', ['as' => $namePrefix . 'category-select', 'uses' => 'CategoryController@select']);

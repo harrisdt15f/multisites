@@ -25,7 +25,7 @@ class ActivityInfosController extends ApiMainController
             'title' => 'required',
             'type' => 'required|numeric',
             'content' => 'required',
-            'pic' => 'required',
+            'pic' => 'required|image|mimes:jpeg,png,jpg',
             'start_time' => 'required|date_format:Y-m-d H:i:s',
             'end_time' => 'required|date_format:Y-m-d H:i:s',
             'status' => 'required',
@@ -41,18 +41,20 @@ class ActivityInfosController extends ApiMainController
         }
         //接收文件信息
         $file = $this->inputs['pic'];
-        $path = 'uploaded_files/mobile_activity_' . $this->currentPlatformEloq->platform_id . '_' . $this->currentPlatformEloq->platform_name;
-        $rule = ['jpg', 'png', 'gif'];
+        $path = 'uploaded_files/' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id . '/mobile_activity_' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id;
         //进行上传
-        $pic = $this->uploadImg($file, $path, $rule);
+        $pic = $this->uploadImg($file, $path);
         if ($pic['success'] === false) {
             return $this->msgout(false, [], $pic['message'], '0009');
         }
+        //生成缩略图
+        $thumbnail_path = $this->creatThumbnail($pic['path'], 100, 200, 'sm_');
         $addDatas = [
             'title' => $this->inputs['title'],
             'type' => $this->inputs['type'],
             'content' => $this->inputs['content'],
-            'pic_url' => '/' . $pic['path'],
+            'pic_path' => '/' . $pic['path'],
+            'thumbnail_path' => '/' . $thumbnail_path,
             'start_time' => $this->inputs['start_time'],
             'end_time' => $this->inputs['end_time'],
             'status' => $this->inputs['status'],
@@ -80,6 +82,7 @@ class ActivityInfosController extends ApiMainController
             'title' => 'required',
             'type' => 'required|numeric',
             'content' => 'required',
+            'pic' => 'image|mimes:jpeg,png,jpg',
             'start_time' => 'required|date_format:Y-m-d H:i:s',
             'end_time' => 'required|date_format:Y-m-d H:i:s',
             'status' => 'required',
@@ -94,6 +97,9 @@ class ActivityInfosController extends ApiMainController
             return $this->msgout(false, [], '该活动名已存在', '0009');
         }
         $editDataEloq = $this->eloqM::find($this->inputs['id']);
+        if (is_null($editDataEloq)) {
+            return $this->msgout(false, [], '该活动id不存在', '0009');
+        }
         $editDataEloq->title = $this->inputs['title'];
         $editDataEloq->type = $this->inputs['type'];
         $editDataEloq->content = $this->inputs['content'];
@@ -104,22 +110,26 @@ class ActivityInfosController extends ApiMainController
         $editDataEloq->is_time_interval = $this->inputs['is_time_interval'];
         //如果修改了图片
         if (isset($this->inputs['pic']) && !is_null($this->inputs['pic'])) {
-            $pastpic = $editDataEloq->pic_url;
+            $pastpic = $editDataEloq->pic_path;
+            $thumbnail_path = $editDataEloq->thumbnail_path;
             //接收文件信息
             $file = $this->inputs['pic'];
-            $path = 'uploaded_files/mobile_activity_' . $this->currentPlatformEloq->platform_id . '_' . $this->currentPlatformEloq->platform_name;
-            $rule = ['jpg', 'png', 'gif'];
+            $path = 'uploaded_files/' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id . '/mobile_activity_' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id;
             //进行上传
-            $pic = $this->uploadImg($file, $path, $rule);
+            $pic = $this->uploadImg($file, $path);
             if ($pic['success'] === false) {
                 return $this->msgout(false, [], $pic['message'], '0009');
             }
-            $editDataEloq->pic_url = '/' . $pic['path'];
+            $editDataEloq->pic_path = '/' . $pic['path'];
+            //生成缩略图
+            $editDataEloq->thumbnail_path = '/' . $this->creatThumbnail($pic['path'], 100, 200, 'sm_');
         }
         try {
             $editDataEloq->save();
             if (isset($this->inputs['pic']) && !is_null($this->inputs['pic'])) {
-                $this->deleteFile(substr($pastpic, 1));
+                //删除原图片
+                $this->deletePic(substr($pastpic, 1));
+                $this->deletePic(substr($thumbnail_path, 1));
             }
             return $this->msgout(true, [], '修改活动成功');
         } catch (\Exception $e) {
@@ -141,7 +151,9 @@ class ActivityInfosController extends ApiMainController
         if (!is_null($pastData)) {
             try {
                 $this->eloqM::where('id', $this->inputs['id'])->delete();
-                $this->deleteFile(substr($pastData['pic_url'], 1));
+                //删除图片
+                $this->deletePic(substr($pastData['pic_path'], 1));
+                $this->deletePic(substr($pastData['thumbnail_path'], 1));
                 return $this->msgout(true, [], '删除活动成功');
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
@@ -153,7 +165,7 @@ class ActivityInfosController extends ApiMainController
         }
     }
     //图片上传
-    public function uploadImg($file, $url_path, $rule)
+    public function uploadImg($file, $url_path)
     {
         // 检验一下上传的文件是否有效.
         if ($file->isValid()) {
@@ -161,9 +173,6 @@ class ActivityInfosController extends ApiMainController
             $clientName = $file->getClientOriginalName();
             // 上传文件的后缀.
             $entension = $file->getClientOriginalExtension();
-            if (!in_array($entension, $rule)) {
-                return ['success' => false, 'message' => '图片格式为jpg,png,gif'];
-            }
             $newName = md5(date("Y-m-d H:i:s") . $clientName) . "." . $entension;
             if (!file_exists($url_path)) {
                 mkdir($url_path, 0777, true);
@@ -180,7 +189,7 @@ class ActivityInfosController extends ApiMainController
             return ['success' => true, 'name' => $newName, 'path' => $namePath];
         }
     }
-    public function deleteFile($path)
+    public function deletePic($path)
     {
         if (file_exists($path)) {
             if (!is_writable(dirname($path))) {
@@ -189,5 +198,80 @@ class ActivityInfosController extends ApiMainController
                 return unlink($path);
             }
         }
+    }
+    /**
+     *
+     * 制作缩略图
+     * @param $src_path string 原图路径
+     * @param $max_w int 画布的宽度
+     * @param $max_h int 画布的高度
+     * @param $flag bool 是否是等比缩略图  默认为true
+     * @param $prefix string 缩略图的前缀  默认为'sm_'
+     *
+     */
+    public function creatThumbnail($src_path, $max_w, $max_h, $prefix = 'sm_', $flag = true)
+    {
+        //获取文件的后缀
+        $ext = strtolower(strrchr($src_path, '.'));
+        //判断文件格式
+        switch ($ext) {
+            case '.jpg':
+                $type = 'jpeg';
+                break;
+            case '.jpeg':
+                $type = 'jpeg';
+                break;
+            case '.png':
+                $type = 'png';
+                break;
+        }
+        //拼接打开图片的函数
+        $open_fn = 'imagecreatefrom' . $type;
+        //打开源图
+        $src = $open_fn($src_path);
+        //创建目标图
+        $dst = imagecreatetruecolor($max_w, $max_h);
+        //源图的宽
+        $src_w = imagesx($src);
+        //源图的高
+        $src_h = imagesy($src);
+        //是否等比缩放
+        if ($flag) {
+            //等比
+            //求目标图片的宽高
+            if ($max_w / $max_h < $src_w / $src_h) {
+                //横屏图片以宽为标准
+                $dst_w = $max_w;
+                $dst_h = $max_w * $src_h / $src_w;
+            } else {
+                //竖屏图片以高为标准
+                $dst_h = $max_h;
+                $dst_w = $max_h * $src_w / $src_h;
+            }
+            //在目标图上显示的位置
+            $dst_x = (int) (($max_w - $dst_w) / 2);
+            $dst_y = (int) (($max_h - $dst_h) / 2);
+        } else {
+            //不等比
+            $dst_x = 0;
+            $dst_y = 0;
+            $dst_w = $max_w;
+            $dst_h = $max_h;
+        }
+        //生成缩略图
+        $fool = imagecopyresampled($dst, $src, $dst_x, $dst_y, 0, 0, $dst_w, $dst_h, $src_w, $src_h);
+        //文件名
+        $filename = basename($src_path);
+        //文件夹名
+        $foldername = substr(dirname($src_path), 0);
+        //缩略图存放路径
+        $thumb_path = $foldername . '/' . $prefix . $filename;
+        //把缩略图上传到指定的文件夹
+        imagepng($dst, $thumb_path);
+        //销毁图片资源
+        imagedestroy($dst);
+        imagedestroy($src);
+        //返回新的缩略图的文件名
+        return $thumb_path;
     }
 }
