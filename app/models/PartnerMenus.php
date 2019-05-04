@@ -11,7 +11,7 @@ class PartnerMenus extends BaseModel
 {
     protected $table = 'partner_admin_menus';
 
-    protected $redisFirstTag = 'ms_menu.';
+    protected $redisFirstTag = 'ms_menu';
 
     /**
      * @param PartnerAdminGroupAccess $accessGroupEloq
@@ -32,9 +32,9 @@ class PartnerMenus extends BaseModel
 
     public function forStar()
     {
-        $redisKey = $this->redisFirstTag . '*';
-        if (Cache::has($redisKey)) {
-            $parent_menu = Cache::get($redisKey);
+        $redisKey = '*';
+        if (Cache::tags([$this->redisFirstTag])->has($redisKey)) {
+            $parent_menu = Cache::tags([$this->redisFirstTag])->get($redisKey);
         } else {
             $menuLists = self::all();
             $parent_menu = self::createMenuDatas($menuLists);
@@ -48,9 +48,9 @@ class PartnerMenus extends BaseModel
      */
     public function getUserMenuDatas(PartnerAdminGroupAccess $accessGroupEloq)
     {
-        $redisKey = $this->redisFirstTag . $accessGroupEloq->id;
-        if (Cache::has($redisKey)) {
-            $parent_menu = Cache::get($redisKey);
+        $redisKey = $accessGroupEloq->id;
+        if (Cache::tags([$this->redisFirstTag])->has($redisKey)) {
+            $parent_menu = Cache::tags([$this->redisFirstTag])->get($redisKey);
         } else {
             $role = json_decode($accessGroupEloq->role); //[1,2,3,4,5]
             $menuLists = self::whereIn('id', $role)->get();
@@ -61,12 +61,11 @@ class PartnerMenus extends BaseModel
 
     /**
      * @param $menuLists
-     * @param string $tag
+     * @param string $redisKey
      * @return array
      */
-    public function createMenuDatas($menuLists, $tag = '*')
+    public function createMenuDatas($menuLists, $redisKey = '*')
     {
-        $redisKey = $this->redisFirstTag . $tag;
         $menuForFE = [];
         foreach ($menuLists as $key => $value) {
             if ($value->pid === 0) {
@@ -103,7 +102,8 @@ class PartnerMenus extends BaseModel
         //            $hourToStore = 24;
 //            $expiresAt = Carbon::now()->addHours($hourToStore)->diffInMinutes();
 //            Cache::put('ms_menus', $parent_menu, $expiresAt);
-        Cache::forever($redisKey, $menuForFE);
+        Cache::tags([$this->redisFirstTag])->forever($redisKey, $menuForFE);
+//        Cache::forever($redisKey, $menuForFE);
         return $menuForFE;
     }
 
@@ -112,7 +112,7 @@ class PartnerMenus extends BaseModel
      */
     public function refreshStar(): bool
     {
-        Cache::forget('ms_menus.*');
+        Cache::tags([$this->redisFirstTag])->flush();
         return true;
     }
 

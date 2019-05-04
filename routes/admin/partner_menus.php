@@ -14,4 +14,11 @@ Route::group(['prefix' => 'menu'], function () {
     Route::match(['get', 'options'], 'get-all-menu', ['as' => $namePrefix . 'allPartnerMenu', 'uses' => $controller . 'getAllMenu']);
     //获取当前商户用户的菜单
     Route::match(['get', 'options'], 'current-admin-menu', ['as' => $namePrefix . 'current-admin-menu', 'uses' => $controller . 'currentPartnerMenu']);
+    //所有菜单需要参数 【父级，路由名，可编辑菜单信息】
+    Route::match(['get', 'options'], '/', ['as' => $namePrefix . 'allRequireInfos', 'uses' => $controller . 'allRequireInfos']);
+    Route::match(['post', 'options'], '/changeParent', ['as' => $namePrefix . 'changeParent', 'uses' => $controller . 'changeParent']);
+    Route::post('/add', ['as' => $namePrefix.'add', 'uses' => $controller.'add']);
+    Route::post('/edit', ['as' => $namePrefix.'edit', 'uses' => $controller.'edit']);
+    Route::post('/delete', ['as' => $namePrefix.'delete', 'uses' => $controller.'delete']);
+
 });
