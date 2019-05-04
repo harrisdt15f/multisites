@@ -11,7 +11,7 @@ class CategoryController extends ApiMainController
     //分类管理列表
     public function detail()
     {
-        $datas = $this->eloqM::from('partner_category as a')->leftJoin('partner_category as b', 'a.parent', '=', 'b.id')->select('a.*', 'b.title as parent_title')->get()->toArray();
+        $datas = $this->eloqM::from('partner_category as self')->leftJoin('partner_category as secondary', 'self.parent', '=', 'secondary.id')->select('self.*', 'secondary.title as parent_title')->get()->toArray();
         if (empty($datas)) {
             return $this->msgout(false, [], '没有获取到数据', '0009');
         }

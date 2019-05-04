@@ -35,19 +35,8 @@ class ActivityTypeController extends ApiMainController
         if (is_null($editData)) {
             return $this->msgout(false, [], '需要修改的活动分类id不存在');
         }
-        //图片类型的分类
-        if (array_key_exists('l_size', $this->inputs)) {
-            $editData->l_size = $this->inputs['l_size'];
-        }
-        if (array_key_exists('w_size', $this->inputs)) {
-            $editData->w_size = $this->inputs['w_size'];
-        }
-        if (array_key_exists('status', $this->inputs)) {
-            $editData->status = $this->inputs['status'];
-        }
-        if (array_key_exists('size', $this->inputs)) {
-            $editData->size = $this->inputs['size'];
-        }
+        unset($this->inputs['id']);
+        $this->editAssignment($editData, $this->inputs);
         try {
             $editData->save();
             return $this->msgout(true, [], '修改活动分类成功');

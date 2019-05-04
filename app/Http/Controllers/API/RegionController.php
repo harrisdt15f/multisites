@@ -71,12 +71,7 @@ class RegionController extends ApiMainController
         if ($validator->fails()) {
             return $this->msgout(false, [], $validator->errors()->first());
         }
-        $addDatas = [
-            'region_id' => $this->inputs['region_id'],
-            'region_parent_id' => $this->inputs['region_parent_id'],
-            'region_name' => $this->inputs['region_name'],
-            'region_level' => $this->inputs['region_level'],
-        ];
+        $addDatas = $this->inputs;
         $pastData = $this->eloqM::where(['region_parent_id' => $this->inputs['region_parent_id'], 'region_name' => $this->inputs['region_name']])->orwhere('region_id', $this->inputs['region_id'])->first();
         if (is_null($pastData)) {
             try {

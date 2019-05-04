@@ -14,14 +14,14 @@ use Illuminate\Support\Facades\Route;
 class ApiMainController extends Controller
 {
     protected $inputs;
-    protected $partnerAdmin;//当前的商户用户
-    protected $currentOptRoute;//目前路由
-    protected $fullMenuLists;//所有的菜单
-    protected $currentPlatformEloq = null;//当前商户存在的平台
-    protected $currentPartnerAccessGroup = null;//当前商户的权限组
+    protected $partnerAdmin; //当前的商户用户
+    protected $currentOptRoute; //目前路由
+    protected $fullMenuLists; //所有的菜单
+    protected $currentPlatformEloq = null; //当前商户存在的平台
+    protected $currentPartnerAccessGroup = null; //当前商户的权限组
     protected $partnerMenulists; //目前所有的菜单为前端展示用的
-    protected $eloqM = '';// 当前的eloquent
-    protected $currentRouteName;//当前的route name;
+    protected $eloqM = ''; // 当前的eloquent
+    protected $currentRouteName; //当前的route name;
     protected $routeAccessable = false;
 
     /**
@@ -33,7 +33,7 @@ class ApiMainController extends Controller
             $this->partnerAdmin = Auth::guard('admin')->user();
             //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
             try {
-                $this->currentPlatformEloq = $this->partnerAdmin->platform;//获取目前账号用户属于平台的对象
+                $this->currentPlatformEloq = $this->partnerAdmin->platform; //获取目前账号用户属于平台的对象
                 $this->currentPartnerAccessGroup = $this->partnerAdmin->accessGroup;
             } catch (\Exception $e) {
             }
@@ -47,7 +47,7 @@ class ApiMainController extends Controller
                 }
             }
             $this->adminOperateLog();
-            $this->eloqM = 'App\\models\\' . $this->eloqM;// 当前的eloquent
+            $this->eloqM = 'App\\models\\' . $this->eloqM; // 当前的eloquent
             return $next($request);
         });
     }
@@ -58,8 +58,8 @@ class ApiMainController extends Controller
     private function menuAccess()
     {
         $partnerEloq = new PartnerMenus();
-        $this->fullMenuLists = $partnerEloq->forStar();//所有的菜单
-        $this->partnerMenulists = $partnerEloq->menuLists($this->currentPartnerAccessGroup);//目前所有的菜单为前端展示用的
+        $this->fullMenuLists = $partnerEloq->forStar(); //所有的菜单
+        $this->partnerMenulists = $partnerEloq->menuLists($this->currentPartnerAccessGroup); //目前所有的菜单为前端展示用的
     }
 
     /**
@@ -180,7 +180,8 @@ class ApiMainController extends Controller
                 if ($fixedJoin > 0) {
                     $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $queryConditions);
                 }
-            } else { //for default
+            } else {
+                //for default
                 if ($fixedJoin > 0) {
                     $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $queryConditions);
                 }
@@ -256,13 +257,13 @@ class ApiMainController extends Controller
         if (empty($sizeOfWithInputs)) //如果with 没有参数可以查询时查询全部
         {
             switch ($fixedJoin) {
-                case 1://有一个连表查询的情况下
+                case 1: //有一个连表查询的情况下
                     $queryEloq = $queryEloq->with($withTable);
                     break;
             }
         } else {
             switch ($fixedJoin) {
-                case 1://有一个连表查询的情况下
+                case 1: //有一个连表查询的情况下
                     $queryEloq = $queryEloq->with($withTable)->whereHas($withTable, function ($query) use ($sizeOfWithInputs, $withSearchCriterias, $queryConditions) {
                         if ($sizeOfWithInputs > 1) {
 
@@ -294,5 +295,17 @@ class ApiMainController extends Controller
         }
 
         return $queryEloq;
+    }
+
+    /**
+     * @param $eloqM
+     * @param array $datas
+     */
+    public function editAssignment($eloqM, $datas)
+    {
+        foreach ($datas as $k => $v) {
+            $eloqM->$k = $v;
+        }
+        return $eloqM;
     }
 }
