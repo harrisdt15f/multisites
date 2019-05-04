@@ -29,7 +29,7 @@ class LotteriesController extends ApiMainController
         $series = array_keys(Config::get('game.main.series'));
         $seriesStringImploded = implode(',', $series);
         $rule = [
-            'series_id' => 'required|in:' . $seriesStringImploded,
+            'series_id' => 'required|in:'.$seriesStringImploded,
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
@@ -38,9 +38,12 @@ class LotteriesController extends ApiMainController
         $lotteriesEloq = $this->eloqM::where([
             ['series_id', '=', $this->inputs['series_id']],
             ['status', '=', 1],
-        ])->with(['issueRule' => function ($query) {
-            $query->select('id', 'lottery_id', 'lottery_name', 'begin_time', 'end_time', 'issue_seconds', 'first_time', 'adjust_time', 'encode_time', 'issue_count', 'status', 'created_at', 'updated_at');
-        }])->get()->toArray();
+        ])->with([
+            'issueRule' => function ($query) {
+                $query->select('id', 'lottery_id', 'lottery_name', 'begin_time', 'end_time', 'issue_seconds',
+                    'first_time', 'adjust_time', 'encode_time', 'issue_count', 'status', 'created_at', 'updated_at');
+            }
+        ])->get()->toArray();
         return $this->msgout(true, $lotteriesEloq);
     }
 
