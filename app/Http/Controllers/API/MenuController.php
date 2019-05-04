@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Validator;
 
 class MenuController extends ApiMainController
 {
+    protected $eloqM = 'PartnerMenus';
+
     public function getAllMenu()
     {
 
@@ -57,20 +59,48 @@ class MenuController extends ApiMainController
 
     public function add()
     {
-        $menuEloq = new PartnerMenus();
-        if (isset($this->inputs['isParent']) && $this->inputs['isParent'] === 'on') {
-
-            $menuEloq->label = $this->inputs['menulabel'];
+        $parent = false;
+        if (isset($this->inputs['isParent']) && $this->inputs['isParent'] === '1') {
+            $rule = [
+                'label' => 'required',
+                'en_name' => 'required',
+                'route' => 'required',
+                'display' => 'required',
+            ];
+            $parent = true;
         } else {
-            $menuEloq->label = $this->inputs['menulabel'];
-            $menuEloq->route = $this->inputs['route'];
+            $rule = [
+                'label' => 'required',
+                'en_name' => 'required',
+                'route' => 'required',
+                'display' => 'required',
+                'parentid' => 'required|numeric',//1 2
+            ];
+        }
+        $validator = Validator::make($this->inputs, $rule);
+        if ($validator->fails()) {
+            return $this->msgout(false, [], $validator->errors(), 200);
+        }
+        $MenuEloq = $this->eloqM::where('label', $this->inputs['label'])->first();
+        if (!is_null($MenuEloq)) {
+            return $this->msgout(false, [], '对不起菜单名已存在', '0002');
+        }
+        $menuEloq = new PartnerMenus();
+        $menuEloq->label = $this->inputs['label'];
+        $menuEloq->en_name = $this->inputs['en_name'];
+        $menuEloq->route = $this->inputs['route'];
+        $menuEloq->display = $this->inputs['display'];
+        if ($parent === false) {
             $menuEloq->pid = $this->inputs['parentid'];
         }
-        if ($menuEloq->save()) {
+        try {
+            $menuEloq->save();
             $menuEloq->refreshStar();
-            return response()->json(['success' => true, 'menucreated' => 1]);
-        } else {
-            return response()->json(['success' => false, 'menucreated' => 0]);
+            return $this->msgout(true, $menuEloq->toArray());
+        } catch (\Exception $e) {
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
+            return $this->msgout(false, [], $msg, $sqlState);
         }
     }
 
