@@ -6,21 +6,21 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
-class CachePicControl extends Command
+class DeleteCachePicControl extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'CachePic';
+    protected $signature = 'DeleteCachePic';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = '定时删除没上传活动的图片';
 
     /**
      * Execute the console command.
@@ -29,7 +29,7 @@ class CachePicControl extends Command
      */
     public function handle()
     {
-        Log::info('任务调度' . date('Y-m-d H:i:s', time()));
+        Log::info('开始定时删除没上传活动的图片' . date('Y-m-d H:i:s', time()));
         if (Cache::has('CachePic')) {
             $CachePic = Cache::get('CachePic');
             foreach ($CachePic as $k => $v) {

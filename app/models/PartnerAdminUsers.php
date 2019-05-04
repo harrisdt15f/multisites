@@ -2,8 +2,8 @@
 
 namespace App\models;
 
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use SMartins\PassportMultiauth\HasMultiAuthApiTokens;
 
 class PartnerAdminUsers extends Authenticatable
@@ -17,7 +17,7 @@ class PartnerAdminUsers extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name','email', 'password','email_verified_at','rmember_token','is_test','group_id','status','platform_id','super_id'
+        'name', 'email', 'password', 'email_verified_at', 'rmember_token', 'is_test', 'group_id', 'status', 'platform_id', 'super_id',
     ];
 
     /**
@@ -38,14 +38,18 @@ class PartnerAdminUsers extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-
     public function platform()
     {
-        return $this->hasOne(PlatForms::class,'platform_id', 'platform_id');
+        return $this->hasOne(PlatForms::class, 'platform_id', 'platform_id');
     }
 
     public function accessGroup()
     {
-        return $this->hasOne(PartnerAdminGroupAccess::class,'id','group_id');
+        return $this->hasOne(PartnerAdminGroupAccess::class, 'id', 'group_id');
+    }
+
+    public function operateAmount()
+    {
+        return $this->hasOne(FundOperation::class, 'admin_id', 'id');
     }
 }
