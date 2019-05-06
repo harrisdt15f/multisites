@@ -103,7 +103,7 @@ class PartnerAdminGroupController extends ApiMainController
         $datas = $this->eloqM::find($id);
         //检查提交的权限中 是否有 资金操作权限  $fool
         $role = json_decode($this->inputs['role']);
-        $FundOperation = PartnerMenus::select('id')->where('route', '/manage/prize-manage')->first()->toArray();
+        $FundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
         $fool = in_array($FundOperation['id'], $role);
         if (!is_null($datas)) {
             DB::beginTransaction();
@@ -177,7 +177,7 @@ class PartnerAdminGroupController extends ApiMainController
         ])->first();
         //检查是否有资金操作权限
         $role = json_decode($datas->role);
-        $FundOperation = PartnerMenus::select('id')->where('route', '/manage/prize-manage')->first()->toArray();
+        $FundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
         $fool = in_array($FundOperation['id'], $role);
         if (!is_null($datas)) {
             try {
