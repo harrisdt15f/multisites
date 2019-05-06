@@ -12,14 +12,14 @@ class ConfiguresController extends ApiMainController
     //获取全部配置
     public function getConfiguresList()
     {
-        $all = $this->eloqM::all()->toArray();
+        $all = $this->eloqM::select('id', 'parent_id', 'pid', 'sign', 'name', 'description', 'value', 'add_admin_id', 'last_update_admin_id', 'status', 'created_at', 'updated_at')->get();
         foreach ($all as $k1 => $v1) {
             //##########
-            if ($all[$k1]['parent_id'] == 0) {
+            if ($all[$k1]['parent_id'] === 0) {
                 $data[] = $all[$k1];
             } else {
                 foreach ($data as $k2 => $v2) {
-                    if ($all[$k1]['parent_id'] == $data[$k2]['id']) {
+                    if ($all[$k1]['parent_id'] === $data[$k2]['id']) {
                         $data[$k2]['sub'][] = $all[$k1];
                     }
                 }
