@@ -308,4 +308,40 @@ class ApiMainController extends Controller
         }
         return $eloqM;
     }
+
+    /**
+     *
+     * @param $eloqM
+     * @param $type                 0超管对管理操作   1管理对用户操作
+     * @param $in_out               0减少   1增加
+     * @param $OperationAdminId     操作人ID
+     * @param $OperationAdminName   操作人NAME
+     * @param $OperationId          被操作人ID
+     * @param $OperationName        被操作人NAME
+     * @param $amount               操作金额
+     * @param $content              具体描述
+     */
+    public function insertOperationDatas($eloqM, $type = 1, $in_out, $OperationAdminId, $OperationAdminName, $OperationId, $OperationName, $amount, $comment)
+    {
+
+        $OperationDatas = [
+            'type' => $type,
+            'in_out' => $in_out,
+            'amount' => $amount,
+            'comment' => $comment,
+        ];
+        if ($type === 0) {
+            $OperationDatas['super_admin_id'] = $OperationAdminId;
+            $OperationDatas['super_admin_name'] = $OperationAdminName;
+            $OperationDatas['admin_id'] = $OperationId;
+            $OperationDatas['admin_name'] = $OperationName;
+        } elseif ($type === 1) {
+            $OperationDatas['admin_id'] = $OperationAdminId;
+            $OperationDatas['admin_name'] = $OperationAdminName;
+            $OperationDatas['user_id'] = $OperationId;
+            $OperationDatas['user_name'] = $OperationName;
+        }
+        $eloqM->fill($OperationDatas);
+        $eloqM->save();
+    }
 }

@@ -17,7 +17,6 @@ class FundOperationController extends ApiMainController
     {
         $rule = [
             'name' => 'string',
-            'group_id' => 'numeric',
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
@@ -55,21 +54,15 @@ class FundOperationController extends ApiMainController
         if (is_null($admin_user)) {
             return $this->msgout(false, [], '管理员不存在');
         }
-        $comment = '[人工充值额度操作]==> +' . $this->inputs['fund'] . '额度';
+        $comment = '[人工充值额度操作]==> ' . $this->inputs['fund'];
         $partnerAdmin = $this->partnerAdmin;
-        $flowsData = [
-            'super_admin_id' => $partnerAdmin->id,
-            'super_admin_name' => $partnerAdmin->name,
-            'admin_id' => $admin_user->id,
-            'admin_name' => $admin_user->name,
-            'comment' => $comment,
-        ];
+        $type = 0;
+        $in_out = 1;
+        $adminAdmitedFlows = new adminAdmitedFlows();
         DB::beginTransaction();
         try {
             FundOperation::where('admin_id', $this->inputs['id'])->increment('fund', $this->inputs['fund']);
-            $adminAdmitedFlows = new adminAdmitedFlows();
-            $adminAdmitedFlows->fill($flowsData);
-            $adminAdmitedFlows->save();
+            $this->insertOperationDatas($adminAdmitedFlows, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $admin_user->id, $admin_user->name, $this->inputs['fund'], $comment);
             DB::commit();
             return $this->msgout(true, [], '增加额度成功');
         } catch (Exception $e) {
