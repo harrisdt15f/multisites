@@ -82,10 +82,9 @@ class ConfiguresController extends ApiMainController
         if (is_null($pastData)) {
             $editDataEloq = $this->eloqM::find($this->inputs['id']);
             $editDatas = $this->inputs;
-            unset($editDatas['id']);
-            unset($editDatas['parent_id']);
+            unset($editDatas['id'],$editDatas['parent_id']);
             //不是顶级可修改值
-            if ($this->inputs['parent_id'] == 0) {
+            if ($this->inputs['parent_id'] === 0) {
                 unset($editDatas['value']);
             }
             $this->editAssignment($editDataEloq, $editDatas);
