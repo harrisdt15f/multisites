@@ -50,14 +50,15 @@ class PartnerAdminGroupController extends ApiMainController
         $objPartnerAdminGroup = new $this->eloqM;
         $objPartnerAdminGroup->fill($data);
         //检查是否有人工充值权限
-        $FundOperation = PartnerMenus::select('id')->where('route', '/operasyon/prize-operation')->first()->toArray();
+        $FundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
         $fool = in_array($FundOperation['id'], $role);
         try {
             $objPartnerAdminGroup->save();
-            if ($fool) {
+            if ($fool === true) {
                 $FundOperationGroup = new FundOperationGroup();
                 $FundOperationData = [
                     'group_id' => $objPartnerAdminGroup->id,
+                    'group_name' => $objPartnerAdminGroup->group_name,
                 ];
                 $FundOperationGroup->fill($FundOperationData);
                 $FundOperationGroup->save();
@@ -131,6 +132,7 @@ class PartnerAdminGroupController extends ApiMainController
                         }
                         $FundOperationData = [
                             'group_id' => $data['id'],
+                            'group_name' => $data['group_name'],
                         ];
                         $FundOperationGroup->fill($FundOperationData);
                         $FundOperationGroup->save();
@@ -181,7 +183,7 @@ class PartnerAdminGroupController extends ApiMainController
         $fool = in_array($FundOperation['id'], $role);
         if (!is_null($datas)) {
             try {
-                if ($fool) {
+                if ($fool === true) {
                     $FundOperation = new FundOperation();
                     $FundOperationGroup = new FundOperationGroup();
                     //需要删除的资金表 admin

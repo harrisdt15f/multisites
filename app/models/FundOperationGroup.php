@@ -7,6 +7,6 @@ class FundOperationGroup extends BaseModel
     protected $table = 'fund_operation_group';
 
     protected $fillable = [
-        'group_id',
+        'group_id', 'group_name',
     ];
 }
