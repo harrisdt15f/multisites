@@ -37,9 +37,10 @@ class ConfiguresController extends ApiMainController
             'sign' => 'required',
             'name' => 'required',
             'description' => 'required',
+            'value' => 'required' //父级的时候是不需要传送 value 值
         ];
         if (isset($this->inputs['parent_id']) && $this->inputs['parent_id'] === 0) {
-            $rule['value'] = 'required';
+            unset($rule['value']);
         }
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
@@ -47,8 +48,9 @@ class ConfiguresController extends ApiMainController
         }
         $addDatas = $this->inputs;
         $addDatas['pid'] = $this->currentPlatformEloq->platform_id;
-        $addDatas['add_admin_id'] = $this->partnerAdmin->id;
-        $addDatas['last_update_admin_id'] = $this->partnerAdmin->id;
+        $adminId = $this->partnerAdmin->id;
+        $addDatas['add_admin_id'] = $adminId;
+        $addDatas['last_update_admin_id'] = $adminId;
         $addDatas['status'] = 1;
         $pastData = $this->eloqM::where('sign', $this->inputs['sign'])->first();
         if (is_null($pastData)) {
