@@ -13,6 +13,7 @@ class ConfiguresController extends ApiMainController
     public function getConfiguresList()
     {
         $all = $this->eloqM::select('id', 'parent_id', 'pid', 'sign', 'name', 'description', 'value', 'add_admin_id', 'last_update_admin_id', 'status', 'created_at', 'updated_at')->get();
+        $data=[];
         foreach ($all as $k1 => $v1) {
             //##########
             if ($all[$k1]['parent_id'] === 0) {
