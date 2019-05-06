@@ -15,7 +15,6 @@ class FundOperationController extends ApiMainController
 {
     public function users()
     {
-
         $rule = [
             'name' => 'numeric',
             'group_id' => 'numeric',
