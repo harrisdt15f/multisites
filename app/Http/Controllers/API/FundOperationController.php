@@ -13,10 +13,10 @@ use Illuminate\Support\Facades\Validator;
 
 class FundOperationController extends ApiMainController
 {
-    public function users()
+    public function admins()
     {
         $rule = [
-            'name' => 'numeric',
+            'name' => 'string',
             'group_id' => 'numeric',
         ];
         $validator = Validator::make($this->inputs, $rule);
@@ -56,9 +56,10 @@ class FundOperationController extends ApiMainController
             return $this->msgout(false, [], '管理员不存在');
         }
         $comment = '[人工充值额度操作]==> +' . $this->inputs['fund'] . '额度';
+        $partnerAdmin = $this->partnerAdmin;
         $flowsData = [
-            'super_admin_id' => $this->partnerAdmin->id,
-            'super_admin_name' => $this->partnerAdmin->name,
+            'super_admin_id' => $partnerAdmin->id,
+            'super_admin_name' => $partnerAdmin->name,
             'admin_id' => $admin_user->id,
             'admin_name' => $admin_user->name,
             'comment' => $comment,
