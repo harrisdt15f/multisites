@@ -2,6 +2,8 @@
 
 namespace App\models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 class PartnerSysConfigures extends BaseModel
 {
     protected $table = 'partner_sys_configures';
@@ -18,7 +20,7 @@ class PartnerSysConfigures extends BaseModel
         'status'
     ];
 
-    public function childs()
+    public function childs(): HasMany
     {
         return $this->hasMany(__CLASS__, 'parent_id', 'id');
     }
