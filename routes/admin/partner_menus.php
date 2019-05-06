@@ -17,8 +17,7 @@ Route::group(['prefix' => 'menu'], function () {
     //所有菜单需要参数 【父级，路由名，可编辑菜单信息】
     Route::match(['get', 'options'], '/', ['as' => $namePrefix . 'allRequireInfos', 'uses' => $controller . 'allRequireInfos']);
     Route::match(['post', 'options'], '/changeParent', ['as' => $namePrefix . 'changeParent', 'uses' => $controller . 'changeParent']);
-    Route::post('/add', ['as' => $namePrefix.'add', 'uses' => $controller.'add']);
-    Route::post('/edit', ['as' => $namePrefix.'edit', 'uses' => $controller.'edit']);
-    Route::post('/delete', ['as' => $namePrefix.'delete', 'uses' => $controller.'delete']);
-
+    Route::match(['post', 'options'], '/add', ['as' => $namePrefix . 'add', 'uses' => $controller . 'add']);
+    Route::match(['post', 'options'], '/edit', ['as' => $namePrefix . 'edit', 'uses' => $controller . 'edit']);
+    Route::match(['post', 'options'], '/delete', ['as' => $namePrefix . 'delete', 'uses' => $controller . 'delete']);
 });
