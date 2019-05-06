@@ -37,6 +37,8 @@ class FundOperationController extends ApiMainController
         $orderFields = 'id';
         $orderFlow = 'asc';
         $data = $this->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields, $orderFields, $orderFlow);
+        $SysConfiguresEloq = PartnerSysConfigures::where('sign', 'admin_recharge_daily_limit')->first();
+        $data['dailyLimitFund'] = $SysConfiguresEloq['value'];
         return $this->msgout(true, $data);
     }
     public function addFund()
