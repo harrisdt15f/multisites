@@ -26,7 +26,7 @@ class ActivityTypeController extends ApiMainController
             'size' => 'numeric|gt:0',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors()->first());
+            return $this->msgout(false, [], 400, $validator->errors()->first());
         }
         $editData = $this->eloqM::find($this->inputs['id']);
         if (is_null($editData)) {
@@ -40,7 +40,7 @@ class ActivityTypeController extends ApiMainController
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgout(false, [], $sqlState, $msg);
         }
     }
 }

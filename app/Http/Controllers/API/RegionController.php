@@ -82,7 +82,7 @@ class RegionController extends ApiMainController
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-                return $this->msgout(false, [], $msg, $sqlState);
+                return $this->msgout(false, [], $sqlState, $msg);
             }
         } else {
             return $this->msgout(false, [], '该行政区已经存在', '0009');
@@ -114,7 +114,7 @@ class RegionController extends ApiMainController
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-                return $this->msgout(false, [], $msg, $sqlState);
+                return $this->msgout(false, [], $sqlState, $msg);
             }
         } else {
             return $this->msgout(false, [], '该行政区ID已存在', '0009');

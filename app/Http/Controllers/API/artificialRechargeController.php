@@ -30,7 +30,7 @@ class artificialRechargeController extends ApiMainController
             'apply_note' => 'required|string',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors());
+            return $this->msgout(false, [], 400, $validator->errors()->first());
         }
         $userData = UserHandleModel::find($this->inputs['id']);
         if (is_null($userData)) {
@@ -64,7 +64,7 @@ class artificialRechargeController extends ApiMainController
             DB::rollBack();
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgout(false, [], $sqlState, $msg);
         }
     }
 

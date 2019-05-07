@@ -33,7 +33,7 @@ class ActivityInfosController extends ApiMainController
             'is_time_interval' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors()->first());
+            return $this->msgout(false, [], 400, $validator->errors()->first());
         }
         $pastData = $this->eloqM::where('title', $this->inputs['title'])->first();
         if (!is_null($pastData)) {
@@ -63,7 +63,7 @@ class ActivityInfosController extends ApiMainController
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgout(false, [], $sqlState, $msg);
         }
     }
     //编辑活动
@@ -82,7 +82,7 @@ class ActivityInfosController extends ApiMainController
             'is_time_interval' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors()->first());
+            return $this->msgout(false, [], 400, $validator->errors()->first());
         }
         $pastData = $this->eloqM::where('title', $this->inputs['title'])->where('id', '!=', $this->inputs['id'])->first();
         if (!is_null($pastData)) {
@@ -121,7 +121,7 @@ class ActivityInfosController extends ApiMainController
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgout(false, [], $sqlState, $msg);
         }
     }
     //删除活动
@@ -131,7 +131,7 @@ class ActivityInfosController extends ApiMainController
             'id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors()->first(), 200);
+            return $this->msgout(false, [], 400, $validator->errors()->first());
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
         if (!is_null($pastData)) {
@@ -144,7 +144,7 @@ class ActivityInfosController extends ApiMainController
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-                return $this->msgout(false, [], $msg, $sqlState);
+                return $this->msgout(false, [], $sqlState, $msg);
             }
         } else {
             return $this->msgout(false, [], '该活动不存在', '0009');

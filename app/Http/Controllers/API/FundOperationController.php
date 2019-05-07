@@ -20,7 +20,7 @@ class FundOperationController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 200);
+            return $this->msgout(false, [], 400, $validator->errors()->first());
         }
         $groupArr = FundOperationGroup::select('group_id')->get()->toArray();
         $group = array_column($groupArr, 'group_id');
@@ -48,7 +48,7 @@ class FundOperationController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 200);
+            return $this->msgout(false, [], 400, $validator->errors()->first());
         }
         $admin_user = PartnerAdminUsers::find($this->inputs['id']);
         if (is_null($admin_user)) {
@@ -73,7 +73,7 @@ class FundOperationController extends ApiMainController
             DB::rollBack();
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgout(false, [], $sqlState, $msg);
         }
     }
     public function everyDayFund()
@@ -83,7 +83,7 @@ class FundOperationController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 200);
+            return $this->msgout(false, [], 400, $validator->errors()->first());
         }
         try {
             $SysConfiguresEloq = PartnerSysConfigures::where('sign', 'admin_recharge_daily_limit')->first();
@@ -94,7 +94,7 @@ class FundOperationController extends ApiMainController
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgout(false, [], $sqlState, $msg);
         }
     }
 }

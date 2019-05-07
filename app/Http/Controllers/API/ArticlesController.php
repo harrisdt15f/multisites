@@ -37,7 +37,7 @@ class ArticlesController extends ApiMainController
             'pic_path' => 'array',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors()->first());
+            return $this->msgout(false, [], 400, $validator->errors()->first());
         }
         $pastData = $this->eloqM::where('title', $this->inputs['title'])->first();
         if (!is_null($pastData)) {
@@ -88,7 +88,7 @@ class ArticlesController extends ApiMainController
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgout(false, [], $sqlState, $msg);
         }
     }
     //编辑文章
@@ -107,7 +107,7 @@ class ArticlesController extends ApiMainController
             'pic_path' => 'required|array',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors()->first());
+            return $this->msgout(false, [], 400, $validator->errors()->first());
         }
         $pastData = $this->eloqM::where('title', $this->inputs['title'])->where('id', '!=', $this->inputs['id'])->first();
         if (!is_null($pastData)) {
@@ -156,7 +156,7 @@ class ArticlesController extends ApiMainController
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgout(false, [], $sqlState, $msg);
         }
     }
     //删除文章
@@ -166,7 +166,7 @@ class ArticlesController extends ApiMainController
             'id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors()->first());
+            return $this->msgout(false, [], 400, $validator->errors()->first());
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
         $pic_path = explode('|', $pastData['pic_path']);
@@ -181,7 +181,7 @@ class ArticlesController extends ApiMainController
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-                return $this->msgout(false, [], $msg, $sqlState);
+                return $this->msgout(false, [], $sqlState, $msg);
             }
         } else {
             return $this->msgout(false, [], '该文章不存在', '0009');
@@ -198,7 +198,7 @@ class ArticlesController extends ApiMainController
             'sort_type' => 'required|in:1,2',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors()->first());
+            return $this->msgout(false, [], 400, $validator->errors()->first());
         }
         try {
             //上拉排序
@@ -223,7 +223,7 @@ class ArticlesController extends ApiMainController
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgout(false, [], $sqlState, $msg);
         }
     }
     //文章置顶
@@ -233,7 +233,7 @@ class ArticlesController extends ApiMainController
             'id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors()->first());
+            return $this->msgout(false, [], 400, $validator->errors()->first());
         }
         $topData = $this->eloqM::find($this->inputs['id']);
         if (is_null($topData)) {
@@ -247,7 +247,7 @@ class ArticlesController extends ApiMainController
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgout(false, [], $sqlState, $msg);
         }
     }
     //图片上传
@@ -257,7 +257,7 @@ class ArticlesController extends ApiMainController
             'pic' => 'required|file',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors()->first());
+            return $this->msgout(false, [], 400, $validator->errors()->first());
         }
         //接收文件信息
         $file = $this->inputs['pic'];

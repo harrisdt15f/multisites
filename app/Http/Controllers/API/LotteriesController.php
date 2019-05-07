@@ -119,7 +119,7 @@ class LotteriesController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 200);
+            return $this->msgout(false, [], 400, $validator->errors()->first());
         }
         event(new IssueGenerateEvent($this->inputs));
         return $this->msgout(true);

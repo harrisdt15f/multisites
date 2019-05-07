@@ -73,7 +73,7 @@ class MenuController extends ApiMainController
         }
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 200);
+            return $this->msgout(false, [], 400, $validator->errors()->first());
         }
         $MenuEloq = $this->eloqM::where('label', $this->inputs['label'])->first();
         if (!is_null($MenuEloq)) {
@@ -95,7 +95,7 @@ class MenuController extends ApiMainController
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgout(false, [], $sqlState, $msg);
         }
     }
 
@@ -107,7 +107,7 @@ class MenuController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 200);
+            return $this->msgout(false, [], 400, $validator->errors()->first());
         }
         $menuEloq = new PartnerMenus();
         $toDelete = $this->inputs['toDelete'];
@@ -151,7 +151,7 @@ class MenuController extends ApiMainController
         }
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 200);
+            return $this->msgout(false, [], 400, $validator->errors()->first());
         }
         $menuEloq = PartnerMenus::find($this->inputs['menuId']);
         $menuEloq->label = $this->inputs['label'];
