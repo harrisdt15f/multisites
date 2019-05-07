@@ -60,22 +60,16 @@ class MenuController extends ApiMainController
     public function add()
     {
         $parent = false;
+        $rule = [
+            'label' => 'required|regex:/[\x{4e00}-\x{9fa5}]+/u',//操作日志
+            'en_name' => 'required|regex:/^(?!\.)(?!.*\.$)(?!.*?\.\.)[a-z.-]+$/',//operation.log
+            'display' => 'required|numeric|in:0,1',
+            'route' => 'required|regex:/^(?!.*\/$)(?!.*?\/\/)[a-z\/-]+$/',// /operasyon/operation-log
+        ];
         if (isset($this->inputs['isParent']) && $this->inputs['isParent'] === '1') {
-            $rule = [
-                'label' => 'required',
-                'en_name' => 'required',
-                'route' => 'required',
-                'display' => 'required',
-            ];
             $parent = true;
         } else {
-            $rule = [
-                'label' => 'required',
-                'en_name' => 'required',
-                'route' => 'required',
-                'display' => 'required',
-                'parentid' => 'required|numeric',//1 2
-            ];
+            $rule['parentId'] = 'required|numeric';
         }
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
@@ -106,17 +100,27 @@ class MenuController extends ApiMainController
 
     public function delete()
     {
+        $rule = [
+            'toDelete' => 'required|array',
+            'toDelete.*' => 'int'
+        ];
+        $validator = Validator::make($this->inputs, $rule);
+        if ($validator->fails()) {
+            return $this->msgout(false, [], $validator->errors(), 200);
+        }
         $menuEloq = new PartnerMenus();
-        $toDelete = json_decode($this->inputs['toDelete'], true);
+        $toDelete = $this->inputs['toDelete'];
         if (!empty($toDelete)) {
             try {
-                $menuEloq->find($toDelete)->each(function ($product, $key) {
+                $datas = $menuEloq->find($toDelete)->each(function ($product, $key)  {
+                    $data[] = $product->toArray();
                     $product->delete();
+                    return $data;
                 });
                 $menuEloq->refreshStar();
-                return response()->json(['success' => true, 'menudeleted' => 1]);
+                return $this->msgout(true, $datas);
             } catch (\Exception $e) {
-                return response()->json(['success' => false, 'menudeleted' => 0]);
+                return $this->msgout(false, [], $e->getMessage(), '0002');
             }
         }
     }
@@ -136,7 +140,7 @@ class MenuController extends ApiMainController
             'en_name' => 'required|regex:/^(?!\.)(?!.*\.$)(?!.*?\.\.)[a-z.-]+$/',//operation.log
             'display' => 'required|numeric|in:0,1',
             'menuId' => 'required|numeric',
-            'route' =>'required|regex:/^(?!.*\/$)(?!.*?\/\/)[a-z\/-]+$/',// /operasyon/operation-log
+            'route' => 'required|regex:/^(?!.*\/$)(?!.*?\/\/)[a-z\/-]+$/',// /operasyon/operation-log
         ];
         if (isset($this->inputs['isParent']) && $this->inputs['isParent'] === '1') {
             $rule['isParent'] = 'required|numeric|in:0,1';
