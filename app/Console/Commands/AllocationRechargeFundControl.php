@@ -56,7 +56,9 @@ class AllocationRechargeFundControl extends Command
                 $fund = $everyDayfund;
                 $addFund = $fund - $v['fund'];
                 $adminFund = $v['fund'] + $addFund;
-                $comment = '[每日充值额度发放]=>>' . $addFund . '|[目前额度]=>>' . $adminFund;
+                $type = ArtificialRechargeLog::SYSTEM;
+                $in_out = ArtificialRechargeLog::INCREMENT;
+                $comment = '[每日充值额度发放]=>>+' . $addFund . '|[目前额度]=>>' . $adminFund;
                 $editFundData = [
                     'fund' => $fund,
                     'updated_at' => $time,
@@ -65,7 +67,8 @@ class AllocationRechargeFundControl extends Command
                     'admin_id' => $v['id'],
                     'admin_name' => $v['name'],
                     'comment' => $comment,
-                    'type' => 2,
+                    'type' => $type,
+                    'in_out' => $in_out,
                     'created_at' => $time,
                     'updated_at' => $time,
                 ];

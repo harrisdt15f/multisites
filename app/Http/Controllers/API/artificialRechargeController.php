@@ -51,9 +51,9 @@ class artificialRechargeController extends ApiMainController
             $newFund = $adminOperationFund - $this->inputs['amount'];
             $adminFundEdit = ['fund' => $newFund];
             $ArtificialRechargeLog = new ArtificialRechargeLog();
-            $type = 1;
-            $in_out = 0;
-            $comment = '[给用户人工充值]==>' . $this->inputs['amount'] . '|[目前额度]==>' . $newFund;
+            $type = ArtificialRechargeLog::ADMIN;
+            $in_out = ArtificialRechargeLog::DECREMENT;
+            $comment = '[给用户人工充值]==>-' . $this->inputs['amount'] . '|[目前额度]==>' . $newFund;
             $adminFundData->fill($adminFundEdit);
             $adminFundData->save();
             $AuditFlowID = $this->insertAuditFlow($partnerAdmin->id, $partnerAdmin->name, $this->inputs['apply_note']);
