@@ -85,7 +85,7 @@ class MenuController extends ApiMainController
         $menuEloq->route = $this->inputs['route'];
         $menuEloq->display = $this->inputs['display'];
         if ($parent === false) {
-            $menuEloq->pid = $this->inputs['parentid'];
+            $menuEloq->pid = $this->inputs['parentId'];
         }
         try {
             $menuEloq->save();
