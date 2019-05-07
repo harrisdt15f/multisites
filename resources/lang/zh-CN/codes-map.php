@@ -21,7 +21,7 @@ foreach ($aErrorCodeFiles as $skey => $sErrcodeFile) {
         if (empty($data)) {
             $data = ${'arrError'.$skey};
         } else {
-            $data = $data+${'arrError'.$skey};
+            $data += ${'arrError'.$skey};
         }
     }
 }
