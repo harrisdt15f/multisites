@@ -109,7 +109,6 @@ class MenuController extends ApiMainController
         $menuEloq = new PartnerMenus();
         $toDelete = json_decode($this->inputs['toDelete'], true);
         if (!empty($toDelete)) {
-
             try {
                 $menuEloq->find($toDelete)->each(function ($product, $key) {
                     $product->delete();
@@ -122,26 +121,52 @@ class MenuController extends ApiMainController
         }
     }
 
-    public function edit()
+    /**
+     *  菜单编辑接口
+     * (?!\.) - don't allow . at start
+     * (?!.*?\.\.) - don't allow 2 consecutive dots
+     * (?!.*\.$) - don't allow . at end
+     * @return JsonResponse
+     */
+    public function edit(): ?JsonResponse
     {
-        $menuEloq = PartnerMenus::find($this->inputs['menuid']);
-        if (isset($this->inputs['eisParent']) && $this->inputs['eisParent'] === 'on') {
-
-            $menuEloq->label = $this->inputs['emenulabel'];
+        $parent = false;
+        $rule = [
+            'label' => 'required|regex:/[\x{4e00}-\x{9fa5}]+/u',//操作日志
+            'en_name' => 'required|regex:/^(?!\.)(?!.*\.$)(?!.*?\.\.)[a-z.-]+$/',//operation.log
+            'display' => 'required|numeric|in:0,1',
+            'menuId' => 'required|numeric',
+            'route' =>'required|regex:/^(?!.*\/$)(?!.*?\/\/)[a-z\/-]+$/',// /operasyon/operation-log
+        ];
+        if (isset($this->inputs['isParent']) && $this->inputs['isParent'] === '1') {
+            $rule['isParent'] = 'required|numeric|in:0,1';
+            $parent = true;
+        } else {
+            $rule['parentId'] = 'required|numeric';
+            $rule['route'] = 'required|regex:/^(?!.*\/$)(?!.*?\/\/)[a-z/-]+$/';// /operasyon/operation-log
+        }
+        $validator = Validator::make($this->inputs, $rule);
+        if ($validator->fails()) {
+            return $this->msgout(false, [], $validator->errors(), 200);
+        }
+        $menuEloq = PartnerMenus::find($this->inputs['menuId']);
+        $menuEloq->label = $this->inputs['label'];
+        $menuEloq->en_name = $this->inputs['en_name'];
+        $menuEloq->display = $this->inputs['display'];
+        if ($parent === true) {
             $menuEloq->route = '#';
             $menuEloq->pid = 0;
         } else {
-            $menuEloq->label = $this->inputs['emenulabel'];
-            $menuEloq->route = $this->inputs['eroute'];
-            $menuEloq->pid = $this->inputs['eparentid'];
+            $menuEloq->route = $this->inputs['route'];
+            $menuEloq->pid = $this->inputs['parentId'];
         }
+        $data = $menuEloq->toArray();
         if ($menuEloq->save()) {
             $menuEloq->refreshStar();
-            return response()->json(['success' => true, 'menuedited' => 1]);
+            return $this->msgout(true, $data);
         } else {
-            return response()->json(['success' => false, 'menuedited' => 0]);
+            return $this->msgout(false, [], '编辑保存有误', '0002');
         }
-
     }
 
     public function changeParent()
