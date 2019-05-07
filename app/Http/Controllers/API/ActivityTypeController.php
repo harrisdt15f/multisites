@@ -11,9 +11,6 @@ class ActivityTypeController extends ApiMainController
     public function detail()
     {
         $datas = $this->eloqM::where('status', 1)->get()->toArray();
-        if (empty($datas)) {
-            return $this->msgout(false, [], '没有获取到数据', '0009');
-        }
         return $this->msgout(true, $datas);
     }
     /**
