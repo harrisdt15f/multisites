@@ -14,7 +14,7 @@ class PartnerMenus extends BaseModel
     protected $redisFirstTag = 'ms_menu';
 
     /**
-     * @param PartnerAdminGroupAccess $accessGroupEloq
+     * @param  PartnerAdminGroupAccess  $accessGroupEloq
      * @return array
      * TODO : 由于快速开发 后续需要弄缓存与异常处理
      */
@@ -43,7 +43,7 @@ class PartnerMenus extends BaseModel
     }
 
     /**
-     * @param PartnerAdminGroupAccess $accessGroupEloq
+     * @param  PartnerAdminGroupAccess  $accessGroupEloq
      * @return array|mixed
      */
     public function getUserMenuDatas(PartnerAdminGroupAccess $accessGroupEloq)
@@ -54,14 +54,14 @@ class PartnerMenus extends BaseModel
         } else {
             $role = json_decode($accessGroupEloq->role); //[1,2,3,4,5]
             $menuLists = self::whereIn('id', $role)->get();
-            $parent_menu = self::createMenuDatas($menuLists,$accessGroupEloq->id);
+            $parent_menu = self::createMenuDatas($menuLists, $accessGroupEloq->id);
         }
         return $parent_menu;
     }
 
     /**
      * @param $menuLists
-     * @param string $redisKey
+     * @param  string  $redisKey
      * @return array
      */
     public function createMenuDatas($menuLists, $redisKey = '*')
@@ -69,33 +69,15 @@ class PartnerMenus extends BaseModel
         $menuForFE = [];
         foreach ($menuLists as $key => $value) {
             if ($value->pid === 0) {
-                $menuForFE[$value->id]['label'] = $value->label;
-                $menuForFE[$value->id]['route'] = $value->route;
-                $menuForFE[$value->id]['display'] = $value->display;
-                $menuForFE[$value->id]['icon'] = $value->icon;
-                $menuForFE[$value->id]['en_name'] = $value->en_name;
-                $menuForFE[$value->id]['pid'] = $value->pid;
-            } else if ($value->level === 2) {
-                $menuForFE[$value->pid]['child'][$value->id]['label'] = $value->label;
-                $menuForFE[$value->pid]['child'][$value->id]['route'] = $value->route;
-                $menuForFE[$value->pid]['child'][$value->id]['display'] = $value->display;
-                $menuForFE[$value->pid]['child'][$value->id]['icon'] = $value->icon;
-                $menuForFE[$value->pid]['child'][$value->id]['en_name'] = $value->en_name;
-                $menuForFE[$value->pid]['child'][$value->id]['pid'] = $value->pid;
-                $secondEloq = Self::find($value->id);
-                $thirdChildArr = $secondEloq->thirdChild->toArray();
-                if (!empty($thirdChildArr)) {
-                    foreach ($thirdChildArr as $tcvalue) {
-                        $thirdChildMenuIndex = [];
-                        $thirdChildMenuIndex['label'] = $tcvalue['label'];
-                        $thirdChildMenuIndex['route'] = $tcvalue['route'];
-                        $thirdChildMenuIndex['display'] = $tcvalue['display'];
-                        $thirdChildMenuIndex['icon'] = $tcvalue['icon'];
-                        $thirdChildMenuIndex['en_name'] = $tcvalue['en_name'];
-                        $thirdChildMenuIndex['pid'] = $tcvalue['pid'];
-                        $menuForFE[$value->pid]['child'][$value->id]['child'][$tcvalue['id']] = $thirdChildMenuIndex;
+                $menuForFE[$value->id] = $value->toArray();
+            } else {
+                if ($value->level === 2) {
+                    $menuForFE[$value->pid]['child'][$value->id] = $value->toArray();
+                    if ($value->thirdChild()->exists()) {
+                        foreach ($value->thirdChild as $tcvalue) {
+                            $menuForFE[$value->pid]['child'][$value->id]['child'][$tcvalue->id] = $tcvalue->toArray();
+                        }
                     }
-
                 }
             }
         }
