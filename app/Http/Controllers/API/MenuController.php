@@ -149,7 +149,6 @@ class MenuController extends ApiMainController
             $parent = true;
         } else {
             $rule['parentId'] = 'required|numeric';
-            $rule['route'] = 'required|regex:/^(?!.*\/$)(?!.*?\/\/)[a-z/-]+$/';// /operasyon/operation-log
         }
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {

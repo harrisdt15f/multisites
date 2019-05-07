@@ -2,6 +2,7 @@
 
 namespace App\models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -104,7 +105,7 @@ class PartnerMenus extends BaseModel
         return self::where('pid', 0)->get();
     }
 
-    public function childs()
+    public function childs(): HasMany
     {
         $data = $this->hasMany(__CLASS__, 'pid', 'id');
         return $data;
