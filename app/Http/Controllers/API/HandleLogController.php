@@ -12,6 +12,6 @@ class HandleLogController extends ApiMainController
     {
         $searchAbleFields = ['origin', 'ip', 'device', 'os','os_version','browser','admin_name','menu_label','device_type'];
         $data = $this->generateSearchQuery($this->eloqM, $searchAbleFields);
-        return $this->msgout(true, $data);
+        return $this->msgOut(true, $data);
     }
 }

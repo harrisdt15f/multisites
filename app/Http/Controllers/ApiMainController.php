@@ -44,7 +44,7 @@ class ApiMainController extends Controller
                 $this->menuAccess();
                 $this->routeAccessCheck();
                 if ($this->routeAccessable === false) {
-                    return $this->msgout($this->routeAccessable, [], '100001');
+                    return $this->msgOut($this->routeAccessable, [], '100001');
                 }
             }
             $this->adminOperateLog();
@@ -109,7 +109,7 @@ class ApiMainController extends Controller
      * @param  string  $code
      * @return JsonResponse
      */
-    protected function msgout($success = false, $data = [], $code = '', $message = '')
+    protected function msgOut($success = false, $data = [], $code = '', $message = ''): JsonResponse
     {
         $defaultSuccessCode = 200;
         if ($success === true) {

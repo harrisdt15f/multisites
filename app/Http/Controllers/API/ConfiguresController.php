@@ -22,7 +22,7 @@ class ConfiguresController extends ApiMainController
                 $data[$partnerSysConfigItem->id]['sub'] = $partnerSysConfigItem->childs->toArray();
             }
         }
-        return $this->msgout(true, $data);
+        return $this->msgOut(true, $data);
     }
 
     //添加配置
@@ -40,7 +40,7 @@ class ConfiguresController extends ApiMainController
         }
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         $addDatas = $this->inputs;
         $addDatas['pid'] = $this->currentPlatformEloq->platform_id;
@@ -54,14 +54,14 @@ class ConfiguresController extends ApiMainController
                 $configure = new $this->eloqM();
                 $configure->fill($addDatas);
                 $configure->save();
-                return $this->msgout(true, [], '添加配置成功');
+                return $this->msgOut(true, [], '添加配置成功');
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-                return $this->msgout(false, [], $sqlState, $msg);
+                return $this->msgOut(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgout(false, [], '该配置键名已存在', '0009');
+            return $this->msgOut(false, [], '该配置键名已存在', '0009');
         }
     }
 
@@ -76,7 +76,7 @@ class ConfiguresController extends ApiMainController
             'description' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         $pastData = $this->eloqM::where('sign', $this->inputs['sign'])->where('id', '!=', $this->inputs['id'])->first();
         if (is_null($pastData)) {
@@ -90,14 +90,14 @@ class ConfiguresController extends ApiMainController
             $this->editAssignment($editDataEloq, $editDatas);
             try {
                 $editDataEloq->save();
-                return $this->msgout(true, [], '修改配置成功');
+                return $this->msgOut(true, [], '修改配置成功');
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-                return $this->msgout(false, [], $sqlState, $msg);
+                return $this->msgOut(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgout(false, [], '该配置键名已存在', '0009');
+            return $this->msgOut(false, [], '该配置键名已存在', '0009');
         }
     }
 
@@ -108,20 +108,20 @@ class ConfiguresController extends ApiMainController
             'id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
         if (!is_null($pastData)) {
             try {
                 $this->eloqM::where('id', $this->inputs['id'])->delete();
-                return $this->msgout(true, [], '删除配置成功');
+                return $this->msgOut(true, [], '删除配置成功');
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-                return $this->msgout(false, [], $sqlState, $msg);
+                return $this->msgOut(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgout(false, [], '该数据不存在', '0009');
+            return $this->msgOut(false, [], '该数据不存在', '0009');
         }
     }
 
@@ -134,10 +134,10 @@ class ConfiguresController extends ApiMainController
             'status' => 'required|in:0,1',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         if ($this->inputs['parent_id'] == 0) {
-            return $this->msgout(false, [], '主级配置不可修改状态', '0009');
+            return $this->msgOut(false, [], '主级配置不可修改状态', '0009');
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
         if (!is_null($pastData)) {
@@ -149,14 +149,14 @@ class ConfiguresController extends ApiMainController
             $pastData->status = $editStatus;
             try {
                 $pastData->save();
-                return $this->msgout(true, [], '修改配置状态成功');
+                return $this->msgOut(true, [], '修改配置状态成功');
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-                return $this->msgout(false, [], $sqlState, $msg);
+                return $this->msgOut(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgout(false, [], '该配置不存在', '0009');
+            return $this->msgOut(false, [], '该配置不存在', '0009');
         }
     }
 }

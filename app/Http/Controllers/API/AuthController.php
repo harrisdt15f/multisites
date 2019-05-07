@@ -36,7 +36,7 @@ class AuthController extends ApiMainController
         ]);
         $credentials = request(['email', 'password']);
         if (!Auth::attempt($credentials)) {
-            return $this->msgout(false, [], '100002');
+            return $this->msgOut(false, [], '100002');
         }
         $user = $request->user();
         $tokenResult = $this->refreshActivatePartnerToken($user);
@@ -47,7 +47,7 @@ class AuthController extends ApiMainController
                 $tokenResult->token->expires_at
             )->toDateTimeString()
         ];
-        return $this->msgout(true, $data);
+        return $this->msgOut(true, $data);
     }
 
 
@@ -76,10 +76,10 @@ class AuthController extends ApiMainController
             'password' => 'required|string',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], 400, $validator->errors());
+            return $this->msgOut(false, [], 400, $validator->errors());
         }
         if (!Hash::check($this->inputs['old_password'], $this->partnerAdmin->password)) {
-            return $this->msgout(false, [], '100003');
+            return $this->msgOut(false, [], '100003');
         } else {
             $this->partnerAdmin->password = Hash::make($this->inputs['password']);
             try {
@@ -92,11 +92,11 @@ class AuthController extends ApiMainController
                         $tokenResult->token->expires_at
                     )->toDateTimeString()
                 ];
-                return $this->msgout(true, $data, '密码更改成功');
+                return $this->msgOut(true, $data, '密码更改成功');
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-                return $this->msgout(false, [], $sqlState, $msg);
+                return $this->msgOut(false, [], $sqlState, $msg);
             }
         }
 
@@ -117,7 +117,7 @@ class AuthController extends ApiMainController
             'group_id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
@@ -125,7 +125,7 @@ class AuthController extends ApiMainController
         $user = PartnerAdminUsers::create($input);
         $success['token'] = $user->createToken('MyApp')->accessToken;
         $success['name'] = $user->name;
-        return $this->msgout(true, $success);
+        return $this->msgOut(true, $success);
     }
 
     /**
@@ -141,9 +141,9 @@ class AuthController extends ApiMainController
             } else {
                 $result = $data->toArray();
             }
-            return $this->msgout(true, $result);
+            return $this->msgOut(true, $result);
         } catch (\Exception $e) {
-            return $this->msgout(false, [], $e->getCode(), $e->getMessage());
+            return $this->msgOut(false, [], $e->getCode(), $e->getMessage());
         }
     }
 
@@ -154,14 +154,14 @@ class AuthController extends ApiMainController
             'group_id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], 400, $validator->errors());
+            return $this->msgOut(false, [], 400, $validator->errors());
         }
         $targetUserEloq = $this->eloqM::find($this->inputs['id']);
         if (!is_null($targetUserEloq)) {
             $targetUserEloq->group_id = $this->inputs['group_id'];
             if ($targetUserEloq->save()) {
                 $result = $targetUserEloq->toArray();
-                return $this->msgout(true, $result);
+                return $this->msgOut(true, $result);
             }
         }
     }
@@ -175,7 +175,7 @@ class AuthController extends ApiMainController
     public function details()
     {
         $user = Auth::user();
-        return $this->msgout(true, $user);
+        return $this->msgOut(true, $user);
     }
 
     /**
@@ -210,7 +210,7 @@ class AuthController extends ApiMainController
             'name' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], 400, $validator->errors());
+            return $this->msgOut(false, [], 400, $validator->errors());
         }
 
         $targetUserEloq = $this->eloqM::where([
@@ -224,10 +224,10 @@ class AuthController extends ApiMainController
             }
             OauthAccessTokens::clearOldToken($targetUserEloq->id);//删除相关登录的token
             if ($targetUserEloq->delete()) {//删除用户
-                return $this->msgout(true, []);
+                return $this->msgOut(true, []);
             }
         } else {
-            return $this->msgout(false, [], '100004');
+            return $this->msgOut(false, [], '100004');
         }
     }
 
@@ -238,7 +238,7 @@ class AuthController extends ApiMainController
             'password' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], 400, $validator->errors());
+            return $this->msgOut(false, [], 400, $validator->errors());
         }
         $targetUserEloq = $this->eloqM::where([
             ['id', '=', $this->inputs['id']],
@@ -247,10 +247,10 @@ class AuthController extends ApiMainController
         if (!is_null($targetUserEloq)) {
             $targetUserEloq->password = Hash::make($this->inputs['password']);
             if ($targetUserEloq->save()) {//用户更新密码
-                return $this->msgout(true, []);
+                return $this->msgOut(true, []);
             }
         } else {
-            return $this->msgout(false, [], '100004');
+            return $this->msgOut(false, [], '100004');
         }
     }
 }

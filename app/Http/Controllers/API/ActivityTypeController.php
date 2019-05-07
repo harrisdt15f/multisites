@@ -11,7 +11,7 @@ class ActivityTypeController extends ApiMainController
     public function detail()
     {
         $datas = $this->eloqM::where('status', 1)->get()->toArray();
-        return $this->msgout(true, $datas);
+        return $this->msgOut(true, $datas);
     }
     /**
      * 编辑活动分类
@@ -26,21 +26,21 @@ class ActivityTypeController extends ApiMainController
             'size' => 'numeric|gt:0',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         $editData = $this->eloqM::find($this->inputs['id']);
         if (is_null($editData)) {
-            return $this->msgout(false, [], '需要修改的活动分类id不存在');
+            return $this->msgOut(false, [], '需要修改的活动分类id不存在');
         }
         unset($this->inputs['id']);
         $this->editAssignment($editData, $this->inputs);
         try {
             $editData->save();
-            return $this->msgout(true, [], '修改活动分类成功');
+            return $this->msgOut(true, [], '修改活动分类成功');
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgout(false, [], $sqlState, $msg);
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
 }

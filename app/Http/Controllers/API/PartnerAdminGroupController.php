@@ -25,7 +25,7 @@ class PartnerAdminGroupController extends ApiMainController
     public function index()
     {
         $data = $this->eloqM::all()->toArray();
-        return $this->msgout(true, $data);
+        return $this->msgOut(true, $data);
     }
 
     /**
@@ -40,7 +40,7 @@ class PartnerAdminGroupController extends ApiMainController
             'role' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
 //        unique:books,label
         $data['platform_id'] = $this->currentPlatformEloq->platform_id;
@@ -66,13 +66,13 @@ class PartnerAdminGroupController extends ApiMainController
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-            return $this->msgout(false, [], $sqlState, $msg);
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
         $partnerAccessGroupEloq = PartnerMenus::whereIn('id', $role)->get();
         $partnerMenuObj = new PartnerMenus();
         $partnerMenuObj->createMenuDatas($partnerAccessGroupEloq, $objPartnerAdminGroup->id);
         $objPartnerAdminGroup->save();
-        return $this->msgout(true, $data);
+        return $this->msgOut(true, $data);
     }
 
     protected function accessOnlyColumn()
@@ -98,7 +98,7 @@ class PartnerAdminGroupController extends ApiMainController
             'role' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], 400, $validator->errors());
+            return $this->msgOut(false, [], 400, $validator->errors());
         }
         $id = $request->get('id');
         $datas = $this->eloqM::find($id);
@@ -147,15 +147,15 @@ class PartnerAdminGroupController extends ApiMainController
                     }
                 }
                 DB::commit();
-                return $this->msgout(true, $data);
+                return $this->msgOut(true, $data);
             } catch (Exception $e) {
                 DB::rollBack();
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-                return $this->msgout(false, [], $sqlState, $msg);
+                return $this->msgOut(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgout(false, [], '100200');
+            return $this->msgOut(false, [], '100200');
         }
     }
 
@@ -170,7 +170,7 @@ class PartnerAdminGroupController extends ApiMainController
             'group_name' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], 400, $validator->errors());
+            return $this->msgOut(false, [], 400, $validator->errors());
         }
         $id = $this->inputs['id'];
         $datas = $this->eloqM::where([
@@ -194,14 +194,14 @@ class PartnerAdminGroupController extends ApiMainController
                 }
                 PartnerAdminUsers::where('group_id', $datas->id)->update(['group_id' => null]);
                 $datas->delete();
-                return $this->msgout(true, []);
+                return $this->msgOut(true, []);
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-                return $this->msgout(false, [], $sqlState, $msg);
+                return $this->msgOut(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgout(false, [], '100201');
+            return $this->msgOut(false, [], '100201');
         }
     }
 
@@ -211,14 +211,14 @@ class PartnerAdminGroupController extends ApiMainController
             'id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], 400, $validator->errors());
+            return $this->msgOut(false, [], 400, $validator->errors());
         }
         $accessGroupEloq = $this->eloqM::find($this->inputs['id']);
         if (!is_null($accessGroupEloq)) {
             $data = $accessGroupEloq->adminUsers->toArray();
-            return $this->msgout(true, $data);
+            return $this->msgOut(true, $data);
         } else {
-            return $this->msgout(false, [], '100202');
+            return $this->msgOut(false, [], '100202');
         }
     }
 
