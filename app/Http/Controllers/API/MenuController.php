@@ -70,6 +70,7 @@ class MenuController extends ApiMainController
             $parent = true;
         } else {
             $rule['parentId'] = 'required|numeric';
+            $rule['level'] = 'required|numeric|in:1,2,3';
         }
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
@@ -86,6 +87,7 @@ class MenuController extends ApiMainController
         $menuEloq->display = $this->inputs['display'];
         if ($parent === false) {
             $menuEloq->pid = $this->inputs['parentId'];
+            $menuEloq->level = $this->inputs['level'];
         }
         try {
             $menuEloq->save();

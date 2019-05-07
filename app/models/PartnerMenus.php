@@ -67,15 +67,16 @@ class PartnerMenus extends BaseModel
     public function createMenuDatas($menuLists, $redisKey = '*')
     {
         $menuForFE = [];
-        foreach ($menuLists as $key => $value) {
-            if ($value->pid === 0) {
-                $menuForFE[$value->id] = $value->toArray();
-            } else {
-                if ($value->level === 2) {
-                    $menuForFE[$value->pid]['child'][$value->id] = $value->toArray();
-                    if ($value->thirdChild()->exists()) {
-                        foreach ($value->thirdChild as $tcvalue) {
-                            $menuForFE[$value->pid]['child'][$value->id]['child'][$tcvalue->id] = $tcvalue->toArray();
+        foreach ($menuLists as $key => $firstMenu) {
+            if ($firstMenu->pid === 0) {
+                $menuForFE[$firstMenu->id] = $firstMenu->toArray();
+                if ($firstMenu->childs()->exists()) {
+                    foreach ($firstMenu->childs as $secondMenu) {
+                        $menuForFE[$firstMenu->id]['child'][$secondMenu->id] = $secondMenu->toArray();
+                        if ($secondMenu->childs()->exists()) {
+                            foreach ($secondMenu->childs as $thirdMenu) {
+                                $menuForFE[$firstMenu->id]['child'][$secondMenu->id]['child'][$thirdMenu->id] = $thirdMenu->toArray();
+                            }
                         }
                     }
                 }
@@ -103,7 +104,7 @@ class PartnerMenus extends BaseModel
         return self::where('pid', 0)->get();
     }
 
-    public function thirdChild()
+    public function childs()
     {
         $data = $this->hasMany(__CLASS__, 'pid', 'id');
         return $data;
