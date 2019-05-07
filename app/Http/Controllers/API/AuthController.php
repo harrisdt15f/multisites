@@ -96,7 +96,7 @@ class AuthController extends ApiMainController
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-                return $this->msgout(false, [], $msg, $sqlState);
+                return $this->msgout(false, [], $sqlState, $msg);
             }
         }
 
@@ -117,7 +117,7 @@ class AuthController extends ApiMainController
             'group_id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors()->first(), 400);
+            return $this->msgout(false, [], 400, $validator->errors()->first());
         }
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
@@ -143,7 +143,7 @@ class AuthController extends ApiMainController
             }
             return $this->msgout(true, $result);
         } catch (\Exception $e) {
-            return $this->msgout(false, [], $e->getMessage(), $e->getCode());
+            return $this->msgout(false, [], $e->getCode(), $e->getMessage());
         }
     }
 
@@ -154,7 +154,7 @@ class AuthController extends ApiMainController
             'group_id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 400);
+            return $this->msgout(false, [], 400, $validator->errors());
         }
         $targetUserEloq = $this->eloqM::find($this->inputs['id']);
         if (!is_null($targetUserEloq)) {
@@ -210,7 +210,7 @@ class AuthController extends ApiMainController
             'name' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 401);
+            return $this->msgout(false, [], 400, $validator->errors());
         }
 
         $targetUserEloq = $this->eloqM::where([
@@ -238,7 +238,7 @@ class AuthController extends ApiMainController
             'password' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 400);
+            return $this->msgout(false, [], 400, $validator->errors());
         }
         $targetUserEloq = $this->eloqM::where([
             ['id', '=', $this->inputs['id']],

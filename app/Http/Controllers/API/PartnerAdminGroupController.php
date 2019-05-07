@@ -40,7 +40,7 @@ class PartnerAdminGroupController extends ApiMainController
             'role' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors()->first(), 200);
+            return $this->msgout(false, [], 400, $validator->errors()->first());
         }
 //        unique:books,label
         $data['platform_id'] = $this->currentPlatformEloq->platform_id;
@@ -66,7 +66,7 @@ class PartnerAdminGroupController extends ApiMainController
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgout(false, [], $sqlState, $msg);
         }
         $partnerAccessGroupEloq = PartnerMenus::whereIn('id', $role)->get();
         $partnerMenuObj = new PartnerMenus();
@@ -98,7 +98,7 @@ class PartnerAdminGroupController extends ApiMainController
             'role' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 401);
+            return $this->msgout(false, [], 400, $validator->errors());
         }
         $id = $request->get('id');
         $datas = $this->eloqM::find($id);
@@ -152,10 +152,10 @@ class PartnerAdminGroupController extends ApiMainController
                 DB::rollBack();
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-                return $this->msgout(false, [], $msg, $sqlState);
+                return $this->msgout(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgout(false, [], '没有此组可编辑', '0001');
+            return $this->msgout(false, [], '100200');
         }
     }
 
@@ -170,7 +170,7 @@ class PartnerAdminGroupController extends ApiMainController
             'group_name' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 401);
+            return $this->msgout(false, [], 400, $validator->errors());
         }
         $id = $this->inputs['id'];
         $datas = $this->eloqM::where([
@@ -198,10 +198,10 @@ class PartnerAdminGroupController extends ApiMainController
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-                return $this->msgout(false, [], $msg, $sqlState);
+                return $this->msgout(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgout(false, [], '没有此组可删除', '0001');
+            return $this->msgout(false, [], '100201');
         }
     }
 
@@ -211,14 +211,14 @@ class PartnerAdminGroupController extends ApiMainController
             'id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 401);
+            return $this->msgout(false, [], 400, $validator->errors());
         }
         $accessGroupEloq = $this->eloqM::find($this->inputs['id']);
         if (!is_null($accessGroupEloq)) {
             $data = $accessGroupEloq->adminUsers->toArray();
             return $this->msgout(true, $data);
         } else {
-            return $this->msgout(false, [], '没有此组', '0001');
+            return $this->msgout(false, [], '100202');
         }
     }
 

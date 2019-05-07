@@ -39,11 +39,11 @@ class UserHandleController extends ApiMainController
             'password' => 'required',
             'fund_password' => 'required',
             'is_tester' => 'required|numeric',
-            'prize_group' => 'required|numeric|between:' . $min . ',' . $max,
+            'prize_group' => 'required|numeric|between:'.$min.','.$max,
             'type' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors()->first(), 400);
+            return $this->msgout(false, [], 400, $validator->errors()->first());
         }
         $this->inputs['nickname'] = $this->inputs['username'];
         $this->inputs['password'] = bcrypt($this->inputs['password']);
@@ -74,7 +74,7 @@ class UserHandleController extends ApiMainController
             DB::rollBack();
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgout(false, [], $sqlState, $msg);
         }
 //        $success['token'] = $user->createToken('前端')->accessToken;
 
@@ -86,9 +86,19 @@ class UserHandleController extends ApiMainController
         //target model to join
         $fixedJoin = 1;//number of joining tables
         $withTable = 'account';
-        $searchAbleFields = ['username', 'type', 'vip_level', 'is_tester', 'frozen_type', 'prize_group', 'level_deep', 'register_ip'];
+        $searchAbleFields = [
+            'username',
+            'type',
+            'vip_level',
+            'is_tester',
+            'frozen_type',
+            'prize_group',
+            'level_deep',
+            'register_ip'
+        ];
         $withSearchAbleFields = ['balance'];
-        $data = $this->generateSearchQuery($this->eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields);
+        $data = $this->generateSearchQuery($this->eloqM, $searchAbleFields, $fixedJoin, $withTable,
+            $withSearchAbleFields);
         return $this->msgout(true, $data);
     }
 
@@ -130,7 +140,7 @@ class UserHandleController extends ApiMainController
     {
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 400);
+            return $this->msgout(false, [], 400, $validator->errors());
         }
         $applyUserEloq = $this->eloqM::find($this->inputs['id']);
         if (!is_null($applyUserEloq)) {
@@ -145,8 +155,10 @@ class UserHandleController extends ApiMainController
             if (!is_null($adminApplyCheckEloq)) {
                 if ($type === 1) {
                     $code = '100100';
-                } else if ($type === 2) {
-                    $code = '100101';
+                } else {
+                    if ($type === 2) {
+                        $code = '100101';
+                    }
                 }
                 return $this->msgout(false, [], $code);
             }
@@ -176,7 +188,7 @@ class UserHandleController extends ApiMainController
                 DB::rollBack();
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-                return $this->msgout(false, [], $msg, $sqlState);
+                return $this->msgout(false, [], $sqlState, $msg);
             }
         } else {
             return $this->msgout(false, [], '100004');
@@ -208,7 +220,7 @@ class UserHandleController extends ApiMainController
         //target model to join
         $fixedJoin = 1;//number of joining tables
         $withTable = 'auditFlow';
-        $witTableCriterias = $withTable . ':id,admin_id,auditor_id,apply_note,auditor_note,updated_at,admin_name,auditor_name,username';
+        $witTableCriterias = $withTable.':id,admin_id,auditor_id,apply_note,auditor_note,updated_at,admin_name,auditor_name,username';
         $searchAbleFields = ['type', 'status', 'created_at', 'updated_at'];
         $withSearchAbleFields = ['username'];
         $data = $this->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields);
@@ -235,7 +247,7 @@ class UserHandleController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 400);
+            return $this->msgout(false, [], 400, $validator->errors());
         }
         $eloqM = $this->modelWithNameSpace('PassworAuditLists');
         $applyUserEloq = $eloqM::where([
@@ -269,7 +281,7 @@ class UserHandleController extends ApiMainController
                 DB::rollBack();
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-                return $this->msgout(false, [], $msg, $sqlState);
+                return $this->msgout(false, [], $sqlState, $msg);
             }
         } else {
             return $this->msgout(false, [], '100102');
@@ -289,7 +301,7 @@ class UserHandleController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 400);
+            return $this->msgout(false, [], 400, $validator->errors());
         }
         $userEloq = $this->eloqM::find($this->inputs['user_id']);
         if (!is_null($userEloq)) {
@@ -313,7 +325,7 @@ class UserHandleController extends ApiMainController
                 DB::rollBack();
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-                return $this->msgout(false, [], $msg, $sqlState);
+                return $this->msgout(false, [], $sqlState, $msg);
             }
         }
     }
@@ -325,7 +337,7 @@ class UserHandleController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 400);
+            return $this->msgout(false, [], 400, $validator->errors());
         }
         $userEloq = $this->eloqM::find($this->inputs['user_id']);
         if (!is_null($userEloq)) {
