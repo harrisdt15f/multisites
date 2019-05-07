@@ -320,8 +320,9 @@ class ApiMainController extends Controller
      * @param $OperationName        被操作人NAME
      * @param $amount               操作金额
      * @param $content              具体描述
+     * @param $AuditFlow0ID         审核表id
      */
-    public function insertOperationDatas($eloqM, $type = 1, $in_out, $OperationAdminId, $OperationAdminName, $OperationId, $OperationName, $amount, $comment)
+    public function insertOperationDatas($eloqM, $type = 1, $in_out, $OperationAdminId, $OperationAdminName, $OperationId, $OperationName, $amount, $comment, $AuditFlow0ID)
     {
 
         $OperationDatas = [
@@ -329,6 +330,8 @@ class ApiMainController extends Controller
             'in_out' => $in_out,
             'amount' => $amount,
             'comment' => $comment,
+            'audit_flow_id' => $AuditFlow0ID,
+            'status' => 0,
         ];
         if ($type === 0) {
             $OperationDatas['super_admin_id'] = $OperationAdminId;

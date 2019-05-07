@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\models\adminAdmitedFlows;
+use App\models\ArtificialRechargeLog;
 use App\models\FundOperation;
 use App\models\FundOperationGroup;
 use App\models\PartnerAdminUsers;
@@ -36,7 +36,7 @@ class AllocationRechargeFundControl extends Command
     {
         Log::info('开始定时发放人工充值额度');
         $FundOperation = new FundOperation();
-        $adminFlowsEloq = new adminAdmitedFlows();
+        $ArtificialRechargeLog = new ArtificialRechargeLog();
         $AdminUsersEloq = new PartnerAdminUsers();
         $PartnerSysConfigures = new PartnerSysConfigures();
         $FundOperationGroup = new FundOperationGroup();
@@ -56,7 +56,7 @@ class AllocationRechargeFundControl extends Command
                 $fund = $everyDayfund;
                 $addFund = $fund - $v['fund'];
                 $adminFund = $v['fund'] + $addFund;
-                $comment = '[每日充值额度发放]=>>' . $addFund . '||[目前额度]=>>' . $adminFund;
+                $comment = '[每日充值额度发放]=>>' . $addFund . '|[目前额度]=>>' . $adminFund;
                 $editFundData = [
                     'fund' => $fund,
                     'updated_at' => $time,
@@ -65,13 +65,14 @@ class AllocationRechargeFundControl extends Command
                     'admin_id' => $v['id'],
                     'admin_name' => $v['name'],
                     'comment' => $comment,
+                    'type' => 2,
                     'created_at' => $time,
                     'updated_at' => $time,
                 ];
                 DB::beginTransaction();
                 try {
                     $FundOperation->where('admin_id', $v['id'])->update($editFundData);
-                    $adminFlowsEloq->insert($flowsData);
+                    $ArtificialRechargeLog->insert($flowsData);
                     DB::commit();
                 } catch (Exception $e) {
                     DB::rollBack();

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\ApiMainController;
-use App\models\adminAdmitedFlows;
+use App\models\ArtificialRechargeLog;
 use App\models\FundOperation;
 use App\models\FundOperationGroup;
 use App\models\PartnerAdminUsers;
@@ -58,11 +58,11 @@ class FundOperationController extends ApiMainController
         $partnerAdmin = $this->partnerAdmin;
         $type = 0;
         $in_out = 1;
-        $adminAdmitedFlows = new adminAdmitedFlows();
+        $ArtificialRechargeLog = new ArtificialRechargeLog();
         DB::beginTransaction();
         try {
             FundOperation::where('admin_id', $this->inputs['id'])->increment('fund', $this->inputs['fund']);
-            $this->insertOperationDatas($adminAdmitedFlows, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $admin_user->id, $admin_user->name, $this->inputs['fund'], $comment);
+            $this->insertOperationDatas($ArtificialRechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $admin_user->id, $admin_user->name, $this->inputs['fund'], $comment);
             DB::commit();
             return $this->msgout(true, [], '增加额度成功');
         } catch (Exception $e) {
