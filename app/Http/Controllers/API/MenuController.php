@@ -15,7 +15,6 @@ class MenuController extends ApiMainController
 
     public function getAllMenu()
     {
-
         $data = [
             'success' => true,
             'data' => $this->fullMenuLists,
