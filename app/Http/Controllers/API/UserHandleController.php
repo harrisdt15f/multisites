@@ -43,7 +43,7 @@ class UserHandleController extends ApiMainController
             'type' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors()->first(), 200);
+            return $this->msgout(false, [], $validator->errors()->first(), 400);
         }
         $this->inputs['nickname'] = $this->inputs['username'];
         $this->inputs['password'] = bcrypt($this->inputs['password']);
@@ -123,14 +123,14 @@ class UserHandleController extends ApiMainController
     /**
      * 申请资金密码跟密码共用功能
      * @param $rule
-     * @param $type
+     * @param $type todo if type new added then should notice on error message
      * @return \Illuminate\Http\JsonResponse
      */
     public function commonHandleUserPassword($rule, $type)
     {
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 401);
+            return $this->msgout(false, [], $validator->errors(), 400);
         }
         $applyUserEloq = $this->eloqM::find($this->inputs['id']);
         if (!is_null($applyUserEloq)) {
@@ -144,11 +144,11 @@ class UserHandleController extends ApiMainController
             ])->first();
             if (!is_null($adminApplyCheckEloq)) {
                 if ($type === 1) {
-                    $message = '更改密码已有申请';
+                    $code = '100100';
                 } else if ($type === 2) {
-                    $message = '更改资金密码已有申请';
+                    $code = '100101';
                 }
-                return $this->msgout(false, [], $message, '0002');
+                return $this->msgout(false, [], $code);
             }
             //###################
             $flowData = [
@@ -179,7 +179,7 @@ class UserHandleController extends ApiMainController
                 return $this->msgout(false, [], $msg, $sqlState);
             }
         } else {
-            return $this->msgout(false, [], '没有此用户', '0002');
+            return $this->msgout(false, [], '100004');
         }
     }
 
@@ -235,7 +235,7 @@ class UserHandleController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 200);
+            return $this->msgout(false, [], $validator->errors(), 400);
         }
         $eloqM = $this->modelWithNameSpace('PassworAuditLists');
         $applyUserEloq = $eloqM::where([
@@ -272,7 +272,7 @@ class UserHandleController extends ApiMainController
                 return $this->msgout(false, [], $msg, $sqlState);
             }
         } else {
-            return $this->msgout(false, [], '没有此条信息', '0002');
+            return $this->msgout(false, [], '100102');
         }
     }
 
@@ -289,7 +289,7 @@ class UserHandleController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 200);
+            return $this->msgout(false, [], $validator->errors(), 400);
         }
         $userEloq = $this->eloqM::find($this->inputs['user_id']);
         if (!is_null($userEloq)) {
@@ -325,7 +325,7 @@ class UserHandleController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 200);
+            return $this->msgout(false, [], $validator->errors(), 400);
         }
         $userEloq = $this->eloqM::find($this->inputs['user_id']);
         if (!is_null($userEloq)) {
