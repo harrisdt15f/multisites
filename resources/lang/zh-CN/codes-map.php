@@ -12,7 +12,7 @@
 
 use Illuminate\Support\Facades\Config;
 
-$errorCodeDir = base_path().'/resources/lang/'.Config::get('app.locale').'/errorcodes/';
+$errorCodeDir = base_path().'/resources/lang/'.Config::get('app.locale').'/codes-and-messages/';
 $aErrorCodeFiles = glob($errorCodeDir.'*.php');
 $data = [];
 foreach ($aErrorCodeFiles as $skey => $sErrcodeFile) {
