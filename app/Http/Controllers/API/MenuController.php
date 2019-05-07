@@ -15,7 +15,6 @@ class MenuController extends ApiMainController
 
     public function getAllMenu()
     {
-
         $data = [
             'success' => true,
             'data' => $this->fullMenuLists,
@@ -38,6 +37,9 @@ class MenuController extends ApiMainController
      */
     public function allRequireInfos(): JsonResponse
     {
+//        $aa =  __('errorcodes/exception-normal.100001');
+        $aa =  __('errorcodes.100001');
+        dd($aa);
         $firstlevelmenus = PartnerMenus::getFirstLevelList();
         $routeCollection = Route::getRoutes()->get();
         $editMenu = PartnerMenus::all();
