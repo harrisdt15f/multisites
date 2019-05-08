@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\ApiMainController;
+use App\models\FundOperation;
 use App\models\OauthAccessTokens;
+use App\models\PartnerAdminGroupAccess;
 use App\models\PartnerAdminUsers;
+use App\models\PartnerMenus;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -32,7 +35,7 @@ class AuthController extends ApiMainController
         $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
-            'remember_me' => 'boolean'
+            'remember_me' => 'boolean',
         ]);
         $credentials = request(['email', 'password']);
         if (!Auth::attempt($credentials)) {
@@ -45,11 +48,10 @@ class AuthController extends ApiMainController
             'token_type' => 'Bearer',
             'expires_at' => Carbon::parse(
                 $tokenResult->token->expires_at
-            )->toDateTimeString()
+            )->toDateTimeString(),
         ];
         return $this->msgOut(true, $data);
     }
-
 
     private function refreshActivatePartnerToken($user)
     {
@@ -90,7 +92,7 @@ class AuthController extends ApiMainController
                     'token_type' => 'Bearer',
                     'expires_at' => Carbon::parse(
                         $tokenResult->token->expires_at
-                    )->toDateTimeString()
+                    )->toDateTimeString(),
                 ];
                 return $this->msgOut(true, $data, '密码更改成功');
             } catch (\Exception $e) {
@@ -119,10 +121,26 @@ class AuthController extends ApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
+        $group = PartnerAdminGroupAccess::find($this->inputs['group_id']);
+        $role = json_decode($group->role, true);
+        $fool = false;
+        $FundOperation = PartnerMenus::select('id')->orWhere('route', '/manage')->orWhere('route', '/manage/prize-manage')->orWhere('route', '/manage/recharge')->get()->toArray();
+        foreach ($FundOperation as $k => $v) {
+            if (in_array($v['id'], $role)) {
+                $fool = true;
+                break;
+            }
+        }
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
         $input['platform_id'] = $this->currentPlatformEloq->platform_id;
         $user = PartnerAdminUsers::create($input);
+        if ($fool === true) {
+            $insertData = ['admin_id' => $user->id];
+            $FundOperationEloq = new FundOperation();
+            $FundOperationEloq->fill($insertData);
+            $FundOperationEloq->save();
+        }
         $success['token'] = $user->createToken('MyApp')->accessToken;
         $success['name'] = $user->name;
         return $this->msgOut(true, $success);
@@ -166,7 +184,6 @@ class AuthController extends ApiMainController
         }
     }
 
-
     /**
      * details api
      *
@@ -188,7 +205,7 @@ class AuthController extends ApiMainController
     {
         $request->user()->token()->revoke();
         return response()->json([
-            'message' => 'Successfully logged out'
+            'message' => 'Successfully logged out',
         ]);
     }
 
@@ -220,10 +237,11 @@ class AuthController extends ApiMainController
         if (!is_null($targetUserEloq)) {
             $token = $targetUserEloq->token();
             if ($token) {
-                $token->revoke();//取消目前登录中的状态
+                $token->revoke(); //取消目前登录中的状态
             }
-            OauthAccessTokens::clearOldToken($targetUserEloq->id);//删除相关登录的token
-            if ($targetUserEloq->delete()) {//删除用户
+            OauthAccessTokens::clearOldToken($targetUserEloq->id); //删除相关登录的token
+            if ($targetUserEloq->delete()) {
+//删除用户
                 return $this->msgOut(true, []);
             }
         } else {
@@ -246,7 +264,8 @@ class AuthController extends ApiMainController
         ])->first();
         if (!is_null($targetUserEloq)) {
             $targetUserEloq->password = Hash::make($this->inputs['password']);
-            if ($targetUserEloq->save()) {//用户更新密码
+            if ($targetUserEloq->save()) {
+//用户更新密码
                 return $this->msgOut(true, []);
             }
         } else {
