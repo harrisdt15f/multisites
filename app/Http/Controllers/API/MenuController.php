@@ -15,7 +15,6 @@ class MenuController extends ApiMainController
 
     public function getAllMenu()
     {
-
         $data = [
             'success' => true,
             'data' => $this->fullMenuLists,
@@ -54,7 +53,7 @@ class MenuController extends ApiMainController
         $data['rname'] = $rname;
         $data['editMenu'] = $editMenu;
         $data['routeMatchingName'] = $routeMatchingName;
-        return $this->msgout(true, $data);
+        return $this->msgOut(true, $data);
     }
 
     public function add()
@@ -74,11 +73,11 @@ class MenuController extends ApiMainController
         }
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 200);
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         $MenuEloq = $this->eloqM::where('label', $this->inputs['label'])->first();
         if (!is_null($MenuEloq)) {
-            return $this->msgout(false, [], '对不起菜单名已存在', '0002');
+            return $this->msgOut(false, [], '对不起菜单名已存在', '0002');
         }
         $menuEloq = new PartnerMenus();
         $menuEloq->label = $this->inputs['label'];
@@ -92,11 +91,11 @@ class MenuController extends ApiMainController
         try {
             $menuEloq->save();
             $menuEloq->refreshStar();
-            return $this->msgout(true, $menuEloq->toArray());
+            return $this->msgOut(true, $menuEloq->toArray());
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
 
@@ -108,7 +107,7 @@ class MenuController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 200);
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         $menuEloq = new PartnerMenus();
         $toDelete = $this->inputs['toDelete'];
@@ -120,9 +119,9 @@ class MenuController extends ApiMainController
                     return $data;
                 });
                 $menuEloq->refreshStar();
-                return $this->msgout(true, $datas);
+                return $this->msgOut(true, $datas);
             } catch (\Exception $e) {
-                return $this->msgout(false, [], $e->getMessage(), '0002');
+                return $this->msgOut(false, [], $e->getMessage(), '0002');
             }
         }
     }
@@ -152,7 +151,7 @@ class MenuController extends ApiMainController
         }
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 200);
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         $menuEloq = PartnerMenus::find($this->inputs['menuId']);
         $menuEloq->label = $this->inputs['label'];
@@ -168,9 +167,9 @@ class MenuController extends ApiMainController
         $data = $menuEloq->toArray();
         if ($menuEloq->save()) {
             $menuEloq->refreshStar();
-            return $this->msgout(true, $data);
+            return $this->msgOut(true, $data);
         } else {
-            return $this->msgout(false, [], '编辑保存有误', '0002');
+            return $this->msgOut(false, [], '编辑保存有误', '0002');
         }
     }
 
@@ -195,7 +194,7 @@ class MenuController extends ApiMainController
             if ($atLeastOne === true) {
                 $menuEloq->refreshStar();
             }
-            return $this->msgout(true, $itemProcess);
+            return $this->msgOut(true, $itemProcess);
         }
     }
 

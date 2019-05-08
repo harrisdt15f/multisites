@@ -25,7 +25,7 @@ class RechargeCheckController extends ApiMainController
         $orderFlow = 'desc';
         $this->inputs['type'] = 1;
         $data = $this->generateSearchQuery($this->eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields, $orderFields, $orderFlow);
-        return $this->msgout(true, $data);
+        return $this->msgOut(true, $data);
     }
 
     public function auditSuccess()
@@ -35,7 +35,7 @@ class RechargeCheckController extends ApiMainController
             'auditor_note' => 'required|string',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors());
+            return $this->msgOut(false, [], $validator->errors());
         }
         // 人工充值记录表
         $RechargeLog = $this->eloqM::find($this->inputs['id']);
@@ -44,7 +44,7 @@ class RechargeCheckController extends ApiMainController
         $auditFlow = auditFlow::where('id', $RechargeLog->audit_flow_id)->first();
         $RechargeLog = $this->eloqM::find($this->inputs['id']);
         if ($RechargeLog->status !== 0) {
-            return $this->msgout(false, [], '当前状态非待审核状态');
+            return $this->msgOut(false, [], '当前状态非待审核状态');
         }
         //用户金额表
         $UserAccounts = UserAccounts::where('user_id', $RechargeLog->user_id)->first();
@@ -61,12 +61,12 @@ class RechargeCheckController extends ApiMainController
             //用户帐变表
             $this->insertChangeReport($userData, $RechargeLog['amount'], $balance);
             DB::commit();
-            return $this->msgout(true, [], '审核成功');
+            return $this->msgOut(true, [], '审核成功');
         } catch (Exception $e) {
             DB::rollBack();
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
 
@@ -77,11 +77,11 @@ class RechargeCheckController extends ApiMainController
             'auditor_note' => 'required|string',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors());
+            return $this->msgOut(false, [], $validator->errors());
         }
         $RechargeLog = $this->eloqM::find($this->inputs['id']);
         if ($RechargeLog->status !== 0) {
-            return $this->msgout(false, [], '当前状态非待审核状态');
+            return $this->msgOut(false, [], '当前状态非待审核状态');
         }
         $RechargeLogEdit = ['status' => 2];
         $auditFlow = auditFlow::where('id', $RechargeLog->audit_flow_id)->first();
@@ -101,12 +101,12 @@ class RechargeCheckController extends ApiMainController
             $adminFundData->save();
             $this->insertOperationDatas($RechargeLogeloqM, $type, $in_out, null, null, $auditFlow->admin_id, $auditFlow->admin_name, $RechargeLog->amount, $comment, null);
             DB::commit();
-            return $this->msgout(true, [], '充值驳回成功');
+            return $this->msgOut(true, [], '充值驳回成功');
         } catch (Exception $e) {
             DB::rollBack();
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
 

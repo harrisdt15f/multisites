@@ -20,7 +20,7 @@ class FundOperationController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 200);
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         $groupArr = FundOperationGroup::select('group_id')->get()->toArray();
         $group = array_column($groupArr, 'group_id');
@@ -38,7 +38,7 @@ class FundOperationController extends ApiMainController
         $SysConfiguresEloq = PartnerSysConfigures::where('sign', 'admin_recharge_daily_limit')->first();
         $finalData['admin_user'] = $data;
         $finalData['dailyFundLimit'] = $SysConfiguresEloq['value'];
-        return $this->msgout(true, $finalData);
+        return $this->msgOut(true, $finalData);
     }
     public function addFund()
     {
@@ -48,11 +48,11 @@ class FundOperationController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 200);
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         $admin_user = PartnerAdminUsers::find($this->inputs['id']);
         if (is_null($admin_user)) {
-            return $this->msgout(false, [], '管理员不存在');
+            return $this->msgOut(false, [], '管理员不存在');
         }
         $FundOperationAdmin = FundOperation::where('admin_id', $this->inputs['id'])->first();
         $newFund = $FundOperationAdmin->fund + $this->inputs['fund'];
@@ -68,12 +68,12 @@ class FundOperationController extends ApiMainController
             $FundOperationAdmin->save();
             $this->insertOperationDatas($ArtificialRechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $admin_user->id, $admin_user->name, $this->inputs['fund'], $comment, null);
             DB::commit();
-            return $this->msgout(true, [], '增加额度成功');
+            return $this->msgOut(true, [], '增加额度成功');
         } catch (Exception $e) {
             DB::rollBack();
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
     public function everyDayFund()
@@ -83,18 +83,18 @@ class FundOperationController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 200);
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         try {
             $SysConfiguresEloq = PartnerSysConfigures::where('sign', 'admin_recharge_daily_limit')->first();
             $editData = ['value' => $this->inputs['fund']];
             $SysConfiguresEloq->fill($editData);
             $SysConfiguresEloq->save();
-            return $this->msgout(true, [], '设置额度成功');
+            return $this->msgOut(true, [], '设置额度成功');
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
 }

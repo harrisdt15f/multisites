@@ -14,9 +14,9 @@ class ActivityInfosController extends ApiMainController
         $searchAbleFields = ['title', 'type', 'status', 'admin_name', 'is_time_interval'];
         $datas = $this->generateSearchQuery($this->eloqM, $searchAbleFields);
         if (empty($datas)) {
-            return $this->msgout(false, [], '没有获取到数据', '0009');
+            return $this->msgOut(false, [], '没有获取到数据', '0009');
         }
-        return $this->msgout(true, $datas);
+        return $this->msgOut(true, $datas);
     }
     //添加活动
     public function add()
@@ -33,11 +33,11 @@ class ActivityInfosController extends ApiMainController
             'is_time_interval' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors()->first());
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         $pastData = $this->eloqM::where('title', $this->inputs['title'])->first();
         if (!is_null($pastData)) {
-            return $this->msgout(false, [], '该活动名已存在', '0009');
+            return $this->msgOut(false, [], '该活动名已存在', '0009');
         }
         //接收文件信息
         $file = $this->inputs['pic'];
@@ -45,7 +45,7 @@ class ActivityInfosController extends ApiMainController
         //进行上传
         $pic = $this->uploadImg($file, $path);
         if ($pic['success'] === false) {
-            return $this->msgout(false, [], $pic['message'], '0009');
+            return $this->msgOut(false, [], $pic['message'], '0009');
         }
         //生成缩略图
         $thumbnail_path = $this->creatThumbnail($pic['path'], 100, 200, 'sm_');
@@ -59,11 +59,11 @@ class ActivityInfosController extends ApiMainController
             $configure = new $this->eloqM();
             $configure->fill($addDatas);
             $configure->save();
-            return $this->msgout(true, [], '添加活动成功');
+            return $this->msgOut(true, [], '添加活动成功');
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
     //编辑活动
@@ -82,15 +82,15 @@ class ActivityInfosController extends ApiMainController
             'is_time_interval' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors()->first());
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         $pastData = $this->eloqM::where('title', $this->inputs['title'])->where('id', '!=', $this->inputs['id'])->first();
         if (!is_null($pastData)) {
-            return $this->msgout(false, [], '该活动名已存在', '0009');
+            return $this->msgOut(false, [], '该活动名已存在', '0009');
         }
         $editDataEloq = $this->eloqM::find($this->inputs['id']);
         if (is_null($editDataEloq)) {
-            return $this->msgout(false, [], '该活动id不存在', '0009');
+            return $this->msgOut(false, [], '该活动id不存在', '0009');
         }
         //如果修改了图片
         if (isset($this->inputs['pic']) && !is_null($this->inputs['pic'])) {
@@ -103,7 +103,7 @@ class ActivityInfosController extends ApiMainController
             //进行上传
             $picdata = $this->uploadImg($pic, $path);
             if ($picdata['success'] === false) {
-                return $this->msgout(false, [], $pic['message'], '0009');
+                return $this->msgOut(false, [], $pic['message'], '0009');
             }
             $editDataEloq->pic_path = '/' . $picdata['path'];
             //生成缩略图
@@ -117,11 +117,11 @@ class ActivityInfosController extends ApiMainController
                 $this->deletePic(substr($pastpic, 1));
                 $this->deletePic(substr($thumbnail_path, 1));
             }
-            return $this->msgout(true, [], '修改活动成功');
+            return $this->msgOut(true, [], '修改活动成功');
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
     //删除活动
@@ -131,7 +131,7 @@ class ActivityInfosController extends ApiMainController
             'id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors()->first(), 200);
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
         if (!is_null($pastData)) {
@@ -140,14 +140,14 @@ class ActivityInfosController extends ApiMainController
                 //删除图片
                 $this->deletePic(substr($pastData['pic_path'], 1));
                 $this->deletePic(substr($pastData['thumbnail_path'], 1));
-                return $this->msgout(true, [], '删除活动成功');
+                return $this->msgOut(true, [], '删除活动成功');
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-                return $this->msgout(false, [], $msg, $sqlState);
+                return $this->msgOut(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgout(false, [], '该活动不存在', '0009');
+            return $this->msgOut(false, [], '该活动不存在', '0009');
         }
     }
     //图片上传
@@ -179,7 +179,7 @@ class ActivityInfosController extends ApiMainController
     {
         if (file_exists($path)) {
             if (!is_writable(dirname($path))) {
-                return $this->msgout(true, [], dirname($path) . ' 请设置权限!!!');
+                return $this->msgOut(true, [], dirname($path).' 请设置权限!!!');
             } else {
                 return unlink($path);
             }

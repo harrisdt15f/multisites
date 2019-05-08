@@ -18,7 +18,7 @@ class LotteriesController extends ApiMainController
     public function seriesLists()
     {
         $seriesData = Config::get('game.main.series');
-        return $this->msgout(true, $seriesData);
+        return $this->msgOut(true, $seriesData);
     }
 
     /**
@@ -33,7 +33,7 @@ class LotteriesController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 401);
+            return $this->msgOut(false, [], $validator->errors(), 401);
         }
         $lotteriesEloq = $this->eloqM::where([
             ['series_id', '=', $this->inputs['series_id']],
@@ -44,7 +44,7 @@ class LotteriesController extends ApiMainController
                     'first_time', 'adjust_time', 'encode_time', 'issue_count', 'status', 'created_at', 'updated_at');
             }
         ])->get()->toArray();
-        return $this->msgout(true, $lotteriesEloq);
+        return $this->msgOut(true, $lotteriesEloq);
     }
 
     /**
@@ -84,7 +84,7 @@ class LotteriesController extends ApiMainController
             Cache::put($redisKey, $method, $expiresAt);
 //            Cache::forever($redisKey, $method);
         }
-        return $this->msgout(true, $method);
+        return $this->msgOut(true, $method);
     }
 
     public function lotteryIssueLists()
@@ -105,7 +105,7 @@ class LotteriesController extends ApiMainController
         }
         $searchAbleFields = ['lottery_id', 'issue'];
         $data = $this->generateSearchQuery($eloqM, $searchAbleFields);
-        return $this->msgout(true, $data);
+        return $this->msgOut(true, $data);
     }
 
     // 生成奖期
@@ -119,9 +119,9 @@ class LotteriesController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors(), 200);
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         event(new IssueGenerateEvent($this->inputs));
-        return $this->msgout(true);
+        return $this->msgOut(true);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\models\PartnerAdminRoute;
 use App\models\PartnerMenus;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
@@ -43,11 +44,11 @@ class ApiMainController extends Controller
                 $this->menuAccess();
                 $this->routeAccessCheck();
                 if ($this->routeAccessable === false) {
-                    return $this->msgout($this->routeAccessable, [], '您没有访问权限', '404');
+                    return $this->msgOut($this->routeAccessable, [], '100001');
                 }
             }
             $this->adminOperateLog();
-            $this->eloqM = 'App\\models\\' . $this->eloqM; // 当前的eloquent
+            $this->eloqM = 'App\\models\\'.$this->eloqM; // 当前的eloquent
             return $next($request);
         });
     }
@@ -102,17 +103,18 @@ class ApiMainController extends Controller
     }
 
     /**
-     * @param bool $success
-     * @param array $data
-     * @param string $message
-     * @param string $code
-     * @return \Illuminate\Http\JsonResponse
+     * @param  bool  $success
+     * @param  array  $data
+     * @param  string  $message
+     * @param  string  $code
+     * @return JsonResponse
      */
-    protected function msgout($success = false, $data = [], $message = '', $code = '')
+    protected function msgOut($success = false, $data = [], $code = '', $message = ''): JsonResponse
     {
+        $defaultSuccessCode = 200;
         if ($success === true) {
-            $message = $message == '' ? '执行成功' : $message;
-            $code = $code == '' ? '200' : $code;
+            $code = $code == '' ? $defaultSuccessCode : $code;
+            $message = $message == '' ? __('codes-map.'.$defaultSuccessCode) : __('codes-map.'.$code);
         }
         $datas = [
             'success' => $success,
@@ -125,22 +127,29 @@ class ApiMainController extends Controller
 
     protected function modelWithNameSpace($eloqM = null)
     {
-        return !is_null($eloqM) ? 'App\\models\\' . $eloqM : $eloqM;
+        return !is_null($eloqM) ? 'App\\models\\'.$eloqM : $eloqM;
     }
 
     /**
      * Generate Search Query
      * @param $eloqM
      * @param $searchAbleFields
-     * @param int $fixedJoin
+     * @param  int  $fixedJoin
      * @param $withTable
      * @param $withSearchAbleFields
-     * @param string $orderFields
-     * @param string $orderFlow
+     * @param  string  $orderFields
+     * @param  string  $orderFlow
      * @return mixed
      */
-    public function generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin = 0, $withTable = null, $withSearchAbleFields = null, $orderFields = 'updated_at', $orderFlow = 'desc')
-    {
+    public function generateSearchQuery(
+        $eloqM,
+        $searchAbleFields,
+        $fixedJoin = 0,
+        $withTable = null,
+        $withSearchAbleFields = null,
+        $orderFields = 'updated_at',
+        $orderFlow = 'desc'
+    ) {
         $searchCriterias = Arr::only($this->inputs, $searchAbleFields);
         $queryConditionField = $this->inputs['query_conditions'] ?? '';
         $queryConditions = Arr::wrap(json_decode($queryConditionField, true));
@@ -162,7 +171,7 @@ class ApiMainController extends Controller
                     $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
                     if ($sign == 'LIKE') {
                         $sign = strtolower($sign);
-                        $value = '%' . $value . '%';
+                        $value = '%'.$value.'%';
                     }
                     $whereCriteria = [];
                     $whereCriteria[] = $key;
@@ -178,59 +187,66 @@ class ApiMainController extends Controller
                 }
                 $queryEloq = $eloqM::where($whereData);
                 if ($fixedJoin > 0) {
-                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $queryConditions);
+                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs,
+                        $withSearchCriterias, $queryConditions);
                 }
             } else {
                 //for default
                 if ($fixedJoin > 0) {
-                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $queryConditions);
+                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs,
+                        $withSearchCriterias, $queryConditions);
                 }
             }
-        } else if ($sizeOfInputs > 1) {
-            //for multiple where condition searching
-            if (!empty($searchCriterias)) {
-                $whereData = [];
-                foreach ($searchCriterias as $key => $value) {
-                    $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
-                    if ($sign == 'LIKE') {
-                        $sign = strtolower($sign);
-                        $value = '%' . $value . '%';
-                    }
-                    $whereCriteria = [];
-                    $whereCriteria[] = $key;
+        } else {
+            if ($sizeOfInputs > 1) {
+                //for multiple where condition searching
+                if (!empty($searchCriterias)) {
+                    $whereData = [];
+                    foreach ($searchCriterias as $key => $value) {
+                        $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
+                        if ($sign == 'LIKE') {
+                            $sign = strtolower($sign);
+                            $value = '%'.$value.'%';
+                        }
+                        $whereCriteria = [];
+                        $whereCriteria[] = $key;
 
-                    $whereCriteria[] = $sign;
-                    $whereCriteria[] = $value;
-                    $whereData[] = $whereCriteria;
+                        $whereCriteria[] = $sign;
+                        $whereCriteria[] = $value;
+                        $whereData[] = $whereCriteria;
+                    }
+                    if (!empty($timeConditions)) {
+                        $whereData = array_merge($whereData, $timeConditions);
+                    }
+                    if (!empty($extraContitions)) {
+                        $whereData = array_merge($whereData, $extraContitions);
+                    }
+                    $queryEloq = $eloqM::where($whereData);
+                    if ($fixedJoin > 0) {
+                        $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs,
+                            $withSearchCriterias, $queryConditions);
+                    }
+                } else {
+                    if ($fixedJoin > 0) {
+                        $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs,
+                            $withSearchCriterias, $queryConditions);
+                    }
                 }
+            } else {
+                $whereData = [];
                 if (!empty($timeConditions)) {
-                    $whereData = array_merge($whereData, $timeConditions);
+                    $whereData = $timeConditions;
                 }
                 if (!empty($extraContitions)) {
                     $whereData = array_merge($whereData, $extraContitions);
                 }
-                $queryEloq = $eloqM::where($whereData);
-                if ($fixedJoin > 0) {
-                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $queryConditions);
+                if (!empty($whereData)) {
+                    $queryEloq = $eloqM::where($whereData); //$extraContitions
                 }
-            } else {
                 if ($fixedJoin > 0) {
-                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $queryConditions);
+                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs,
+                        $withSearchCriterias, $queryConditions);
                 }
-            }
-        } else {
-            $whereData = [];
-            if (!empty($timeConditions)) {
-                $whereData = $timeConditions;
-            }
-            if (!empty($extraContitions)) {
-                $whereData = array_merge($whereData, $extraContitions);
-            }
-            if (!empty($whereData)) {
-                $queryEloq = $eloqM::where($whereData); //$extraContitions
-            }
-            if ($fixedJoin > 0) {
-                $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $queryConditions);
             }
         }
         //extra wherein condition
@@ -252,8 +268,14 @@ class ApiMainController extends Controller
      * @param $queryConditions
      * @return mixed
      */
-    public function eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs, $withSearchCriterias, $queryConditions)
-    {
+    public function eloqToJoin(
+        $queryEloq,
+        $fixedJoin,
+        $withTable,
+        $sizeOfWithInputs,
+        $withSearchCriterias,
+        $queryConditions
+    ) {
         if (empty($sizeOfWithInputs)) //如果with 没有参数可以查询时查询全部
         {
             switch ($fixedJoin) {
@@ -264,32 +286,37 @@ class ApiMainController extends Controller
         } else {
             switch ($fixedJoin) {
                 case 1: //有一个连表查询的情况下
-                    $queryEloq = $queryEloq->with($withTable)->whereHas($withTable, function ($query) use ($sizeOfWithInputs, $withSearchCriterias, $queryConditions) {
-                        if ($sizeOfWithInputs > 1) {
+                    $queryEloq = $queryEloq->with($withTable)->whereHas($withTable,
+                        function ($query) use ($sizeOfWithInputs, $withSearchCriterias, $queryConditions) {
+                            if ($sizeOfWithInputs > 1) {
 
-                            if (!empty($withSearchCriterias)) {
-                                foreach ($withSearchCriterias as $key => $value) {
-                                    $whereCriteria = [];
-                                    $whereCriteria[] = $key;
-                                    $whereCriteria[] = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
-                                    $whereCriteria[] = $value;
-                                    $whereData[] = $whereCriteria;
-                                }
-                                $query->where($whereData);
-                            }
-                        } else if ($sizeOfWithInputs == 1) {
-                            if (!empty($withSearchCriterias)) {
-                                foreach ($withSearchCriterias as $key => $value) {
-                                    $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
-                                    if ($sign == 'LIKE') {
-                                        $sign = strtolower($sign);
-                                        $value = '%' . $value . '%';
+                                if (!empty($withSearchCriterias)) {
+                                    foreach ($withSearchCriterias as $key => $value) {
+                                        $whereCriteria = [];
+                                        $whereCriteria[] = $key;
+                                        $whereCriteria[] = array_key_exists($key,
+                                            $queryConditions) ? $queryConditions[$key] : '=';
+                                        $whereCriteria[] = $value;
+                                        $whereData[] = $whereCriteria;
                                     }
-                                    $query->where($key, $sign, $value);
+                                    $query->where($whereData);
+                                }
+                            } else {
+                                if ($sizeOfWithInputs == 1) {
+                                    if (!empty($withSearchCriterias)) {
+                                        foreach ($withSearchCriterias as $key => $value) {
+                                            $sign = array_key_exists($key,
+                                                $queryConditions) ? $queryConditions[$key] : '=';
+                                            if ($sign == 'LIKE') {
+                                                $sign = strtolower($sign);
+                                                $value = '%'.$value.'%';
+                                            }
+                                            $query->where($key, $sign, $value);
+                                        }
+                                    }
                                 }
                             }
-                        }
-                    });
+                        });
                     break;
             }
         }
@@ -299,7 +326,7 @@ class ApiMainController extends Controller
 
     /**
      * @param $eloqM
-     * @param array $datas
+     * @param  array  $datas
      */
     public function editAssignment($eloqM, $datas)
     {
@@ -312,8 +339,8 @@ class ApiMainController extends Controller
     /**
      *
      * @param $eloqM
-     * @param $type                 0系统对管理操作   1超管对管理操作  2管理对用户操作
-     * @param $in_out               0减少   1增加
+     * @param $type  0系统对管理操作   1超管对管理操作  2管理对用户操作
+     * @param $in_out  0减少   1增加
      * @param $OperationAdminId     操作人ID
      * @param $OperationAdminName   操作人NAME
      * @param $OperationId          被操作人ID
@@ -322,8 +349,18 @@ class ApiMainController extends Controller
      * @param $content              具体描述
      * @param $AuditFlow0ID         审核表id
      */
-    public function insertOperationDatas($eloqM, $type, $in_out, $OperationAdminId, $OperationAdminName, $OperationId, $OperationName, $amount, $comment, $AuditFlow0ID)
-    {
+    public function insertOperationDatas(
+        $eloqM,
+        $type,
+        $in_out,
+        $OperationAdminId,
+        $OperationAdminName,
+        $OperationId,
+        $OperationName,
+        $amount,
+        $comment,
+        $AuditFlow0ID
+    ) {
 
         $OperationDatas = [
             'type' => $type,

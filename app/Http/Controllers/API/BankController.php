@@ -12,7 +12,7 @@ class BankController extends ApiMainController
     {
         $searchAbleFields = ['title', 'code', 'pay_type', 'status'];
         $banksDatas = $this->generateSearchQuery($this->eloqM, $searchAbleFields);
-        return $this->msgout(true, $banksDatas);
+        return $this->msgOut(true, $banksDatas);
     }
     public function addBank()
     {
@@ -29,7 +29,7 @@ class BankController extends ApiMainController
             'allow_user_level' => 'required|string',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors()->first());
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         $addDatas = [
             'title' => $this->inputs['title'],
@@ -47,11 +47,11 @@ class BankController extends ApiMainController
             $configure = new $this->eloqM();
             $configure->fill($addDatas);
             $configure->save();
-            return $this->msgout(true, [], '添加银行成功');
+            return $this->msgOut(true, [], '添加银行成功');
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
     public function editBank()
@@ -69,20 +69,20 @@ class BankController extends ApiMainController
             'allow_user_level' => 'required|string',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors()->first());
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         $editDataEloq = $this->eloqM::find($this->inputs['id']);
         if (empty($editDataEloq)) {
-            return $this->msgout(false, [], '银行id不存在');
+            return $this->msgOut(false, [], '银行id不存在');
         }
         $this->editAssignment($editDataEloq, $this->inputs);
         try {
             $editDataEloq->save();
-            return $this->msgout(true, [], '修改银行成功');
+            return $this->msgOut(true, [], '修改银行成功');
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
     public function deleteBank()
@@ -91,15 +91,15 @@ class BankController extends ApiMainController
             'id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], $validator->errors()->first(), 200);
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         try {
             $this->eloqM::where('id', $this->inputs['id'])->delete();
-            return $this->msgout(true, [], '删除银行成功');
+            return $this->msgOut(true, [], '删除银行成功');
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgout(false, [], $msg, $sqlState);
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
 }
