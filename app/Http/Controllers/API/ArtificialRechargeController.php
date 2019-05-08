@@ -10,7 +10,7 @@ use App\models\UserHandleModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class artificialRechargeController extends ApiMainController
+class ArtificialRechargeController extends ApiMainController
 {
     protected $eloqM = 'UserHandleModel';
     public function users()
@@ -34,17 +34,17 @@ class artificialRechargeController extends ApiMainController
         }
         $userData = UserHandleModel::find($this->inputs['id']);
         if (is_null($userData)) {
-            return $this->msgOut(false, [], '需要充值的用户不存在');
+            return $this->msgOut(false, [], 101100);
         }
         $partnerAdmin = $this->partnerAdmin;
         $adminFundData = FundOperation::where('admin_id', $partnerAdmin->id)->first();
         if (is_null($adminFundData)) {
-            return $this->msgOut(false, [], '您目前没有充值额度');
+            return $this->msgOut(false, [], 101101);
         }
         $adminOperationFund = $adminFundData->fund;
         //可操作额度小于充值额度
         if ($adminOperationFund < $this->inputs['amount']) {
-            return $this->msgOut(false, [], '您的充值额度不足,目前可用充值额度为'.$adminOperationFund);
+            return $this->msgOut(false, [], 101102);
         }
         DB::beginTransaction();
         try {
@@ -59,7 +59,7 @@ class artificialRechargeController extends ApiMainController
             $AuditFlowID = $this->insertAuditFlow($partnerAdmin->id, $partnerAdmin->name, $this->inputs['apply_note']);
             $this->insertOperationDatas($ArtificialRechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $userData->id, $userData->nickname, $this->inputs['amount'], $comment, $AuditFlowID);
             DB::commit();
-            return $this->msgOut(true, [], '操作成功，请等待管理员审核');
+            return $this->msgOut(true, [], 200, '操作成功，请等待管理员审核');
         } catch (Exception $e) {
             DB::rollBack();
             $errorObj = $e->getPrevious()->getPrevious();

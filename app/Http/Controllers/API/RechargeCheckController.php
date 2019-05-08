@@ -46,13 +46,13 @@ class RechargeCheckController extends ApiMainController
         if ($RechargeLog->status !== 0) {
             return $this->msgOut(false, [], 100900);
         }
-        //用户金额表
-        $UserAccounts = UserAccounts::where('user_id', $RechargeLog->user_id)->first();
-        $userData = UserHandleModel::where('id', $RechargeLog->user_id)->with('account')->first()->toArray();
-        $balance = $userData['account']['balance'] + $RechargeLog['amount'];
-        $UserAccountsEdit = ['balance' => $balance];
         DB::beginTransaction();
         try {
+            //用户金额表
+            $UserAccounts = UserAccounts::where('user_id', $RechargeLog->user_id)->lockForUpdate()->first();
+            $userData = UserHandleModel::where('id', $RechargeLog->user_id)->with('account')->first()->toArray();
+            $balance = $userData['account']['balance'] + $RechargeLog['amount'];
+            $UserAccountsEdit = ['balance' => $balance];
             $RechargeLog->fill($RechargeLogEdit);
             $RechargeLog->save();
             $this->auditFlowEdit($auditFlow, $this->partnerAdmin, $this->inputs['auditor_note']);
@@ -61,7 +61,7 @@ class RechargeCheckController extends ApiMainController
             //用户帐变表
             $this->insertChangeReport($userData, $RechargeLog['amount'], $balance);
             DB::commit();
-            return $this->msgOut(true, [], '审核成功');
+            return $this->msgOut(true, [], 200);
         } catch (Exception $e) {
             DB::rollBack();
             $errorObj = $e->getPrevious()->getPrevious();
@@ -101,7 +101,7 @@ class RechargeCheckController extends ApiMainController
             $adminFundData->save();
             $this->insertOperationDatas($RechargeLogeloqM, $type, $in_out, null, null, $auditFlow->admin_id, $auditFlow->admin_name, $RechargeLog->amount, $comment, null);
             DB::commit();
-            return $this->msgOut(true, [], '充值驳回成功');
+            return $this->msgOut(true, [], 200);
         } catch (Exception $e) {
             DB::rollBack();
             $errorObj = $e->getPrevious()->getPrevious();
