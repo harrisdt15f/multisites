@@ -35,7 +35,7 @@ class RechargeCheckController extends ApiMainController
             'auditor_note' => 'required|string',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], $validator->errors());
+            return $this->msgOut(false, [], 400, $validator->errors());
         }
         // 人工充值记录表
         $RechargeLog = $this->eloqM::find($this->inputs['id']);
@@ -44,7 +44,7 @@ class RechargeCheckController extends ApiMainController
         $auditFlow = auditFlow::where('id', $RechargeLog->audit_flow_id)->first();
         $RechargeLog = $this->eloqM::find($this->inputs['id']);
         if ($RechargeLog->status !== 0) {
-            return $this->msgOut(false, [], '当前状态非待审核状态');
+            return $this->msgOut(false, [], 100900);
         }
         //用户金额表
         $UserAccounts = UserAccounts::where('user_id', $RechargeLog->user_id)->first();
@@ -77,11 +77,11 @@ class RechargeCheckController extends ApiMainController
             'auditor_note' => 'required|string',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], $validator->errors());
+            return $this->msgOut(false, [], 400, $validator->errors());
         }
         $RechargeLog = $this->eloqM::find($this->inputs['id']);
         if ($RechargeLog->status !== 0) {
-            return $this->msgOut(false, [], '当前状态非待审核状态');
+            return $this->msgOut(false, [], 100900);
         }
         $RechargeLogEdit = ['status' => 2];
         $auditFlow = auditFlow::where('id', $RechargeLog->audit_flow_id)->first();

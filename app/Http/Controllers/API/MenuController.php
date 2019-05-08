@@ -31,7 +31,6 @@ class MenuController extends ApiMainController
         return response()->json($data);
     }
 
-
     /**
      * @return JsonResponse
      */
@@ -60,10 +59,10 @@ class MenuController extends ApiMainController
     {
         $parent = false;
         $rule = [
-            'label' => 'required|regex:/[\x{4e00}-\x{9fa5}]+/u',//操作日志
-            'en_name' => 'required|regex:/^(?!\.)(?!.*\.$)(?!.*?\.\.)[a-z.-]+$/',//operation.log
+            'label' => 'required|regex:/[\x{4e00}-\x{9fa5}]+/u', //操作日志
+            'en_name' => 'required|regex:/^(?!\.)(?!.*\.$)(?!.*?\.\.)[a-z.-]+$/', //operation.log
             'display' => 'required|numeric|in:0,1',
-            'route' => 'required|regex:/^(?!.*\/$)(?!.*?\/\/)[a-z\/-]+$/',// /operasyon/operation-log
+            'route' => 'required|regex:/^(?!.*\/$)(?!.*?\/\/)[a-z\/-]+$/', // /operasyon/operation-log
         ];
         if (isset($this->inputs['isParent']) && $this->inputs['isParent'] === '1') {
             $parent = true;
@@ -77,7 +76,7 @@ class MenuController extends ApiMainController
         }
         $MenuEloq = $this->eloqM::where('label', $this->inputs['label'])->first();
         if (!is_null($MenuEloq)) {
-            return $this->msgOut(false, [], '对不起菜单名已存在', '0002');
+            return $this->msgOut(false, [], 100800);
         }
         $menuEloq = new PartnerMenus();
         $menuEloq->label = $this->inputs['label'];
@@ -103,7 +102,7 @@ class MenuController extends ApiMainController
     {
         $rule = [
             'toDelete' => 'required|array',
-            'toDelete.*' => 'int'
+            'toDelete.*' => 'int',
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
@@ -113,7 +112,7 @@ class MenuController extends ApiMainController
         $toDelete = $this->inputs['toDelete'];
         if (!empty($toDelete)) {
             try {
-                $datas = $menuEloq->find($toDelete)->each(function ($product, $key)  {
+                $datas = $menuEloq->find($toDelete)->each(function ($product, $key) {
                     $data[] = $product->toArray();
                     $product->delete();
                     return $data;
@@ -133,15 +132,15 @@ class MenuController extends ApiMainController
      * (?!.*\.$) - don't allow . at end
      * @return JsonResponse
      */
-    public function edit(): ?JsonResponse
+    public function edit():  ? JsonResponse
     {
         $parent = false;
         $rule = [
-            'label' => 'required|regex:/[\x{4e00}-\x{9fa5}]+/u',//操作日志
-            'en_name' => 'required|regex:/^(?!\.)(?!.*\.$)(?!.*?\.\.)[a-z.-]+$/',//operation.log
+            'label' => 'required|regex:/[\x{4e00}-\x{9fa5}]+/u', //操作日志
+            'en_name' => 'required|regex:/^(?!\.)(?!.*\.$)(?!.*?\.\.)[a-z.-]+$/', //operation.log
             'display' => 'required|numeric|in:0,1',
             'menuId' => 'required|numeric',
-            'route' => 'required|regex:/^(?!.*\/$)(?!.*?\/\/)[a-z\/-]+$/',// /operasyon/operation-log
+            'route' => 'required|regex:/^(?!.*\/$)(?!.*?\/\/)[a-z\/-]+$/', // /operasyon/operation-log
         ];
         if (isset($this->inputs['isParent']) && $this->inputs['isParent'] === '1') {
             $rule['isParent'] = 'required|numeric|in:0,1';
@@ -169,7 +168,7 @@ class MenuController extends ApiMainController
             $menuEloq->refreshStar();
             return $this->msgOut(true, $data);
         } else {
-            return $this->msgOut(false, [], '编辑保存有误', '0002');
+            return $this->msgOut(false, [], 100801);
         }
     }
 
@@ -181,7 +180,7 @@ class MenuController extends ApiMainController
         if (!empty($parseDatas)) {
             foreach ($parseDatas as $key => $value) {
                 $menuEloq = PartnerMenus::find($value['currentId']);
-                $menuEloq->pid = $value['currentParent'] === '#' ? 0 : (int)$value['currentParent'];
+                $menuEloq->pid = $value['currentParent'] === '#' ? 0 : (int) $value['currentParent'];
                 if ($menuEloq->save()) {
                     $pass['pass'] = $value['currentText'];
                     $itemProcess[] = $pass;
@@ -197,6 +196,5 @@ class MenuController extends ApiMainController
             return $this->msgOut(true, $itemProcess);
         }
     }
-
 
 }

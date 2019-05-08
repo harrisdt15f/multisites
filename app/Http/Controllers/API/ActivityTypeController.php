@@ -30,7 +30,7 @@ class ActivityTypeController extends ApiMainController
         }
         $editData = $this->eloqM::find($this->inputs['id']);
         if (is_null($editData)) {
-            return $this->msgOut(false, [], '需要修改的活动分类id不存在');
+            return $this->msgOut(false, [], 100400);
         }
         unset($this->inputs['id']);
         $this->editAssignment($editData, $this->inputs);

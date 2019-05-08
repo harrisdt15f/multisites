@@ -13,11 +13,9 @@ class ConfiguresController extends ApiMainController
     public function getConfiguresList()
     {
         $partnerSysConfigEloq = $this->eloqM::select('id', 'parent_id', 'pid', 'sign', 'name', 'description', 'value', 'add_admin_id', 'last_update_admin_id', 'status', 'created_at', 'updated_at')->get();
-        $data=[];
-        foreach ($partnerSysConfigEloq as $partnerSysConfigItem)
-        {
-            if ($partnerSysConfigItem->parent_id===0)
-            {
+        $data = [];
+        foreach ($partnerSysConfigEloq as $partnerSysConfigItem) {
+            if ($partnerSysConfigItem->parent_id === 0) {
                 $data[$partnerSysConfigItem->id] = $partnerSysConfigItem->toArray();
                 $data[$partnerSysConfigItem->id]['sub'] = $partnerSysConfigItem->childs->toArray();
             }
@@ -33,7 +31,7 @@ class ConfiguresController extends ApiMainController
             'sign' => 'required',
             'name' => 'required',
             'description' => 'required',
-            'value' => 'required' //父级的时候是不需要传送 value 值
+            'value' => 'required', //父级的时候是不需要传送 value 值
         ];
         if (isset($this->inputs['parent_id']) && $this->inputs['parent_id'] === 0) {
             unset($rule['value']);
@@ -61,7 +59,7 @@ class ConfiguresController extends ApiMainController
                 return $this->msgOut(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgOut(false, [], '该配置键名已存在', '0009');
+            return $this->msgOut(false, [], 100700);
         }
     }
 
@@ -82,7 +80,7 @@ class ConfiguresController extends ApiMainController
         if (is_null($pastData)) {
             $editDataEloq = $this->eloqM::find($this->inputs['id']);
             $editDatas = $this->inputs;
-            unset($editDatas['id'],$editDatas['parent_id']);
+            unset($editDatas['id'], $editDatas['parent_id']);
             //不是顶级可修改值
             if ($this->inputs['parent_id'] === 0) {
                 unset($editDatas['value']);
@@ -97,7 +95,7 @@ class ConfiguresController extends ApiMainController
                 return $this->msgOut(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgOut(false, [], '该配置键名已存在', '0009');
+            return $this->msgOut(false, [], 100700);
         }
     }
 
@@ -121,7 +119,7 @@ class ConfiguresController extends ApiMainController
                 return $this->msgOut(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgOut(false, [], '该数据不存在', '0009');
+            return $this->msgOut(false, [], 100701);
         }
     }
 
@@ -137,7 +135,7 @@ class ConfiguresController extends ApiMainController
             return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         if ($this->inputs['parent_id'] == 0) {
-            return $this->msgOut(false, [], '主级配置不可修改状态', '0009');
+            return $this->msgOut(false, [], 100702);
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
         if (!is_null($pastData)) {
@@ -156,7 +154,7 @@ class ConfiguresController extends ApiMainController
                 return $this->msgOut(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgOut(false, [], '该配置不存在', '0009');
+            return $this->msgOut(false, [], 100701);
         }
     }
 }

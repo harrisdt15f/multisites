@@ -13,9 +13,6 @@ class RegionController extends ApiMainController
     public function detail()
     {
         $datas = $this->eloqM::whereIn('region_level', [1, 2, 3])->get()->toArray();
-        if (empty($datas)) {
-            return $this->msgOut(false, [], '没有获取到数据', '0009');
-        }
         return $this->msgOut(true, $datas);
     }
     //获取 镇(街道) 列表
@@ -26,16 +23,13 @@ class RegionController extends ApiMainController
             'region_level' => 'required|in:3',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], $validator->errors()->first());
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         $check = $this->eloqM::where(['region_level' => $this->inputs['region_level'], 'region_id' => $this->inputs['region_parent_id']])->first();
         if (is_null($check)) {
-            return $this->msgOut(false, [], '县级行政区编码错误', '0009');
+            return $this->msgOut(false, [], 101000);
         }
         $datas = $this->eloqM::where(['region_level' => 4, 'region_parent_id' => $this->inputs['region_parent_id']])->get()->toArray();
-        if (empty($datas)) {
-            return $this->msgOut(false, [], '没有获取到数据', '0009');
-        }
         return $this->msgOut(true, $datas);
     }
     //模糊搜索 镇(街道)
@@ -45,7 +39,7 @@ class RegionController extends ApiMainController
             'search_name' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], $validator->errors()->first());
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         $datas = $this->eloqM::select('a.*', 'b.region_name as country_name', 'c.region_name as city_name', 'd.region_name as province_name')
             ->from('region as a')
@@ -54,9 +48,6 @@ class RegionController extends ApiMainController
             ->leftJoin('region as d', 'c.region_parent_id', '=', 'd.region_id')
             ->where([['a.region_name', 'like', '%' . $this->inputs['search_name'] . '%'], ['a.region_level', 4]])
             ->get()->toArray();
-        if (empty($datas)) {
-            return $this->msgOut(false, [], '没有查询到该数据', '0009');
-        }
         return $this->msgOut(true, $datas);
     }
     //添加行政区
@@ -69,7 +60,7 @@ class RegionController extends ApiMainController
             'region_level' => 'required|in:1,2,3,4',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], $validator->errors()->first());
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         $addDatas = $this->inputs;
         $pastData = $this->eloqM::where(['region_parent_id' => $this->inputs['region_parent_id'], 'region_name' => $this->inputs['region_name']])->orwhere('region_id', $this->inputs['region_id'])->first();
@@ -85,7 +76,7 @@ class RegionController extends ApiMainController
                 return $this->msgOut(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgOut(false, [], '该行政区已经存在', '0009');
+            return $this->msgOut(false, [], 101001);
         }
     }
     //编辑行政区
@@ -117,7 +108,7 @@ class RegionController extends ApiMainController
                 return $this->msgOut(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgOut(false, [], '该行政区ID已存在', '0009');
+            return $this->msgOut(false, [], '101001');
         }
     }
 }

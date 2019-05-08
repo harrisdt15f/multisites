@@ -31,18 +31,7 @@ class BankController extends ApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
-        $addDatas = [
-            'title' => $this->inputs['title'],
-            'code' => $this->inputs['code'],
-            'pay_type' => $this->inputs['pay_type'],
-            'status' => $this->inputs['status'],
-            'min_recharge' => $this->inputs['min_recharge'],
-            'max_recharge' => $this->inputs['max_recharge'],
-            'min_withdraw' => $this->inputs['min_withdraw'],
-            'max_withdraw' => $this->inputs['max_withdraw'],
-            'remarks' => $this->inputs['remarks'],
-            'allow_user_level' => $this->inputs['allow_user_level'],
-        ];
+        $addDatas = $this->inputs;
         try {
             $configure = new $this->eloqM();
             $configure->fill($addDatas);
@@ -73,7 +62,7 @@ class BankController extends ApiMainController
         }
         $editDataEloq = $this->eloqM::find($this->inputs['id']);
         if (empty($editDataEloq)) {
-            return $this->msgOut(false, [], '银行id不存在');
+            return $this->msgOut(false, [], 100600);
         }
         $this->editAssignment($editDataEloq, $this->inputs);
         try {

@@ -29,11 +29,11 @@ class LotteriesController extends ApiMainController
         $series = array_keys(Config::get('game.main.series'));
         $seriesStringImploded = implode(',', $series);
         $rule = [
-            'series_id' => 'required|in:'.$seriesStringImploded,
+            'series_id' => 'required|in:' . $seriesStringImploded,
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], $validator->errors(), 401);
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
         }
         $lotteriesEloq = $this->eloqM::where([
             ['series_id', '=', $this->inputs['series_id']],
@@ -42,7 +42,7 @@ class LotteriesController extends ApiMainController
             'issueRule' => function ($query) {
                 $query->select('id', 'lottery_id', 'lottery_name', 'begin_time', 'end_time', 'issue_seconds',
                     'first_time', 'adjust_time', 'encode_time', 'issue_count', 'status', 'created_at', 'updated_at');
-            }
+            },
         ])->get()->toArray();
         return $this->msgOut(true, $lotteriesEloq);
     }
@@ -62,7 +62,7 @@ class LotteriesController extends ApiMainController
                 $methodEloq = MethodsModel::where([
                     ['series_id', '=', $seriesIthem],
                 ])->first();
-                $lotteriesIds = $methodEloq->lotteriesIds;//        dd($lotteriesIds);
+                $lotteriesIds = $methodEloq->lotteriesIds; //        dd($lotteriesIds);
                 foreach ($lotteriesIds as $litems) {
                     $currentLotteryId = $litems->lottery_id;
                     $temp[$seriesIthem][$currentLotteryId] = [];
@@ -93,7 +93,7 @@ class LotteriesController extends ApiMainController
         $eloqM = $this->modelWithNameSpace($modelName);
         $seriesId = $this->inputs['series_id'] ?? '';
 //        {"method":"whereIn","key":"id","value":["cqssc","xjssc","hljssc","zx1fc","txffc"]}
-//        $extraWhereConditions = Arr::wrap(json_decode($this->inputs['extra_where'], true));
+        //        $extraWhereConditions = Arr::wrap(json_decode($this->inputs['extra_where'], true));
         if (!empty($seriesId)) {
             $lotteryEnNames = LotteriesModel::where('series_id', $seriesId)->get(['en_name']);
             foreach ($lotteryEnNames as $lotteryIthems) {

@@ -41,7 +41,7 @@ class ArticlesController extends ApiMainController
         }
         $pastData = $this->eloqM::where('title', $this->inputs['title'])->first();
         if (!is_null($pastData)) {
-            return $this->msgOut(false, [], '该文章名已存在', '0009');
+            return $this->msgOut(false, [], 100500);
         }
         $sortdata = $this->eloqM::orderBy('sort', 'desc')->first();
         if (is_null($sortdata)) {
@@ -111,7 +111,7 @@ class ArticlesController extends ApiMainController
         }
         $pastData = $this->eloqM::where('title', $this->inputs['title'])->where('id', '!=', $this->inputs['id'])->first();
         if (!is_null($pastData)) {
-            return $this->msgOut(false, [], '该文章名已存在', '0009');
+            return $this->msgOut(false, [], 100500);
         }
         $editDataEloq = $this->eloqM::find($this->inputs['id']);
         $past_pic_path = $editDataEloq->pic_path;
@@ -184,7 +184,7 @@ class ArticlesController extends ApiMainController
                 return $this->msgOut(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgOut(false, [], '该文章不存在', '0009');
+            return $this->msgOut(false, [], 100501);
         }
     }
     //文章排序
@@ -205,7 +205,7 @@ class ArticlesController extends ApiMainController
             if ($this->inputs['sort_type'] == 1) {
                 $frontData = $this->eloqM::find($this->inputs['front_id']);
                 if (!isset($frontData)) {
-                    return $this->msgOut(false, [], '需要排序的文章不存在');
+                    return $this->msgOut(false, [], 100501);
                 }
                 $frontData->sort = $this->inputs['front_sort'];
                 $this->eloqM::where('sort', '>=', $this->inputs['front_sort'])->where('sort', '<', $this->inputs['rearways_sort'])->increment('sort');
@@ -213,7 +213,7 @@ class ArticlesController extends ApiMainController
             } elseif ($this->inputs['sort_type'] == 2) {
                 $frontData = $this->eloqM::find($this->inputs['rearways_id']);
                 if (!isset($frontData)) {
-                    return $this->msgOut(false, [], '需要排序的文章不存在');
+                    return $this->msgOut(false, [], 100501);
                 }
                 $frontData->sort = $this->inputs['rearways_sort'];
                 $this->eloqM::where('sort', '>', $this->inputs['front_sort'])->where('sort', '<=', $this->inputs['rearways_sort'])->decrement('sort');
@@ -237,7 +237,7 @@ class ArticlesController extends ApiMainController
         }
         $topData = $this->eloqM::find($this->inputs['id']);
         if (is_null($topData)) {
-            return $this->msgOut(false, [], '需要置顶的文章不存在');
+            return $this->msgOut(false, [], 100501);
         }
         try {
             $this->eloqM::where('sort', '<', $topData['sort'])->increment('sort');
@@ -266,7 +266,7 @@ class ArticlesController extends ApiMainController
         //进行上传
         $pic = $this->uploadImg($file, $path, $rule);
         if ($pic['success'] === false) {
-            return $this->msgOut(false, [], $pic['message'], '0009');
+            return $this->msgOut(false, [], $pic['code']);
         }
         $minutes = 2 * 24 * 60;
         $pic['expire_time'] = (time() + 60 * 30) . '';
@@ -288,14 +288,14 @@ class ArticlesController extends ApiMainController
             // 上传文件的后缀.
             $entension = $file->getClientOriginalExtension();
             if (!in_array($entension, $rule)) {
-                return ['success' => false, 'message' => '图片格式为jpg,png,gif'];
+                return ['success' => false, 'code' => 100502];
             }
             $newName = md5(date("Y-m-d H:i:s") . $clientName) . "." . $entension;
             if (!file_exists($url_path)) {
                 mkdir($url_path, 0777, true);
             }
             if (!is_writable(dirname($url_path))) {
-                return ['success' => false, 'message' => dirname($url_path) . ' 请设置权限!!!'];
+                return ['success' => false, 'code' => 100503];
             } else {
                 $file->move($url_path, $newName);
             }
@@ -310,7 +310,7 @@ class ArticlesController extends ApiMainController
     {
         if (file_exists($path)) {
             if (!is_writable(dirname($path))) {
-                return $this->msgOut(true, [], dirname($path).' 请设置权限!!!');
+                return $this->msgOut(true, [], dirname($path) . ' 请设置权限!!!');
             } else {
                 return unlink($path);
             }
