@@ -48,7 +48,7 @@ class ApiMainController extends Controller
                 }
             }
             $this->adminOperateLog();
-            $this->eloqM = 'App\\models\\'.$this->eloqM; // 当前的eloquent
+            $this->eloqM = 'App\\models\\' . $this->eloqM; // 当前的eloquent
             return $next($request);
         });
     }
@@ -112,10 +112,13 @@ class ApiMainController extends Controller
     protected function msgOut($success = false, $data = [], $code = '', $message = ''): JsonResponse
     {
         $defaultSuccessCode = 200;
+        $defaultErrorCode = 404;
         if ($success === true) {
             $code = $code == '' ? $defaultSuccessCode : $code;
-            $message = $message == '' ? __('codes-map.'.$defaultSuccessCode) : __('codes-map.'.$code);
+        } else {
+            $code = $code == '' ? $defaultErrorCode : $code;
         }
+        $message = $message == '' ? __('codes-map.' . $code) : $message;
         $datas = [
             'success' => $success,
             'code' => $code,
@@ -127,7 +130,7 @@ class ApiMainController extends Controller
 
     protected function modelWithNameSpace($eloqM = null)
     {
-        return !is_null($eloqM) ? 'App\\models\\'.$eloqM : $eloqM;
+        return !is_null($eloqM) ? 'App\\models\\' . $eloqM : $eloqM;
     }
 
     /**
@@ -171,7 +174,7 @@ class ApiMainController extends Controller
                     $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
                     if ($sign == 'LIKE') {
                         $sign = strtolower($sign);
-                        $value = '%'.$value.'%';
+                        $value = '%' . $value . '%';
                     }
                     $whereCriteria = [];
                     $whereCriteria[] = $key;
@@ -206,7 +209,7 @@ class ApiMainController extends Controller
                         $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
                         if ($sign == 'LIKE') {
                             $sign = strtolower($sign);
-                            $value = '%'.$value.'%';
+                            $value = '%' . $value . '%';
                         }
                         $whereCriteria = [];
                         $whereCriteria[] = $key;
@@ -309,7 +312,7 @@ class ApiMainController extends Controller
                                                 $queryConditions) ? $queryConditions[$key] : '=';
                                             if ($sign == 'LIKE') {
                                                 $sign = strtolower($sign);
-                                                $value = '%'.$value.'%';
+                                                $value = '%' . $value . '%';
                                             }
                                             $query->where($key, $sign, $value);
                                         }
