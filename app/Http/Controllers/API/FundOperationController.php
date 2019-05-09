@@ -15,9 +15,7 @@ class FundOperationController extends ApiMainController
 {
     public function admins()
     {
-        $rule = [
-            'name' => 'string',
-        ];
+        $rule = ['name' => 'string'];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
@@ -55,6 +53,9 @@ class FundOperationController extends ApiMainController
             return $this->msgOut(false, [], '101300');
         }
         $FundOperationAdmin = FundOperation::where('admin_id', $this->inputs['id'])->first();
+        if (is_null($FundOperationAdmin)) {
+            return $this->msgOut(false, [], '101301');
+        }
         $newFund = $FundOperationAdmin->fund + $this->inputs['fund'];
         $AdminEditData = ['fund' => $newFund];
         $comment = '[人工充值额度操作]==>+' . $this->inputs['fund'] . '|[目前额度]==>' . $newFund;
@@ -85,8 +86,11 @@ class FundOperationController extends ApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
+        $SysConfiguresEloq = PartnerSysConfigures::where('sign', 'admin_recharge_daily_limit')->first();
+        if (is_null($SysConfiguresEloq)) {
+            return $this->msgOut(false, [], '101302');
+        }
         try {
-            $SysConfiguresEloq = PartnerSysConfigures::where('sign', 'admin_recharge_daily_limit')->first();
             $editData = ['value' => $this->inputs['fund']];
             $SysConfiguresEloq->fill($editData);
             $SysConfiguresEloq->save();

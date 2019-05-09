@@ -123,6 +123,8 @@ class RechargeCheckController extends ApiMainController
 
     public function insertChangeReport($user, $amount, $balance)
     {
+        //type_sign
+        //type_name
         $insertData = [
             'sign' => $user['sign'],
             'user_id' => $user['id'],
