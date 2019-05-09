@@ -51,10 +51,10 @@ class PartnerAdminGroupController extends ApiMainController
         $objPartnerAdminGroup->fill($data);
         //检查是否有人工充值权限
         $FundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
-        $fool = in_array($FundOperation['id'], $role);
+        $exist = in_array($FundOperation['id'], $role);
         try {
             $objPartnerAdminGroup->save();
-            if ($fool === true) {
+            if ($exist === true) {
                 $FundOperationGroup = new FundOperationGroup();
                 $FundOperationData = [
                     'group_id' => $objPartnerAdminGroup->id,
@@ -102,10 +102,10 @@ class PartnerAdminGroupController extends ApiMainController
         }
         $id = $request->get('id');
         $datas = $this->eloqM::find($id);
-        //检查提交的权限中 是否有 人工充值权限  $fool
+        //检查提交的权限中 是否有 人工充值权限  $exist
         $role = json_decode($this->inputs['role']);
         $FundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
-        $fool = in_array($FundOperation['id'], $role);
+        $exist = in_array($FundOperation['id'], $role);
         if (!is_null($datas)) {
             DB::beginTransaction();
             $datas->group_name = $request->get('group_name');
@@ -119,7 +119,7 @@ class PartnerAdminGroupController extends ApiMainController
                 //检查资金操作权限表是否存在此用户组  $check
                 $FundOperationGroup = new FundOperationGroup();
                 $check = $FundOperationGroup->where('group_id', $data['id'])->first();
-                if ($fool === true) {
+                if ($exist === true) {
                     if (is_null($check)) {
                         //需要删除的资金表 admin
                         $admins = PartnerAdminUsers::where('group_id', $id)->get()->toArray();
@@ -180,10 +180,10 @@ class PartnerAdminGroupController extends ApiMainController
         //检查是否有人工充值权限
         $role = json_decode($datas->role);
         $FundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
-        $fool = in_array($FundOperation['id'], $role);
+        $exist = in_array($FundOperation['id'], $role);
         if (!is_null($datas)) {
             try {
-                if ($fool === true) {
+                if ($exist === true) {
                     $FundOperation = new FundOperation();
                     $FundOperationGroup = new FundOperationGroup();
                     //需要删除的资金表 admin
