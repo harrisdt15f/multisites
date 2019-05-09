@@ -40,7 +40,7 @@ class PartnerAdminGroupController extends ApiMainController
             'role' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
 //        unique:books,label
         $data['platform_id'] = $this->currentPlatformEloq->platform_id;
@@ -98,7 +98,7 @@ class PartnerAdminGroupController extends ApiMainController
             'role' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors());
+            return $this->msgOut(false, [], '400', $validator->errors());
         }
         $id = $request->get('id');
         $datas = $this->eloqM::find($id);
@@ -170,7 +170,7 @@ class PartnerAdminGroupController extends ApiMainController
             'group_name' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors());
+            return $this->msgOut(false, [], '400', $validator->errors());
         }
         $id = $this->inputs['id'];
         $datas = $this->eloqM::where([
@@ -211,7 +211,7 @@ class PartnerAdminGroupController extends ApiMainController
             'id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors());
+            return $this->msgOut(false, [], '400', $validator->errors());
         }
         $accessGroupEloq = $this->eloqM::find($this->inputs['id']);
         if (!is_null($accessGroupEloq)) {

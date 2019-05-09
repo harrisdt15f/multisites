@@ -17,9 +17,6 @@ class ArticlesController extends ApiMainController
         $type = 'asc';
         $searchAbleFields = ['title', 'type', 'search_text', 'is_for_agent'];
         $datas = $this->generateSearchQuery($this->eloqM, $searchAbleFields, 0, null, null, $field, $type);
-        if (empty($datas)) {
-            return $this->msgOut(false, [], '没有获取到数据', '0009');
-        }
         return $this->msgOut(true, $datas);
     }
     //发布文章
@@ -37,11 +34,11 @@ class ArticlesController extends ApiMainController
             'pic_path' => 'array',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastData = $this->eloqM::where('title', $this->inputs['title'])->first();
         if (!is_null($pastData)) {
-            return $this->msgOut(false, [], 100500);
+            return $this->msgOut(false, [], '100500');
         }
         $sortdata = $this->eloqM::orderBy('sort', 'desc')->first();
         if (is_null($sortdata)) {
@@ -84,7 +81,7 @@ class ArticlesController extends ApiMainController
                     Cache::put('CachePic', $CachePic, $minutes);
                 }
             }
-            return $this->msgOut(true, [], '发布文章成功');
+            return $this->msgOut(true, [], '200');
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -107,11 +104,11 @@ class ArticlesController extends ApiMainController
             'pic_path' => 'required|array',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastData = $this->eloqM::where('title', $this->inputs['title'])->where('id', '!=', $this->inputs['id'])->first();
         if (!is_null($pastData)) {
-            return $this->msgOut(false, [], 100500);
+            return $this->msgOut(false, [], '100500');
         }
         $editDataEloq = $this->eloqM::find($this->inputs['id']);
         $past_pic_path = $editDataEloq->pic_path;
@@ -152,7 +149,7 @@ class ArticlesController extends ApiMainController
             $flowConfigure->save();
             $editDataEloq->audit_flow_id = $flowConfigure->id;
             $editDataEloq->save();
-            return $this->msgOut(true, [], '修改文章成功');
+            return $this->msgOut(true, [], '200');
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -166,7 +163,7 @@ class ArticlesController extends ApiMainController
             'id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
         $pic_path = explode('|', $pastData['pic_path']);
@@ -177,14 +174,14 @@ class ArticlesController extends ApiMainController
                 foreach ($pic_path as $k => $v) {
                     $this->deleteArticlePic($v);
                 }
-                return $this->msgOut(true, [], '删除文章成功');
+                return $this->msgOut(true, [], '200');
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
                 return $this->msgOut(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgOut(false, [], 100501);
+            return $this->msgOut(false, [], '100501');
         }
     }
     //文章排序
@@ -198,14 +195,14 @@ class ArticlesController extends ApiMainController
             'sort_type' => 'required|in:1,2',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         try {
             //上拉排序
             if ($this->inputs['sort_type'] == 1) {
                 $frontData = $this->eloqM::find($this->inputs['front_id']);
                 if (!isset($frontData)) {
-                    return $this->msgOut(false, [], 100501);
+                    return $this->msgOut(false, [], '100501');
                 }
                 $frontData->sort = $this->inputs['front_sort'];
                 $this->eloqM::where('sort', '>=', $this->inputs['front_sort'])->where('sort', '<', $this->inputs['rearways_sort'])->increment('sort');
@@ -213,13 +210,13 @@ class ArticlesController extends ApiMainController
             } elseif ($this->inputs['sort_type'] == 2) {
                 $frontData = $this->eloqM::find($this->inputs['rearways_id']);
                 if (!isset($frontData)) {
-                    return $this->msgOut(false, [], 100501);
+                    return $this->msgOut(false, [], '100501');
                 }
                 $frontData->sort = $this->inputs['rearways_sort'];
                 $this->eloqM::where('sort', '>', $this->inputs['front_sort'])->where('sort', '<=', $this->inputs['rearways_sort'])->decrement('sort');
             }
             $frontData->save();
-            return $this->msgOut(true, [], '文章排序成功');
+            return $this->msgOut(true, [], '200');
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -233,17 +230,17 @@ class ArticlesController extends ApiMainController
             'id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $topData = $this->eloqM::find($this->inputs['id']);
         if (is_null($topData)) {
-            return $this->msgOut(false, [], 100501);
+            return $this->msgOut(false, [], '100501');
         }
         try {
             $this->eloqM::where('sort', '<', $topData['sort'])->increment('sort');
             $topData->sort = 1;
             $topData->save();
-            return $this->msgOut(true, [], '文章置顶成功');
+            return $this->msgOut(true, [], '200');
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -257,7 +254,7 @@ class ArticlesController extends ApiMainController
             'pic' => 'required|file',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         //接收文件信息
         $file = $this->inputs['pic'];
@@ -277,7 +274,7 @@ class ArticlesController extends ApiMainController
             $CachePic[$pic['name']] = $pic;
         }
         Cache::put('CachePic', $CachePic, $minutes);
-        return $this->msgOut(true, $pic, '图片上传成功');
+        return $this->msgOut(true, $pic, '200');
     }
     public function uploadImg($file, $url_path, $rule)
     {
@@ -310,7 +307,7 @@ class ArticlesController extends ApiMainController
     {
         if (file_exists($path)) {
             if (!is_writable(dirname($path))) {
-                return $this->msgOut(true, [], dirname($path) . ' 请设置权限!!!');
+                return $this->msgOut(false, [], '400', dirname($path) . ' 请设置权限!!!');
             } else {
                 return unlink($path);
             }

@@ -25,17 +25,17 @@ class AccountChangeTypeController extends ApiMainController
             'type' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], 400, $validator->errors()->first());
+            return $this->msgout(false, [], '400', $validator->errors()->first());
         }
         $checkData = $this->eloqM::where('sign', $this->inputs['sign'])->first();
         if (!is_null($checkData)) {
-            return $this->msgout(false, [], 101201);
+            return $this->msgout(false, [], '101201');
         }
         $eloqM = new $this->eloqM;
         try {
             $eloqM->fill($this->inputs);
             $eloqM->save();
-            return $this->msgout(true, 200);
+            return $this->msgout(true, '200');
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -53,24 +53,24 @@ class AccountChangeTypeController extends ApiMainController
             'type' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], 400, $validator->errors()->first());
+            return $this->msgout(false, [], '400', $validator->errors()->first());
         }
         $pastEloq = $this->eloqM::find($this->inputs['id']);
         if (is_null($pastEloq)) {
-            return $this->msgout(false, [], 101200);
+            return $this->msgout(false, [], '101200');
         }
         $checkData = $this->eloqM::where(function ($query) {
             $query->where('sign', $this->inputs['sign'])->where('id', '!=', $this->inputs['id']);
         })->first();
         if (!is_null($checkData)) {
-            return $this->msgout(false, [], 101201);
+            return $this->msgout(false, [], '101201');
         }
         $editData = $this->inputs;
         unset($editData['id']);
         try {
             $this->editAssignment($pastEloq, $editData);
             $pastEloq->save();
-            return $this->msgout(true, 200);
+            return $this->msgout(true, '200');
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -84,15 +84,15 @@ class AccountChangeTypeController extends ApiMainController
             'id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgout(false, [], 400, $validator->errors()->first());
+            return $this->msgout(false, [], '400', $validator->errors()->first());
         }
         $pastEloq = $this->eloqM::find($this->inputs['id']);
         if (is_null($pastEloq)) {
-            return $this->msgout(false, [], 101200);
+            return $this->msgout(false, [], '101200');
         }
         try {
             $pastEloq->delete();
-            return $this->msgout(false, [], 200);
+            return $this->msgout(false, [], '200');
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］

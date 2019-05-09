@@ -78,7 +78,7 @@ class AuthController extends ApiMainController
             'password' => 'required|string',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors());
+            return $this->msgOut(false, [], '400', $validator->errors());
         }
         if (!Hash::check($this->inputs['old_password'], $this->partnerAdmin->password)) {
             return $this->msgOut(false, [], '100003');
@@ -94,7 +94,7 @@ class AuthController extends ApiMainController
                         $tokenResult->token->expires_at
                     )->toDateTimeString(),
                 ];
-                return $this->msgOut(true, $data, '密码更改成功');
+                return $this->msgOut(true, $data, '200', '密码更改成功');
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
@@ -119,7 +119,7 @@ class AuthController extends ApiMainController
             'group_id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $group = PartnerAdminGroupAccess::find($this->inputs['group_id']);
         $role = json_decode($group->role, true);
@@ -172,7 +172,7 @@ class AuthController extends ApiMainController
             'group_id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors());
+            return $this->msgOut(false, [], '400', $validator->errors());
         }
         $targetUserEloq = $this->eloqM::find($this->inputs['id']);
         if (!is_null($targetUserEloq)) {
@@ -227,7 +227,7 @@ class AuthController extends ApiMainController
             'name' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors());
+            return $this->msgOut(false, [], '400', $validator->errors());
         }
 
         $targetUserEloq = $this->eloqM::where([
@@ -256,7 +256,7 @@ class AuthController extends ApiMainController
             'password' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors());
+            return $this->msgOut(false, [], '400', $validator->errors());
         }
         $targetUserEloq = $this->eloqM::where([
             ['id', '=', $this->inputs['id']],

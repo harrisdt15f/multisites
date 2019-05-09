@@ -35,7 +35,7 @@ class RechargeCheckController extends ApiMainController
             'auditor_note' => 'required|string',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors());
+            return $this->msgOut(false, [], '400', $validator->errors());
         }
         // 人工充值记录表
         $RechargeLog = $this->eloqM::find($this->inputs['id']);
@@ -44,7 +44,7 @@ class RechargeCheckController extends ApiMainController
         $auditFlow = auditFlow::where('id', $RechargeLog->audit_flow_id)->first();
         $RechargeLog = $this->eloqM::find($this->inputs['id']);
         if ($RechargeLog->status !== 0) {
-            return $this->msgOut(false, [], 100900);
+            return $this->msgOut(false, [], '100900');
         }
         DB::beginTransaction();
         try {
@@ -61,7 +61,7 @@ class RechargeCheckController extends ApiMainController
             //用户帐变表
             $this->insertChangeReport($userData, $RechargeLog['amount'], $balance);
             DB::commit();
-            return $this->msgOut(true, [], 200);
+            return $this->msgOut(true, [], '200');
         } catch (Exception $e) {
             DB::rollBack();
             $errorObj = $e->getPrevious()->getPrevious();
@@ -77,11 +77,11 @@ class RechargeCheckController extends ApiMainController
             'auditor_note' => 'required|string',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors());
+            return $this->msgOut(false, [], '400', $validator->errors());
         }
         $RechargeLog = $this->eloqM::find($this->inputs['id']);
         if ($RechargeLog->status !== 0) {
-            return $this->msgOut(false, [], 100900);
+            return $this->msgOut(false, [], '100900');
         }
         $RechargeLogEdit = ['status' => 2];
         $auditFlow = auditFlow::where('id', $RechargeLog->audit_flow_id)->first();
@@ -101,7 +101,7 @@ class RechargeCheckController extends ApiMainController
             $adminFundData->save();
             $this->insertOperationDatas($RechargeLogeloqM, $type, $in_out, null, null, $auditFlow->admin_id, $auditFlow->admin_name, $RechargeLog->amount, $comment, null);
             DB::commit();
-            return $this->msgOut(true, [], 200);
+            return $this->msgOut(true, [], '200');
         } catch (Exception $e) {
             DB::rollBack();
             $errorObj = $e->getPrevious()->getPrevious();

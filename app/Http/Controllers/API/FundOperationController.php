@@ -20,7 +20,7 @@ class FundOperationController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $groupArr = FundOperationGroup::select('group_id')->get()->toArray();
         $group = array_column($groupArr, 'group_id');
@@ -48,7 +48,7 @@ class FundOperationController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $admin_user = PartnerAdminUsers::find($this->inputs['id']);
         if (is_null($admin_user)) {
@@ -68,7 +68,7 @@ class FundOperationController extends ApiMainController
             $FundOperationAdmin->save();
             $this->insertOperationDatas($ArtificialRechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $admin_user->id, $admin_user->name, $this->inputs['fund'], $comment, null);
             DB::commit();
-            return $this->msgOut(true, [], 200);
+            return $this->msgOut(true, [], '200');
         } catch (Exception $e) {
             DB::rollBack();
             $errorObj = $e->getPrevious()->getPrevious();
@@ -83,14 +83,14 @@ class FundOperationController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         try {
             $SysConfiguresEloq = PartnerSysConfigures::where('sign', 'admin_recharge_daily_limit')->first();
             $editData = ['value' => $this->inputs['fund']];
             $SysConfiguresEloq->fill($editData);
             $SysConfiguresEloq->save();
-            return $this->msgOut(true, [], 200);
+            return $this->msgOut(true, [], '200');
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -105,7 +105,7 @@ class FundOperationController extends ApiMainController
             'end_time' => 'required|date',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $datas = ArtificialRechargeLog::where(function ($query) {
             $query->where('admin_id', $this->inputs['admin_id'])

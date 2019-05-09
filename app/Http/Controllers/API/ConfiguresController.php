@@ -38,7 +38,7 @@ class ConfiguresController extends ApiMainController
         }
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $addDatas = $this->inputs;
         $addDatas['pid'] = $this->currentPlatformEloq->platform_id;
@@ -52,14 +52,14 @@ class ConfiguresController extends ApiMainController
                 $configure = new $this->eloqM();
                 $configure->fill($addDatas);
                 $configure->save();
-                return $this->msgOut(true, [], '添加配置成功');
+                return $this->msgOut(true, [], '200');
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
                 return $this->msgOut(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgOut(false, [], 100700);
+            return $this->msgOut(false, [], '100700');
         }
     }
 
@@ -74,7 +74,7 @@ class ConfiguresController extends ApiMainController
             'description' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastData = $this->eloqM::where('sign', $this->inputs['sign'])->where('id', '!=', $this->inputs['id'])->first();
         if (is_null($pastData)) {
@@ -88,14 +88,14 @@ class ConfiguresController extends ApiMainController
             $this->editAssignment($editDataEloq, $editDatas);
             try {
                 $editDataEloq->save();
-                return $this->msgOut(true, [], '修改配置成功');
+                return $this->msgOut(true, [], '200');
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
                 return $this->msgOut(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgOut(false, [], 100700);
+            return $this->msgOut(false, [], '100700');
         }
     }
 
@@ -106,20 +106,20 @@ class ConfiguresController extends ApiMainController
             'id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
         if (!is_null($pastData)) {
             try {
                 $this->eloqM::where('id', $this->inputs['id'])->delete();
-                return $this->msgOut(true, [], '删除配置成功');
+                return $this->msgOut(true, [], '200');
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
                 return $this->msgOut(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgOut(false, [], 100701);
+            return $this->msgOut(false, [], '100701');
         }
     }
 
@@ -132,10 +132,10 @@ class ConfiguresController extends ApiMainController
             'status' => 'required|in:0,1',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         if ($this->inputs['parent_id'] == 0) {
-            return $this->msgOut(false, [], 100702);
+            return $this->msgOut(false, [], '100702');
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
         if (!is_null($pastData)) {
@@ -147,14 +147,14 @@ class ConfiguresController extends ApiMainController
             $pastData->status = $editStatus;
             try {
                 $pastData->save();
-                return $this->msgOut(true, [], '修改配置状态成功');
+                return $this->msgOut(true, [], '200');
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
                 return $this->msgOut(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgOut(false, [], 100701);
+            return $this->msgOut(false, [], '100701');
         }
     }
 }

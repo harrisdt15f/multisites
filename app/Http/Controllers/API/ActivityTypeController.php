@@ -26,17 +26,17 @@ class ActivityTypeController extends ApiMainController
             'size' => 'numeric|gt:0',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $editData = $this->eloqM::find($this->inputs['id']);
         if (is_null($editData)) {
-            return $this->msgOut(false, [], 100400);
+            return $this->msgOut(false, [], '100400');
         }
         unset($this->inputs['id']);
         $this->editAssignment($editData, $this->inputs);
         try {
             $editData->save();
-            return $this->msgOut(true, [], '修改活动分类成功');
+            return $this->msgOut(true, [], '200');
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］

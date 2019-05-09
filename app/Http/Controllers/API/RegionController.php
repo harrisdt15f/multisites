@@ -23,11 +23,11 @@ class RegionController extends ApiMainController
             'region_level' => 'required|in:3',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $check = $this->eloqM::where(['region_level' => $this->inputs['region_level'], 'region_id' => $this->inputs['region_parent_id']])->first();
         if (is_null($check)) {
-            return $this->msgOut(false, [], 101000);
+            return $this->msgOut(false, [], '101000');
         }
         $datas = $this->eloqM::where(['region_level' => 4, 'region_parent_id' => $this->inputs['region_parent_id']])->get()->toArray();
         return $this->msgOut(true, $datas);
@@ -39,7 +39,7 @@ class RegionController extends ApiMainController
             'search_name' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $datas = $this->eloqM::select('a.*', 'b.region_name as country_name', 'c.region_name as city_name', 'd.region_name as province_name')
             ->from('region as a')
@@ -60,7 +60,7 @@ class RegionController extends ApiMainController
             'region_level' => 'required|in:1,2,3,4',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $addDatas = $this->inputs;
         $pastData = $this->eloqM::where(['region_parent_id' => $this->inputs['region_parent_id'], 'region_name' => $this->inputs['region_name']])->orwhere('region_id', $this->inputs['region_id'])->first();
@@ -69,14 +69,14 @@ class RegionController extends ApiMainController
                 $configure = new $this->eloqM();
                 $configure->fill($addDatas);
                 $configure->save();
-                return $this->msgOut(true, [], '添加行政区成功');
+                return $this->msgOut(true, [], '200');
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
                 return $this->msgOut(false, [], $sqlState, $msg);
             }
         } else {
-            return $this->msgOut(false, [], 101001);
+            return $this->msgOut(false, [], '101001');
         }
     }
     //编辑行政区
@@ -89,7 +89,7 @@ class RegionController extends ApiMainController
             'region_level' => 'required|in:1,2,3,4',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], $validator->errors()->first(), 200);
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastData = $this->eloqM::where(function ($query) {
             $query->where('region_id', '=', $this->inputs['region_id'])
@@ -101,7 +101,7 @@ class RegionController extends ApiMainController
             $editDataEloq->region_name = $this->inputs['region_name'];
             try {
                 $editDataEloq->save();
-                return $this->msgOut(true, [], '修改行政区成功');
+                return $this->msgOut(true, [], '200');
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］

@@ -52,4 +52,6 @@ return [
     //AccountChangeTypeController
     '101200' => '帐变类型不存在',
     '101201' => 'sign已存在',
+    //FundOperationController
+    '101300' => '管理员不存在',
 ];
