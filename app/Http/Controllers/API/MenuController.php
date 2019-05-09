@@ -63,7 +63,7 @@ class MenuController extends ApiMainController
             'en_name' => 'required|regex:/^(?!\.)(?!.*\.$)(?!.*?\.\.)[a-z.-]+$/', //operation.log
             'display' => 'required|numeric|in:0,1',
             'route' => 'required|regex:/^(?!.*\/$)(?!.*?\/\/)[a-z\/-]+$/', // /operasyon/operation-log
-            'icon' => 'required|regex:/^(?!\-)(?!.*\-$)(?!.*?\-\-)(?!\ )(?!.*\ $)(?!.*?\ \ )[a-z0-9 -]+$/',
+            'icon' => 'regex:/^(?!\-)(?!.*\-$)(?!.*?\-\-)(?!\ )(?!.*\ $)(?!.*?\ \ )[a-z0-9 -]+$/',
             //anticon anticon-appstore  icon-6-icon
         ];
         if (isset($this->inputs['isParent']) && $this->inputs['isParent'] === '1') {
@@ -144,7 +144,7 @@ class MenuController extends ApiMainController
             'display' => 'required|numeric|in:0,1',
             'menuId' => 'required|numeric',
             'route' => 'required|regex:/^(?!.*\/$)(?!.*?\/\/)[a-z\/-]+$/', // /operasyon/operation-log
-            'icon' => 'required|regex:/^(?!\-)(?!.*\-$)(?!.*?\-\-)(?!\ )(?!.*\ $)(?!.*?\ \ )[a-z0-9 -]+$/',
+            'icon' => 'regex:/^(?!\-)(?!.*\-$)(?!.*?\-\-)(?!\ )(?!.*\ $)(?!.*?\ \ )[a-z0-9 -]+$/',
             //anticon anticon-appstore  icon-6-icon
         ];
         if (isset($this->inputs['isParent']) && $this->inputs['isParent'] === '1') {
