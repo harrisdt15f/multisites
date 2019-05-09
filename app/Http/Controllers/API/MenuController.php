@@ -63,6 +63,8 @@ class MenuController extends ApiMainController
             'en_name' => 'required|regex:/^(?!\.)(?!.*\.$)(?!.*?\.\.)[a-z.-]+$/', //operation.log
             'display' => 'required|numeric|in:0,1',
             'route' => 'required|regex:/^(?!.*\/$)(?!.*?\/\/)[a-z\/-]+$/', // /operasyon/operation-log
+            'icon' => 'required|regex:/^(?!\-)(?!.*\-$)(?!.*?\-\-)(?!\ )(?!.*\ $)(?!.*?\ \ )[a-z0-9 -]+$/',
+            //anticon anticon-appstore  icon-6-icon
         ];
         if (isset($this->inputs['isParent']) && $this->inputs['isParent'] === '1') {
             $parent = true;
@@ -83,6 +85,7 @@ class MenuController extends ApiMainController
         $menuEloq->en_name = $this->inputs['en_name'];
         $menuEloq->route = $this->inputs['route'];
         $menuEloq->display = $this->inputs['display'];
+        $menuEloq->icon = $this->inputs['icon'];
         if ($parent === false) {
             $menuEloq->pid = $this->inputs['parentId'];
             $menuEloq->level = $this->inputs['level'];
@@ -132,7 +135,7 @@ class MenuController extends ApiMainController
      * (?!.*\.$) - don't allow . at end
      * @return JsonResponse
      */
-    public function edit():  ? JsonResponse
+    public function edit(): ?JsonResponse
     {
         $parent = false;
         $rule = [
@@ -141,6 +144,8 @@ class MenuController extends ApiMainController
             'display' => 'required|numeric|in:0,1',
             'menuId' => 'required|numeric',
             'route' => 'required|regex:/^(?!.*\/$)(?!.*?\/\/)[a-z\/-]+$/', // /operasyon/operation-log
+            'icon' => 'required|regex:/^(?!\-)(?!.*\-$)(?!.*?\-\-)(?!\ )(?!.*\ $)(?!.*?\ \ )[a-z0-9 -]+$/',
+            //anticon anticon-appstore  icon-6-icon
         ];
         if (isset($this->inputs['isParent']) && $this->inputs['isParent'] === '1') {
             $rule['isParent'] = 'required|numeric|in:0,1';
@@ -156,6 +161,7 @@ class MenuController extends ApiMainController
         $menuEloq->label = $this->inputs['label'];
         $menuEloq->en_name = $this->inputs['en_name'];
         $menuEloq->display = $this->inputs['display'];
+        $menuEloq->icon = $this->inputs['icon'];
         if ($parent === true) {
             $menuEloq->route = '#';
             $menuEloq->pid = 0;
@@ -180,7 +186,7 @@ class MenuController extends ApiMainController
         if (!empty($parseDatas)) {
             foreach ($parseDatas as $key => $value) {
                 $menuEloq = PartnerMenus::find($value['currentId']);
-                $menuEloq->pid = $value['currentParent'] === '#' ? 0 : (int) $value['currentParent'];
+                $menuEloq->pid = $value['currentParent'] === '#' ? 0 : (int)$value['currentParent'];
                 if ($menuEloq->save()) {
                     $pass['pass'] = $value['currentText'];
                     $itemProcess[] = $pass;
