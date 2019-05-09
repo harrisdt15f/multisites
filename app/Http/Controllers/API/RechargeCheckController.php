@@ -20,10 +20,10 @@ class RechargeCheckController extends ApiMainController
         $fixedJoin = 1;
         $withTable = 'auditFlow';
         $withSearchAbleFields = ['apply_note'];
-        $searchAbleFields = ['status'];
+        $searchAbleFields = ['status', 'type'];
         $orderFields = 'id';
         $orderFlow = 'desc';
-        $this->inputs['type'] = 1;
+        $this->inputs['type'] = 2;
         $data = $this->generateSearchQuery($this->eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields, $orderFields, $orderFlow);
         return $this->msgOut(true, $data);
     }
