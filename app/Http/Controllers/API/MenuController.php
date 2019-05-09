@@ -74,11 +74,11 @@ class MenuController extends ApiMainController
         }
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $MenuEloq = $this->eloqM::where('label', $this->inputs['label'])->first();
         if (!is_null($MenuEloq)) {
-            return $this->msgOut(false, [], 100800);
+            return $this->msgOut(false, [], '100800');
         }
         $menuEloq = new PartnerMenus();
         $menuEloq->label = $this->inputs['label'];
@@ -109,7 +109,7 @@ class MenuController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $menuEloq = new PartnerMenus();
         $toDelete = $this->inputs['toDelete'];
@@ -123,7 +123,7 @@ class MenuController extends ApiMainController
                 $menuEloq->refreshStar();
                 return $this->msgOut(true, $datas);
             } catch (\Exception $e) {
-                return $this->msgOut(false, [], $e->getMessage(), '0002');
+                return $this->msgOut(false, [], '0002', $e->getMessage());
             }
         }
     }
@@ -155,7 +155,7 @@ class MenuController extends ApiMainController
         }
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $menuEloq = PartnerMenus::find($this->inputs['menuId']);
         $menuEloq->label = $this->inputs['label'];
@@ -174,7 +174,7 @@ class MenuController extends ApiMainController
             $menuEloq->refreshStar();
             return $this->msgOut(true, $data);
         } else {
-            return $this->msgOut(false, [], 100801);
+            return $this->msgOut(false, [], '100801');
         }
     }
 

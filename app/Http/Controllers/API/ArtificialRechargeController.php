@@ -30,21 +30,21 @@ class ArtificialRechargeController extends ApiMainController
             'apply_note' => 'required|string',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $userData = UserHandleModel::find($this->inputs['id']);
         if (is_null($userData)) {
-            return $this->msgOut(false, [], 101100);
+            return $this->msgOut(false, [], '101100');
         }
         $partnerAdmin = $this->partnerAdmin;
         $adminFundData = FundOperation::where('admin_id', $partnerAdmin->id)->first();
         if (is_null($adminFundData)) {
-            return $this->msgOut(false, [], 101101);
+            return $this->msgOut(false, [], '101101');
         }
         $adminOperationFund = $adminFundData->fund;
         //可操作额度小于充值额度
         if ($adminOperationFund < $this->inputs['amount']) {
-            return $this->msgOut(false, [], 101102);
+            return $this->msgOut(false, [], '101102');
         }
         DB::beginTransaction();
         try {
@@ -59,7 +59,7 @@ class ArtificialRechargeController extends ApiMainController
             $AuditFlowID = $this->insertAuditFlow($partnerAdmin->id, $partnerAdmin->name, $this->inputs['apply_note']);
             $this->insertOperationDatas($ArtificialRechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $userData->id, $userData->nickname, $this->inputs['amount'], $comment, $AuditFlowID);
             DB::commit();
-            return $this->msgOut(true, [], 200, '操作成功，请等待管理员审核');
+            return $this->msgOut(true, [], '200', '操作成功，请等待管理员审核');
         } catch (Exception $e) {
             DB::rollBack();
             $errorObj = $e->getPrevious()->getPrevious();

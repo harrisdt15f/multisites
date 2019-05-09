@@ -33,7 +33,7 @@ class LotteriesController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $lotteriesEloq = $this->eloqM::where([
             ['series_id', '=', $this->inputs['series_id']],
@@ -119,7 +119,7 @@ class LotteriesController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         event(new IssueGenerateEvent($this->inputs));
         return $this->msgOut(true);

@@ -29,14 +29,14 @@ class BankController extends ApiMainController
             'allow_user_level' => 'required|string',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $addDatas = $this->inputs;
         try {
             $configure = new $this->eloqM();
             $configure->fill($addDatas);
             $configure->save();
-            return $this->msgOut(true, [], '添加银行成功');
+            return $this->msgOut(true, [], '200');
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -58,16 +58,16 @@ class BankController extends ApiMainController
             'allow_user_level' => 'required|string',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $editDataEloq = $this->eloqM::find($this->inputs['id']);
         if (empty($editDataEloq)) {
-            return $this->msgOut(false, [], 100600);
+            return $this->msgOut(false, [], '100600');
         }
         $this->editAssignment($editDataEloq, $this->inputs);
         try {
             $editDataEloq->save();
-            return $this->msgOut(true, [], '修改银行成功');
+            return $this->msgOut(true, [], '200');
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -80,11 +80,11 @@ class BankController extends ApiMainController
             'id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         try {
             $this->eloqM::where('id', $this->inputs['id'])->delete();
-            return $this->msgOut(true, [], '删除银行成功');
+            return $this->msgOut(true, [], '200');
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］

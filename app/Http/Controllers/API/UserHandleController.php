@@ -39,11 +39,11 @@ class UserHandleController extends ApiMainController
             'password' => 'required',
             'fund_password' => 'required',
             'is_tester' => 'required|numeric',
-            'prize_group' => 'required|numeric|between:'.$min.','.$max,
+            'prize_group' => 'required|numeric|between:' . $min . ',' . $max,
             'type' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors()->first());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $this->inputs['nickname'] = $this->inputs['username'];
         $this->inputs['password'] = bcrypt($this->inputs['password']);
@@ -61,7 +61,7 @@ class UserHandleController extends ApiMainController
                 'user_id' => $user->id,
                 'balance' => 0,
                 'frozen' => 0,
-                'status' => 1
+                'status' => 1,
             ];
             $userAccountEloq = $userAccountEloq->fill($userAccountData);
             $userAccountEloq->save();
@@ -84,7 +84,7 @@ class UserHandleController extends ApiMainController
     public function usersInfo()
     {
         //target model to join
-        $fixedJoin = 1;//number of joining tables
+        $fixedJoin = 1; //number of joining tables
         $withTable = 'account';
         $searchAbleFields = [
             'username',
@@ -94,7 +94,7 @@ class UserHandleController extends ApiMainController
             'frozen_type',
             'prize_group',
             'level_deep',
-            'register_ip'
+            'register_ip',
         ];
         $withSearchAbleFields = ['balance'];
         $data = $this->generateSearchQuery($this->eloqM, $searchAbleFields, $fixedJoin, $withTable,
@@ -140,7 +140,7 @@ class UserHandleController extends ApiMainController
     {
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors());
+            return $this->msgOut(false, [], '400', $validator->errors());
         }
         $applyUserEloq = $this->eloqM::find($this->inputs['id']);
         if (!is_null($applyUserEloq)) {
@@ -218,9 +218,9 @@ class UserHandleController extends ApiMainController
         //main model
         $eloqM = $this->modelWithNameSpace('PassworAuditLists');
         //target model to join
-        $fixedJoin = 1;//number of joining tables
+        $fixedJoin = 1; //number of joining tables
         $withTable = 'auditFlow';
-        $witTableCriterias = $withTable.':id,admin_id,auditor_id,apply_note,auditor_note,updated_at,admin_name,auditor_name,username';
+        $witTableCriterias = $withTable . ':id,admin_id,auditor_id,apply_note,auditor_note,updated_at,admin_name,auditor_name,username';
         $searchAbleFields = ['type', 'status', 'created_at', 'updated_at'];
         $withSearchAbleFields = ['username'];
         $data = $this->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields);
@@ -241,13 +241,13 @@ class UserHandleController extends ApiMainController
     {
         $rule = [
             'id' => 'required|numeric',
-            'type' => 'required|numeric',//1登录密码 2 资金密码
-            'status' => 'required|numeric',//1 通过 2 拒绝
-            'auditor_note' => 'required',//密码审核备注
+            'type' => 'required|numeric', //1登录密码 2 资金密码
+            'status' => 'required|numeric', //1 通过 2 拒绝
+            'auditor_note' => 'required', //密码审核备注
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors());
+            return $this->msgOut(false, [], '400', $validator->errors());
         }
         $eloqM = $this->modelWithNameSpace('PassworAuditLists');
         $applyUserEloq = $eloqM::where([
@@ -296,12 +296,12 @@ class UserHandleController extends ApiMainController
     {
         $rule = [
             'user_id' => 'required|numeric',
-            'frozen_type' => 'required|numeric',//冻结类型
-            'comment' => 'required',//备注
+            'frozen_type' => 'required|numeric', //冻结类型
+            'comment' => 'required', //备注
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors());
+            return $this->msgOut(false, [], '400', $validator->errors());
         }
         $userEloq = $this->eloqM::find($this->inputs['user_id']);
         if (!is_null($userEloq)) {
@@ -337,7 +337,7 @@ class UserHandleController extends ApiMainController
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], 400, $validator->errors());
+            return $this->msgOut(false, [], '400', $validator->errors());
         }
         $userEloq = $this->eloqM::find($this->inputs['user_id']);
         if (!is_null($userEloq)) {
@@ -346,6 +346,5 @@ class UserHandleController extends ApiMainController
         }
 
     }
-
 
 }
