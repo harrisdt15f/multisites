@@ -68,10 +68,8 @@ class PartnerAdminGroupController extends ApiMainController
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);
         }
-        $partnerAccessGroupEloq = PartnerMenus::whereIn('id', $role)->get();
         $partnerMenuObj = new PartnerMenus();
-        $partnerMenuObj->createMenuDatas($partnerAccessGroupEloq, $objPartnerAdminGroup->id);
-        $objPartnerAdminGroup->save();
+        $partnerMenuObj->createMenuDatas($objPartnerAdminGroup->id, $role);
         return $this->msgOut(true, $data);
     }
 
