@@ -52,7 +52,7 @@ class FundOperationController extends ApiMainController
         }
         $admin_user = PartnerAdminUsers::find($this->inputs['id']);
         if (is_null($admin_user)) {
-            return $this->msgOut(false, [], '管理员不存在');
+            return $this->msgOut(false, [], '101300');
         }
         $FundOperationAdmin = FundOperation::where('admin_id', $this->inputs['id'])->first();
         $newFund = $FundOperationAdmin->fund + $this->inputs['fund'];
@@ -68,7 +68,7 @@ class FundOperationController extends ApiMainController
             $FundOperationAdmin->save();
             $this->insertOperationDatas($ArtificialRechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $admin_user->id, $admin_user->name, $this->inputs['fund'], $comment, null);
             DB::commit();
-            return $this->msgOut(true, [], '增加额度成功');
+            return $this->msgOut(true, [], 200);
         } catch (Exception $e) {
             DB::rollBack();
             $errorObj = $e->getPrevious()->getPrevious();
@@ -90,11 +90,28 @@ class FundOperationController extends ApiMainController
             $editData = ['value' => $this->inputs['fund']];
             $SysConfiguresEloq->fill($editData);
             $SysConfiguresEloq->save();
-            return $this->msgOut(true, [], '设置额度成功');
+            return $this->msgOut(true, [], 200);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);
         }
+    }
+    public function fundChangeLog()
+    {
+        $validator = Validator::make($this->inputs, [
+            'admin_id' => 'required|numeric',
+            'start_time' => 'required|date',
+            'end_time' => 'required|date',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], 400, $validator->errors()->first());
+        }
+        $datas = ArtificialRechargeLog::where(function ($query) {
+            $query->where('admin_id', $this->inputs['admin_id'])
+                ->where('created_at', '>', $this->inputs['start_time'])
+                ->where('created_at', '<', $this->inputs['end_time']);
+        })->get()->toArray();
+        return $this->msgout(true, $datas);
     }
 }
