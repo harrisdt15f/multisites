@@ -50,13 +50,8 @@ class PartnerAdminGroupController extends ApiMainController
         $objPartnerAdminGroup = new $this->eloqM;
         $objPartnerAdminGroup->fill($data);
         //检查是否有人工充值权限
-        $FundOperation = PartnerMenus::select('id')->orWhere('route', '/manage')->orWhere('route', '/manage/prize-manage')->orWhere('route', '/manage/recharge')->get()->toArray();
-        foreach ($FundOperation as $k => $v) {
-            if (in_array($v['id'], $role)) {
-                $fool = true;
-                break;
-            }
-        }
+        $FundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
+        $fool = in_array($FundOperation['id'], $role);
         try {
             $objPartnerAdminGroup->save();
             if ($fool === true) {
@@ -109,13 +104,8 @@ class PartnerAdminGroupController extends ApiMainController
         $datas = $this->eloqM::find($id);
         //检查提交的权限中 是否有 人工充值权限  $fool
         $role = json_decode($this->inputs['role']);
-        $FundOperation = PartnerMenus::select('id')->orWhere('route', '/manage')->orWhere('route', '/manage/prize-manage')->orWhere('route', '/manage/recharge')->get()->toArray();
-        foreach ($FundOperation as $k => $v) {
-            if (in_array($v['id'], $role)) {
-                $fool = true;
-                break;
-            }
-        }
+        $FundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
+        $fool = in_array($FundOperation['id'], $role);
         if (!is_null($datas)) {
             DB::beginTransaction();
             $datas->group_name = $request->get('group_name');
@@ -189,13 +179,8 @@ class PartnerAdminGroupController extends ApiMainController
         ])->first();
         //检查是否有人工充值权限
         $role = json_decode($datas->role);
-        $FundOperation = PartnerMenus::select('id')->orWhere('route', '/manage')->orWhere('route', '/manage/prize-manage')->orWhere('route', '/manage/recharge')->get()->toArray();
-        foreach ($FundOperation as $k => $v) {
-            if (in_array($v['id'], $role)) {
-                $fool = true;
-                break;
-            }
-        }
+        $FundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
+        $fool = in_array($FundOperation['id'], $role);
         if (!is_null($datas)) {
             try {
                 if ($fool === true) {
