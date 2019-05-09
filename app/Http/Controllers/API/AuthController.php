@@ -122,12 +122,13 @@ class AuthController extends ApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $group = PartnerAdminGroupAccess::find($this->inputs['group_id']);
-        $role = json_decode($group->role, true);
-        $fool = false;
-        $FundOperation = PartnerMenus::select('id')->orWhere('route', '/manage')->orWhere('route', '/manage/prize-manage')->orWhere('route', '/manage/recharge')->get()->toArray();
-        foreach ($FundOperation as $k => $v) {
-            if (in_array($v['id'], $role)) {
-                $fool = true;
+        $role = Arr::wrap(json_decode($group->role, true));
+        $isManualRecharge = false;
+        $FundOperationArray = PartnerMenus::select('id')->orWhere('route', '/manage')->orWhere('route',
+            '/manage/prize-manage')->orWhere('route', '/manage/recharge')->get()->toArray();
+        foreach ($FundOperationArray as $value) {
+            if (in_array($value['id'], $role, true)) {
+                $isManualRecharge = true;
                 break;
             }
         }
@@ -135,7 +136,7 @@ class AuthController extends ApiMainController
         $input['password'] = bcrypt($input['password']);
         $input['platform_id'] = $this->currentPlatformEloq->platform_id;
         $user = PartnerAdminUsers::create($input);
-        if ($fool === true) {
+        if ($isManualRecharge === true) {
             $insertData = ['admin_id' => $user->id];
             $FundOperationEloq = new FundOperation();
             $FundOperationEloq->fill($insertData);

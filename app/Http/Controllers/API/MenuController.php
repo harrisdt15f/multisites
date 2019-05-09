@@ -85,7 +85,7 @@ class MenuController extends ApiMainController
         $menuEloq->en_name = $this->inputs['en_name'];
         $menuEloq->route = $this->inputs['route'];
         $menuEloq->display = $this->inputs['display'];
-        $menuEloq->icon = $this->inputs['icon'];
+        $menuEloq->icon = $this->inputs['icon'] ?? null;
         if ($parent === false) {
             $menuEloq->pid = $this->inputs['parentId'];
             $menuEloq->level = $this->inputs['level'];
