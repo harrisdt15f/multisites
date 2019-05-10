@@ -7,7 +7,9 @@ use App\models\FundOperation;
 use App\models\FundOperationGroup;
 use App\models\PartnerAdminUsers;
 use App\models\PartnerMenus;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -159,7 +161,7 @@ class PartnerAdminGroupController extends ApiMainController
 
     /**
      * 删除组管理员角色
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function destroy()
     {
@@ -176,9 +178,9 @@ class PartnerAdminGroupController extends ApiMainController
             ['group_name', '=', $this->inputs['group_name']],
         ])->first();
         //检查是否有人工充值权限
-        $role = json_decode($datas->role);
+        $role = Arr::wrap(json_decode($datas->role, true));
         $FundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
-        $isManualRecharge = in_array($FundOperation['id'], $role);
+        $isManualRecharge = in_array($FundOperation['id'], $role, true);
         if (!is_null($datas)) {
             try {
                 if ($isManualRecharge === true) {
