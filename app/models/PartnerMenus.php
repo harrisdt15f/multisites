@@ -37,8 +37,7 @@ class PartnerMenus extends BaseModel
         if (Cache::tags([$this->redisFirstTag])->has($redisKey)) {
             $parent_menu = Cache::tags([$this->redisFirstTag])->get($redisKey);
         } else {
-            $menuLists = self::all();
-            $parent_menu = self::createMenuDatas($menuLists);
+            $parent_menu = self::createMenuDatas();
         }
         return $parent_menu;
     }
@@ -55,27 +54,32 @@ class PartnerMenus extends BaseModel
         } else {
             $role = json_decode($accessGroupEloq->role); //[1,2,3,4,5]
             $menuLists = self::whereIn('id', $role)->get();
-            $parent_menu = self::createMenuDatas($menuLists, $accessGroupEloq->id);
+            $parent_menu = self::createMenuDatas($accessGroupEloq->id, $role);
         }
         return $parent_menu;
     }
 
     /**
-     * @param $menuLists
      * @param  string  $redisKey
+     * @param  string  $role
      * @return array
      */
-    public function createMenuDatas($menuLists, $redisKey = '*')
+    public function createMenuDatas($redisKey = '*', $role = '*')
     {
         $menuForFE = [];
+        $menuLists = self::getFirstLevelList();
         foreach ($menuLists as $key => $firstMenu) {
             if ($firstMenu->pid === 0) {
                 $menuForFE[$firstMenu->id] = $firstMenu->toArray();
                 if ($firstMenu->childs()->exists()) {
-                    foreach ($firstMenu->childs as $secondMenu) {
+                    $firstChilds = $role == '*' ? $firstMenu->childs->sortBy('sort') : $firstMenu->childs->whereIn('id',
+                        $role)->sortBy('sort');
+                    foreach ($firstChilds as $secondMenu) {
                         $menuForFE[$firstMenu->id]['child'][$secondMenu->id] = $secondMenu->toArray();
                         if ($secondMenu->childs()->exists()) {
-                            foreach ($secondMenu->childs as $thirdMenu) {
+                            $secondChilds = $role == '*' ? $secondMenu->childs->sortBy('sort') : $secondMenu->childs->whereIn('id',
+                                $role)->sortBy('sort');
+                            foreach ($secondChilds as $thirdMenu) {
                                 $menuForFE[$firstMenu->id]['child'][$secondMenu->id]['child'][$thirdMenu->id] = $thirdMenu->toArray();
                             }
                         }
@@ -102,7 +106,7 @@ class PartnerMenus extends BaseModel
 
     public static function getFirstLevelList()
     {
-        return self::where('pid', 0)->get();
+        return self::where('pid', 0)->orderBy('sort')->get();
     }
 
     public function childs(): HasMany

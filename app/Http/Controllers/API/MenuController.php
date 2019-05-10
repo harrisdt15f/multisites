@@ -64,6 +64,7 @@ class MenuController extends ApiMainController
             'display' => 'required|numeric|in:0,1',
             'route' => 'required|regex:/^(?!.*\/$)(?!.*?\/\/)[a-z\/-]+$/', // /operasyon/operation-log
             'icon' => 'regex:/^(?!\-)(?!.*\-$)(?!.*?\-\-)(?!\ )(?!.*\ $)(?!.*?\ \ )[a-z0-9 -]+$/',
+            'sort' => 'require|int',
             //anticon anticon-appstore  icon-6-icon
         ];
         if (isset($this->inputs['isParent']) && $this->inputs['isParent'] === '1') {
@@ -86,6 +87,7 @@ class MenuController extends ApiMainController
         $menuEloq->route = $this->inputs['route'];
         $menuEloq->display = $this->inputs['display'];
         $menuEloq->icon = $this->inputs['icon'] ?? null;
+        $menuEloq->sort = $this->inputs['sort'];
         if ($parent === false) {
             $menuEloq->pid = $this->inputs['parentId'];
             $menuEloq->level = $this->inputs['level'];
