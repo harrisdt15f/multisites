@@ -180,7 +180,7 @@ class MenuController extends ApiMainController
         }
     }
 
-    public function changeParent()
+    public function changeParent(): ?JsonResponse
     {
         $parseDatas = json_decode($this->inputs['dragResult'], true);
         $itemProcess = [];
@@ -189,6 +189,7 @@ class MenuController extends ApiMainController
             foreach ($parseDatas as $key => $value) {
                 $menuEloq = PartnerMenus::find($value['currentId']);
                 $menuEloq->pid = $value['currentParent'] === '#' ? 0 : (int)$value['currentParent'];
+                $menuEloq->sort = $value['currentSort'];
                 if ($menuEloq->save()) {
                     $pass['pass'] = $value['currentText'];
                     $itemProcess[] = $pass;
