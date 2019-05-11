@@ -56,7 +56,7 @@ class ActivityInfosController extends ApiMainController
             $configure = new $this->eloqM();
             $configure->fill($addDatas);
             $configure->save();
-            return $this->msgOut(true, [], '200');
+            return $this->msgOut(true);
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
@@ -114,7 +114,7 @@ class ActivityInfosController extends ApiMainController
                 $this->deletePic(substr($pastpic, 1));
                 $this->deletePic(substr($thumbnail_path, 1));
             }
-            return $this->msgOut(true, [], '200');
+            return $this->msgOut(true);
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -137,7 +137,7 @@ class ActivityInfosController extends ApiMainController
                 //删除图片
                 $this->deletePic(substr($pastData['pic_path'], 1));
                 $this->deletePic(substr($pastData['thumbnail_path'], 1));
-                return $this->msgOut(true, [], '200');
+                return $this->msgOut(true);
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］

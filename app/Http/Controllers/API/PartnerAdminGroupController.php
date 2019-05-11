@@ -205,7 +205,7 @@ class PartnerAdminGroupController extends ApiMainController
                         $fundOperationEloq->whereIn('admin_id', $admins)->delete();
                     }
                 }
-                return $this->msgOut(true, []);
+                return $this->msgOut(true);
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］

@@ -36,7 +36,7 @@ class BankController extends ApiMainController
             $configure = new $this->eloqM();
             $configure->fill($addDatas);
             $configure->save();
-            return $this->msgOut(true, [], '200');
+            return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -67,7 +67,7 @@ class BankController extends ApiMainController
         $this->editAssignment($editDataEloq, $this->inputs);
         try {
             $editDataEloq->save();
-            return $this->msgOut(true, [], '200');
+            return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -84,7 +84,7 @@ class BankController extends ApiMainController
         }
         try {
             $this->eloqM::where('id', $this->inputs['id'])->delete();
-            return $this->msgOut(true, [], '200');
+            return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］

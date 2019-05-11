@@ -81,7 +81,7 @@ class ArticlesController extends ApiMainController
                     Cache::put('CachePic', $CachePic, $minutes);
                 }
             }
-            return $this->msgOut(true, [], '200');
+            return $this->msgOut(true);
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -149,7 +149,7 @@ class ArticlesController extends ApiMainController
             $flowConfigure->save();
             $editDataEloq->audit_flow_id = $flowConfigure->id;
             $editDataEloq->save();
-            return $this->msgOut(true, [], '200');
+            return $this->msgOut(true);
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -174,7 +174,7 @@ class ArticlesController extends ApiMainController
                 foreach ($pic_path as $k => $v) {
                     $this->deleteArticlePic($v);
                 }
-                return $this->msgOut(true, [], '200');
+                return $this->msgOut(true);
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -216,7 +216,7 @@ class ArticlesController extends ApiMainController
                 $this->eloqM::where('sort', '>', $this->inputs['front_sort'])->where('sort', '<=', $this->inputs['rearways_sort'])->decrement('sort');
             }
             $frontData->save();
-            return $this->msgOut(true, [], '200');
+            return $this->msgOut(true);
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -240,7 +240,7 @@ class ArticlesController extends ApiMainController
             $this->eloqM::where('sort', '<', $topData['sort'])->increment('sort');
             $topData->sort = 1;
             $topData->save();
-            return $this->msgOut(true, [], '200');
+            return $this->msgOut(true);
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -274,7 +274,7 @@ class ArticlesController extends ApiMainController
             $CachePic[$pic['name']] = $pic;
         }
         Cache::put('CachePic', $CachePic, $minutes);
-        return $this->msgOut(true, $pic, '200');
+        return $this->msgOut(true, $pic);
     }
     public function uploadImg($file, $url_path, $rule)
     {

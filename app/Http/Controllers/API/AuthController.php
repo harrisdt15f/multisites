@@ -94,7 +94,7 @@ class AuthController extends ApiMainController
                         $tokenResult->token->expires_at
                     )->toDateTimeString(),
                 ];
-                return $this->msgOut(true, $data, '200', '密码更改成功');
+                return $this->msgOut(true, $data);
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
@@ -237,7 +237,7 @@ class AuthController extends ApiMainController
             OauthAccessTokens::clearOldToken($targetUserEloq->id); //删除相关登录的token
             if ($targetUserEloq->delete()) {
 //删除用户
-                return $this->msgOut(true, []);
+                return $this->msgOut(true);
             }
         } else {
             return $this->msgOut(false, [], '100004');
@@ -261,7 +261,7 @@ class AuthController extends ApiMainController
             $targetUserEloq->password = Hash::make($this->inputs['password']);
             if ($targetUserEloq->save()) {
 //用户更新密码
-                return $this->msgOut(true, []);
+                return $this->msgOut(true);
             }
         } else {
             return $this->msgOut(false, [], '100004');

@@ -36,7 +36,7 @@ class ActivityTypeController extends ApiMainController
         $this->editAssignment($editData, $this->inputs);
         try {
             $editData->save();
-            return $this->msgOut(true, [], '200');
+            return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］

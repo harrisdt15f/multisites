@@ -183,7 +183,7 @@ class UserHandleController extends ApiMainController
                 $adminApplyResult = $adminApplyEloq->fill($auditData);
                 $adminApplyResult->save();
                 DB::commit();
-                return $this->msgOut(true, []);
+                return $this->msgOut(true);
             } catch (\Exception $e) {
                 DB::rollBack();
                 $errorObj = $e->getPrevious()->getPrevious();
@@ -276,7 +276,7 @@ class UserHandleController extends ApiMainController
                 $applyUserEloq->status = $this->inputs['status'];
                 $applyUserEloq->save();
                 DB::commit();
-                return $this->msgOut(true, []);
+                return $this->msgOut(true);
             } catch (\Exception $e) {
                 DB::rollBack();
                 $errorObj = $e->getPrevious()->getPrevious();
@@ -320,7 +320,7 @@ class UserHandleController extends ApiMainController
                 $userAdmitFlowLog->fill($data);
                 $userAdmitFlowLog->save();
                 DB::commit();
-                return $this->msgOut(true, []);
+                return $this->msgOut(true);
             } catch (\Exception $e) {
                 DB::rollBack();
                 $errorObj = $e->getPrevious()->getPrevious();

@@ -69,7 +69,7 @@ class RegionController extends ApiMainController
                 $configure = new $this->eloqM();
                 $configure->fill($addDatas);
                 $configure->save();
-                return $this->msgOut(true, [], '200');
+                return $this->msgOut(true);
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
@@ -101,7 +101,7 @@ class RegionController extends ApiMainController
             $editDataEloq->region_name = $this->inputs['region_name'];
             try {
                 $editDataEloq->save();
-                return $this->msgOut(true, [], '200');
+                return $this->msgOut(true);
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
