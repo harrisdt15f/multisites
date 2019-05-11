@@ -122,16 +122,10 @@ class AuthController extends ApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $group = PartnerAdminGroupAccess::find($this->inputs['group_id']);
-        $role = Arr::wrap(json_decode($group->role, true));
+        $role = $group->role == '*' ? Arr::wrap($group->role) : Arr::wrap(json_decode($group->role, true));
         $isManualRecharge = false;
-        $FundOperationArray = PartnerMenus::select('id')->orWhere('route', '/manage')->orWhere('route',
-            '/manage/prize-manage')->orWhere('route', '/manage/recharge')->get()->toArray();
-        foreach ($FundOperationArray as $value) {
-            if (in_array($value['id'], $role, true)) {
-                $isManualRecharge = true;
-                break;
-            }
-        }
+        $FundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
+        $isManualRecharge = in_array($FundOperation['id'], $role);
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
         $input['platform_id'] = $this->currentPlatformEloq->platform_id;

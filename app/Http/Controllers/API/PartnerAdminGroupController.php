@@ -44,18 +44,18 @@ class PartnerAdminGroupController extends ApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-//        unique:books,label
-        $data['platform_id'] = $this->currentPlatformEloq->platform_id;
-        $data['group_name'] = $this->inputs['group_name'];
-        $data['role'] = $this->inputs['role'];
-        $role = json_decode($this->inputs['role']); //[1,2,3,4,5]
-        $objPartnerAdminGroup = new $this->eloqM;
-        $objPartnerAdminGroup->fill($data);
-        //检查是否有人工充值权限
-        $FundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
-        $isManualRecharge = in_array($FundOperation['id'], $role);
         try {
+            $data['platform_id'] = $this->currentPlatformEloq->platform_id;
+            $data['group_name'] = $this->inputs['group_name'];
+            $data['role'] = $this->inputs['role'];
+            $role = $this->inputs['role'] == '*' ? Arr::wrap($this->inputs['role']) : Arr::wrap(json_decode($this->inputs['role'], true));
+            $objPartnerAdminGroup = new $this->eloqM;
+            $objPartnerAdminGroup->fill($data);
             $objPartnerAdminGroup->save();
+            //检查是否有人工充值权限
+            $fundOperationCriteriaEloq = PartnerMenus::select('id')->where('route', '/manage/recharge')->first();
+            $isManualRecharge = in_array($fundOperationCriteriaEloq['id'], $role);
+            //如果有人工充值权限   添加 fund_operation_group 表
             if ($isManualRecharge === true) {
                 $FundOperationGroup = new FundOperationGroup();
                 $FundOperationData = [
@@ -101,12 +101,12 @@ class PartnerAdminGroupController extends ApiMainController
         }
         $id = $this->inputs['id'];
         $datas = $this->eloqM::find($id);
-        $role = $this->inputs['role'] == '*' ? $this->inputs['role'] : Arr::wrap(json_decode($this->inputs['role'],
+        $role = $this->inputs['role'] == '*' ? Arr::wrap($this->inputs['role']) : Arr::wrap(json_decode($this->inputs['role'],
             true));
         if (!is_null($datas)) {
             DB::beginTransaction();
             $datas->group_name = $this->inputs['group_name'];
-            $datas->role = $role;
+            $datas->role = $this->inputs['role'];
             //#####################################################################################
             try {
                 $datas->save();
@@ -134,6 +134,7 @@ class PartnerAdminGroupController extends ApiMainController
                                 $fundOperationData = [
                                     'admin_id' => $adminData->id,
                                     'created_at' => date('Y-m-d H:i:s'),
+                                    'updated_at' => date('Y-m-d H:i:s'),
                                 ];
                                 $fundOperationDatas[] = $fundOperationData;
                             }
@@ -184,23 +185,26 @@ class PartnerAdminGroupController extends ApiMainController
             ['id', '=', $id],
             ['group_name', '=', $this->inputs['group_name']],
         ])->first();
-        //检查是否有人工充值权限
-        $role = Arr::wrap(json_decode($datas->role, true));
-        $FundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
-        $isManualRecharge = in_array($FundOperation['id'], $role, true);
         if (!is_null($datas)) {
             try {
-                if ($isManualRecharge === true) {
-                    $FundOperation = new FundOperation();
-                    $FundOperationGroup = new FundOperationGroup();
-                    //需要删除的资金表 admin
-                    $adminsData = PartnerAdminUsers::select('id')->where('group_id', $id)->get()->toArray();
-                    $admins = array_column($adminsData, 'id');
-                    $FundOperation->whereIn('admin_id', $admins)->delete();
-                    $FundOperationGroup->where('group_id', $id)->delete();
-                }
                 PartnerAdminUsers::where('group_id', $datas->id)->update(['group_id' => null]);
                 $datas->delete();
+                //检查是否有人工充值权限
+                $role = $datas->role == '*' ? Arr::wrap($datas->role) : Arr::wrap(json_decode($datas->role, true));
+                $FundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
+                $isManualRecharge = in_array($FundOperation['id'], $role, true);
+                //如果有有人工充值权限   删除  FundOperation  FundOperationGroup 表
+                if ($isManualRecharge === true) {
+                    $FundOperationGroup = new FundOperationGroup();
+                    $FundOperationGroup->where('group_id', $id)->delete();
+                    //需要删除的资金表 admin
+                    $fundOperationEloq = new FundOperation();
+                    $adminsData = PartnerAdminUsers::select('id')->where('group_id', $id)->get();
+                    $admins = array_column($adminsData->toArray(), 'id');
+                    if (!is_null($adminsData)) {
+                        $fundOperationEloq->whereIn('admin_id', $admins)->delete();
+                    }
+                }
                 return $this->msgOut(true, []);
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();

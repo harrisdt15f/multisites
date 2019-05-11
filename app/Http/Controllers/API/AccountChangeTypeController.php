@@ -92,7 +92,7 @@ class AccountChangeTypeController extends ApiMainController
         }
         try {
             $pastEloq->delete();
-            return $this->msgout(false, [], '200');
+            return $this->msgout(true, [], '200');
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
