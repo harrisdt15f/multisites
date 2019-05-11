@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\models\PartnerAdminGroupAccess;
 use App\models\PartnerAdminRoute;
 use App\models\PartnerMenus;
+use App\models\PlatForms;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -33,10 +35,13 @@ class ApiMainController extends Controller
         $this->middleware(function ($request, $next) {
             $this->partnerAdmin = Auth::guard('admin')->user();
             //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
-            try {
+            $this->currentPartnerAccessGroup = new PartnerAdminGroupAccess();
+            $this->currentPlatformEloq = new PlatForms();
+            if ($this->partnerAdmin->platform()->exists()) {
                 $this->currentPlatformEloq = $this->partnerAdmin->platform; //获取目前账号用户属于平台的对象
-                $this->currentPartnerAccessGroup = $this->partnerAdmin->accessGroup;
-            } catch (\Exception $e) {
+                if ($this->partnerAdmin->accessGroup()->exists()) {
+                    $this->currentPartnerAccessGroup = $this->partnerAdmin->accessGroup;
+                }
             }
             $this->inputs = Input::all(); //获取所有相关的传参数据
             //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
@@ -48,7 +53,7 @@ class ApiMainController extends Controller
                 }
             }
             $this->adminOperateLog();
-            $this->eloqM = 'App\\models\\' . $this->eloqM; // 当前的eloquent
+            $this->eloqM = 'App\\models\\'.$this->eloqM; // 当前的eloquent
             return $next($request);
         });
     }
@@ -118,7 +123,7 @@ class ApiMainController extends Controller
         } else {
             $code = $code == '' ? $defaultErrorCode : $code;
         }
-        $message = $message == '' ? __('codes-map.' . $code) : $message;
+        $message = $message == '' ? __('codes-map.'.$code) : $message;
         $datas = [
             'success' => $success,
             'code' => $code,
@@ -130,7 +135,7 @@ class ApiMainController extends Controller
 
     protected function modelWithNameSpace($eloqM = null)
     {
-        return !is_null($eloqM) ? 'App\\models\\' . $eloqM : $eloqM;
+        return !is_null($eloqM) ? 'App\\models\\'.$eloqM : $eloqM;
     }
 
     /**
@@ -174,7 +179,7 @@ class ApiMainController extends Controller
                     $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
                     if ($sign == 'LIKE') {
                         $sign = strtolower($sign);
-                        $value = '%' . $value . '%';
+                        $value = '%'.$value.'%';
                     }
                     $whereCriteria = [];
                     $whereCriteria[] = $key;
@@ -209,7 +214,7 @@ class ApiMainController extends Controller
                         $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
                         if ($sign == 'LIKE') {
                             $sign = strtolower($sign);
-                            $value = '%' . $value . '%';
+                            $value = '%'.$value.'%';
                         }
                         $whereCriteria = [];
                         $whereCriteria[] = $key;
@@ -312,7 +317,7 @@ class ApiMainController extends Controller
                                                 $queryConditions) ? $queryConditions[$key] : '=';
                                             if ($sign == 'LIKE') {
                                                 $sign = strtolower($sign);
-                                                $value = '%' . $value . '%';
+                                                $value = '%'.$value.'%';
                                             }
                                             $query->where($key, $sign, $value);
                                         }
