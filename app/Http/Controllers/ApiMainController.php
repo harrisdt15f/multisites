@@ -34,24 +34,24 @@ class ApiMainController extends Controller
     {
         $this->middleware(function ($request, $next) {
             $this->partnerAdmin = Auth::guard('admin')->user();
-            //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
-            $this->currentPartnerAccessGroup = new PartnerAdminGroupAccess();
-            $this->currentPlatformEloq = new PlatForms();
-            if ($this->partnerAdmin->platform()->exists()) {
-                $this->currentPlatformEloq = $this->partnerAdmin->platform; //获取目前账号用户属于平台的对象
-                if ($this->partnerAdmin->accessGroup()->exists()) {
-                    $this->currentPartnerAccessGroup = $this->partnerAdmin->accessGroup;
+            if (!is_null($this->partnerAdmin)) {
+                //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
+                $this->currentPartnerAccessGroup = new PartnerAdminGroupAccess();
+                $this->currentPlatformEloq = new PlatForms();
+                if ($this->partnerAdmin->platform()->exists()) {
+                    $this->currentPlatformEloq = $this->partnerAdmin->platform; //获取目前账号用户属于平台的对象
+                    if ($this->partnerAdmin->accessGroup()->exists()) {
+                        $this->currentPartnerAccessGroup = $this->partnerAdmin->accessGroup;
+                    }
+                    $this->menuAccess();
+                    $this->routeAccessCheck();
+                    if ($this->routeAccessable === false) {
+                        return $this->msgOut($this->routeAccessable, [], '100001');
+                    }
                 }
             }
             $this->inputs = Input::all(); //获取所有相关的传参数据
             //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
-            if (!is_null($this->currentPlatformEloq)) {
-                $this->menuAccess();
-                $this->routeAccessCheck();
-                if ($this->routeAccessable === false) {
-                    return $this->msgOut($this->routeAccessable, [], '100001');
-                }
-            }
             $this->adminOperateLog();
             $this->eloqM = 'App\\models\\'.$this->eloqM; // 当前的eloquent
             return $next($request);
@@ -93,7 +93,6 @@ class ApiMainController extends Controller
                 }
             }
         }
-
     }
 
     /**
