@@ -16,6 +16,7 @@ class PartnerLogsApi extends BaseModel
 
     protected $fillable = [
         'description',
+        'log_uuid',
         'origin',
         'type',
         'result',

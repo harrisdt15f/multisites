@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 class ApiMainController extends Controller
 {
@@ -26,6 +27,8 @@ class ApiMainController extends Controller
     protected $eloqM = ''; // 当前的eloquent
     protected $currentRouteName; //当前的route name;
     protected $routeAccessable = false;
+    protected $log_uuid;//当前的logId
+
 
     /**
      * AdminMainController constructor.
@@ -100,8 +103,10 @@ class ApiMainController extends Controller
      */
     private function adminOperateLog(): void
     {
+        $this->log_uuid = Str::orderedUuid()->getNodeHex();
         $datas['input'] = $this->inputs;
         $datas['route'] = $this->currentOptRoute;
+        $datas['log_uuid'] = $this->log_uuid;
         $log = json_encode($datas, JSON_UNESCAPED_UNICODE);
         Log::channel('apibyqueue')->info($log);
     }
