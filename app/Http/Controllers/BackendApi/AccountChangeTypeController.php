@@ -1,43 +1,40 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\BackendApi;
 
-use App\Http\Controllers\ApiMainController;
 use Illuminate\Support\Facades\Validator;
 
-class RouteController extends ApiMainController
+class AccountChangeTypeController extends BackEndApiMainController
 {
-    protected $eloqM = 'PartnerAdminRoute';
+    protected $eloqM = 'AccountChangeType';
 
     public function detail()
     {
-        $fixedJoin = 1;
-        $withTable = 'menu';
-        $withSearchAbleFields = ['label'];
-        $searchAbleFields = ['route_name', 'menu_group_id', 'title'];
-        $datas = $this->generateSearchQuery($this->eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields);
-        return $this->msgOut(true, $datas);
+        $searchAbleFields = ['name', 'sign', 'in_out', 'type'];
+        $datas = $this->generateSearchQuery($this->eloqM, $searchAbleFields);
+        return $this->msgout(true, $datas);
     }
 
     public function add()
     {
         $validator = Validator::make($this->inputs, [
-            'route_name' => 'required|string',
-            'menu_group_id' => 'required|numeric',
-            'title' => 'required|string',
+            'name' => 'required|string',
+            'sign' => 'required|string',
+            'in_out' => 'required|numeric|in:0,1',
+            'type' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
+            return $this->msgout(false, [], '400', $validator->errors()->first());
         }
-        $checkData = $this->eloqM::where('route_name', $this->inputs['route_name'])->first();
+        $checkData = $this->eloqM::where('sign', $this->inputs['sign'])->first();
         if (!is_null($checkData)) {
-            return $this->msgOut(false, [], '101400');
+            return $this->msgout(false, [], '101201');
         }
+        $eloqM = new $this->eloqM;
         try {
-            $routeEloq = new $this->eloqM;
-            $routeEloq->fill($this->inputs);
-            $routeEloq->save();
-            return $this->msgOut(true);
+            $eloqM->fill($this->inputs);
+            $eloqM->save();
+            return $this->msgout(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -49,30 +46,30 @@ class RouteController extends ApiMainController
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
-            'route_name' => 'required|string',
-            'menu_group_id' => 'required|numeric',
-            'title' => 'required|string',
+            'name' => 'required|string',
+            'sign' => 'required|string',
+            'in_out' => 'required|numeric|in:0,1',
+            'type' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
+            return $this->msgout(false, [], '400', $validator->errors()->first());
         }
         $pastEloq = $this->eloqM::find($this->inputs['id']);
         if (is_null($pastEloq)) {
-            return $this->msgOut(false, [], '101401');
+            return $this->msgout(false, [], '101200');
         }
-        $checkRouteName = $this->eloqM::where(function ($query) {
-            $query->where('route_name', $this->inputs['route_name'])
-                ->where('id', '!=', $this->inputs['id']);
+        $checkData = $this->eloqM::where(function ($query) {
+            $query->where('sign', $this->inputs['sign'])->where('id', '!=', $this->inputs['id']);
         })->first();
-        if (!is_null($checkRouteName)) {
-            return $this->msgOut(false, [], '101400');
+        if (!is_null($checkData)) {
+            return $this->msgout(false, [], '101201');
         }
         $editData = $this->inputs;
         unset($editData['id']);
         try {
             $this->editAssignment($pastEloq, $editData);
             $pastEloq->save();
-            return $this->msgOut(true);
+            return $this->msgout(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -86,15 +83,15 @@ class RouteController extends ApiMainController
             'id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
+            return $this->msgout(false, [], '400', $validator->errors()->first());
         }
         $pastEloq = $this->eloqM::find($this->inputs['id']);
         if (is_null($pastEloq)) {
-            return $this->msgOut(false, [], '101401');
+            return $this->msgout(false, [], '101200');
         }
         try {
             $pastEloq->delete();
-            return $this->msgOut(true);
+            return $this->msgout(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］

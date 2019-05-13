@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\BackendApi;
 
-use App\Http\Controllers\ApiMainController;
 use App\models\PartnerMenus;
 use function GuzzleHttp\json_decode;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 
-class MenuController extends ApiMainController
+class MenuController extends BackEndApiMainController
 {
     protected $eloqM = 'PartnerMenus';
 

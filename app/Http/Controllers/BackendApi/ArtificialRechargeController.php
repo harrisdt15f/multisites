@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\BackendApi;
 
-use App\Http\Controllers\ApiMainController;
 use App\models\ArtificialRechargeLog;
 use App\models\AuditFlow;
 use App\models\FundOperation;
@@ -10,7 +9,7 @@ use App\models\UserHandleModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class ArtificialRechargeController extends ApiMainController
+class ArtificialRechargeController extends BackEndApiMainController
 {
     protected $eloqM = 'UserHandleModel';
     public function users()

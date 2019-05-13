@@ -14,10 +14,10 @@ use Illuminate\Http\Request;
 |
 */
 //Auth::routes();
-Route::group(['middleware' => ['api'], 'namespace' => 'API'], function () {
+Route::group(['middleware' => ['api'], 'namespace' => 'BackendApi'], function () {
     Route::match(['post', 'options'], 'login', ['as' => 'login', 'uses' => 'AuthController@login']);
 });
-Route::group(['middleware' => ['api', 'auth:admin'], 'namespace' => 'API'], function () {
+Route::group(['middleware' => ['api', 'auth:admin'], 'namespace' => 'BackendApi'], function () {
     $sRouteDir = Config::get('route.admin');
     $aRouteFiles = glob($sRouteDir . '*.php');
     foreach ($aRouteFiles as $sRouteFile) {
