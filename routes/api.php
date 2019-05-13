@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 */
 //Auth::routes();
 Route::group(['middleware' => ['api'], 'namespace' => 'BackendApi'], function () {
-    Route::match(['post', 'options'], 'login', ['as' => 'login', 'uses' => 'AuthController@login']);
+    Route::match(['post', 'options'], 'login', ['as' => 'login', 'uses' => 'BackendAuthController@login']);
 });
 Route::group(['middleware' => ['api', 'auth:admin'], 'namespace' => 'BackendApi'], function () {
     $sRouteDir = Config::get('route.admin');
