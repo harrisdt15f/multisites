@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\BackendApi;
 
-use App\Http\Controllers\ApiMainController;
 use App\models\ArtificialRechargeLog;
 use App\models\FundOperation;
 use App\models\FundOperationGroup;
@@ -11,7 +10,7 @@ use App\models\PartnerSysConfigures;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class FundOperationController extends ApiMainController
+class FundOperationController extends BackEndApiMainController
 {
     public function admins()
     {

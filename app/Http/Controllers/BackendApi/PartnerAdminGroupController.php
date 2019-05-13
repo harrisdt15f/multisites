@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\BackendApi;
 
-use App\Http\Controllers\ApiMainController;
 use App\models\FundOperation;
 use App\models\FundOperationGroup;
 use App\models\PartnerAdminUsers;
@@ -13,7 +12,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class PartnerAdminGroupController extends ApiMainController
+class PartnerAdminGroupController extends BackEndApiMainController
 {
     protected $postUnaccess = ['id', 'updated_at', 'created_at']; //不需要接收的字段
 

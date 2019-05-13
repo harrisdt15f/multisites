@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\BackendApi;
 
-use App\Http\Controllers\ApiMainController;
 use App\models\FundOperation;
 use App\models\OauthAccessTokens;
 use App\models\PartnerAdminGroupAccess;
@@ -18,7 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
-class AuthController extends ApiMainController
+class AuthController extends BackEndApiMainController
 {
     public $successStatus = 200;
 

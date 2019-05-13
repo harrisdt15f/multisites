@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\BackendApi;
 
-use App\Http\Controllers\ApiMainController;
 use Illuminate\Support\Facades\Validator;
 
-class ActivityInfosController extends ApiMainController
+class ActivityInfosController extends BackEndApiMainController
 {
     protected $eloqM = 'ActivityInfos';
     //活动列表

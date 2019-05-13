@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\BackendApi;
 
-use App\Http\Controllers\ApiMainController;
 use App\models\AuditFlow;
 use App\models\HandleUserAccounts;
 use App\models\PassworAuditLists;
@@ -12,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
-class UserHandleController extends ApiMainController
+class UserHandleController extends BackEndApiMainController
 {
     protected $eloqM = 'UserHandleModel';
 

@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\BackendApi;
 
-use App\Http\Controllers\ApiMainController;
 use Illuminate\Support\Facades\Validator;
 
-class ActivityTypeController extends ApiMainController
+class ActivityTypeController extends BackEndApiMainController
 {
     protected $eloqM = 'ActivityType';
     public function detail()

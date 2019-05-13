@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\BackendApi;
 
-use App\Http\Controllers\ApiMainController;
 use App\models\AuditFlow;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
-class ArticlesController extends ApiMainController
+class ArticlesController extends BackEndApiMainController
 {
     protected $eloqM = 'Articles';
     //文章列表

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\BackendApi;
 
-use App\Http\Controllers\ApiMainController;
 use App\models\AccountChangeReport;
 use App\models\AuditFlow;
 use App\models\FundOperation;
@@ -11,7 +10,7 @@ use App\models\UserHandleModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class RechargeCheckController extends ApiMainController
+class RechargeCheckController extends BackEndApiMainController
 {
     protected $eloqM = 'ArtificialRechargeLog';
 

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\BackendApi;
 
+use App\Http\Controllers\Controller;
 use App\models\PartnerAdminGroupAccess;
 use App\models\PartnerAdminRoute;
 use App\models\PartnerMenus;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
-class ApiMainController extends Controller
+class BackEndApiMainController extends Controller
 {
     protected $inputs;
     protected $partnerAdmin; //当前的商户用户

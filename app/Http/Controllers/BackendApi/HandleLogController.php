@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers\BackendApi;
 
-use App\Http\Controllers\ApiMainController;
 
-class HandleLogController extends ApiMainController
+class HandleLogController extends BackEndApiMainController
 {
     protected $eloqM = 'PartnerLogsApi';
 

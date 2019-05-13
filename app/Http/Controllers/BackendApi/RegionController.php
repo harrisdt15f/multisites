@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\BackendApi;
 
-use App\Http\Controllers\ApiMainController;
 use Illuminate\Support\Facades\Validator;
 
-class RegionController extends ApiMainController
+class RegionController extends BackEndApiMainController
 {
     protected $eloqM = 'Region';
 

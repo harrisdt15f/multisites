@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\BackendApi;
 
 use App\Events\IssueGenerateEvent;
-use App\Http\Controllers\ApiMainController;
 use App\models\LotteriesModel;
 use App\models\MethodsModel;
 use Illuminate\Support\Carbon;
@@ -11,7 +10,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Validator;
 
-class LotteriesController extends ApiMainController
+class LotteriesController extends BackEndApiMainController
 {
     protected $eloqM = 'LotteriesModel';
 

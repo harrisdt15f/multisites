@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\BackendApi;
 
-use App\Http\Controllers\ApiMainController;
 use Illuminate\Support\Facades\Validator;
 
-class AccountChangeTypeController extends ApiMainController
+class AccountChangeTypeController extends BackEndApiMainController
 {
     protected $eloqM = 'AccountChangeType';
 
