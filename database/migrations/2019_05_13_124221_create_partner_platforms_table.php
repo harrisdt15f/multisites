@@ -18,6 +18,7 @@ class CreatePartnerPlatformsTable extends Migration {
 			$table->string('sign', 16);
 			$table->string('platform_name', 64);
 			$table->string('db_sign', 32)->default('default');
+            $table->string('db_name', 32);
 			$table->string('theme', 32)->default('default');
 			$table->integer('prize_group_min')->default(1700);
 			$table->integer('prize_group_max')->default(1980);

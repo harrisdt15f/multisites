@@ -23,8 +23,9 @@ class CreateMethodsTable extends Migration {
 			$table->string('method_group', 32);
 			$table->string('method_row', 32)->nullable();
 			$table->integer('group_sort')->default(0);
-			$table->integer('tab_sort')->default(0);
+            $table->integer('row_sort')->default(0);
 			$table->integer('method_sort')->default(0);
+            $table->boolean('show')->default(1);
 			$table->boolean('status')->default(0);
 			$table->timestamps();
 		});

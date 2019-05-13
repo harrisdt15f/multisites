@@ -15,15 +15,15 @@ class CreateTraceListTable extends Migration {
 		Schema::create('trace_list', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->string('sign', 32);
 			$table->integer('user_id');
 			$table->integer('top_id');
 			$table->integer('parent_id');
 			$table->string('rid', 256);
 			$table->string('username', 64);
+            $table->boolean('is_tester')->default(0);
 			$table->string('series_id', 32);
-			$table->string('lottery_id', 32);
-			$table->string('method_id', 32);
+            $table->string('lottery_sign', 32);
+            $table->string('method_sign', 32);
 			$table->string('method_name', 32);
 			$table->string('issue', 32);
 			$table->text('bet_number');

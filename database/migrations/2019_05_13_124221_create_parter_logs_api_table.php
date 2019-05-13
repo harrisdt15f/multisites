@@ -15,6 +15,7 @@ class CreateParterLogsApiTable extends Migration {
 		Schema::create('parter_logs_api', function(Blueprint $table)
 		{
 			$table->increments('id');
+            $table->string('log_uuid', 45)->nullable();
 			$table->text('description', 65535)->nullable();
 			$table->string('origin', 200)->nullable();
 			$table->enum('type', array('log','store','change','delete'));
@@ -36,6 +37,13 @@ class CreateParterLogsApiTable extends Migration {
 			$table->string('user_agent', 200)->nullable();
 			$table->text('inputs', 65535)->nullable();
 			$table->text('route', 65535)->nullable();
+            $table->integer('route_id')->unsigned()->nullable();
+            $table->integer('admin_id')->nullable();
+            $table->string('admin_name', 64)->nullable();
+            $table->string('username', 64)->nullable();
+            $table->integer('menu_id')->nullable();
+            $table->string('menu_label', 64)->nullable();
+            $table->text('menu_path', 65535)->nullable();
 			$table->timestamps();
 		});
 	}

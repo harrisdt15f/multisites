@@ -3,7 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateAccountChangeTypeTable extends Migration {
+class CreateAccountChangeTypePastTable extends Migration
+{
 
 	/**
 	 * Run the migrations.
@@ -12,7 +13,7 @@ class CreateAccountChangeTypeTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('account_change_type', function(Blueprint $table)
+        Schema::create('account_change_type_past', function (Blueprint $table)
 		{
 			$table->increments('id');
 			$table->string('name', 32);
@@ -29,6 +30,8 @@ class CreateAccountChangeTypeTable extends Migration {
 			$table->boolean('to_id')->default(1);
 			$table->boolean('frozen_type')->default(1);
 			$table->boolean('activity_sign')->default(1);
+            $table->integer('admin_id')->default(0);
+            $table->timestamps();
 		});
 	}
 
@@ -40,7 +43,7 @@ class CreateAccountChangeTypeTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('account_change_type');
+        Schema::drop('account_change_type_past');
 	}
 
 }

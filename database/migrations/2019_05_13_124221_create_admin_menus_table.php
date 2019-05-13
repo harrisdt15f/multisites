@@ -15,10 +15,11 @@ class CreateAdminMenusTable extends Migration {
 		Schema::create('admin_menus', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->integer('pid')->default(0);
+            $table->integer('pid');
 			$table->string('rid', 64)->default('');
 			$table->string('title', 64);
-			$table->string('route', 64);
+            $table->string('route', 64)->default('');
+            $table->string('api_path', 64)->default('');
 			$table->integer('sort')->default(0);
 			$table->string('css_class', 64)->default('');
 			$table->boolean('type')->default(1);

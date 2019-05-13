@@ -1,11 +1,11 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateOauthAccessTokenProvidersTable extends Migration
 {
+
     /**
      * Run the migrations.
      *
@@ -17,12 +17,9 @@ class CreateOauthAccessTokenProvidersTable extends Migration
             $table->string('oauth_access_token_id', 100)->primary();
             $table->string('provider');
             $table->timestamps();
-            $table->foreign('oauth_access_token_id')
-                ->references('id')
-                ->on('oauth_access_tokens')
-                ->onDelete('cascade');
         });
     }
+
 
     /**
      * Reverse the migrations.
@@ -31,6 +28,7 @@ class CreateOauthAccessTokenProvidersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('oauth_access_token_providers');
+        Schema::drop('oauth_access_token_providers');
     }
+
 }

@@ -25,9 +25,9 @@ class CreateUserTransferRecordsTable extends Migration {
 			$table->integer('add_time');
 			$table->integer('day');
 			$table->timestamps();
-			$table->index(['from_user_id','to_user_id','add_time']);
 			$table->index(['from_user_id','add_time']);
 			$table->index(['to_user_id','add_time']);
+            $table->index(['from_user_id', 'to_user_id', 'add_time']);
 		});
 	}
 

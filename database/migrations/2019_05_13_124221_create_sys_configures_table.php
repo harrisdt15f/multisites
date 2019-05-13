@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreatePartnerSysConfiguresTable extends Migration {
+class CreateSysConfiguresTable extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,11 +12,12 @@ class CreatePartnerSysConfiguresTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('partner_sys_configures', function(Blueprint $table)
+		Schema::create('sys_configures', function(Blueprint $table)
 		{
 			$table->increments('id');
 			$table->integer('pid')->comment('父类id, 顶级为0');
-			$table->string('sign', 32)->index('sys_configures_sign_index')->comment('sign 标识');
+            $table->string('rid', 64)->default('')->comment('关系id');
+			$table->string('sign', 32)->index()->comment('sign 标识');
 			$table->string('name', 32)->comment('标题');
 			$table->string('description', 128)->nullable()->comment('描述');
 			$table->string('value', 128)->comment('配置选项value');
@@ -35,7 +36,7 @@ class CreatePartnerSysConfiguresTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('partner_sys_configures');
+		Schema::drop('sys_configures');
 	}
 
 }

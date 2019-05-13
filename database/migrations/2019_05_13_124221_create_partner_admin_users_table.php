@@ -15,7 +15,7 @@ class CreatePartnerAdminUsersTable extends Migration {
 		Schema::create('partner_admin_users', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->string('name', 10);
+            $table->string('name', 64);
             $table->string('email')->unique('users_email_unique');
 			$table->dateTime('email_verified_at')->nullable();
 			$table->string('password');

@@ -16,15 +16,12 @@ class CreateUserAccountsTable extends Migration {
 		{
 			$table->increments('id');
 			$table->integer('user_id');
-			$table->integer('top_id');
-			$table->integer('parent_id');
-			$table->string('rid', 256);
 			$table->bigInteger('balance')->unsigned()->default(0);
 			$table->bigInteger('frozen')->unsigned()->default(0);
 			$table->boolean('status')->default(0);
 			$table->timestamps();
-			$table->index(['user_id','frozen']);
 			$table->index(['user_id','balance']);
+            $table->index(['user_id', 'frozen']);
 		});
 	}
 

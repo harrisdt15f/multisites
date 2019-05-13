@@ -19,7 +19,12 @@ class CreateAdminAccessLogsTable extends Migration {
 			$table->string('admin_username', 64)->default('');
 			$table->string('route', 64);
 			$table->char('ip', 15);
+            $table->char('proxy_ip', 15)->default('0.0.0.0');
 			$table->text('params', 65535);
+            $table->string('device', 16)->default('');
+            $table->string('platform', 32)->default('');
+            $table->string('browser', 32)->default('');
+            $table->text('agent', 65535);
 			$table->integer('day');
 			$table->timestamps();
 		});

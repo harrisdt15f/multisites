@@ -15,7 +15,6 @@ class CreateProjectsTable extends Migration {
 		Schema::create('projects', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->string('sign', 32);
 			$table->integer('user_id');
 			$table->string('username', 64)->default('');
 			$table->integer('top_id')->index();
@@ -23,18 +22,19 @@ class CreateProjectsTable extends Migration {
 			$table->integer('parent_id');
 			$table->boolean('is_tester')->default(0);
 			$table->string('series_id', 32);
-			$table->string('lottery_id', 32);
-			$table->string('method_id', 32);
+            $table->string('lottery_sign', 32);
+            $table->string('method_sign', 32);
 			$table->string('method_name', 32);
 			$table->integer('user_prize_group');
 			$table->integer('bet_prize_group');
 			$table->integer('trace_id')->default(0);
 			$table->boolean('mode');
 			$table->integer('times')->unsigned();
-			$table->decimal('single_price', 15, 4);
-			$table->decimal('total_price', 15, 4);
+            $table->decimal('price', 15, 4);
+            $table->decimal('total_cost', 15, 4)->default(0.0000);
 			$table->string('issue', 32);
 			$table->text('bet_number', 16777215);
+            $table->string('open_number', 64)->default('');
 			$table->string('prize_set', 64);
 			$table->boolean('is_win')->default(0);
 			$table->decimal('bonus', 15, 4)->default(0.0000);
@@ -57,9 +57,9 @@ class CreateProjectsTable extends Migration {
 			$table->integer('time_trace')->default(0);
 			$table->integer('time_cancel')->default(0);
 			$table->integer('time_stat')->default(0);
-			$table->index(['sign','lottery_id','time_bought']);
-			$table->index(['sign','issue']);
-			$table->index(['sign','user_id','lottery_id','time_bought']);
+            $table->index(['user_id', 'lottery_sign', 'time_bought']);
+            $table->index(['lottery_sign', 'time_bought']);
+            $table->index(['issue', 'user_id']);
 		});
 	}
 
