@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\BackendApi;
 
-use App\Http\Controllers\ApiMainController;
 use Illuminate\Support\Facades\Validator;
 
-class CategoryController extends ApiMainController
+class CategoryController extends BackEndApiMainController
 {
     protected $eloqM = 'Category';
     //分类管理列表

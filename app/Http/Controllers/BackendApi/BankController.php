@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\BackendApi;
 
-use App\Http\Controllers\ApiMainController;
 use Illuminate\Support\Facades\Validator;
 
-class BankController extends ApiMainController
+class BankController extends BackEndApiMainController
 {
     protected $eloqM = 'Banks';
     public function detail()

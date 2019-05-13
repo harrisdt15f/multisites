@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\BackendApi;
 
-use App\Http\Controllers\ApiMainController;
 use Illuminate\Support\Facades\Validator;
 
-class ConfiguresController extends ApiMainController
+class ConfiguresController extends BackEndApiMainController
 {
     protected $eloqM = 'PartnerSysConfigures';
 
