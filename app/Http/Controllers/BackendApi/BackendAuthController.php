@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
-class AuthController extends BackEndApiMainController
+class BackendAuthController extends BackEndApiMainController
 {
     public $successStatus = 200;
 
