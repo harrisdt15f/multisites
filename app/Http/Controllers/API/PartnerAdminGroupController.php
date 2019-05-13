@@ -48,7 +48,8 @@ class PartnerAdminGroupController extends ApiMainController
             $data['platform_id'] = $this->currentPlatformEloq->platform_id;
             $data['group_name'] = $this->inputs['group_name'];
             $data['role'] = $this->inputs['role'];
-            $role = $this->inputs['role'] == '*' ? Arr::wrap($this->inputs['role']) : Arr::wrap(json_decode($this->inputs['role'], true));
+            $role = $this->inputs['role'] == '*' ? Arr::wrap($this->inputs['role']) : Arr::wrap(json_decode($this->inputs['role'],
+                true));
             $objPartnerAdminGroup = new $this->eloqM;
             $objPartnerAdminGroup->fill($data);
             $objPartnerAdminGroup->save();
@@ -171,7 +172,7 @@ class PartnerAdminGroupController extends ApiMainController
      * 删除组管理员角色
      * @return JsonResponse
      */
-    public function destroy()
+    public function destroy(): ?JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -187,7 +188,9 @@ class PartnerAdminGroupController extends ApiMainController
         ])->first();
         if (!is_null($datas)) {
             try {
-                PartnerAdminUsers::where('group_id', $datas->id)->update(['group_id' => null]);
+                if ($datas->adminUsers()->exists()) {
+                    $datas->adminUsers()->delete();
+                }
                 $datas->delete();
                 //检查是否有人工充值权限
                 $role = $datas->role == '*' ? Arr::wrap($datas->role) : Arr::wrap(json_decode($datas->role, true));
