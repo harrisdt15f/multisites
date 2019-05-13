@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\BackendApi;
 
 use App\Http\Controllers\ApiMainController;
 use App\models\AccountChangeReport;
