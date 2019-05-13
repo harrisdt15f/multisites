@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\WebControllers;
 
 use App\models\PartnerMenus;
 use function GuzzleHttp\json_decode;

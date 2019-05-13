@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\WebControllers;
 
 
+use App\Http\Controllers\Controller;
 use App\models\PartnerMenus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
