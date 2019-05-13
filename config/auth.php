@@ -40,13 +40,12 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-
-        'api' => [
+        'frontend-web' => [
             'driver' => 'passport',
             'provider' => 'users',
         ],
         // ** New guard **
-        'admin' => [
+        'backend' => [
             'driver' => 'passport',
             'provider' => 'admins',
         ],
