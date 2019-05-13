@@ -6,6 +6,8 @@ use App\models\ArtificialRechargeLog;
 use App\models\AuditFlow;
 use App\models\FundOperation;
 use App\models\UserHandleModel;
+use App\models\UserRechargeHistory;
+use App\models\UserRechargeLog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -47,16 +49,33 @@ class ArtificialRechargeController extends BackEndApiMainController
         }
         DB::beginTransaction();
         try {
+            //扣除管理员额度
             $newFund = $adminOperationFund - $this->inputs['amount'];
             $adminFundEdit = ['fund' => $newFund];
+            $adminFundData->fill($adminFundEdit);
+            $adminFundData->save();
+            //插入审核表
+            $auditFlowID = $this->insertAuditFlow($partnerAdmin->id, $partnerAdmin->name, $this->inputs['apply_note']);
+            //添加管理员额度明细表
             $ArtificialRechargeLog = new ArtificialRechargeLog();
             $type = ArtificialRechargeLog::ADMIN;
             $in_out = ArtificialRechargeLog::DECREMENT;
             $comment = '[给用户人工充值]==>-' . $this->inputs['amount'] . '|[目前额度]==>' . $newFund;
-            $adminFundData->fill($adminFundEdit);
-            $adminFundData->save();
-            $AuditFlowID = $this->insertAuditFlow($partnerAdmin->id, $partnerAdmin->name, $this->inputs['apply_note']);
-            $this->insertOperationDatas($ArtificialRechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $userData->id, $userData->nickname, $this->inputs['amount'], $comment, $AuditFlowID);
+            $this->insertOperationDatas($ArtificialRechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $userData->id, $userData->nickname, $this->inputs['amount'], $comment, $auditFlowID);
+            //用户 user_recharge_history 表
+            $userRechargeHistory = new UserRechargeHistory();
+            $deposit_mode = UserRechargeHistory::ARTIFICIAL;
+            $status = UserRechargeHistory::UNDERWAYAUDIT;
+            $audit_flow_id = $auditFlowID;
+            $rechargeHistoryArr = insertRechargeHistoryArr($userData->id, $userData->nickname, $userData->is_tester, $userData->top_id, $this->inputs['amount'], $audit_flow_id, $status, $deposit_mode);
+            $userRechargeHistory->fill($rechargeHistoryArr);
+            $userRechargeHistory->save();
+            // 用户 user_recharge_log 表
+            $rchargeLogeEloq = new UserRechargeLog();
+            $log_num = $this->log_uuid;
+            $rechargeLogArr = insertRechargeLogArr($userRechargeHistory->company_order_num, $log_num, $deposit_mode);
+            $rchargeLogeEloq->fill($rechargeLogArr);
+            $rchargeLogeEloq->save();
             DB::commit();
             return $this->msgOut(true, [], '200', '操作成功，请等待管理员审核');
         } catch (Exception $e) {

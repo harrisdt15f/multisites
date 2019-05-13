@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\BackendApi;
 
 use App\models\AccountChangeReport;
@@ -7,6 +6,7 @@ use App\models\AuditFlow;
 use App\models\FundOperation;
 use App\models\UserAccounts;
 use App\models\UserHandleModel;
+use App\models\UserRechargeHistory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -36,24 +36,28 @@ class RechargeCheckController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors());
         }
-        // 人工充值记录表
-        $RechargeLog = $this->eloqM::find($this->inputs['id']);
-        $RechargeLogEdit = ['status' => 1];
         // 审核表
-        $auditFlow = auditFlow::where('id', $RechargeLog->audit_flow_id)->first();
         $RechargeLog = $this->eloqM::find($this->inputs['id']);
+        $auditFlow = auditFlow::where('id', $RechargeLog->audit_flow_id)->first();
         if ($RechargeLog->status !== 0) {
             return $this->msgOut(false, [], '100900');
         }
         DB::beginTransaction();
         try {
+            // 修改 artificial_recharge_log 表 的审核状态
+            $RechargeLogEdit = ['status' => $RechargeLog::AUDITSUCCESS];
+            $RechargeLog->fill($RechargeLogEdit);
+            $RechargeLog->save();
+            // 修改 user_recharge_history 表 的审核状态
+            $historyEloq = UserRechargeHistory::where('audit_flow_id', $RechargeLog->audit_flow_id)->first();
+            $historyEdit = ['status' => $historyEloq::AUDITSUCCESS];
+            $historyEloq->fill($historyEdit);
+            $historyEloq->save();
             //用户金额表
             $UserAccounts = UserAccounts::where('user_id', $RechargeLog->user_id)->lockForUpdate()->first();
             $userData = UserHandleModel::where('id', $RechargeLog->user_id)->with('account')->first()->toArray();
             $balance = $userData['account']['balance'] + $RechargeLog['amount'];
             $UserAccountsEdit = ['balance' => $balance];
-            $RechargeLog->fill($RechargeLogEdit);
-            $RechargeLog->save();
             $this->auditFlowEdit($auditFlow, $this->partnerAdmin, $this->inputs['auditor_note']);
             $UserAccounts->fill($UserAccountsEdit);
             $UserAccounts->save();
@@ -82,22 +86,30 @@ class RechargeCheckController extends BackEndApiMainController
         if ($RechargeLog->status !== 0) {
             return $this->msgOut(false, [], '100900');
         }
-        $RechargeLogEdit = ['status' => 2];
-        $auditFlow = auditFlow::where('id', $RechargeLog->audit_flow_id)->first();
         $adminFundData = FundOperation::where('admin_id', $RechargeLog->admin_id)->first();
         $newFund = $adminFundData->fund + $RechargeLog->amount;
-        $adminFundDataEdit = ['fund' => $newFund];
-        $RechargeLogeloqM = new $this->eloqM;
-        $type = 0;
-        $in_out = 1;
-        $comment = '[充值审核失败额度返还]==>+' . $RechargeLog['amount'] . '|[目前额度]==>' . $newFund;
         DB::beginTransaction();
         try {
+            // 修改 artificial_recharge_log 表 的审核状态
+            $RechargeLogEdit = ['status' => $RechargeLog::AUDITFAILURE];
             $RechargeLog->fill($RechargeLogEdit);
             $RechargeLog->save();
+            // 修改 user_recharge_history 表 的审核状态
+            $historyEloq = UserRechargeHistory::where('audit_flow_id', $RechargeLog->audit_flow_id)->first();
+            $historyEdit = ['status' => $historyEloq::AUDITFAILURE];
+            $historyEloq->fill($historyEdit);
+            $historyEloq->save();
+            //退还管理员人工充值额度
+            $auditFlow = auditFlow::where('id', $RechargeLog->audit_flow_id)->first();
+            $adminFundDataEdit = ['fund' => $newFund];
             $this->auditFlowEdit($auditFlow, $this->partnerAdmin, $this->inputs['auditor_note']);
             $adminFundData->fill($adminFundDataEdit);
             $adminFundData->save();
+            //返还额度后  插入artificial_recharge_log 记录表
+            $RechargeLogeloqM = new $this->eloqM;
+            $type = $RechargeLogeloqM::SYSTEM;
+            $in_out = $RechargeLogeloqM::INCREMENT;
+            $comment = '[充值审核失败额度返还]==>+' . $RechargeLog['amount'] . '|[目前额度]==>' . $newFund;
             $this->insertOperationDatas($RechargeLogeloqM, $type, $in_out, null, null, $auditFlow->admin_id, $auditFlow->admin_name, $RechargeLog->amount, $comment, null);
             DB::commit();
             return $this->msgOut(true);
