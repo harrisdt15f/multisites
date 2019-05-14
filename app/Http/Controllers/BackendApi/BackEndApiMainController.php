@@ -37,7 +37,7 @@ class BackEndApiMainController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            $this->partnerAdmin = Auth::guard('admin')->user();
+            $this->partnerAdmin = Auth::guard('backend')->user();
             if (!is_null($this->partnerAdmin)) {
                 //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
                 $this->currentPartnerAccessGroup = new PartnerAdminGroupAccess();
