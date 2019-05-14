@@ -23,6 +23,8 @@ class BackendAuthController extends BackEndApiMainController
 
     protected $eloqM = 'PartnerAdminUsers';
 
+    protected $currentGuard ='backend';
+
     /**
      * Login user and create token
      *
@@ -37,17 +39,15 @@ class BackendAuthController extends BackEndApiMainController
             'remember_me' => 'boolean',
         ]);
         $credentials = request(['email', 'password']);
-        if (!Auth::attempt($credentials)) {
+        if (! $token = auth($this->currentGuard)->attempt($credentials)) {
             return $this->msgOut(false, [], '100002');
         }
-        $user = $request->user();
-        $tokenResult = $this->refreshActivatePartnerToken($user);
+        $user = $request->user($this->currentGuard);
+//        $tokenResult = $this->refreshActivatePartnerToken($user);
         $data = [
-            'access_token' => $tokenResult->accessToken,
+            'access_token' => $token,
             'token_type' => 'Bearer',
-            'expires_at' => Carbon::parse(
-                $tokenResult->token->expires_at
-            )->toDateTimeString(),
+            'expires_at' => auth()->factory()->getTTL() * 60
         ];
         return $this->msgOut(true, $data);
     }
