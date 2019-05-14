@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\BackendApi;
+namespace App\Http\Controllers\BackendApi\DeveloperUsage\Frontend;
 
+use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use Illuminate\Support\Facades\Validator;
 
-class FrontendAllocatedModelController extends BackEndApiMainController
+class FrontendAppRouteController extends BackEndApiMainController
 {
-    protected $eloqM = 'FrontendAllocatedModel';
+    protected $eloqM = 'FrontendAppRoute';
 
     public function detail()
     {
@@ -17,26 +18,21 @@ class FrontendAllocatedModelController extends BackEndApiMainController
     public function add()
     {
         $validator = Validator::make($this->inputs, [
-            'label' => 'required|string',
-            'en_name' => 'required|string',
-            'pid' => 'required|numeric',
-            'type' => 'required|numeric',
+            'route_name' => 'required|string',
+            'frontend_model_id' => 'required|numeric',
+            'title' => 'required|string',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $checkLabelEloq = $this->eloqM::where('label', $this->inputs['label'])->first();
-        if (!is_null($checkLabelEloq)) {
-            return $this->msgOut(false, [], '101600');
-        }
-        $checkEnNamelEloq = $this->eloqM::where('en_name', $this->inputs['en_name'])->first();
-        if (!is_null($checkEnNamelEloq)) {
-            return $this->msgOut(false, [], '101601');
+        $checkData = $this->eloqM::where('route_name', $this->inputs['route_name'])->first();
+        if (!is_null($checkData)) {
+            return $this->msgOut(false, [], 101500);
         }
         try {
-            $modelEloq = new $this->eloqM;
-            $modelEloq->fill($this->inputs);
-            $modelEloq->save();
+            $routeEloq = new $this->eloqM;
+            $routeEloq->fill($this->inputs);
+            $routeEloq->save();
             return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
@@ -53,9 +49,9 @@ class FrontendAllocatedModelController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $checkidIdEloq = $this->eloqM::find($this->inputs['id']);
-        if (is_null($checkidIdEloq)) {
-            return $this->msgOut(false, [], '101602');
+        $checkData = $this->eloqM::find($this->inputs['id']);
+        if (is_null($checkData)) {
+            return $this->msgOut(false, [], 101501);
         }
         try {
             $this->eloqM::where('id', $this->inputs['id'])->delete();
