@@ -7,7 +7,7 @@
  */
 
 //管理员角色相关
-Route::group(['prefix' => 'partner-admin-group'], function () {
+Route::group(['prefix' => 'partner-admin-group','namespace' => 'Admin'], function () {
     $namePrefix = 'partnerAdminGroup.';
     $controller = 'PartnerAdminGroupController@';
     //添加管理员角色

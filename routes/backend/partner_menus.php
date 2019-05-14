@@ -7,7 +7,7 @@
  */
 
 //菜单相关
-Route::group(['prefix' => 'menu'], function () {
+Route::group(['prefix' => 'menu','namespace' => 'DeveloperUsage\Menu'], function () {
     $namePrefix = 'menu.';
     $controller = 'MenuController@';
     //获取商户用户的所有菜单

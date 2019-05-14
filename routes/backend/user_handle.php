@@ -7,7 +7,7 @@
  */
 
 //管理总代用户与玩家
-Route::group(['prefix' => 'user-handle'], function () {
+Route::group(['prefix' => 'user-handle','namespace' => 'Users'], function () {
     $namePrefix = 'userhandle.';
     $controller = 'UserHandleController@';
     //创建总代

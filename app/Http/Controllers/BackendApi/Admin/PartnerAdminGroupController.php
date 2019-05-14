@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\BackendApi;
+namespace App\Http\Controllers\BackendApi\Admin;
 
+use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\models\FundOperation;
 use App\models\FundOperationGroup;
 use App\models\PartnerAdminUsers;

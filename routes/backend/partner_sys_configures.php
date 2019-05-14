@@ -1,7 +1,7 @@
 <?php
 
 //配置相关
-Route::group(['prefix' => 'partner-sys-configures'], function () {
+Route::group(['prefix' => 'partner-sys-configures','namespace' => 'Admin'], function () {
     $namePrefix = 'configures.';
     $controller = 'ConfiguresController@';
     Route::match(['get', 'options'], 'detail', ['as' => $namePrefix . 'detail', 'uses' => $controller . 'getConfiguresList']);
