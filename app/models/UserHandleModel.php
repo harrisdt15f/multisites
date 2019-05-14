@@ -4,11 +4,10 @@ namespace App\models;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use SMartins\PassportMultiauth\HasMultiAuthApiTokens;
 
 class UserHandleModel extends Authenticatable
 {
-    use Notifiable, HasMultiAuthApiTokens;
+    use Notifiable;
 
     const TYPE_TOP_AGENT     = 1;
     const TYPE_AGENT         = 2;

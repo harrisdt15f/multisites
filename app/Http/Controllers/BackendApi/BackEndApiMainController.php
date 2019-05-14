@@ -29,6 +29,8 @@ class BackEndApiMainController extends Controller
     protected $currentRouteName; //当前的route name;
     protected $routeAccessable = false;
     protected $log_uuid;//当前的logId
+    protected $currentGuard ='backend';
+    protected $currentAuth;
 
 
     /**
@@ -37,7 +39,8 @@ class BackEndApiMainController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            $this->partnerAdmin = Auth::guard('backend')->user();
+            $this->currentAuth = auth($this->currentGuard);
+            $this->partnerAdmin = $this->currentAuth->user();
             if (!is_null($this->partnerAdmin)) {
                 //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
                 $this->currentPartnerAccessGroup = new PartnerAdminGroupAccess();

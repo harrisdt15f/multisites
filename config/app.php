@@ -176,14 +176,12 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
-        Laravel\Passport\PassportServiceProvider::class,
+        //device agents
         Jenssegers\Agent\AgentServiceProvider::class,
         //Cors
         Barryvdh\Cors\ServiceProvider::class,
         //Iseeds
         Orangehill\Iseed\IseedServiceProvider::class,
-        //multiauth
-        SMartins\PassportMultiauth\Providers\MultiauthServiceProvider::class,
         //jwt
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
     ],
