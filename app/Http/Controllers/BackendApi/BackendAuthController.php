@@ -14,6 +14,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class BackendAuthController extends BackEndApiMainController
@@ -217,10 +218,14 @@ class BackendAuthController extends BackEndApiMainController
 
     /**
      * Logout user (Revoke the token)
+     * @param  Request  $request
      * @return JsonResponse [string] message
      */
-    public function logout(): JsonResponse
+    public function logout(Request $request): JsonResponse
     {
+        $throtleKey = Str::lower($this->currentAuth->user()->email.'|'.$request->ip());
+        $request->session()->invalidate();
+        $this->limiter()->clear($throtleKey);
         $this->currentAuth->logout();
         $this->currentAuth->invalidate();
         return response()->json([
