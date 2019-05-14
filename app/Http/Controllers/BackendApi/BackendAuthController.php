@@ -23,8 +23,6 @@ class BackendAuthController extends BackEndApiMainController
 
     protected $eloqM = 'PartnerAdminUsers';
 
-    protected $currentGuard ='backend';
-
     /**
      * Login user and create token
      *
@@ -38,32 +36,32 @@ class BackendAuthController extends BackEndApiMainController
             'password' => 'required|string',
             'remember_me' => 'boolean',
         ]);
+//        $remember = $request->get('remember_me');
         $credentials = request(['email', 'password']);
-        if (! $token = auth($this->currentGuard)->attempt($credentials)) {
+        if (!$token = $this->currentAuth->attempt($credentials)) {
             return $this->msgOut(false, [], '100002');
         }
-        $user = $request->user($this->currentGuard);
+//        $user = $request->user($this->currentGuard);
 //        $tokenResult = $this->refreshActivatePartnerToken($user);
+        $expireInMinute = $this->currentAuth->factory()->getTTL();
+        $expireAt = Carbon::now()->addMinutes($expireInMinute)->format('Y-m-d H:i:s');
         $data = [
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'expires_at' => auth()->factory()->getTTL() * 60
+            'expires_at' => $expireAt
         ];
         return $this->msgOut(true, $data);
     }
 
-    private function refreshActivatePartnerToken($user)
+    /**
+     * Refresh a token.
+     *
+     * @return JsonResponse
+     */
+    public function refresh()
     {
-        OauthAccessTokens::clearOldToken($user->id);
-        $tokenResult = $user->createToken('Personal Access Token');
-        $token = $tokenResult->token;
-        if (isset($this->inputs['remember_me'])) {
-            $token->expires_at = Carbon::now()->addWeeks(1);
-        } else {
-            $token->expires_at = Carbon::now()->addMinute(30);
-        }
-        $token->save();
-        return $tokenResult;
+        $token = $this->currentAuth->refresh();
+        return $token;
     }
 
     /**
@@ -85,13 +83,13 @@ class BackendAuthController extends BackEndApiMainController
             $this->partnerAdmin->password = Hash::make($this->inputs['password']);
             try {
                 $this->partnerAdmin->save();
-                $tokenResult = $this->refreshActivatePartnerToken($this->partnerAdmin);
+                $token = $this->refresh();
+                $expireInMinute = $this->currentAuth->factory()->getTTL();
+                $expireAt = Carbon::now()->addMinutes($expireInMinute)->format('Y-m-d H:i:s');
                 $data = [
-                    'access_token' => $tokenResult->accessToken,
+                    'access_token' => $token,
                     'token_type' => 'Bearer',
-                    'expires_at' => Carbon::parse(
-                        $tokenResult->token->expires_at
-                    )->toDateTimeString(),
+                    'expires_at' => $expireAt,
                 ];
                 return $this->msgOut(true, $data);
             } catch (\Exception $e) {
@@ -105,12 +103,11 @@ class BackendAuthController extends BackEndApiMainController
 
     /**
      * Register api
-     *
-     * @return Response
+     * @return JsonResponse
      */
-    public function register(Request $request)
+    public function register(): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($this->inputs, [
             'name' => 'required|unique:partner_admin_users',
             'email' => 'required|email|unique:partner_admin_users',
             'password' => 'required',
@@ -124,8 +121,8 @@ class BackendAuthController extends BackEndApiMainController
         $role = $group->role == '*' ? Arr::wrap($group->role) : Arr::wrap(json_decode($group->role, true));
         $isManualRecharge = false;
         $FundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
-        $isManualRecharge = in_array($FundOperation['id'], $role);
-        $input = $request->all();
+        $isManualRecharge = in_array($FundOperation['id'], $role, true);
+        $input = $this->inputs;
         $input['password'] = bcrypt($input['password']);
         $input['platform_id'] = $this->currentPlatformEloq->platform_id;
         $user = PartnerAdminUsers::create($input);
@@ -135,7 +132,9 @@ class BackendAuthController extends BackEndApiMainController
             $FundOperationEloq->fill($insertData);
             $FundOperationEloq->save();
         }
-        $success['token'] = $user->createToken('MyApp')->accessToken;
+        $credentials = request(['email', 'password']);
+        $token = $this->currentAuth->attempt($credentials);
+        $success['token'] = $token;
         $success['name'] = $user->name;
         return $this->msgOut(true, $success);
     }
@@ -144,7 +143,7 @@ class BackendAuthController extends BackEndApiMainController
      * 获取所有当前平台的商户管理员用户
      * @return JsonResponse
      */
-    public function allUser()
+    public function allUser(): ?JsonResponse
     {
         try {
             $data = $this->currentPlatformEloq->partnerAdminUsers;
@@ -159,7 +158,10 @@ class BackendAuthController extends BackEndApiMainController
         }
     }
 
-    public function updateUserGroup()
+    /**
+     * @return JsonResponse|null
+     */
+    public function updateUserGroup(): ?JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -183,21 +185,19 @@ class BackendAuthController extends BackEndApiMainController
      *
      * @return Response
      */
-    public function details()
+    public function details(): Response
     {
-        $user = Auth::user();
+        $user = $this->partnerAdmin;
         return $this->msgOut(true, $user);
     }
 
     /**
      * Logout user (Revoke the token)
-     *
-     * @param  Request  $request
      * @return JsonResponse [string] message
      */
-    public function logout(Request $request): JsonResponse
+    public function logout(): JsonResponse
     {
-        $request->user()->token()->revoke();
+        $this->currentAuth->logout();
         return response()->json([
             'message' => 'Successfully logged out',
         ]);
@@ -214,7 +214,7 @@ class BackendAuthController extends BackEndApiMainController
         return response()->json($request->user());
     }
 
-    public function deletePartnerAdmin()
+    public function deletePartnerAdmin(): ?JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -243,7 +243,7 @@ class BackendAuthController extends BackEndApiMainController
         }
     }
 
-    public function updatePAdmPassword()
+    public function updatePAdmPassword(): ?JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',

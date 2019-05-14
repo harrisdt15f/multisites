@@ -5,7 +5,6 @@ namespace App\models;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-//use SMartins\PassportMultiauth\HasMultiAuthApiTokens;
 
 class PartnerAdminUsers extends Authenticatable implements JWTSubject
 {
