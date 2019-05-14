@@ -41,6 +41,8 @@ class BackendAuthController extends BackEndApiMainController
         if (!$token = $this->currentAuth->attempt($credentials)) {
             return $this->msgOut(false, [], '100002');
         }
+        $this->currentAuth->logout();
+        $token = $this->currentAuth->attempt($credentials);
 //        $user = $request->user($this->currentGuard);
 //        $tokenResult = $this->refreshActivatePartnerToken($user);
         $expireInMinute = $this->currentAuth->factory()->getTTL();

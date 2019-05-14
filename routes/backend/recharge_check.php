@@ -1,6 +1,6 @@
 <?php
 //玩家管理-充值审核
-Route::group(['prefix' => 'recharge-check'], function () {
+Route::group(['prefix' => 'recharge-check','namespace' => 'Users\Fund'], function () {
     $namePrefix = 'RechargeCheck.';
     $controller = 'RechargeCheckController@';
     Route::match(['post', 'options'], 'detail', ['as' => $namePrefix . 'detail', 'uses' => $controller . 'detail']);
