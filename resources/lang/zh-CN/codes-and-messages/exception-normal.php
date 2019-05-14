@@ -59,4 +59,11 @@ return [
     //RouteController
     '101400' => 'route_name已存在',
     '101401' => '该路由不存在',
+    //FrontendWebRouteController
+    '101500' => 'route_name已存在',
+    '101501' => '该路由不存在',
+    //FrontendAllocatedModel
+    '101600' => '名称已存在',
+    '101601' => 'en_name已存在',
+    '101602' => '模块不存在',
 ];
