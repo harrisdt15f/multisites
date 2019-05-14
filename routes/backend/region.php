@@ -1,7 +1,7 @@
 <?php
 
 //省市地区相关
-Route::group(['prefix' => 'region'], function () {
+Route::group(['prefix' => 'region','namespace' => 'Users\District'], function () {
     $namePrefix = 'region.';
     $controller = 'RegionController@';
     Route::match(['get', 'options'], 'detail', ['as' => $namePrefix . 'detail', 'uses' => $controller . 'detail']);

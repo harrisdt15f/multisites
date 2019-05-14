@@ -1,6 +1,6 @@
 <?php
 //额度管理
-Route::group(['prefix' => 'fundOperation'], function () {
+Route::group(['prefix' => 'fundOperation','namespace' => 'Admin\FundOperate'], function () {
     $namePrefix = 'fundOperation.';
     $controller = 'FundOperationController@';
     Route::match(['post', 'options'], 'admins', ['as' => $namePrefix . 'admins', 'uses' => $controller . 'admins']);

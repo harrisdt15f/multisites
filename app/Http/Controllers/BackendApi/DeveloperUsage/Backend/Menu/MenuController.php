@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\BackendApi\DeveloperUsage\Menu;
+namespace App\Http\Controllers\BackendApi\DeveloperUsage\Backend\Menu;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\models\PartnerMenus;

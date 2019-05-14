@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\BackendApi;
+namespace App\Http\Controllers\BackendApi\DeveloperUsage\Backend\Routes;
 
+use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use Illuminate\Support\Facades\Validator;
 
 class RouteController extends BackEndApiMainController

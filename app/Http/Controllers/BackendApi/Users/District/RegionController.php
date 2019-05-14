@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\BackendApi;
+namespace App\Http\Controllers\BackendApi\Users\District;
 
+use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use Illuminate\Support\Facades\Validator;
 
 class RegionController extends BackEndApiMainController

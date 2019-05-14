@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\BackendApi;
+namespace App\Http\Controllers\BackendApi\Admin\FundOperate;
 
+use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use Illuminate\Support\Facades\Validator;
 
 class BankController extends BackEndApiMainController

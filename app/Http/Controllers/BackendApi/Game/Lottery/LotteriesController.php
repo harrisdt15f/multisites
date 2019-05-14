@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\BackendApi;
+namespace App\Http\Controllers\BackendApi\Game\Lottery;Game\Lottery;
 
 use App\Events\IssueGenerateEvent;
+use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\models\LotteriesModel;
 use App\models\MethodsModel;
 use Illuminate\Support\Carbon;

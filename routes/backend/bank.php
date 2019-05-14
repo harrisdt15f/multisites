@@ -1,6 +1,6 @@
 <?php
 //银行管理
-Route::group(['prefix' => 'bank'], function () {
+Route::group(['prefix' => 'bank','namespace' => 'Admin\FundOperate'], function () {
     $namePrefix = 'bank.';
     $controller = 'BankController@';
     Route::match(['post', 'options'], 'detail', ['as' => $namePrefix . 'detail', 'uses' => $controller . 'detail']);

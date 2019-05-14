@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\BackendApi;
+namespace App\Http\Controllers\BackendApi\Admin\Article;
 
+use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\models\AuditFlow;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;

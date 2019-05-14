@@ -7,7 +7,7 @@
  */
 
 //管理总代用户与玩家
-Route::group(['prefix' => 'log'], function () {
+Route::group(['prefix' => 'log','namespace' => 'Admin\Log'], function () {
     $namePrefix = 'loghandle.';
     $controller = 'HandleLogController@';
     //搜索日志列表

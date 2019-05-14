@@ -1,7 +1,7 @@
 <?php
 
 //活动相关
-Route::group(['prefix' => 'activity'], function () {
+Route::group(['prefix' => 'activity','namespace' => 'Admin\Activity'], function () {
     $namePrefix = 'activity.';
     $controller = 'ActivityInfosController@';
     Route::match(['post', 'options'], 'detail', ['as' => $namePrefix . 'detail', 'uses' => $controller . 'detail']);

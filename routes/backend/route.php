@@ -1,6 +1,6 @@
 <?php
 //开发管理-路由管理
-Route::group(['prefix' => 'route'], function () {
+Route::group(['prefix' => 'route','namespace' => 'DeveloperUsage\Backend\Routes'], function () {
     $namePrefix = 'route.';
     $controller = 'RouteController@';
     Route::match(['post', 'options'], 'detail', ['as' => $namePrefix . 'detail', 'uses' => $controller . 'detail']);

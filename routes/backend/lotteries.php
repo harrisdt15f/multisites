@@ -7,7 +7,7 @@
  */
 
 //游戏
-Route::group(['prefix' => 'lotteries'], function () {
+Route::group(['prefix' => 'lotteries','namespace' => 'Game\Lottery'], function () {
     $namePrefix = 'lotteries.';
     $controller = 'LotteriesController@';
     //游戏series获取接口

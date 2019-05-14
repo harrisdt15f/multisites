@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\BackendApi;
+namespace App\Http\Controllers\BackendApi\Admin\Log;
 
+
+use App\Http\Controllers\BackendApi\BackEndApiMainController;
 
 class HandleLogController extends BackEndApiMainController
 {
