@@ -13,7 +13,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        Commands\CachePicControl::class,
+        Commands\DeleteCachePicControl::class,
+        Commands\AllocationRechargeFundControl::class,
     ];
 
     /**
@@ -24,7 +25,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('CachePic')->daily()->at('03:00');
+        $schedule->command('DeleteCachePic')->daily()->at('03:00');
+        $schedule->command('AllocationRechargeFund')->daily()->at('00:00');
     }
 
     /**

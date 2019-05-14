@@ -1,5 +1,8 @@
 <?php
 
+use App\models\PartnerAdminUsers;
+use App\models\UserHandleModel;
+
 return [
 
     /*
@@ -14,7 +17,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
+        'guard' => 'frontend-web',
         'passwords' => 'users',
     ],
 
@@ -40,14 +43,13 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-
-        'api' => [
-            'driver' => 'passport',
+        'frontend-web' => [
+            'driver' => 'jwt',
             'provider' => 'users',
         ],
         // ** New guard **
-        'admin' => [
-            'driver' => 'passport',
+        'backend' => [
+            'driver' => 'jwt',
             'provider' => 'admins',
         ],
     ],
@@ -72,13 +74,13 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => \App\models\PartnerAdminUsers::class,
+            'model' => UserHandleModel::class,
         ],
 
         // ** New provider**
         'admins' => [
             'driver' => 'eloquent',
-            'model' => \App\models\PartnerAdminUsers::class,
+            'model' => PartnerAdminUsers::class,
         ],
 
         // 'users' => [

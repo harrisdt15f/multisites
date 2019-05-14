@@ -53,6 +53,7 @@ class ApiLogProcessor
             'browser' => $browser,
             'bs_version' => $bsVersion,
             'device_type' => $type,
+            'log_uuid' => $messageArr['log_uuid'],
         ];
         if ($osVersion) {
             $record['extra']['os_version'] = $osVersion;

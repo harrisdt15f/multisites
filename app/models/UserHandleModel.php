@@ -4,11 +4,10 @@ namespace App\models;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use SMartins\PassportMultiauth\HasMultiAuthApiTokens;
 
 class UserHandleModel extends Authenticatable
 {
-    use Notifiable, HasMultiAuthApiTokens;
+    use Notifiable;
 
     const TYPE_TOP_AGENT     = 1;
     const TYPE_AGENT         = 2;
@@ -22,7 +21,7 @@ class UserHandleModel extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'top_id', 'parent_id', 'rid', 'sign', 'platform_id','account_id', 'type', 'vip_level', 'is_tester', 'frozen_type', 'username', 'nickname', 'password', 'fund_password', 'prize_group', 'remember_token', 'level_deep', 'register_ip', 'last_login_ip', 'register_time', 'last_login_time', 'extend_info', 'status'
+        'username', 'top_id', 'parent_id', 'rid', 'sign', 'account_id', 'type', 'vip_level', 'is_tester', 'frozen_type', 'nickname', 'password', 'fund_password', 'prize_group', 'remember_token', 'level_deep', 'register_ip', 'last_login_ip', 'register_time', 'last_login_time', 'extend_info', 'status'
     ];
 
     /**

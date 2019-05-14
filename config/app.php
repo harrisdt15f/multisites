@@ -176,14 +176,14 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
-        Laravel\Passport\PassportServiceProvider::class,
+        //device agents
         Jenssegers\Agent\AgentServiceProvider::class,
         //Cors
         Barryvdh\Cors\ServiceProvider::class,
         //Iseeds
         Orangehill\Iseed\IseedServiceProvider::class,
-        //multiauth
-        SMartins\PassportMultiauth\Providers\MultiauthServiceProvider::class,
+        //jwt
+        Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
     ],
 
     /*
@@ -233,6 +233,8 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Agent' => Jenssegers\Agent\Facades\Agent::class,
+        'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
+        'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
     ],
 
 ];
