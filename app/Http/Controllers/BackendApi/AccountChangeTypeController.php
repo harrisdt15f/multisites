@@ -34,7 +34,7 @@ class AccountChangeTypeController extends BackEndApiMainController
         try {
             $eloqM->fill($this->inputs);
             $eloqM->save();
-            return $this->msgout(true, '200');
+            return $this->msgout(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -69,7 +69,7 @@ class AccountChangeTypeController extends BackEndApiMainController
         try {
             $this->editAssignment($pastEloq, $editData);
             $pastEloq->save();
-            return $this->msgout(true, '200');
+            return $this->msgout(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -91,7 +91,7 @@ class AccountChangeTypeController extends BackEndApiMainController
         }
         try {
             $pastEloq->delete();
-            return $this->msgout(true, [], '200');
+            return $this->msgout(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］

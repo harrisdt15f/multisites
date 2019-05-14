@@ -182,7 +182,7 @@ class UserHandleController extends BackEndApiMainController
                 $adminApplyResult = $adminApplyEloq->fill($auditData);
                 $adminApplyResult->save();
                 DB::commit();
-                return $this->msgOut(true, []);
+                return $this->msgOut(true);
             } catch (\Exception $e) {
                 DB::rollBack();
                 $errorObj = $e->getPrevious()->getPrevious();
@@ -275,7 +275,7 @@ class UserHandleController extends BackEndApiMainController
                 $applyUserEloq->status = $this->inputs['status'];
                 $applyUserEloq->save();
                 DB::commit();
-                return $this->msgOut(true, []);
+                return $this->msgOut(true);
             } catch (\Exception $e) {
                 DB::rollBack();
                 $errorObj = $e->getPrevious()->getPrevious();
@@ -319,7 +319,7 @@ class UserHandleController extends BackEndApiMainController
                 $userAdmitFlowLog->fill($data);
                 $userAdmitFlowLog->save();
                 DB::commit();
-                return $this->msgOut(true, []);
+                return $this->msgOut(true);
             } catch (\Exception $e) {
                 DB::rollBack();
                 $errorObj = $e->getPrevious()->getPrevious();

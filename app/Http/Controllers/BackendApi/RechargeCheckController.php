@@ -60,7 +60,7 @@ class RechargeCheckController extends BackEndApiMainController
             //用户帐变表
             $this->insertChangeReport($userData, $RechargeLog['amount'], $balance);
             DB::commit();
-            return $this->msgOut(true, [], '200');
+            return $this->msgOut(true);
         } catch (Exception $e) {
             DB::rollBack();
             $errorObj = $e->getPrevious()->getPrevious();
@@ -100,7 +100,7 @@ class RechargeCheckController extends BackEndApiMainController
             $adminFundData->save();
             $this->insertOperationDatas($RechargeLogeloqM, $type, $in_out, null, null, $auditFlow->admin_id, $auditFlow->admin_name, $RechargeLog->amount, $comment, null);
             DB::commit();
-            return $this->msgOut(true, [], '200');
+            return $this->msgOut(true);
         } catch (Exception $e) {
             DB::rollBack();
             $errorObj = $e->getPrevious()->getPrevious();

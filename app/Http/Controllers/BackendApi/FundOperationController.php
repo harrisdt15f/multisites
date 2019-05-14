@@ -68,7 +68,7 @@ class FundOperationController extends BackEndApiMainController
             $FundOperationAdmin->save();
             $this->insertOperationDatas($ArtificialRechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $admin_user->id, $admin_user->name, $this->inputs['fund'], $comment, null);
             DB::commit();
-            return $this->msgOut(true, [], '200');
+            return $this->msgOut(true);
         } catch (Exception $e) {
             DB::rollBack();
             $errorObj = $e->getPrevious()->getPrevious();
@@ -93,7 +93,7 @@ class FundOperationController extends BackEndApiMainController
             $editData = ['value' => $this->inputs['fund']];
             $SysConfiguresEloq->fill($editData);
             $SysConfiguresEloq->save();
-            return $this->msgOut(true, [], '200');
+            return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
