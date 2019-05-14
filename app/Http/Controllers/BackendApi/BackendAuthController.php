@@ -23,7 +23,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class BackendAuthController extends BackEndApiMainController
 {
-    use AuthenticatesUsers,AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+    use AuthenticatesUsers, AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     public $successStatus = 200;
 
@@ -43,7 +43,7 @@ class BackendAuthController extends BackEndApiMainController
             'remember_me' => 'boolean',
         ]);
         $credentials = request(['email', 'password']);
-        $this->maxAttempts =1;
+        $this->maxAttempts = 5;
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
         // the IP address of the client making these requests into this application.
@@ -52,7 +52,7 @@ class BackendAuthController extends BackEndApiMainController
             $seconds = $this->limiter()->availableIn(
                 $this->throttleKey($request)
             );
-            return $this->msgOut(false, [], '100002');
+            return $this->msgOut(false, [], '100005');
         }
         if (!$token = $this->currentAuth->attempt($credentials)) {
             return $this->msgOut(false, [], '100002');
@@ -71,11 +71,17 @@ class BackendAuthController extends BackEndApiMainController
 //        $tokenResult = $this->refreshActivatePartnerToken($user);
         $expireInMinute = $this->currentAuth->factory()->getTTL();
         $expireAt = Carbon::now()->addMinutes($expireInMinute)->format('Y-m-d H:i:s');
+        $user = $this->currentAuth->user();
+        JWTAuth::setToken($user->remember_token);
+        JWTAuth::invalidate();
+        $user->remember_token = $token;
+        $user->save();
         $data = [
             'access_token' => $token,
             'token_type' => 'Bearer',
             'expires_at' => $expireAt
         ];
+
         return $this->msgOut(true, $data);
     }
 
