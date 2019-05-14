@@ -3,27 +3,23 @@
 namespace App\Http\Controllers\BackendApi;
 
 use App\models\FundOperation;
-//use App\models\OauthAccessTokens;
 use App\models\PartnerAdminGroupAccess;
 use App\models\PartnerAdminUsers;
 use App\models\PartnerMenus;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class BackendAuthController extends BackEndApiMainController
 {
-    use AuthenticatesUsers,AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+    use AuthenticatesUsers;
 
     public $successStatus = 200;
 
@@ -43,7 +39,8 @@ class BackendAuthController extends BackEndApiMainController
             'remember_me' => 'boolean',
         ]);
         $credentials = request(['email', 'password']);
-        $this->maxAttempts =1;
+        $this->maxAttempts = 1;//1 times
+        $this->decayMinutes = 1;//1 minutes
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
         // the IP address of the client making these requests into this application.
@@ -52,25 +49,26 @@ class BackendAuthController extends BackEndApiMainController
             $seconds = $this->limiter()->availableIn(
                 $this->throttleKey($request)
             );
-            return $this->msgOut(false, [], '100002');
+            return $this->msgOut(false, [], '100005');
         }
         if (!$token = $this->currentAuth->attempt($credentials)) {
             return $this->msgOut(false, [], '100002');
         }
         $request->session()->regenerate();
         $this->clearLoginAttempts($request);
-//        $user = $this->currentAuth->setToken($token)->user();
-//        $this->currentAuth->invalidate();
-//        $this->currentAuth->invalidate();
-
         // If the login attempt was unsuccessful we will increment the number of attempts
         // to login and redirect the user back to the login form. Of course, when this
         // user surpasses their maximum number of attempts they will get locked out.
         $this->incrementLoginAttempts($request);
-//        $user = $request->user($this->currentGuard);
-//        $tokenResult = $this->refreshActivatePartnerToken($user);
         $expireInMinute = $this->currentAuth->factory()->getTTL();
         $expireAt = Carbon::now()->addMinutes($expireInMinute)->format('Y-m-d H:i:s');
+        $user = $this->currentAuth->user();
+        if (!is_null($user->remember_token)) {
+            JWTAuth::setToken($user->remember_token);
+            JWTAuth::invalidate();
+        }
+        $user->remember_token = $token;
+        $user->save();
         $data = [
             'access_token' => $token,
             'token_type' => 'Bearer',
@@ -106,10 +104,11 @@ class BackendAuthController extends BackEndApiMainController
         if (!Hash::check($this->inputs['old_password'], $this->partnerAdmin->password)) {
             return $this->msgOut(false, [], '100003');
         } else {
+            $token = $this->refresh();
             $this->partnerAdmin->password = Hash::make($this->inputs['password']);
+            $this->partnerAdmin->remember_token = $token;
             try {
                 $this->partnerAdmin->save();
-                $token = $this->refresh();
                 $expireInMinute = $this->currentAuth->factory()->getTTL();
                 $expireAt = Carbon::now()->addMinutes($expireInMinute)->format('Y-m-d H:i:s');
                 $data = [
@@ -219,10 +218,14 @@ class BackendAuthController extends BackEndApiMainController
 
     /**
      * Logout user (Revoke the token)
+     * @param  Request  $request
      * @return JsonResponse [string] message
      */
-    public function logout(): JsonResponse
+    public function logout(Request $request): JsonResponse
     {
+        $throtleKey = Str::lower($this->currentAuth->user()->email.'|'.$request->ip());
+        $request->session()->invalidate();
+        $this->limiter()->clear($throtleKey);
         $this->currentAuth->logout();
         $this->currentAuth->invalidate();
         return response()->json([
