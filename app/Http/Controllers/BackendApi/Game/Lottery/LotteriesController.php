@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\BackendApi\Game\Lottery;Game\Lottery;
+namespace App\Http\Controllers\BackendApi\Game\Lottery;
 
 use App\Events\IssueGenerateEvent;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
