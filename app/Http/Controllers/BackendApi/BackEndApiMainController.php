@@ -31,6 +31,7 @@ class BackEndApiMainController extends Controller
     protected $log_uuid;//当前的logId
     protected $currentGuard ='backend';
     protected $currentAuth;
+    protected $guard = 'admin';
 
 
     /**

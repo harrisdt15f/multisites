@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\BackendApi;
 
 use App\models\FundOperation;
-use App\models\OauthAccessTokens;
+//use App\models\OauthAccessTokens;
 use App\models\PartnerAdminGroupAccess;
 use App\models\PartnerAdminUsers;
 use App\models\PartnerMenus;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -16,9 +19,12 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class BackendAuthController extends BackEndApiMainController
 {
+    use AuthenticatesUsers,AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
     public $successStatus = 200;
 
     protected $eloqM = 'PartnerAdminUsers';
@@ -36,11 +42,31 @@ class BackendAuthController extends BackEndApiMainController
             'password' => 'required|string',
             'remember_me' => 'boolean',
         ]);
-//        $remember = $request->get('remember_me');
         $credentials = request(['email', 'password']);
+        $this->maxAttempts =1;
+        // If the class is using the ThrottlesLogins trait, we can automatically throttle
+        // the login attempts for this application. We'll key this by the username and
+        // the IP address of the client making these requests into this application.
+        if ($this->hasTooManyLoginAttempts($request)) {
+            $this->fireLockoutEvent($request);
+            $seconds = $this->limiter()->availableIn(
+                $this->throttleKey($request)
+            );
+            return $this->msgOut(false, [], '100002');
+        }
         if (!$token = $this->currentAuth->attempt($credentials)) {
             return $this->msgOut(false, [], '100002');
         }
+        $request->session()->regenerate();
+        $this->clearLoginAttempts($request);
+//        $user = $this->currentAuth->setToken($token)->user();
+//        $this->currentAuth->invalidate();
+//        $this->currentAuth->invalidate();
+
+        // If the login attempt was unsuccessful we will increment the number of attempts
+        // to login and redirect the user back to the login form. Of course, when this
+        // user surpasses their maximum number of attempts they will get locked out.
+        $this->incrementLoginAttempts($request);
 //        $user = $request->user($this->currentGuard);
 //        $tokenResult = $this->refreshActivatePartnerToken($user);
         $expireInMinute = $this->currentAuth->factory()->getTTL();
@@ -198,6 +224,7 @@ class BackendAuthController extends BackEndApiMainController
     public function logout(): JsonResponse
     {
         $this->currentAuth->logout();
+        $this->currentAuth->invalidate();
         return response()->json([
             'message' => 'Successfully logged out',
         ]);
@@ -233,7 +260,7 @@ class BackendAuthController extends BackEndApiMainController
             if ($token) {
                 $token->revoke(); //取消目前登录中的状态
             }
-            OauthAccessTokens::clearOldToken($targetUserEloq->id); //删除相关登录的token
+//            OauthAccessTokens::clearOldToken($targetUserEloq->id); //删除相关登录的token
             if ($targetUserEloq->delete()) {
 //删除用户
                 return $this->msgOut(true);

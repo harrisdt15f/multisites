@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\BackendApi;
+namespace App\Http\Controllers\BackendApi\Users\Fund;
 
+use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\models\ArtificialRechargeLog;
 use App\models\AuditFlow;
 use App\models\FundOperation;
