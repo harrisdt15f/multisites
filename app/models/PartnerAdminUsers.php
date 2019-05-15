@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class PartnerAdminUsers extends Authenticatable implements JWTSubject
 {
     use Notifiable;
+
     protected $table = 'partner_admin_users';
 
     /**

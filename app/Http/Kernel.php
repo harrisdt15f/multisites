@@ -45,6 +45,11 @@ class Kernel extends HttpKernel
             'bindings',
             'cors',
         ],
+        'frontend-api' => [
+            'throttle:10,1',
+            'bindings',
+            'cors',
+        ],
         'api' => [
             'throttle:60,1',
             'bindings',

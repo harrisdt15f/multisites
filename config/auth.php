@@ -47,6 +47,10 @@ return [
             'driver' => 'jwt',
             'provider' => 'users',
         ],
+        'frontend-mobile' => [
+            'driver' => 'jwt',
+            'provider' => 'users',
+        ],
         // ** New guard **
         'backend' => [
             'driver' => 'jwt',
