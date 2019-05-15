@@ -15,20 +15,12 @@ class MenuController extends BackEndApiMainController
 
     public function getAllMenu()
     {
-        $data = [
-            'success' => true,
-            'data' => $this->fullMenuLists,
-        ];
-        return response()->json($data);
+        return $this->msgOut(true,$this->fullMenuLists);
     }
 
     public function currentPartnerMenu()
     {
-        $data = [
-            'success' => true,
-            'data' => $this->partnerMenulists,
-        ];
-        return response()->json($data);
+        return $this->msgOut(true,$this->partnerMenulists);
     }
 
     /**

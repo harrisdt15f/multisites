@@ -125,6 +125,10 @@ class BackEndApiMainController extends Controller
      */
     protected function msgOut($success = false, $data = [], $code = '', $message = ''): JsonResponse
     {
+        /*if ($this->currentAuth->user())
+        {
+            $data['access_token']=$this->currentAuth->user()->remember_token;
+        }*/
         $defaultSuccessCode = 200;
         $defaultErrorCode = 404;
         if ($success === true) {

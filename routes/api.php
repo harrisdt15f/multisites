@@ -17,7 +17,11 @@ use Illuminate\Http\Request;
 Route::group(['middleware' => ['backend-api'], 'namespace' => 'BackendApi', 'prefix' => 'api'], function () {
     Route::match(['post', 'options'], 'login', ['as' => 'login', 'uses' => 'BackendAuthController@login']);
 });
-Route::group(['middleware' => ['backend-api', 'auth:backend'], 'namespace' => 'BackendApi', 'prefix' => 'api'], function () {
+Route::group([
+    'middleware' => ['backend-api', 'auth:backend'],
+    'namespace' => 'BackendApi',
+    'prefix' => 'api'
+], function () {
     $sRouteDir = base_path().'/routes/backend/';
     $aRouteFiles = glob($sRouteDir.'*.php');
     foreach ($aRouteFiles as $sRouteFile) {
