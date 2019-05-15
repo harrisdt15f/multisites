@@ -17,7 +17,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'frontend-mobile',
+        'guard' => 'web',
         'passwords' => 'users',
     ],
 
@@ -41,7 +41,7 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
-            'provider' => 'users',
+            'provider' => 'admins',
         ],
         'frontend-web' => [
             'driver' => 'jwt',
