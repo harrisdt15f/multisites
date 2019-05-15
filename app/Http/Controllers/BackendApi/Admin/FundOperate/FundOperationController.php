@@ -67,7 +67,7 @@ class FundOperationController extends BackEndApiMainController
         try {
             $FundOperationAdmin->fill($AdminEditData);
             $FundOperationAdmin->save();
-            $this->insertOperationDatas($ArtificialRechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $admin_user->id, $admin_user->name, $this->inputs['fund'], $comment, null);
+            insertOperationDatas($ArtificialRechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $admin_user->id, $admin_user->name, $this->inputs['fund'], $comment, null);
             DB::commit();
             return $this->msgOut(true);
         } catch (Exception $e) {

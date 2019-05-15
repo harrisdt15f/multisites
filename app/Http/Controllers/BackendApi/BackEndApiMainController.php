@@ -28,11 +28,10 @@ class BackEndApiMainController extends Controller
     protected $eloqM = ''; // 当前的eloquent
     protected $currentRouteName; //当前的route name;
     protected $routeAccessable = false;
-    protected $log_uuid;//当前的logId
-    protected $currentGuard ='backend';
+    protected $log_uuid; //当前的logId
+    protected $currentGuard = 'backend';
     protected $currentAuth;
     protected $guard = 'admin';
-
 
     /**
      * AdminMainController constructor.
@@ -61,7 +60,7 @@ class BackEndApiMainController extends Controller
             $this->inputs = Input::all(); //获取所有相关的传参数据
             //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
             $this->adminOperateLog();
-            $this->eloqM = 'App\\models\\'.$this->eloqM; // 当前的eloquent
+            $this->eloqM = 'App\\models\\' . $this->eloqM; // 当前的eloquent
             return $next($request);
         });
     }
@@ -127,7 +126,7 @@ class BackEndApiMainController extends Controller
     {
         /*if ($this->currentAuth->user())
         {
-            $data['access_token']=$this->currentAuth->user()->remember_token;
+        $data['access_token']=$this->currentAuth->user()->remember_token;
         }*/
         $defaultSuccessCode = 200;
         $defaultErrorCode = 404;
@@ -136,7 +135,7 @@ class BackEndApiMainController extends Controller
         } else {
             $code = $code == '' ? $defaultErrorCode : $code;
         }
-        $message = $message == '' ? __('codes-map.'.$code) : $message;
+        $message = $message == '' ? __('codes-map.' . $code) : $message;
         $datas = [
             'success' => $success,
             'code' => $code,
@@ -148,7 +147,7 @@ class BackEndApiMainController extends Controller
 
     protected function modelWithNameSpace($eloqM = null)
     {
-        return !is_null($eloqM) ? 'App\\models\\'.$eloqM : $eloqM;
+        return !is_null($eloqM) ? 'App\\models\\' . $eloqM : $eloqM;
     }
 
     /**
@@ -192,7 +191,7 @@ class BackEndApiMainController extends Controller
                     $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
                     if ($sign == 'LIKE') {
                         $sign = strtolower($sign);
-                        $value = '%'.$value.'%';
+                        $value = '%' . $value . '%';
                     }
                     $whereCriteria = [];
                     $whereCriteria[] = $key;
@@ -227,7 +226,7 @@ class BackEndApiMainController extends Controller
                         $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
                         if ($sign == 'LIKE') {
                             $sign = strtolower($sign);
-                            $value = '%'.$value.'%';
+                            $value = '%' . $value . '%';
                         }
                         $whereCriteria = [];
                         $whereCriteria[] = $key;
@@ -330,7 +329,7 @@ class BackEndApiMainController extends Controller
                                                 $queryConditions) ? $queryConditions[$key] : '=';
                                             if ($sign == 'LIKE') {
                                                 $sign = strtolower($sign);
-                                                $value = '%'.$value.'%';
+                                                $value = '%' . $value . '%';
                                             }
                                             $query->where($key, $sign, $value);
                                         }
@@ -357,56 +356,4 @@ class BackEndApiMainController extends Controller
         return $eloqM;
     }
 
-    /**
-     *
-     * @param $eloqM
-     * @param $type  0系统对管理操作   1超管对管理操作  2管理对用户操作
-     * @param $in_out  0减少   1增加
-     * @param $OperationAdminId     操作人ID
-     * @param $OperationAdminName   操作人NAME
-     * @param $OperationId          被操作人ID
-     * @param $OperationName        被操作人NAME
-     * @param $amount               操作金额
-     * @param $content              具体描述
-     * @param $AuditFlow0ID         审核表id
-     */
-    public function insertOperationDatas(
-        $eloqM,
-        $type,
-        $in_out,
-        $OperationAdminId,
-        $OperationAdminName,
-        $OperationId,
-        $OperationName,
-        $amount,
-        $comment,
-        $AuditFlow0ID
-    ) {
-
-        $OperationDatas = [
-            'type' => $type,
-            'in_out' => $in_out,
-            'amount' => $amount,
-            'comment' => $comment,
-            'audit_flow_id' => $AuditFlow0ID,
-        ];
-        if ($type === 0) {
-            $OperationDatas['admin_id'] = $OperationId;
-            $OperationDatas['admin_name'] = $OperationName;
-        } elseif ($type === 1) {
-            $OperationDatas['super_admin_id'] = $OperationAdminId;
-            $OperationDatas['super_admin_name'] = $OperationAdminName;
-            $OperationDatas['admin_id'] = $OperationId;
-            $OperationDatas['admin_name'] = $OperationName;
-        } elseif ($type === 2) {
-            $OperationDatas['admin_id'] = $OperationAdminId;
-            $OperationDatas['admin_name'] = $OperationAdminName;
-            $OperationDatas['user_id'] = $OperationId;
-            $OperationDatas['user_name'] = $OperationName;
-            $OperationDatas['status'] = 0;
-
-        }
-        $eloqM->fill($OperationDatas);
-        $eloqM->save();
-    }
 }

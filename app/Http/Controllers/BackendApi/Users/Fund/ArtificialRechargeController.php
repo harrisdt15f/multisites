@@ -62,7 +62,7 @@ class ArtificialRechargeController extends BackEndApiMainController
             $type = ArtificialRechargeLog::ADMIN;
             $in_out = ArtificialRechargeLog::DECREMENT;
             $comment = '[给用户人工充值]==>-' . $this->inputs['amount'] . '|[目前额度]==>' . $newFund;
-            $this->insertOperationDatas($ArtificialRechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $userData->id, $userData->nickname, $this->inputs['amount'], $comment, $auditFlowID);
+            insertOperationDatas($ArtificialRechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $userData->id, $userData->nickname, $this->inputs['amount'], $comment, $auditFlowID);
             //用户 user_recharge_history 表
             $userRechargeHistory = new UserRechargeHistory();
             $deposit_mode = UserRechargeHistory::ARTIFICIAL;

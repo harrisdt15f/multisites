@@ -23,6 +23,7 @@ class FrontendAllocatedModelController extends BackEndApiMainController
             'en_name' => 'required|string',
             'pid' => 'required|numeric',
             'type' => 'required|numeric',
+            'level' => 'required|numeric|in:1,2,3',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
@@ -34,6 +35,12 @@ class FrontendAllocatedModelController extends BackEndApiMainController
         $checkEnNamelEloq = $this->eloqM::where('en_name', $this->inputs['en_name'])->first();
         if (!is_null($checkEnNamelEloq)) {
             return $this->msgOut(false, [], '101601');
+        }
+        if ($this->inputs['pid'] != 0) {
+            $checkParentLevel = $this->eloqM::where('id', $this->inputs['pid'])->first();
+            if ($checkParentLevel->level === 3) {
+                return $this->msgOut(false, [], '101603');
+            }
         }
         try {
             $modelEloq = new $this->eloqM;

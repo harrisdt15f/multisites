@@ -7,7 +7,7 @@ class FrontendAllocatedModel extends BaseModel
     protected $table = 'frontend_allocated_model';
 
     protected $fillable = [
-        'label', 'en_name', 'pid', 'type', 'updated_at', 'created_at',
+        'label', 'en_name', 'pid', 'type', 'level', 'updated_at', 'created_at',
     ];
 
     public function allFrontendModel()
@@ -31,6 +31,6 @@ class FrontendAllocatedModel extends BaseModel
     }
     public function Parent()
     {
-        return self::where('pid', 0)->get();
+        return self::where('level', 1)->get();
     }
 }
