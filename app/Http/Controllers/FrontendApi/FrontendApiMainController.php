@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\BackendApi;
+namespace App\Http\Controllers\FrontendApi;
 
 use App\Http\Controllers\Controller;
 use App\models\PartnerAdminGroupAccess;
@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
-class BackEndApiMainController extends Controller
+class FrontendApiMainController extends Controller
 {
     protected $inputs;
     protected $partnerAdmin; //当前的商户用户
@@ -28,9 +28,10 @@ class BackEndApiMainController extends Controller
     protected $eloqM = ''; // 当前的eloquent
     protected $currentRouteName; //当前的route name;
     protected $routeAccessable = false;
-    protected $log_uuid; //当前的logId
-    protected $currentGuard = 'backend';
+    protected $log_uuid;//当前的logId
+    protected $currentGuard ='frontend-web';
     protected $currentAuth;
+
 
     /**
      * AdminMainController constructor.
@@ -40,65 +41,12 @@ class BackEndApiMainController extends Controller
         $this->middleware(function ($request, $next) {
             $this->currentAuth = auth($this->currentGuard);
             $this->partnerAdmin = $this->currentAuth->user();
-            if (!is_null($this->partnerAdmin)) {
-                //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
-                $this->currentPartnerAccessGroup = new PartnerAdminGroupAccess();
-                $this->currentPlatformEloq = new PlatForms();
-                if ($this->partnerAdmin->platform()->exists()) {
-                    $this->currentPlatformEloq = $this->partnerAdmin->platform; //获取目前账号用户属于平台的对象
-                    if ($this->partnerAdmin->accessGroup()->exists()) {
-                        $this->currentPartnerAccessGroup = $this->partnerAdmin->accessGroup;
-                    }
-                    $this->menuAccess();
-                    $this->routeAccessCheck();
-                    if ($this->routeAccessable === false) {
-                        return $this->msgOut($this->routeAccessable, [], '100001');
-                    }
-                }
-            }
             $this->inputs = Input::all(); //获取所有相关的传参数据
             //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
-            $this->adminOperateLog();
-            $this->eloqM = 'App\\models\\' . $this->eloqM; // 当前的eloquent
+//            $this->adminOperateLog();
+            $this->eloqM = 'App\\models\\'.$this->eloqM; // 当前的eloquent
             return $next($request);
         });
-    }
-
-    /**
-     *　初始化所有菜单，目前商户该拥有的菜单与权限
-     */
-    private function menuAccess()
-    {
-        $partnerEloq = new PartnerMenus();
-        $this->fullMenuLists = $partnerEloq->forStar(); //所有的菜单
-        $this->partnerMenulists = $partnerEloq->menuLists($this->currentPartnerAccessGroup); //目前所有的菜单为前端展示用的
-    }
-
-    /**
-     *　检测目前的路由是否有权限访问
-     */
-    private function routeAccessCheck(): void
-    {
-        $this->currentOptRoute = Route::getCurrentRoute();
-        $this->currentRouteName = $this->currentOptRoute->action['as']; //当前的route name;
-        //$partnerAdREloq = PartnerAdminRoute::where('route_name',$this->currentRouteName)->first()->parentRoute->menu;
-        $partnerAdREloq = PartnerAdminRoute::where('route_name', $this->currentRouteName)->first();
-        if (!is_null($partnerAdREloq)) {
-            $partnerMenuEloq = $partnerAdREloq->menu;
-            //set if it is accissable or not
-            if (!empty($this->currentPartnerAccessGroup->role)) {
-                if ($this->currentPartnerAccessGroup->role == '*') {
-                    $this->routeAccessable = true;
-                } else {
-                    $currentRouteGroup = json_decode($this->currentPartnerAccessGroup->role, true);
-                    if (in_array($partnerMenuEloq->id, $currentRouteGroup)) {
-                        $this->routeAccessable = true;
-                    } elseif (in_array($this->currentRouteName, Config::get('routelistexclude'))) {
-                        $this->routeAccessable = true;
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -123,10 +71,6 @@ class BackEndApiMainController extends Controller
      */
     protected function msgOut($success = false, $data = [], $code = '', $message = ''): JsonResponse
     {
-        /*if ($this->currentAuth->user())
-        {
-        $data['access_token']=$this->currentAuth->user()->remember_token;
-        }*/
         $defaultSuccessCode = 200;
         $defaultErrorCode = 404;
         if ($success === true) {
@@ -134,7 +78,7 @@ class BackEndApiMainController extends Controller
         } else {
             $code = $code == '' ? $defaultErrorCode : $code;
         }
-        $message = $message == '' ? __('codes-map.' . $code) : $message;
+        $message = $message == '' ? __('frontend-codes-map.'.$code) : $message;
         $datas = [
             'success' => $success,
             'code' => $code,
@@ -146,7 +90,7 @@ class BackEndApiMainController extends Controller
 
     protected function modelWithNameSpace($eloqM = null)
     {
-        return !is_null($eloqM) ? 'App\\models\\' . $eloqM : $eloqM;
+        return !is_null($eloqM) ? 'App\\models\\'.$eloqM : $eloqM;
     }
 
     /**
@@ -190,7 +134,7 @@ class BackEndApiMainController extends Controller
                     $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
                     if ($sign == 'LIKE') {
                         $sign = strtolower($sign);
-                        $value = '%' . $value . '%';
+                        $value = '%'.$value.'%';
                     }
                     $whereCriteria = [];
                     $whereCriteria[] = $key;
@@ -225,7 +169,7 @@ class BackEndApiMainController extends Controller
                         $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
                         if ($sign == 'LIKE') {
                             $sign = strtolower($sign);
-                            $value = '%' . $value . '%';
+                            $value = '%'.$value.'%';
                         }
                         $whereCriteria = [];
                         $whereCriteria[] = $key;
@@ -328,7 +272,7 @@ class BackEndApiMainController extends Controller
                                                 $queryConditions) ? $queryConditions[$key] : '=';
                                             if ($sign == 'LIKE') {
                                                 $sign = strtolower($sign);
-                                                $value = '%' . $value . '%';
+                                                $value = '%'.$value.'%';
                                             }
                                             $query->where($key, $sign, $value);
                                         }
@@ -354,5 +298,4 @@ class BackEndApiMainController extends Controller
         }
         return $eloqM;
     }
-
 }
