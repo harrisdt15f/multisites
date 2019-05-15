@@ -11,11 +11,7 @@ class RouteController extends BackEndApiMainController
 
     public function detail()
     {
-        $fixedJoin = 1;
-        $withTable = 'menu';
-        $withSearchAbleFields = ['label'];
-        $searchAbleFields = ['route_name', 'menu_group_id', 'title'];
-        $datas = $this->generateSearchQuery($this->eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields);
+        $datas = $this->eloqM::with('menu')->get();
         return $this->msgOut(true, $datas);
     }
 
