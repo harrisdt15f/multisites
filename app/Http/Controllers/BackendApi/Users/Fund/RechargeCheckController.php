@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\BackendApi\Users\Fund;
 
+use App\Common\FundOperationRecharge;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\models\AccountChangeReport;
 use App\models\AuditFlow;
@@ -112,7 +113,8 @@ class RechargeCheckController extends BackEndApiMainController
             $type = $RechargeLogeloqM::SYSTEM;
             $in_out = $RechargeLogeloqM::INCREMENT;
             $comment = '[充值审核失败额度返还]==>+' . $RechargeLog['amount'] . '|[目前额度]==>' . $newFund;
-            insertOperationDatas($RechargeLogeloqM, $type, $in_out, null, null, $auditFlow->admin_id, $auditFlow->admin_name, $RechargeLog->amount, $comment, null);
+            $fundOperationClass = new FundOperationRecharge();
+            $fundOperationClass->insertOperationDatas($RechargeLogeloqM, $type, $in_out, null, null, $auditFlow->admin_id, $auditFlow->admin_name, $RechargeLog->amount, $comment, null);
             DB::commit();
             return $this->msgOut(true);
         } catch (Exception $e) {

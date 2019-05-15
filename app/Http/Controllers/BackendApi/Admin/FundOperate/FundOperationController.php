@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\BackendApi\Admin\FundOperate;
 
+use App\Common\FundOperationRecharge;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\models\ArtificialRechargeLog;
 use App\models\FundOperation;
@@ -67,7 +68,8 @@ class FundOperationController extends BackEndApiMainController
         try {
             $FundOperationAdmin->fill($AdminEditData);
             $FundOperationAdmin->save();
-            insertOperationDatas($ArtificialRechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $admin_user->id, $admin_user->name, $this->inputs['fund'], $comment, null);
+            $fundOperationClass = new FundOperationRecharge();
+            $fundOperationClass->insertOperationDatas($ArtificialRechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $admin_user->id, $admin_user->name, $this->inputs['fund'], $comment, null);
             DB::commit();
             return $this->msgOut(true);
         } catch (Exception $e) {
