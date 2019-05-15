@@ -13,6 +13,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -64,8 +65,12 @@ class BackendAuthController extends BackEndApiMainController
         $expireAt = Carbon::now()->addMinutes($expireInMinute)->format('Y-m-d H:i:s');
         $user = $this->currentAuth->user();
         if (!is_null($user->remember_token)) {
-            JWTAuth::setToken($user->remember_token);
-            JWTAuth::invalidate();
+            try {
+                JWTAuth::setToken($user->remember_token);
+                JWTAuth::invalidate();
+            } catch (\Exception $e) {
+                Log::info($e->getMessage());
+            }
         }
         $user->remember_token = $token;
         $user->save();
