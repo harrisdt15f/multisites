@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BackendApi\DeveloperUsage\Backend\Routes;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\models\PartnerMenus;
 use Illuminate\Support\Facades\Validator;
 
 class RouteController extends BackEndApiMainController
@@ -45,7 +46,7 @@ class RouteController extends BackEndApiMainController
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
-            'route_name' => 'required|string',
+            'menu_group_id' => 'required|numeric',
             'title' => 'required|string',
         ]);
         if ($validator->fails()) {
@@ -55,15 +56,22 @@ class RouteController extends BackEndApiMainController
         if (is_null($pastEloq)) {
             return $this->msgOut(false, [], '101401');
         }
-        $checkRouteName = $this->eloqM::where(function ($query) {
-            $query->where('route_name', $this->inputs['route_name'])
+        $checkMeun = PartnerMenus::where('id', $this->inputs['menu_group_id'])->first();
+        if (is_null($checkMeun)) {
+            return $this->msgOut(false, [], '101402');
+        }
+        $checkTitle = $this->eloqM::where(function ($query) {
+            $query->where('title', $this->inputs['title'])
                 ->where('id', '!=', $this->inputs['id']);
         })->first();
-        if (!is_null($checkRouteName)) {
+        if (!is_null($checkTitle)) {
             return $this->msgOut(false, [], '101400');
         }
         $editData = $this->inputs;
         unset($editData['id']);
+        if (array_key_exists('route_name', $editData)) {
+            unset($editData['route_name']);
+        }
         try {
             $this->editAssignment($pastEloq, $editData);
             $pastEloq->save();
