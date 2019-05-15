@@ -7,7 +7,7 @@
  */
 
 //游戏
-Route::group(['prefix' => 'lotteries','namespace' => 'Game\Lottery'], function () {
+Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], function () {
     $namePrefix = 'lotteries.';
     $controller = 'LotteriesController@';
     //游戏series获取接口
@@ -20,4 +20,6 @@ Route::group(['prefix' => 'lotteries','namespace' => 'Game\Lottery'], function (
     Route::match(['post', 'options'], 'lotteries-issue-lists', ['as' => $namePrefix . 'lotteries-issue-lists', 'uses' => $controller . 'lotteryIssueLists']);
     //奖期生成接口
     Route::match(['post', 'options'], 'lotteries-issue-generate', ['as' => $namePrefix . 'lotteries-issue-generate', 'uses' => $controller . 'generateIssue']);
+    //彩种开关
+    Route::match(['post', 'options'], 'lotteries-switch', ['as' => $namePrefix . 'lotteries-issue-generate', 'uses' => $controller . 'lotteriesSwitch']);
 });

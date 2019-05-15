@@ -124,4 +124,29 @@ class LotteriesController extends BackEndApiMainController
         event(new IssueGenerateEvent($this->inputs));
         return $this->msgOut(true);
     }
+
+    //彩种开关
+    public function lotteriesSwitch()
+    {
+        $validator = Validator::make($this->inputs, [
+            'id' => 'required|numeric',
+            'status' => 'required|numeric|in:0,1',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
+        }
+        $lotteriesEloq = $this->eloqM::find($this->inputs['id']);
+        if (is_null($lotteriesEloq)) {
+            return $this->msgOut(false, [], '101700');
+        }
+        try {
+            $lotteriesEloq->status = $this->inputs['status'];
+            $lotteriesEloq->save();
+            return $this->msgOut(true);
+        } catch (Exception $e) {
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+            return $this->msgOut(false, [], $sqlState, $msg);
+        }
+    }
 }
