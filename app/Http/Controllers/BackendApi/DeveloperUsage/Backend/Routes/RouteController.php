@@ -26,10 +26,7 @@ class RouteController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $checkTitle = $this->eloqM::where(function ($query) {
-            $query->where('title', $this->inputs['title'])
-                ->where('id', '!=', $this->inputs['id']);
-        })->first();
+        $checkTitle = $this->eloqM::where('title', $this->inputs['title'])->first();
         if (!is_null($checkTitle)) {
             return $this->msgOut(false, [], '101400');
         }
