@@ -72,7 +72,13 @@ class LotteriesController extends BackEndApiMainController
                         $temp[$seriesIthem][$currentLotteryId][$curentMethodGroup] = [];
                         $methodRows = $mgitems->methodRows;
                         foreach ($methodRows as $rowitems) {
-                            $temp[$seriesIthem][$currentLotteryId][$curentMethodGroup][$rowitems->method_row] = $rowitems->methodDetails->toArray();
+                            $method_row = $rowitems->method_row;
+                            $temp[$seriesIthem][$currentLotteryId][$curentMethodGroup][$rowitems->method_row] = $rowitems->where(function ($query) use ($currentLotteryId, $curentMethodGroup, $method_row) {
+                                $query->where('lottery_id', $currentLotteryId)
+                                    ->where('method_group', $curentMethodGroup)
+                                    ->where('method_row', $method_row);
+                            })
+                                ->with('methodDetails')->get()->toArray();
                         }
                     }
 
@@ -149,4 +155,39 @@ class LotteriesController extends BackEndApiMainController
             return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
+
+    //玩法组开关
+    // public function methodGroupSwitch()
+    // {
+    //     $validator = Validator::make($this->inputs, [
+    //         'lottery_id' => 'required|string',
+    //         'method_group' => 'required|string',
+    //         'status' => 'required|num',
+    //     ]);
+    //     if ($validator->fails()) {
+    //         return $this->msgOut(false, [], '400', $validator->errors()->first());
+    //     }
+    //     $methodGroupEloq = MethodsModel::select('id')->where(function ($query) {
+    //         $query->where('lottery_id', $this->inputs['lottery_id'])
+    //             ->where('method_group', $this->inputs['method_group']);
+    //     })->get()->toArray();
+    //     if (empty($methodGroupEloq)) {
+    //         return $this->msgOut(false, [], '101701');
+    //     }
+    //     $methodGroupIds = array_column($methodGroupEloq, 'id');
+    //     //==================================================================
+    //     var_dump($methodGroupIds);
+
+    //     //==================================================================
+    // }
+
+    //玩法行开关
+    // public function methodRowSwitch(){
+
+    // }
+
+    //玩法开关
+    // public function methodSwitch(){
+
+    // }
 }
