@@ -12,4 +12,5 @@ Route::group(['prefix' => 'user'], function () {
     $controller = 'FrontendAuthController@';
     //创建总代
     Route::match(['post', 'options'], 'detail', ['as' => $namePrefix . 'userDetail', 'uses' => $controller . 'userDetail']);
+    Route::match(['get', 'options'], 'logout', ['as' => $namePrefix . 'logout', 'uses' => $controller . 'logout']);
 });

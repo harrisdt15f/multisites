@@ -58,7 +58,7 @@ class MenuController extends BackEndApiMainController
             'display' => 'required|numeric|in:0,1',
             'route' => 'required|regex:/^(?!.*\/$)(?!.*?\/\/)[a-z\/-]+$/', // /operasyon/operation-log
             'icon' => 'regex:/^(?!\-)(?!.*\-$)(?!.*?\-\-)(?!\ )(?!.*\ $)(?!.*?\ \ )[a-z0-9 -]+$/',
-            'sort' => 'require|int',
+            'sort' => 'required|integer',
             //anticon anticon-appstore  icon-6-icon
         ];
         if (isset($this->inputs['isParent']) && $this->inputs['isParent'] === '1') {

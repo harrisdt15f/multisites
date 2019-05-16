@@ -251,14 +251,12 @@ class FrontendAuthController extends FrontendApiMainController
      */
     public function logout(Request $request): JsonResponse
     {
-        $throtleKey = Str::lower($this->currentAuth->user()->email.'|'.$request->ip());
+        $throtleKey = Str::lower($this->username().'|'.$request->ip());
         $request->session()->invalidate();
         $this->limiter()->clear($throtleKey);
         $this->currentAuth->logout();
         $this->currentAuth->invalidate();
-        return response()->json([
-            'message' => 'Successfully logged out',
-        ]);
+        return $this->msgOut(true, []);//'Successfully logged out'
     }
 
     /**

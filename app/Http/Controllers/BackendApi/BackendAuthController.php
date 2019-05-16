@@ -228,7 +228,7 @@ class BackendAuthController extends BackEndApiMainController
      */
     public function logout(Request $request): JsonResponse
     {
-        $throtleKey = Str::lower($this->currentAuth->user()->email.'|'.$request->ip());
+        $throtleKey = Str::lower($this->username().'|'.$request->ip());
         $request->session()->invalidate();
         $this->limiter()->clear($throtleKey);
         $this->currentAuth->logout();
