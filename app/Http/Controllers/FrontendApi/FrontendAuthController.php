@@ -23,6 +23,12 @@ class FrontendAuthController extends FrontendApiMainController
 
     protected $eloqM = 'UserHandleModel';
 
+
+    public function username()
+    {
+        return 'username';
+    }
+
     /**
      * Login user and create token
      *
@@ -32,11 +38,11 @@ class FrontendAuthController extends FrontendApiMainController
     public function login(Request $request): JsonResponse
     {
         $request->validate([
-            'email' => 'required|string|email',
+            'username' => 'required|string|alpha_dash',
             'password' => 'required|string',
             'remember_me' => 'boolean',
         ]);
-        $credentials = request(['email', 'password']);
+        $credentials = request(['username', 'password']);
         $this->maxAttempts = 1;//1 times
         $this->decayMinutes = 1;//1 minutes
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
@@ -70,6 +76,8 @@ class FrontendAuthController extends FrontendApiMainController
             }
         }
         $user->remember_token = $token;
+        $user->last_login_ip = request()->ip();
+        $user->last_login_time = Carbon::now()->timestamp;
         $user->save();
         $data = [
             'access_token' => $token,
