@@ -80,9 +80,4 @@ class UserHandleModel extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(UserAdmitedFlowsModel::class,'user_id','id')->orderBy('created_at', 'desc');
     }
-
-    public function getAccountAttribute()
-    {
-        return $this->account->first(); // not addresses()->first(); as it would run the query everytime
-    }
 }

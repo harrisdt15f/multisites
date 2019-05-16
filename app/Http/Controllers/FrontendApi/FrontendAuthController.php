@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\FrontendApi;
 
+use App\models\PartnerSysConfigures;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -83,6 +84,34 @@ class FrontendAuthController extends FrontendApiMainController
             'access_token' => $token,
             'token_type' => 'Bearer',
             'expires_at' => $expireAt
+        ];
+        return $this->msgOut(true, $data);
+    }
+
+    public function userDetail()
+    {
+        $user = $this->currentAuth->user();
+        $account = $user->account;
+        $balance = $account->balance;
+        $frozen = $account->frozen;
+        $data = [
+            'user_id'       => $user->id,
+            'username'      => $user->username,
+            'prize_group'   => $user->prize_group,
+            'user_type'     => $user->type,
+            'is_tester'         => $user->is_tester,
+            'last_login_time'   => $user->last_login_time->toDateTimeString(),
+            'levels'            => $user->levels,
+            'can_withdraw'      => $user->frozen_type <= 0,//$user->frozen_type > 0 ? false : true
+            'today_withdraw'        => 0,//
+            'daysalary_percentage'  => 0,
+            'bonus_percentage'      => 0,
+            'allowed_transfer'      => true,
+            'balance'               => sprintf('%1.4f',substr($balance, 0, strrpos($balance, '.', 0)+1+4)),
+            'frozen_balance'        => sprintf('%1.4f',substr($frozen, 0, strrpos($frozen, '.', 0)+1+4)),
+            'has_funds_password'    => $user->fund_password ? true : false,
+            'download_url'          => PartnerSysConfigures::getConfigValue('app_download_url') .'/'. $user->invite_code,
+            'version'               => PartnerSysConfigures::getConfigValue('app_version'),
         ];
         return $this->msgOut(true, $data);
     }

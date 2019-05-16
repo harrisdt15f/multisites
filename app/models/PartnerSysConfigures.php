@@ -25,5 +25,18 @@ class PartnerSysConfigures extends BaseModel
         return $this->hasMany(__CLASS__, 'parent_id', 'id');
     }
 
+    /**
+     * @param  string  $key
+     * @return string
+     */
+    public static function getConfigValue($key = null): ?string
+    {
+        if (empty($key)) {
+            return $key;
+        } else {
+            return self::where('sign', $key)->value('value');
+        }
+    }
+
 
 }
