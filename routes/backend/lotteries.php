@@ -22,4 +22,10 @@ Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], function 
     Route::match(['post', 'options'], 'lotteries-issue-generate', ['as' => $namePrefix . 'lotteries-issue-generate', 'uses' => $controller . 'generateIssue']);
     //彩种开关
     Route::match(['post', 'options'], 'lotteries-switch', ['as' => $namePrefix . 'lotteries-issue-generate', 'uses' => $controller . 'lotteriesSwitch']);
+    //玩法组开关
+    Route::match(['post', 'options'], 'method-group-switch', ['as' => $namePrefix . 'method-group-switch', 'uses' => $controller . 'methodGroupSwitch']);
+    //玩法行开关
+    Route::match(['post', 'options'], 'method-row-switch', ['as' => $namePrefix . 'method-row-switch', 'uses' => $controller . 'methodRowSwitch']);
+    //玩法开关
+    Route::match(['post', 'options'], 'method-switch', ['as' => $namePrefix . 'method-switch', 'uses' => $controller . 'methodSwitch']);
 });

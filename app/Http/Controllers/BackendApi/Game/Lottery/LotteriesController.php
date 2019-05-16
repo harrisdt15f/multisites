@@ -157,37 +157,90 @@ class LotteriesController extends BackEndApiMainController
     }
 
     //玩法组开关
-    // public function methodGroupSwitch()
-    // {
-    //     $validator = Validator::make($this->inputs, [
-    //         'lottery_id' => 'required|string',
-    //         'method_group' => 'required|string',
-    //         'status' => 'required|num',
-    //     ]);
-    //     if ($validator->fails()) {
-    //         return $this->msgOut(false, [], '400', $validator->errors()->first());
-    //     }
-    //     $methodGroupEloq = MethodsModel::select('id')->where(function ($query) {
-    //         $query->where('lottery_id', $this->inputs['lottery_id'])
-    //             ->where('method_group', $this->inputs['method_group']);
-    //     })->get()->toArray();
-    //     if (empty($methodGroupEloq)) {
-    //         return $this->msgOut(false, [], '101701');
-    //     }
-    //     $methodGroupIds = array_column($methodGroupEloq, 'id');
-    //     //==================================================================
-    //     var_dump($methodGroupIds);
-
-    //     //==================================================================
-    // }
+    public function methodGroupSwitch()
+    {
+        $validator = Validator::make($this->inputs, [
+            'lottery_id' => 'required|string',
+            'method_group' => 'required|string',
+            'status' => 'required|numeric|in:0,1',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
+        }
+        $methodGroupEloq = MethodsModel::select('id')->where(function ($query) {
+            $query->where('lottery_id', $this->inputs['lottery_id'])
+                ->where('method_group', $this->inputs['method_group']);
+        })->get()->toArray();
+        if (empty($methodGroupEloq)) {
+            return $this->msgOut(false, [], '101701');
+        }
+        $methodGroupIds = array_column($methodGroupEloq, 'id');
+        try {
+            $updateDate = ['status', $this->inputs['status']];
+            $MethodsModel = new MethodsModel();
+            $MethodsModel->whereIn('id', $methodGroupIds)->update(['status' => $this->inputs['status']]);
+            return $this->msgOut(true);
+        } catch (Exception $e) {
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+            return $this->msgOut(false, [], $sqlState, $msg);
+        }
+    }
 
     //玩法行开关
-    // public function methodRowSwitch(){
-
-    // }
+    public function methodRowSwitch()
+    {
+        $validator = Validator::make($this->inputs, [
+            'lottery_id' => 'required|string',
+            'method_group' => 'required|string',
+            'method_row' => 'required|string',
+            'status' => 'required|numeric|in:0,1',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
+        }
+        $methodGroupEloq = MethodsModel::select('id')->where(function ($query) {
+            $query->where('lottery_id', $this->inputs['lottery_id'])
+                ->where('method_group', $this->inputs['method_group'])
+                ->where('method_row', $this->inputs['method_row']);
+        })->get()->toArray();
+        if (empty($methodGroupEloq)) {
+            return $this->msgOut(false, [], '101702');
+        }
+        $methodGroupIds = array_column($methodGroupEloq, 'id');
+        try {
+            $updateDate = ['status', $this->inputs['status']];
+            MethodsModel::whereIn('id', $methodGroupIds)->update(['status' => $this->inputs['status']]);
+            return $this->msgOut(true);
+        } catch (Exception $e) {
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+            return $this->msgOut(false, [], $sqlState, $msg);
+        }
+    }
 
     //玩法开关
-    // public function methodSwitch(){
-
-    // }
+    public function methodSwitch()
+    {
+        $validator = Validator::make($this->inputs, [
+            'id' => 'required|numeric',
+            'status' => 'required|numeric|in:0,1',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
+        }
+        $pastData = MethodsModel::find($this->inputs['id']);
+        if (empty($pastData)) {
+            return $this->msgOut(false, [], '101703');
+        }
+        try {
+            $pastData->status = $this->inputs['status'];
+            $pastData->save();
+            return $this->msgOut(true);
+        } catch (Exception $e) {
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+            return $this->msgOut(false, [], $sqlState, $msg);
+        }
+    }
 }
