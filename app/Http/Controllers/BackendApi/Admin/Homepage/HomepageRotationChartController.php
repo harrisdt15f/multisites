@@ -4,6 +4,7 @@ namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
 use App\Common\Image;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\models\ActivityInfos;
 use Illuminate\Support\Facades\Validator;
 
 class HomepageRotationChartController extends BackEndApiMainController
@@ -26,6 +27,7 @@ class HomepageRotationChartController extends BackEndApiMainController
             'type' => 'required|numeric|in:1,2',
             'redirect_url' => 'string',
             'activity_id' => 'numeric',
+            'status' => 'required|numeric|in:0,1',
             'start_time' => 'required|date',
             'end_time' => 'required|date',
         ]);
@@ -78,6 +80,7 @@ class HomepageRotationChartController extends BackEndApiMainController
             'type' => 'required|numeric|in:1,2',
             'redirect_url' => 'string',
             'activity_id' => 'numeric',
+            'status' => 'required|numeric|in:0,1',
             'start_time' => 'required|date',
             'end_time' => 'required|date',
         ]);
@@ -156,6 +159,14 @@ class HomepageRotationChartController extends BackEndApiMainController
             return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
+
+    //操作轮播图时获取的活动列表
+    public function activityList()
+    {
+        $activityList = ActivityInfos::select('id', 'title')->where('status', 1)->get();
+        return $this->msgOut(true, $activityList);
+    }
+
     /**
      * 修改轮播图时   替换图片
      * @param     $pastImg     原图路径
