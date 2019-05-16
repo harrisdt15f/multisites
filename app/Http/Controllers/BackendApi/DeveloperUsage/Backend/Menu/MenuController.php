@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BackendApi\DeveloperUsage\Backend\Menu;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\models\PartnerAdminRoute;
 use App\models\PartnerMenus;
 use function GuzzleHttp\json_decode;
 use Illuminate\Http\JsonResponse;
@@ -28,22 +29,23 @@ class MenuController extends BackEndApiMainController
      */
     public function allRequireInfos(): JsonResponse
     {
-        $firstlevelmenus = PartnerMenus::getFirstLevelList();
+//        $firstlevelmenus = PartnerMenus::getFirstLevelList();
         $routeCollection = Route::getRoutes()->get();
-        $editMenu = PartnerMenus::all();
-        $routeMatchingName = $editMenu->where('route', '!=', '#')->keyBy('route')->toArray();
-        $rname = [];
+//        $editMenu = PartnerMenus::all();
+//        $routeMatchingName = $editMenu->where('route', '!=', '#')->keyBy('route')->toArray();
+        $routeInfo = [];
+        $registeredRoute = PartnerAdminRoute::pluck('route_name')->toArray();
         foreach ($routeCollection as $key => $r) {
             if (isset($r->action['as'])) {
-                if ($r->action['prefix'] !== '_debugbar') {
-                    $rname[$r->action['as']] = $r->uri;
+                if ($r->action['prefix'] !== '_debugbar' && !in_array($r->action['as'],$registeredRoute)) {
+                    $routeInfo[$r->action['as']] = $r->uri;
                 }
             }
         }
-        $data['firstlevelmenus'] = $firstlevelmenus;
-        $data['rname'] = $rname;
-        $data['editMenu'] = $editMenu;
-        $data['routeMatchingName'] = $routeMatchingName;
+//        $data['firstlevelmenus'] = $firstlevelmenus;
+        $data['route_info'] = $routeInfo;
+//        $data['editMenu'] = $editMenu;
+//        $data['routeMatchingName'] = $routeMatchingName;
         return $this->msgOut(true, $data);
     }
 
