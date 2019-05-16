@@ -174,11 +174,10 @@ class LotteriesController extends BackEndApiMainController
         if (empty($methodGroupEloq)) {
             return $this->msgOut(false, [], '101701');
         }
-        $methodGroupIds = array_column($methodGroupEloq, 'id');
         try {
+            $methodGroupIds = array_column($methodGroupEloq, 'id');
             $updateDate = ['status', $this->inputs['status']];
-            $MethodsModel = new MethodsModel();
-            $MethodsModel->whereIn('id', $methodGroupIds)->update(['status' => $this->inputs['status']]);
+            MethodsModel::whereIn('id', $methodGroupIds)->update(['status' => $this->inputs['status']]);
             return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
@@ -207,8 +206,8 @@ class LotteriesController extends BackEndApiMainController
         if (empty($methodGroupEloq)) {
             return $this->msgOut(false, [], '101702');
         }
-        $methodGroupIds = array_column($methodGroupEloq, 'id');
         try {
+            $methodGroupIds = array_column($methodGroupEloq, 'id');
             $updateDate = ['status', $this->inputs['status']];
             MethodsModel::whereIn('id', $methodGroupIds)->update(['status' => $this->inputs['status']]);
             return $this->msgOut(true);
