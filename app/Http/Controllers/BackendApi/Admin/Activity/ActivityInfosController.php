@@ -20,14 +20,12 @@ class ActivityInfosController extends BackEndApiMainController
     {
         $validator = Validator::make($this->inputs, [
             'title' => 'required',
-            'type' => 'required|numeric',
             'content' => 'required',
             'pic' => 'required|image|mimes:jpeg,png,jpg',
             'start_time' => 'required|date_format:Y-m-d H:i:s',
             'end_time' => 'required|date_format:Y-m-d H:i:s',
             'status' => 'required',
             'redirect_url' => 'required',
-            'is_time_interval' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
@@ -69,14 +67,12 @@ class ActivityInfosController extends BackEndApiMainController
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
             'title' => 'required',
-            'type' => 'required|numeric',
             'content' => 'required',
             'pic' => 'image|mimes:jpeg,png,jpg',
             'start_time' => 'required|date_format:Y-m-d H:i:s',
             'end_time' => 'required|date_format:Y-m-d H:i:s',
             'status' => 'required',
             'redirect_url' => 'required',
-            'is_time_interval' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
