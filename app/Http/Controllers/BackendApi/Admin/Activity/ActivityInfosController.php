@@ -22,10 +22,11 @@ class ActivityInfosController extends BackEndApiMainController
             'title' => 'required',
             'content' => 'required',
             'pic' => 'required|image|mimes:jpeg,png,jpg',
-            'start_time' => 'required|date_format:Y-m-d H:i:s',
-            'end_time' => 'required|date_format:Y-m-d H:i:s',
+            'start_time' => 'date_format:Y-m-d H:i:s',
+            'end_time' => 'date_format:Y-m-d H:i:s',
             'status' => 'required',
             'redirect_url' => 'required',
+            'is_time_interval' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
@@ -33,6 +34,19 @@ class ActivityInfosController extends BackEndApiMainController
         $pastData = $this->eloqM::where('title', $this->inputs['title'])->first();
         if (!is_null($pastData)) {
             return $this->msgOut(false, [], '100300');
+        }
+        //活动是否永久 与 开始结束时间 的处理
+        if ($this->inputs['is_time_interval'] == 1) {
+            if (!array_key_exists('start_time', $this->inputs) || !array_key_exists('end_time', $this->inputs)) {
+                return $this->msgOut(false, [], '100303');
+            }
+        } elseif ($this->inputs['is_time_interval'] == 0) {
+            if (array_key_exists('start_time', $this->inputs)) {
+                unset($this->inputs['start_time']);
+            }
+            if (array_key_exists('end_time', $this->inputs)) {
+                unset($this->inputs['end_time']);
+            }
         }
         //接收文件信息
         $file = $this->inputs['pic'];
@@ -69,13 +83,23 @@ class ActivityInfosController extends BackEndApiMainController
             'title' => 'required',
             'content' => 'required',
             'pic' => 'image|mimes:jpeg,png,jpg',
-            'start_time' => 'required|date_format:Y-m-d H:i:s',
-            'end_time' => 'required|date_format:Y-m-d H:i:s',
+            'start_time' => 'date_format:Y-m-d H:i:s',
+            'end_time' => 'date_format:Y-m-d H:i:s',
             'status' => 'required',
             'redirect_url' => 'required',
+            'is_time_interval' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
+        }
+        //活动是否永久 与 开始结束时间 的处理
+        if ($this->inputs['is_time_interval'] == 1) {
+            if (!array_key_exists('start_time', $this->inputs) || !array_key_exists('end_time', $this->inputs)) {
+                return $this->msgOut(false, [], '100303');
+            }
+        } elseif ($this->inputs['is_time_interval'] == 0) {
+            $this->inputs['start_time'] = null;
+            $this->inputs['end_time'] = null;
         }
         $pastData = $this->eloqM::where('title', $this->inputs['title'])->where('id', '!=', $this->inputs['id'])->first();
         if (!is_null($pastData)) {
@@ -85,7 +109,7 @@ class ActivityInfosController extends BackEndApiMainController
         if (is_null($editDataEloq)) {
             return $this->msgOut(false, [], '100301');
         }
-        //如果修改了图片
+        //如果修改了图片 删除原图并且上传新图片
         if (isset($this->inputs['pic']) && !is_null($this->inputs['pic'])) {
             $pic = $this->inputs['pic'];
             unset($this->inputs['pic']);
