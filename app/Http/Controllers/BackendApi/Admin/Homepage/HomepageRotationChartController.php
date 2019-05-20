@@ -5,6 +5,7 @@ namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 use App\Common\Image;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\models\ActivityInfos;
+use App\models\AdvertisementType;
 use Illuminate\Support\Facades\Validator;
 
 class HomepageRotationChartController extends BackEndApiMainController
@@ -189,5 +190,12 @@ class HomepageRotationChartController extends BackEndApiMainController
         } else {
             return ['success' => false, 'code' => '101803'];
         }
+    }
+
+    //上传图片的规格
+    public function picStandard()
+    {
+        $standard = AdvertisementType::select('l_size', 'w_size', 'size')->where('type', 1)->first();
+        return $this->msgOut(true, $standard);
     }
 }
