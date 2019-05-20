@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\BackendApi\Admin\Activity;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Lib\Common\Image;
+use App\Lib\Common\ImageArrange;
 use Illuminate\Support\Facades\Validator;
 
 class ActivityInfosController extends BackEndApiMainController
@@ -53,7 +53,7 @@ class ActivityInfosController extends BackEndApiMainController
         $file = $this->inputs['pic'];
         $path = 'uploaded_files/' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id . '/mobile_activity_' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id;
         //进行上传
-        $ImageClass = new Image();
+        $ImageClass = new ImageArrange();
         $pic = $ImageClass->uploadImg($file, $path);
         if ($pic['success'] === false) {
             return $this->msgOut(false, [], '100302');
@@ -120,7 +120,7 @@ class ActivityInfosController extends BackEndApiMainController
             //接收文件信息
             $path = 'uploaded_files/' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id . '/mobile_activity_' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id;
             //进行上传
-            $ImageClass = new Image();
+            $ImageClass = new ImageArrange();
             $picdata = $ImageClass->uploadImg($pic, $path);
             if ($picdata['success'] === false) {
                 return $this->msgOut(false, [], '100302');
@@ -158,7 +158,7 @@ class ActivityInfosController extends BackEndApiMainController
             try {
                 $this->eloqM::where('id', $this->inputs['id'])->delete();
                 //删除图片
-                $ImageClass = new Image();
+                $ImageClass = new ImageArrange();
                 $ImageClass->deletePic(substr($pastData['pic_path'], 1));
                 $ImageClass->deletePic(substr($pastData['thumbnail_path'], 1));
                 return $this->msgOut(true);

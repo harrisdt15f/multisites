@@ -1,7 +1,7 @@
 <?php
 namespace App\Lib\Common;
 
-class Image
+class ImageArrange
 {
 
     //图片上传
