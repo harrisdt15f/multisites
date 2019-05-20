@@ -151,7 +151,7 @@ class PopularLotteriesController extends BackEndApiMainController
         }
     }
 
-    //排序
+    //热门彩票拉动排序
     public function lotteriesSort()
     {
         $validator = Validator::make($this->inputs, [
@@ -166,6 +166,9 @@ class PopularLotteriesController extends BackEndApiMainController
         }
         $pastFrontData = $this->eloqM::find($this->inputs['front_id']);
         $pastRearwaysData = $this->eloqM::find($this->inputs['rearways_id']);
+        if (is_null($pastFrontData) || is_null($pastRearwaysData)) {
+            return $this->msgOut(false, [], '102008');
+        }
         if ($pastFrontData->type !== $pastRearwaysData->type) {
             return $this->msgOut(false, [], '102007');
         }
@@ -175,9 +178,6 @@ class PopularLotteriesController extends BackEndApiMainController
             //上拉排序
             if ($this->inputs['sort_type'] == 1) {
                 $frontData = $this->eloqM::find($this->inputs['front_id']);
-                if (!isset($frontData)) {
-                    return $this->msgOut(false, [], '102006');
-                }
                 $frontData->sort = $this->inputs['front_sort'];
                 $this->eloqM::where(function ($query) use ($type) {
                     $query->where('type', $type)
@@ -187,9 +187,6 @@ class PopularLotteriesController extends BackEndApiMainController
             } elseif ($this->inputs['sort_type'] == 2) {
                 //下拉排序
                 $frontData = $this->eloqM::find($this->inputs['rearways_id']);
-                if (!isset($frontData)) {
-                    return $this->msgOut(false, [], '102006');
-                }
                 $frontData->sort = $this->inputs['rearways_sort'];
                 $this->eloqM::where(function ($query) use ($type) {
                     $query->where('type', $type)

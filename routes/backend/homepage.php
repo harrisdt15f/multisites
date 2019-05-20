@@ -5,6 +5,7 @@ Route::group(['prefix' => 'homepage', 'namespace' => 'Admin\Homepage'], function
     $controller = 'HomepageController@';
     Route::match(['get', 'options'], 'detail', ['as' => $namePrefix . 'detail', 'uses' => $controller . 'detail']);
     Route::match(['post', 'options'], 'edit', ['as' => $namePrefix . 'edit', 'uses' => $controller . 'edit']);
+    Route::match(['post', 'options'], 'upload-logo', ['as' => $namePrefix . 'upload-logo', 'uses' => $controller . 'uploadLogo']);
 });
 
 //热门彩票管理

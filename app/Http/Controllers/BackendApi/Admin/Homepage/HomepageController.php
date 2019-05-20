@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
+use App\Common\Image;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use Illuminate\Support\Facades\Validator;
 
@@ -57,6 +58,37 @@ class HomepageController extends BackEndApiMainController
             $pastData->save();
             return $this->msgOut(true);
         } catch (Exception $e) {
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+            return $this->msgOut(false, [], $sqlState, $msg);
+        }
+    }
+
+    public function uploadLogo()
+    {
+        $validator = Validator::make($this->inputs, [
+            'pic' => 'required|image',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
+        }
+        $pastData = $this->eloqM::where('key', 'logo')->first();
+        if (is_null($pastData)) {
+            return $this->msgOut(false, [], '101903');
+        }
+        //上传图片
+        $imgClass = new Image();
+        $depositPath = $imgClass->depositPath('Logo', $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
+        $pic = $imgClass->uploadImg($this->inputs['pic'], $depositPath);
+        if ($pic['success'] === false) {
+            return $this->msgOut(false, [], '101904');
+        }
+        try {
+            $pastData->value = '/' . $pic['path'];
+            $pastData->save();
+            return $this->msgOut(true);
+        } catch (Exception $e) {
+            $imgClass->deletePic($pic['path']);
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);
