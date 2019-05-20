@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\FrontendApi\Game\Lottery;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Models\Game\Lottery;
 use App\models\IssueModel;
 use App\models\LotteriesModel;
 use App\models\MethodsModel;
+use App\models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -211,13 +211,30 @@ class LottriesController extends FrontendApiMainController
             'begin_time' => $_lastIssue->begin_time,
             'end_time' => $_lastIssue->end_time,
             'open_time' => $_lastIssue->allow_encode_time,
-            'open_code' => "1,2,3,4,5"
+            'open_code' => '1,2,3,4,5'
         ];
         $data = [
             'issueInfo' => $canBetIssueData,
             'currentIssue' => $currentIssue,
             'lastIssue' => $lastIssue,
         ];
+        return $this->msgOut(true, $data);
+    }
+
+    public function projectHistory()
+    {
+        $validator = Validator::make($this->inputs, [
+            'count'=>'required|integer|min:10|max:100',
+            'lottery_sign' => 'required|string|min:4|max:10|exists:lotteries,en_name',
+            'start' => 'required|integer',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors());
+        }
+        $lotterySign = $this->inputs['lottery_sign'];
+        $start          = $this->inputs['start'];//0
+        $count          = $this->inputs['count'];//10
+        $data   = Project::getGamePageList($lotterySign, $start, $count);
         return $this->msgOut(true, $data);
     }
 

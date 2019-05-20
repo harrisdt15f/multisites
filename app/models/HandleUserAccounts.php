@@ -2,9 +2,9 @@
 
 namespace App\models;
 
-use Illuminate\Database\Eloquent\Model;
+use LaravelArdent\Ardent\Ardent;
 
-class HandleUserAccounts extends Model
+class HandleUserAccounts extends Ardent
 {
     protected $table = 'user_accounts';
 

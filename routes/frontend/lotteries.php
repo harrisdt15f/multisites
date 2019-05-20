@@ -17,4 +17,6 @@ Route::group(['prefix' => 'lotteries','namespace'=>'Game\Lottery'], function () 
     Route::match(['post', 'options'], 'issueHistory', ['as' => $namePrefix . 'issueHistory', 'uses' => $controller . 'issueHistory']);
     //获取可用奖期接口
     Route::match(['post', 'options'], 'availableIssues', ['as' => $namePrefix . 'availableIssues', 'uses' => $controller . 'availableIssues']);
+    //获取下注历史接口
+    Route::match(['post', 'options'], 'projectHistory', ['as' => $namePrefix . 'projectHistory', 'uses' => $controller . 'projectHistory']);
 });
