@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\FrontendApi\Game\Lottery;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
+use App\Models\Game\Lottery;
+use App\models\IssueModel;
 use App\models\LotteriesModel;
 use App\models\MethodsModel;
 use Illuminate\Http\JsonResponse;
@@ -140,8 +142,8 @@ class LottriesController extends FrontendApiMainController
     // 历史奖期
 
     /**
-     * @todo  需要改真实数据 暂时先从那边挪接口
      * @return JsonResponse
+     * @todo  需要改真实数据 暂时先从那边挪接口
      */
     public function issueHistory(): JsonResponse
     {
@@ -154,18 +156,70 @@ class LottriesController extends FrontendApiMainController
         }
         $data = [
             [
-                'issue_no'  => '201809221',
-                'code'      => '1,2,3,4,5'
+                'issue_no' => '201809221',
+                'code' => '1,2,3,4,5'
             ],
             [
-                'issue_no'  => '201809222',
-                'code'      => '1,2,3,4,5'
+                'issue_no' => '201809222',
+                'code' => '1,2,3,4,5'
             ],
             [
-                'issue_no'  => '201809223',
-                'code'      => '1,2,3,4,5'
+                'issue_no' => '201809223',
+                'code' => '1,2,3,4,5'
             ],
         ];
         return $this->msgOut(true, $data);
     }
+
+    /**
+     * 7. 游戏-可用奖期
+     * @return JsonResponse
+     */
+    public function availableIssues(): JsonResponse
+    {
+        $validator = Validator::make($this->inputs, [
+            'lottery_sign' => 'required|string|min:4|max:10|exists:lotteries,en_name',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors());
+        }
+        $lotterySign = $this->inputs['lottery_sign'];
+        $lottery = LotteriesModel::findBySign($lotterySign);
+        $canUserInfo = IssueModel::getCanBetIssue($lotterySign, $lottery->max_trace_number);
+        $canBetIssueData = [];
+        $currentIssue = [];
+        foreach ($canUserInfo as $index => $issue) {
+            if ($index <= 0) {
+                $currentIssue = [
+                    'issue_no' => $issue->issue,
+                    'begin_time' => $issue->begin_time,
+                    'end_time' => $issue->end_time,
+                    'open_time' => $issue->allow_encode_time
+                ];
+            }
+            $canBetIssueData[] = [
+                'issue_no' => $issue->issue,
+                'begin_time' => $issue->begin_time,
+                'end_time' => $issue->end_time,
+                'open_time' => $issue->allow_encode_time
+            ];
+        }
+        // 上一期
+        $_lastIssue = IssueModel::getLastIssue($lotterySign);
+        $lastIssue = [
+            'issue_no' => $_lastIssue->issue,
+            'begin_time' => $_lastIssue->begin_time,
+            'end_time' => $_lastIssue->end_time,
+            'open_time' => $_lastIssue->allow_encode_time,
+            'open_code' => "1,2,3,4,5"
+        ];
+        $data = [
+            'issueInfo' => $canBetIssueData,
+            'currentIssue' => $currentIssue,
+            'lastIssue' => $lastIssue,
+        ];
+        return $this->msgOut(true, $data);
+    }
+
+
 }
