@@ -24,6 +24,11 @@ class LotteriesModel extends BaseModel
         return $this->hasOne(IssueRulesModel::class, 'lottery_id', 'en_name');
     }
 
+    public function gameMethods()
+    {
+        return $this->hasOne(MethodsModel::class, 'lottery_id', 'en_name')->where('status',1);
+    }
+
     /** ================================= 奖期生成 ================================== */
 
     /**
@@ -249,5 +254,18 @@ class LotteriesModel extends BaseModel
         $currentNo = substr($issueNo, -$count);
         $nextNo = intval($currentNo) + 1;
         return str_pad($nextNo, $count, '0', STR_PAD_LEFT);
+    }
+
+    public function getFormatMode() {
+        $modeConfig     = config('game.main.modes');
+        $currentModes   = explode(",", $this->valid_modes);
+
+        $data = [];
+        foreach ($currentModes as $index) {
+            $_mode = $modeConfig[$index];
+            $data[$index] = $_mode;
+        }
+
+        return $data;
     }
 }
