@@ -268,4 +268,9 @@ class LotteriesModel extends BaseModel
 
         return $data;
     }
+
+    // 标识获取彩种
+    public static function findBySign($sign) {
+        return self::where('en_name', $sign)->first();
+    }
 }

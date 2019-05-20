@@ -13,4 +13,6 @@ Route::group(['prefix' => 'lotteries','namespace'=>'Game\Lottery'], function () 
     Route::match(['post', 'options'], 'lotteryList', ['as' => $namePrefix . 'lotteryList', 'uses' => $controller . 'lotteryList']);
     //获取彩种接口
     Route::match(['post', 'options'], 'lotteryInfo', ['as' => $namePrefix . 'lotteryInfo', 'uses' => $controller . 'lotteryInfo']);
+    //获取彩种接口
+    Route::match(['post', 'options'], 'issueHistory', ['as' => $namePrefix . 'issueHistory', 'uses' => $controller . 'issueHistory']);
 });
