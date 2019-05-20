@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BackendApi\Admin\Activity;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\lib\Common\Image;
 use Illuminate\Support\Facades\Validator;
 
 class ActivityInfosController extends BackEndApiMainController
@@ -52,12 +53,13 @@ class ActivityInfosController extends BackEndApiMainController
         $file = $this->inputs['pic'];
         $path = 'uploaded_files/' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id . '/mobile_activity_' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id;
         //进行上传
-        $pic = $this->uploadImg($file, $path);
+        $ImageClass = new Image();
+        $pic = $ImageClass->uploadImg($file, $path);
         if ($pic['success'] === false) {
             return $this->msgOut(false, [], '100302');
         }
         //生成缩略图
-        $thumbnail_path = $this->creatThumbnail($pic['path'], 100, 200, 'sm_');
+        $thumbnail_path = $ImageClass->creatThumbnail($pic['path'], 100, 200, 'sm_');
         $addDatas = $this->inputs;
         unset($addDatas['pic']);
         $addDatas['pic_path'] = '/' . $pic['path'];
@@ -118,21 +120,22 @@ class ActivityInfosController extends BackEndApiMainController
             //接收文件信息
             $path = 'uploaded_files/' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id . '/mobile_activity_' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id;
             //进行上传
-            $picdata = $this->uploadImg($pic, $path);
+            $ImageClass = new Image();
+            $picdata = $ImageClass->uploadImg($pic, $path);
             if ($picdata['success'] === false) {
                 return $this->msgOut(false, [], '100302');
             }
             $editDataEloq->pic_path = '/' . $picdata['path'];
             //生成缩略图
-            $editDataEloq->thumbnail_path = '/' . $this->creatThumbnail($picdata['path'], 100, 200, 'sm_');
+            $editDataEloq->thumbnail_path = '/' . $ImageClass->creatThumbnail($picdata['path'], 100, 200, 'sm_');
         }
         $this->editAssignment($editDataEloq, $this->inputs);
         try {
             $editDataEloq->save();
             if (isset($pic) && !is_null($pic)) {
                 //删除原图片
-                $this->deletePic(substr($pastpic, 1));
-                $this->deletePic(substr($thumbnail_path, 1));
+                $ImageClass->deletePic(substr($pastpic, 1));
+                $ImageClass->deletePic(substr($thumbnail_path, 1));
             }
             return $this->msgOut(true);
         } catch (\Exception $e) {
@@ -155,8 +158,9 @@ class ActivityInfosController extends BackEndApiMainController
             try {
                 $this->eloqM::where('id', $this->inputs['id'])->delete();
                 //删除图片
-                $this->deletePic(substr($pastData['pic_path'], 1));
-                $this->deletePic(substr($pastData['thumbnail_path'], 1));
+                $ImageClass = new Image();
+                $ImageClass->deletePic(substr($pastData['pic_path'], 1));
+                $ImageClass->deletePic(substr($pastData['thumbnail_path'], 1));
                 return $this->msgOut(true);
             } catch (\Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
@@ -166,107 +170,5 @@ class ActivityInfosController extends BackEndApiMainController
         } else {
             return $this->msgOut(false, [], 100301);
         }
-    }
-    //图片上传
-    public function uploadImg($file, $url_path)
-    {
-        // 检验一下上传的文件是否有效.
-        if ($file->isValid()) {
-            // 缓存在tmp文件夹中的文件名 例如 php8933.tmp 这种类型的.
-            $clientName = $file->getClientOriginalName();
-            // 上传文件的后缀.
-            $entension = $file->getClientOriginalExtension();
-            $newName = md5(date("Y-m-d H:i:s") . $clientName) . "." . $entension;
-            if (!file_exists($url_path)) {
-                mkdir($url_path, 0777, true);
-            }
-            if (!is_writable(dirname($url_path))) {
-                return ['success' => false];
-            } else {
-                $file->move($url_path, $newName);
-            }
-            // 这里public_path()就是public文件夹所在的路径.$newName 通过算法获得的文件的名称.主要是不能重复产生冲突即可.
-            // 利用日期和客户端文件名结合 使用md5 算法加密得到结果.后面加上文件原始的拓展名.
-            //文件名
-            $namePath = $url_path . '/' . $newName;
-            return ['success' => true, 'name' => $newName, 'path' => $namePath];
-        }
-    }
-    public function deletePic($path)
-    {
-        if (file_exists($path)) {
-            if (!is_writable(dirname($path))) {
-                return $this->msgOut(false, [], '400', dirname($path) . ' 请设置权限!!!');
-            } else {
-                return unlink($path);
-            }
-        }
-    }
-    /**
-     *
-     * 制作缩略图
-     * @param $srcPath string 原图路径
-     * @param $maxWidth int 画布的宽度
-     * @param $maxHight int 画布的高度
-     * @param $flag bool 是否是等比缩略图  默认为true
-     * @param $prefix string 缩略图的前缀  默认为'sm_'
-     *
-     */
-    public function creatThumbnail($srcPath, $maxWidth, $maxHight, $prefix = 'sm_', $flag = true)
-    {
-        //获取文件的后缀
-        $arr = explode('.', $srcPath);
-        $picType = end($arr);
-        if ($picType === 'jpg') {
-            $picType = 'jpeg';
-        }
-        //拼接打开图片的函数
-        $open_fn = 'imagecreatefrom' . $picType;
-        //打开源图
-        $src = $open_fn($srcPath);
-        //创建目标图
-        $dst = imagecreatetruecolor($maxWidth, $maxHight);
-        //源图的宽
-        $src_w = imagesx($src);
-        //源图的高
-        $src_h = imagesy($src);
-        //是否等比缩放
-        if ($flag) {
-            //等比
-            //求目标图片的宽高
-            if ($maxWidth / $maxHight < $src_w / $src_h) {
-                //横屏图片以宽为标准
-                $dst_w = $maxWidth;
-                $dst_h = $maxWidth * $src_h / $src_w;
-            } else {
-                //竖屏图片以高为标准
-                $dst_h = $maxHight;
-                $dst_w = $maxHight * $src_w / $src_h;
-            }
-            //在目标图上显示的位置
-            $dst_x = (int) (($maxWidth - $dst_w) / 2);
-            $dst_y = (int) (($maxHight - $dst_h) / 2);
-        } else {
-            //不等比
-            $dst_x = 0;
-            $dst_y = 0;
-            $dst_w = $maxWidth;
-            $dst_h = $maxHight;
-        }
-        //生成缩略图
-        $fool = imagecopyresampled($dst, $src, $dst_x, $dst_y, 0, 0, $dst_w, $dst_h, $src_w, $src_h);
-        //文件名
-        $filename = basename($srcPath);
-        //文件夹名
-        $foldername = substr(dirname($srcPath), 0);
-        //缩略图存放路径
-        $thumb_path = $foldername . '/' . $prefix . $filename;
-        //把缩略图上传到指定的文件夹
-        imagepng($dst, $thumb_path);
-        //销毁图片资源
-        imagedestroy($dst);
-        imagedestroy($src);
-        //返回新的缩略图的文件名
-        return $thumb_path;
     }
 }

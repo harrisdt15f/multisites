@@ -1,5 +1,5 @@
 <?php
-namespace app\common;
+namespace app\lib\common;
 
 class Image
 {
@@ -52,8 +52,6 @@ class Image
         $open_fn = 'imagecreatefrom' . $picType;
         //打开源图
         $src = $open_fn($srcPath);
-        //创建目标图
-        $dst = imagecreatetruecolor($maxWidth, $maxHight);
         //源图的宽
         $src_w = imagesx($src);
         //源图的高
@@ -72,15 +70,19 @@ class Image
                 $dst_w = $maxHight * $src_w / $src_h;
             }
             //在目标图上显示的位置
-            $dst_x = (int) (($maxWidth - $dst_w) / 2);
-            $dst_y = (int) (($maxHight - $dst_h) / 2);
+            // $dst_x = (int) (($maxWidth - $dst_w) / 2);
+            // $dst_y = (int) (($maxHight - $dst_h) / 2);
         } else {
             //不等比
-            $dst_x = 0;
-            $dst_y = 0;
+            // $dst_x = 0;
+            // $dst_y = 0;
             $dst_w = $maxWidth;
             $dst_h = $maxHight;
         }
+        $dst_x = 0;
+        $dst_y = 0;
+        //创建目标图
+        $dst = imagecreatetruecolor($dst_w, $dst_h);
         //生成缩略图
         $fool = imagecopyresampled($dst, $src, $dst_x, $dst_y, 0, 0, $dst_w, $dst_h, $src_w, $src_h);
         //文件名
