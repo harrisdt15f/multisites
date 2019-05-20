@@ -16,7 +16,7 @@ class HomepageRotationChartController extends BackEndApiMainController
     public function detail()
     {
         $searchAbleFields = ['title', 'type'];
-        $datas = $this->generateSearchQuery($this->eloqM, $searchAbleFields);
+        $datas = $this->eloqM::get();
         return $this->msgOut(true, $datas);
     }
 
@@ -40,36 +40,43 @@ class HomepageRotationChartController extends BackEndApiMainController
         if (!is_null($checkTitle)) {
             return $this->msgOut(false, [], '101800');
         }
+        //跳转内部
         if ($this->inputs['type'] == 1) {
             if (!array_key_exists('redirect_url', $this->inputs)) {
                 return $this->msgOut(false, [], '101801');
             }
         } elseif ($this->inputs['type'] == 2) {
+            //跳转活动
             if (!array_key_exists('activity_id', $this->inputs)) {
                 return $this->msgOut(false, [], '101802');
             }
+            $checkActivity = ActivityInfos::where('id', $this->inputs['activity_id'])->first();
+            if (is_null($checkActivity)) {
+                return $this->msgOut(false, [], '101808');
+            }
         }
-
+        //上传图片
+        $ImageClass = new Image();
+        $folderName = 'Homepagec_Rotation_chart';
+        $depositPath = $ImageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
+        $pic = $ImageClass->uploadImg($this->inputs['pic'], $depositPath);
+        if ($pic['success'] === false) {
+            return $this->msgOut(false, [], '101803');
+        }
+        //生成缩略图
+        $thumbnail = $ImageClass->creatThumbnail($pic['path'], 100, 200, 'sm_');
+        $addData = $this->inputs;
+        unset($addData['pic']);
+        $addData['pic_path'] = '/' . $pic['path'];
+        $addData['thumbnail_path'] = '/' . $thumbnail;
+        //sort
+        $maxSort = $this->eloqM::orderBy('sort', 'desc')->first();
+        if (is_null($maxSort)) {
+            $addData['sort'] = 1;
+        } else {
+            $addData['sort'] = $maxSort->sort + 1;
+        }
         try {
-            $ImageClass = new Image();
-            $folderName = 'Homepagec_Rotation_chart';
-            $depositPath = $ImageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
-            $pic = $ImageClass->uploadImg($this->inputs['pic'], $depositPath);
-            if ($pic['success'] === false) {
-                return $this->msgOut(false, [], '101803');
-            }
-            $thumbnail = $ImageClass->creatThumbnail($pic['path'], 100, 200, 'sm_');
-            $addData = $this->inputs;
-            unset($addData['pic']);
-            $addData['pic_path'] = '/' . $pic['path'];
-            $addData['thumbnail_path'] = '/' . $thumbnail;
-            //sort
-            $maxSort = $this->eloqM::orderBy('sort', 'desc')->first();
-            if (is_null($maxSort)) {
-                $addData['sort'] = 1;
-            } else {
-                $addData['sort'] = $maxSort->sort + 1;
-            }
             $rotationChartEloq = new $this->eloqM;
             $rotationChartEloq->fill($addData);
             $rotationChartEloq->save();
@@ -88,7 +95,6 @@ class HomepageRotationChartController extends BackEndApiMainController
             'title' => 'required|string',
             'content' => 'required|string',
             'pic' => 'image',
-            'type' => 'required|numeric|in:1,2',
             'redirect_url' => 'string',
             'activity_id' => 'numeric',
             'status' => 'required|numeric|in:0,1',
@@ -109,19 +115,25 @@ class HomepageRotationChartController extends BackEndApiMainController
         if (!is_null($checkTitle)) {
             return $this->msgOut(false, [], '101800');
         }
-        if ($this->inputs['type'] == 1) {
+        //跳转内部
+        if ($pastData['type'] == 1) {
             if (!array_key_exists('redirect_url', $this->inputs)) {
                 return $this->msgOut(false, [], '101801');
             }
-        } elseif ($this->inputs['type'] == 2) {
+        } elseif ($pastData['type'] == 2) {
+            //跳转活动
             if (!array_key_exists('activity_id', $this->inputs)) {
                 return $this->msgOut(false, [], '101802');
+            }
+            $checkActivity = ActivityInfos::where('id', $this->inputs['activity_id'])->first();
+            if (is_null($checkActivity)) {
+                return $this->msgOut(false, [], '101808');
             }
         }
         $editData = $this->inputs;
         unset($editData['id']);
         unset($editData['pic']);
-        //如果上传了新图片   就替换原图
+        //如果要修改图片  删除原图  上传新图
         if (array_key_exists('pic', $this->inputs)) {
             $ImageClass = new Image();
             $picData = $this->replaceImage($pastData['pic_path'], $pastData['thumbnail_path'], $this->inputs['pic'], $ImageClass);
