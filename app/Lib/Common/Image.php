@@ -1,5 +1,5 @@
 <?php
-namespace App\lib\common;
+namespace App\Lib\common;
 
 class Image
 {

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\BackendApi\Admin\FundOperate;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\lib\Common\FundOperationRecharge;
+use App\Lib\Common\FundOperationRecharge;
 use App\models\ArtificialRechargeLog;
 use App\models\FundOperation;
 use App\models\FundOperationGroup;

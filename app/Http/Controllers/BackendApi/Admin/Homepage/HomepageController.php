@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\lib\Common\Image;
+use App\Lib\Common\Image;
 use Illuminate\Support\Facades\Validator;
 
 class HomepageController extends BackEndApiMainController
