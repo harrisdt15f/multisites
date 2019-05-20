@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
-use App\Common\Image;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\lib\Common\Image;
 use Illuminate\Support\Facades\Validator;
 
 class HomepageController extends BackEndApiMainController
