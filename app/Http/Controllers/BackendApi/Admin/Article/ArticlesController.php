@@ -5,6 +5,7 @@ namespace App\Http\Controllers\BackendApi\Admin\Article;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\models\AuditFlow;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ArticlesController extends BackEndApiMainController
@@ -197,6 +198,7 @@ class ArticlesController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
+        DB::beginTransaction();
         try {
             //上拉排序
             if ($this->inputs['sort_type'] == 1) {
@@ -216,8 +218,10 @@ class ArticlesController extends BackEndApiMainController
                 $this->eloqM::where('sort', '>', $this->inputs['front_sort'])->where('sort', '<=', $this->inputs['rearways_sort'])->decrement('sort');
             }
             $frontData->save();
+            DB::commit();
             return $this->msgOut(true);
         } catch (\Exception $e) {
+            DB::rollback();
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);

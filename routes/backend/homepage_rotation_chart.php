@@ -8,4 +8,5 @@ Route::group(['prefix' => 'homepage-rotation-chart', 'namespace' => 'Admin\Homep
     Route::match(['post', 'options'], 'edit', ['as' => $namePrefix . 'edit', 'uses' => $controller . 'edit']);
     Route::match(['post', 'options'], 'delete', ['as' => $namePrefix . 'delete', 'uses' => $controller . 'delete']);
     Route::match(['get', 'options'], 'activity-list', ['as' => $namePrefix . 'activity-list', 'uses' => $controller . 'activityList']);
+    Route::match(['get', 'options'], 'pic-standard', ['as' => $namePrefix . 'pic-standard', 'uses' => $controller . 'picStandard']);
 });
