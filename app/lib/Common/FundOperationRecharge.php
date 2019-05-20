@@ -1,5 +1,5 @@
 <?php
-namespace app\lib\common;
+namespace App\lib\common;
 
 class FundOperationRecharge
 {
