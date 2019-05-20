@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Validator;
 
 class LottriesController extends FrontendApiMainController
 {
@@ -31,29 +32,30 @@ class LottriesController extends FrontendApiMainController
         foreach ($lotteries as $lottery) {
             if (!isset($data[$lottery->series_id])) {
                 $data[$lottery->series_id] = [
-                    'name'  => $seriesConfig[$lottery->series_id],
-                    'sign'  => $lottery->series_id,
-                    'list'  => []
+                    'name' => $seriesConfig[$lottery->series_id],
+                    'sign' => $lottery->series_id,
+                    'list' => []
                 ];
             }
             $data[$lottery->series_id]['list'][] = [
-                'id'                => $lottery->en_name,
-                'name'              => $lottery->name,
-                'min_times'         => $lottery->min_times,
-                'max_times'         => $lottery->max_times,
-                'valid_modes'       => $lottery->valid_modes,
-                'min_prize_group'   => $lottery->min_prize_group,
-                'max_prize_group'   => $lottery->max_prize_group,
-                'max_trace_number'  => $lottery->max_trace_number,
-                'day_issue'         => $lottery->day_issue,
-                'begin_time'        => $lottery->issueRule['begin_time'],
-                'end_time'        => $lottery->issueRule['end_time'],
+                'id' => $lottery->en_name,
+                'name' => $lottery->name,
+                'min_times' => $lottery->min_times,
+                'max_times' => $lottery->max_times,
+                'valid_modes' => $lottery->valid_modes,
+                'min_prize_group' => $lottery->min_prize_group,
+                'max_prize_group' => $lottery->max_prize_group,
+                'max_trace_number' => $lottery->max_trace_number,
+                'day_issue' => $lottery->day_issue,
+                'begin_time' => $lottery->issueRule['begin_time'],
+                'end_time' => $lottery->issueRule['end_time'],
             ];
         }
         return $this->msgOut(true, $data);
     }
 
-    public function lotteryInfo() {
+    public function lotteryInfo(): JsonResponse
+    {
         $lotteries = LotteriesModel::where('status', 1)->get();
         $cacheData = [];
         $redisKey = 'frontend.lottery.lotteryInfo';
@@ -64,46 +66,47 @@ class LottriesController extends FrontendApiMainController
                 $lottery->valid_modes = $lottery->getFormatMode();
 
                 // 获取所有玩法
-                $methods    = MethodsModel::getMethodConfig($lottery->en_name);
+                $methods = MethodsModel::getMethodConfig($lottery->en_name);
                 $methodData = [];
 
-                $groupName  = config('game.method.group_name');
-                $rowName    = config('game.method.row_name');
+                $groupName = config('game.method.group_name');
+                $rowName = config('game.method.row_name');
 
                 $rowData = [];
-                foreach($methods as $index => $method) {
+                foreach ($methods as $index => $method) {
                     $rowData[$method->method_group][$method->method_row][] = [
-                        'method_name' =>    $method->method_name,
-                        'method_id'   =>    $method->method_id
+                        'method_name' => $method->method_name,
+                        'method_id' => $method->method_id
                     ];
                 }
 
-                $groupData  = [];
-                $hasRow     = [];
-                foreach($methods as $index => $method) {
+                $groupData = [];
+                $hasRow = [];
+                foreach ($methods as $index => $method) {
                     // 行
                     if (!isset($groupData[$method->method_group])) {
                         $groupData[$method->method_group] = [];
                     }
 
-                    if (!isset($hasRow[$method->method_group]) || !in_array($method->method_row, $hasRow[$method->method_group])) {
+                    if (!isset($hasRow[$method->method_group]) || !in_array($method->method_row,
+                            $hasRow[$method->method_group])) {
                         $groupData[$method->method_group][] = [
-                            'name'      => $rowName[$method->method_row],
-                            'sign'      => $method->method_row,
-                            'methods'   => $rowData[$method->method_group][$method->method_row],
+                            'name' => $rowName[$method->method_row],
+                            'sign' => $method->method_row,
+                            'methods' => $rowData[$method->method_group][$method->method_row],
                         ];
                         $hasRow[$method->method_group][] = $method->method_row;
                     }
                 }
 
                 // 组
-                $defaultGroup   = "";
-                $defaultMethod  = "";
-                $hasGroup       = [];
-                foreach($methods as $index => $method) {
+                $defaultGroup = '';
+                $defaultMethod = '';
+                $hasGroup = [];
+                foreach ($methods as $index => $method) {
                     if ($index == 0) {
-                        $defaultGroup   = $method->method_group;
-                        $defaultMethod  = $method->method_id;
+                        $defaultGroup = $method->method_group;
+                        $defaultMethod = $method->method_id;
                     }
 
                     // 组
@@ -121,10 +124,10 @@ class LottriesController extends FrontendApiMainController
                 }
 
                 $cacheData[$lottery->en_name] = [
-                    'lottery'           => $lottery,
-                    'methodConfig'      => $methodData,
-                    'defaultGroup'      => $defaultGroup,
-                    'defaultMethod'     => $defaultMethod,
+                    'lottery' => $lottery,
+                    'methodConfig' => $methodData,
+                    'defaultGroup' => $defaultGroup,
+                    'defaultMethod' => $defaultMethod,
                 ];
                 $hourToStore = 24;
                 $expiresAt = Carbon::now()->addHours($hourToStore)->diffInMinutes();
@@ -132,5 +135,37 @@ class LottriesController extends FrontendApiMainController
             }
         }
         return $this->msgOut(true, $cacheData);
+    }
+
+    // 历史奖期
+
+    /**
+     * @todo  需要改真实数据 暂时先从那边挪接口
+     * @return JsonResponse
+     */
+    public function issueHistory(): JsonResponse
+    {
+        $validator = Validator::make($this->inputs, [
+            'lottery_sign' => 'required|string|min:4|max:10|exists:lotteries,en_name',
+            'count' => 'integer',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors());
+        }
+        $data = [
+            [
+                'issue_no'  => '201809221',
+                'code'      => '1,2,3,4,5'
+            ],
+            [
+                'issue_no'  => '201809222',
+                'code'      => '1,2,3,4,5'
+            ],
+            [
+                'issue_no'  => '201809223',
+                'code'      => '1,2,3,4,5'
+            ],
+        ];
+        return $this->msgOut(true, $data);
     }
 }
