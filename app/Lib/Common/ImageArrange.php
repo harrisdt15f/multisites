@@ -15,15 +15,14 @@ class ImageArrange
             $entension = $file->getClientOriginalExtension();
             $newName = md5(date("Y-m-d H:i:s") . $clientName) . "." . $entension;
             if (!file_exists($url_path)) {
-                mkdir($url_path, 0777, true);
+                mkdir($url_path);
+                chmod($url_path, 0777);
             }
             if (!is_writable(dirname($url_path))) {
                 return ['success' => false];
             } else {
                 $file->move($url_path, $newName);
             }
-            // 这里public_path()就是public文件夹所在的路径.$newName 通过算法获得的文件的名称.主要是不能重复产生冲突即可.
-            // 利用日期和客户端文件名结合 使用md5 算法加密得到结果.后面加上文件原始的拓展名.
             //文件名
             $namePath = $url_path . '/' . $newName;
             return ['success' => true, 'name' => $newName, 'path' => $namePath];
