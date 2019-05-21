@@ -152,7 +152,7 @@ class LottriesController extends FrontendApiMainController
             'count' => 'integer',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $data = [
             [
@@ -181,7 +181,7 @@ class LottriesController extends FrontendApiMainController
             'lottery_sign' => 'required|string|min:4|max:10|exists:lotteries,en_name',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $lotterySign = $this->inputs['lottery_sign'];
         $lottery = LotteriesModel::findBySign($lotterySign);
@@ -229,7 +229,7 @@ class LottriesController extends FrontendApiMainController
             'start' => 'required|integer',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $lotterySign = $this->inputs['lottery_sign'];
         $start          = $this->inputs['start'];//0
