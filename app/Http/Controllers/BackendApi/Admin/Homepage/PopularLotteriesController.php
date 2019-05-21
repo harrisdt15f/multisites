@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Lib\Common\Image;
+use App\Lib\Common\ImageArrange;
 use App\models\LotteriesModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -14,13 +14,17 @@ class PopularLotteriesController extends BackEndApiMainController
 
     public function detailOne()
     {
-        $datas = $this->eloqM::where('type', 1)->orderBy('sort', 'asc')->get();
+        $datas = $this->eloqM::select('id','lotteries_id','pic_path','sort')->with(['lotteries'=>function($query){
+            $query->select('id','cn_name');
+        }])->where('type', 1)->orderBy('sort', 'asc')->get();
         return $this->msgOut(true, $datas);
     }
 
     public function detailTwo()
     {
-        $datas = $this->eloqM::where('type', 2)->orderBy('sort', 'asc')->get();
+        $datas = $this->eloqM::select('id','lotteries_id','sort')->with(['lotteries'=>function($query){
+            $query->select('id','cn_name');
+        }])->where('type', 2)->orderBy('sort', 'asc')->get();
         return $this->msgOut(true, $datas);
     }
 
@@ -58,7 +62,7 @@ class PopularLotteriesController extends BackEndApiMainController
         ];
         if ($this->inputs['type'] == 1) {
             //上传图片
-            $imgClass = new Image();
+            $imgClass = new ImageArrange();
             $depositPath = $imgClass->depositPath('popular_lotteries', $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
             $pic = $imgClass->uploadImg($this->inputs['pic'], $depositPath);
             if ($pic['success'] === false) {
@@ -96,7 +100,7 @@ class PopularLotteriesController extends BackEndApiMainController
             return $this->msgOut(false, [], '102004');
         }
         $pastPic = $pastData->pic_path;
-        $imgClass = new Image();
+        $imgClass = new ImageArrange();
         $depositPath = $imgClass->depositPath('popular_lotteries', $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
         $pic = $imgClass->uploadImg($this->inputs['pic'], $depositPath);
         if ($pic['success'] === false) {
@@ -139,7 +143,7 @@ class PopularLotteriesController extends BackEndApiMainController
             DB::commit();
             //热门彩种1 删除图片
             if ($pastData->type === 1) {
-                $imgClass = new Image();
+                $imgClass = new ImageArrange();
                 $imgClass->deletePic(substr($pastData['pic_path'], 1));
             }
             return $this->msgOut(true);

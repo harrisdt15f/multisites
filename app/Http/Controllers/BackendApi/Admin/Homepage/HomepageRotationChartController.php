@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Lib\Common\Image;
+use App\Lib\Common\ImageArrange;
 use App\models\ActivityInfos;
 use App\models\AdvertisementType;
 use Illuminate\Support\Facades\DB;
@@ -56,7 +56,7 @@ class HomepageRotationChartController extends BackEndApiMainController
             }
         }
         //上传图片
-        $ImageClass = new Image();
+        $ImageClass = new ImageArrange();
         $folderName = 'Homepagec_Rotation_chart';
         $depositPath = $ImageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
         $pic = $ImageClass->uploadImg($this->inputs['pic'], $depositPath);
@@ -135,7 +135,7 @@ class HomepageRotationChartController extends BackEndApiMainController
         unset($editData['pic']);
         //如果要修改图片  删除原图  上传新图
         if (array_key_exists('pic', $this->inputs)) {
-            $ImageClass = new Image();
+            $ImageClass = new ImageArrange();
             $picData = $this->replaceImage($pastData['pic_path'], $pastData['thumbnail_path'], $this->inputs['pic'], $ImageClass);
             if ($picData['success'] === false) {
                 return $this->msgOut(false, [], $picData['code']);
@@ -171,7 +171,7 @@ class HomepageRotationChartController extends BackEndApiMainController
         $pastData = $pastDataEloq;
         DB::beginTransaction();
         try {
-            $ImageClass = new Image();
+            $ImageClass = new ImageArrange();
             $deleteStatus = $ImageClass->deletePic(substr($pastDataEloq['pic_path'], 1));
             if ($deleteStatus === false) {
                 return $this->msgOut(false, [], '101805');

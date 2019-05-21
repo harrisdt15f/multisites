@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Lib\Common\Image;
+use App\Lib\Common\ImageArrange;
 use Illuminate\Support\Facades\Validator;
 
 class HomepageController extends BackEndApiMainController
@@ -78,7 +78,7 @@ class HomepageController extends BackEndApiMainController
             return $this->msgOut(false, [], '101903');
         }
         //上传图片
-        $imgClass = new Image();
+        $imgClass = new ImageArrange();
         $depositPath = $imgClass->depositPath($this->inputs['key'], $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
         $pic = $imgClass->uploadImg($this->inputs['pic'], $depositPath);
         if ($pic['success'] === false) {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\BackendApi\Admin\Article;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\models\AuditFlow;
+use App\Lib\Common\ImageArrange;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -139,9 +140,10 @@ class ArticlesController extends BackEndApiMainController
                 $minutes = 2 * 24 * 60;
                 Cache::put('CachePic', $CachePic, $minutes);
                 //删除原图
+                $ImageClass = new ImageArrange();
                 $past_pic_path_arr = explode('|', $past_pic_path);
                 foreach ($past_pic_path_arr as $k => $v) {
-                    $this->deleteArticlePic($v);
+                    $ImageClass->deletePic($v);
                 }
                 $editDataEloq->pic_path = implode('|', $new_pic_path);
             }
@@ -172,8 +174,9 @@ class ArticlesController extends BackEndApiMainController
             try {
                 $this->eloqM::where('id', $this->inputs['id'])->delete();
                 $this->eloqM::where('sort', '>', $pastData['sort'])->decrement('sort');
+                $ImageClass = new ImageArrange();
                 foreach ($pic_path as $k => $v) {
-                    $this->deleteArticlePic($v);
+                    $ImageClass->deletePic($v);
                 }
                 return $this->msgOut(true);
             } catch (\Exception $e) {
@@ -261,13 +264,14 @@ class ArticlesController extends BackEndApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         //接收文件信息
+        $ImageClass = new ImageArrange();
         $file = $this->inputs['pic'];
-        $path = 'uploaded_files/' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id . '/articles_' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id;
-        $rule = ['jpg', 'png', 'gif'];
+        $folderName = 'articles';
+        $depositPath = $ImageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
         //进行上传
-        $pic = $this->uploadImg($file, $path, $rule);
+        $pic = $ImageClass->uploadImg($file, $depositPath);
         if ($pic['success'] === false) {
-            return $this->msgOut(false, [], $pic['code']);
+            return $this->msgOut(false, [], '100502');
         }
         $minutes = 2 * 24 * 60;
         $pic['expire_time'] = (time() + 60 * 30) . '';
@@ -279,42 +283,5 @@ class ArticlesController extends BackEndApiMainController
         }
         Cache::put('CachePic', $CachePic, $minutes);
         return $this->msgOut(true, $pic);
-    }
-    public function uploadImg($file, $url_path, $rule)
-    {
-        // 检验一下上传的文件是否有效.
-        if ($file->isValid()) {
-            // 缓存在tmp文件夹中的文件名 例如 php8933.tmp 这种类型的.
-            $clientName = $file->getClientOriginalName();
-            // 上传文件的后缀.
-            $entension = $file->getClientOriginalExtension();
-            if (!in_array($entension, $rule)) {
-                return ['success' => false, 'code' => 100502];
-            }
-            $newName = md5(date("Y-m-d H:i:s") . $clientName) . "." . $entension;
-            if (!file_exists($url_path)) {
-                mkdir($url_path, 0777, true);
-            }
-            if (!is_writable(dirname($url_path))) {
-                return ['success' => false, 'code' => 100503];
-            } else {
-                $file->move($url_path, $newName);
-            }
-            // 这里public_path()就是public文件夹所在的路径.$newName 通过算法获得的文件的名称.主要是不能重复产生冲突即可.
-            // 利用日期和客户端文件名结合 使用md5 算法加密得到结果.后面加上文件原始的拓展名.
-            //文件名
-            $namePath = $url_path . '/' . $newName;
-            return ['success' => true, 'name' => $newName, 'path' => $namePath];
-        }
-    }
-    public function deleteArticlePic($path)
-    {
-        if (file_exists($path)) {
-            if (!is_writable(dirname($path))) {
-                return $this->msgOut(false, [], '400', dirname($path) . ' 请设置权限!!!');
-            } else {
-                return unlink($path);
-            }
-        }
     }
 }

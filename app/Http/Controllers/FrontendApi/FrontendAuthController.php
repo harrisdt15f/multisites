@@ -138,7 +138,7 @@ class FrontendAuthController extends FrontendApiMainController
             'password' => 'required|string',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         if (!Hash::check($this->inputs['old_password'], $this->partnerAdmin->password)) {
             return $this->msgOut(false, [], '100003');
@@ -232,7 +232,7 @@ class FrontendAuthController extends FrontendApiMainController
             'group_id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $targetUserEloq = $this->eloqM::find($this->inputs['id']);
         if (!is_null($targetUserEloq)) {
@@ -277,7 +277,7 @@ class FrontendAuthController extends FrontendApiMainController
             'name' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
 
         $targetUserEloq = $this->eloqM::where([
@@ -306,7 +306,7 @@ class FrontendAuthController extends FrontendApiMainController
             'password' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors());
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $targetUserEloq = $this->eloqM::where([
             ['id', '=', $this->inputs['id']],

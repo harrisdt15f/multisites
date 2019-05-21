@@ -31,8 +31,7 @@ return [
     //ArticlesController
     '100500' => '文章名已存在',
     '100501' => '文章不存在',
-    '100502' => '图片格式必须是jpg,png,gif',
-    '100503' => '上传图片时，没有写入文件权限',
+    '100502' => '上传图片失败',
     //BankController
     '100600' => '银行不存在',
     //ConfiguresController
