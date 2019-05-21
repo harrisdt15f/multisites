@@ -14,13 +14,17 @@ class PopularLotteriesController extends BackEndApiMainController
 
     public function detailOne()
     {
-        $datas = $this->eloqM::where('type', 1)->orderBy('sort', 'asc')->get();
+        $datas = $this->eloqM::select('id','lotteries_id','pic_path','sort')->with(['lotteries'=>function($query){
+            $query->select('id','cn_name');
+        }])->where('type', 1)->orderBy('sort', 'asc')->get();
         return $this->msgOut(true, $datas);
     }
 
     public function detailTwo()
     {
-        $datas = $this->eloqM::where('type', 2)->orderBy('sort', 'asc')->get();
+        $datas = $this->eloqM::select('id','lotteries_id','sort')->with(['lotteries'=>function($query){
+            $query->select('id','cn_name');
+        }])->where('type', 2)->orderBy('sort', 'asc')->get();
         return $this->msgOut(true, $datas);
     }
 
