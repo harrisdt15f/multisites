@@ -20,6 +20,6 @@ class PartnerAdminGroupAccess extends BaseModel
      */
     public function adminUsers()
     {
-        return $this->hasMany(PartnerAdminUsers::class,'group_id','id')->select(['id','name','email','is_test','status','platform_id']);
+        return $this->hasMany(PartnerAdminUsers::class,'group_id','id')->select(['id','name','email','is_test','status','platform_id','group_id']);
     }
 }
