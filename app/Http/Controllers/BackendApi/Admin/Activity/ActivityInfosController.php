@@ -50,11 +50,12 @@ class ActivityInfosController extends BackEndApiMainController
             }
         }
         //接收文件信息
-        $file = $this->inputs['pic'];
-        $path = 'uploaded_files/' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id . '/mobile_activity_' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id;
-        //进行上传
         $ImageClass = new ImageArrange();
-        $pic = $ImageClass->uploadImg($file, $path);
+        $file = $this->inputs['pic'];
+        $folderName = 'mobile_activity';
+        $depositPath = $ImageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
+        //进行上传
+        $pic = $ImageClass->uploadImg($file, $depositPath);
         if ($pic['success'] === false) {
             return $this->msgOut(false, [], '100302');
         }
@@ -111,17 +112,19 @@ class ActivityInfosController extends BackEndApiMainController
         if (is_null($editDataEloq)) {
             return $this->msgOut(false, [], '100301');
         }
+        $editData = $this->inputs;
         //如果修改了图片 删除原图并且上传新图片
-        if (isset($this->inputs['pic']) && !is_null($this->inputs['pic'])) {
-            $pic = $this->inputs['pic'];
-            unset($this->inputs['pic']);
-            $pastpic = $editDataEloq->pic_path;
-            $thumbnail_path = $editDataEloq->thumbnail_path;
+        if (isset($this->inputs['pic'])) {
+            //
+            unset($editData['pic']);
+            $pastPic = $editDataEloq->pic_path;
+            $pastThumbnail = $editDataEloq->thumbnail_path;
             //接收文件信息
-            $path = 'uploaded_files/' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id . '/mobile_activity_' . $this->currentPlatformEloq->platform_name . '_' . $this->currentPlatformEloq->platform_id;
-            //进行上传
             $ImageClass = new ImageArrange();
-            $picdata = $ImageClass->uploadImg($pic, $path);
+            $folderName = 'mobile_activity';
+            $depositPath = $ImageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
+            //进行上传
+            $picdata = $ImageClass->uploadImg($this->inputs['pic'], $depositPath);
             if ($picdata['success'] === false) {
                 return $this->msgOut(false, [], '100302');
             }
@@ -129,13 +132,13 @@ class ActivityInfosController extends BackEndApiMainController
             //生成缩略图
             $editDataEloq->thumbnail_path = '/' . $ImageClass->creatThumbnail($picdata['path'], 100, 200, 'sm_');
         }
-        $this->editAssignment($editDataEloq, $this->inputs);
+        $this->editAssignment($editDataEloq, $editData);
         try {
             $editDataEloq->save();
-            if (isset($pic) && !is_null($pic)) {
+            if (isset($this->inputs['pic'])) {
                 //删除原图片
-                $ImageClass->deletePic(substr($pastpic, 1));
-                $ImageClass->deletePic(substr($thumbnail_path, 1));
+                $ImageClass->deletePic(substr($pastPic, 1));
+                $ImageClass->deletePic(substr($pastThumbnail, 1));
             }
             return $this->msgOut(true);
         } catch (\Exception $e) {
