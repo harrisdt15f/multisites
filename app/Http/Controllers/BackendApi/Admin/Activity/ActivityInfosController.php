@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 class ActivityInfosController extends BackEndApiMainController
 {
     protected $eloqM = 'ActivityInfos';
+    protected $folderName = 'mobile_activity';//活动图片存放的文件夹名称
     //活动列表
     public function detail()
     {
@@ -51,11 +52,9 @@ class ActivityInfosController extends BackEndApiMainController
         }
         //接收文件信息
         $ImageClass = new ImageArrange();
-        $file = $this->inputs['pic'];
-        $folderName = 'mobile_activity';
-        $depositPath = $ImageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
+        $depositPath = $ImageClass->depositPath($this->folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
         //进行上传
-        $pic = $ImageClass->uploadImg($file, $depositPath);
+        $pic = $ImageClass->uploadImg($this->inputs['pic'], $depositPath);
         if ($pic['success'] === false) {
             return $this->msgOut(false, [], '100302');
         }
@@ -121,8 +120,7 @@ class ActivityInfosController extends BackEndApiMainController
             $pastThumbnail = $editDataEloq->thumbnail_path;
             //接收文件信息
             $ImageClass = new ImageArrange();
-            $folderName = 'mobile_activity';
-            $depositPath = $ImageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
+            $depositPath = $ImageClass->depositPath($this->folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
             //进行上传
             $picdata = $ImageClass->uploadImg($this->inputs['pic'], $depositPath);
             if ($picdata['success'] === false) {
