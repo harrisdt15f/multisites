@@ -15,7 +15,7 @@ class ImageArrange
             $entension = $file->getClientOriginalExtension();
             $newName = md5(date("Y-m-d H:i:s") . $clientName) . "." . $entension;
             if (!file_exists($url_path)) {
-                mkdir($url_path, 0777, true);
+                mkdir($url_path);
                 chmod($url_path, 0777);
             }
             if (!is_writable(dirname($url_path))) {
