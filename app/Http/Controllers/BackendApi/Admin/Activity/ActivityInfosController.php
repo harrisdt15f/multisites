@@ -4,12 +4,13 @@ namespace App\Http\Controllers\BackendApi\Admin\Activity;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\ImageArrange;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ActivityInfosController extends BackEndApiMainController
 {
     protected $eloqM = 'ActivityInfos';
-    protected $folderName = 'mobile_activity';//活动图片存放的文件夹名称
+    protected $folderName = 'mobile_activity'; //活动图片存放的文件夹名称
     //活动列表
     public function detail()
     {
@@ -60,8 +61,16 @@ class ActivityInfosController extends BackEndApiMainController
         }
         //生成缩略图
         $thumbnail_path = $ImageClass->creatThumbnail($pic['path'], 100, 200, 'sm_');
+        //sort
+        $sortdata = $this->eloqM::orderBy('sort', 'desc')->first();
+        if (is_null($sortdata)) {
+            $sort = 1;
+        } else {
+            $sort = $sortdata->sort + 1;
+        }
         $addDatas = $this->inputs;
         unset($addDatas['pic']);
+        $addDatas['sort'] = $sort;
         $addDatas['pic_path'] = '/' . $pic['path'];
         $addDatas['thumbnail_path'] = '/' . $thumbnail_path;
         $addDatas['admin_id'] = $this->partnerAdmin->id;
@@ -145,6 +154,7 @@ class ActivityInfosController extends BackEndApiMainController
             return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
+
     //删除活动
     public function delete()
     {
@@ -156,20 +166,72 @@ class ActivityInfosController extends BackEndApiMainController
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
         if (!is_null($pastData)) {
+            DB::beginTransaction();
             try {
                 $this->eloqM::where('id', $this->inputs['id'])->delete();
+                //排序
+                $this->eloqM::where('sort', '>', $pastData['sort'])->decrement('sort');
                 //删除图片
                 $ImageClass = new ImageArrange();
                 $ImageClass->deletePic(substr($pastData['pic_path'], 1));
                 $ImageClass->deletePic(substr($pastData['thumbnail_path'], 1));
+                DB::commit();
                 return $this->msgOut(true);
             } catch (\Exception $e) {
+                DB::rollback();
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
                 return $this->msgOut(false, [], $sqlState, $msg);
             }
         } else {
             return $this->msgOut(false, [], 100301);
+        }
+    }
+
+    public function sort()
+    {
+        $validator = Validator::make($this->inputs, [
+            'front_id' => 'required|numeric|gt:0',
+            'rearways_id' => 'required|numeric|gt:0',
+            'front_sort' => 'required|numeric|gt:0',
+            'rearways_sort' => 'required|numeric|gt:0',
+            'sort_type' => 'required|in:1,2',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
+        }
+        $pastFrontData = $this->eloqM::find($this->inputs['front_id']);
+        $pastRearwaysData = $this->eloqM::find($this->inputs['rearways_id']);
+        if (is_null($pastFrontData) || is_null($pastRearwaysData)) {
+            return $this->msgOut(false, [], '100304');
+        }
+        DB::beginTransaction();
+        try {
+            //上拉排序
+            if ($this->inputs['sort_type'] == 1) {
+                $stationaryData = $this->eloqM::find($this->inputs['front_id']);
+                $stationaryData->sort = $this->inputs['front_sort'];
+                $this->eloqM::where(function ($query) {
+                    $query->where('sort', '>=', $this->inputs['front_sort'])
+                        ->where('sort', '<', $this->inputs['rearways_sort']);
+                })->increment('sort');
+            } elseif ($this->inputs['sort_type'] == 2) {
+                //下拉排序
+                $stationaryData = $this->eloqM::find($this->inputs['rearways_id']);
+                $stationaryData->sort = $this->inputs['rearways_sort'];
+                $this->eloqM::where(function ($query) {
+                    $query->where('sort', '>', $this->inputs['front_sort'])
+                        ->where('sort', '<=', $this->inputs['rearways_sort']);
+                })->decrement('sort');
+            }
+            $stationaryData->save();
+            DB::commit();
+            return $this->msgOut(true);
+        } catch (\Exception $e) {
+            DB::rollback();
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
 }

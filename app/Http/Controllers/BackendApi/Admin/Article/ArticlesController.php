@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\BackendApi\Admin\Article;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\models\AuditFlow;
 use App\Lib\Common\ImageArrange;
+use App\models\AuditFlow;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -171,6 +171,7 @@ class ArticlesController extends BackEndApiMainController
         $pastData = $this->eloqM::find($this->inputs['id']);
         $pic_path = explode('|', $pastData['pic_path']);
         if (!is_null($pastData)) {
+            DB::beginTransaction();
             try {
                 $this->eloqM::where('id', $this->inputs['id'])->delete();
                 $this->eloqM::where('sort', '>', $pastData['sort'])->decrement('sort');
@@ -178,8 +179,10 @@ class ArticlesController extends BackEndApiMainController
                 foreach ($pic_path as $k => $v) {
                     $ImageClass->deletePic($v);
                 }
+                DB::commit();
                 return $this->msgOut(true);
             } catch (\Exception $e) {
+                DB::rollback();
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
                 return $this->msgOut(false, [], $sqlState, $msg);
