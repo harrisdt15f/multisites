@@ -15,8 +15,12 @@ class HomepageController extends FrontendApiMainController
     //需要展示的前台模块
     public function showHomepageModel()
     {
-        $showHomepageModel = $this->eloqM::select('key')->where('status', 1)->get();
-        return $this->msgOut(true, $showHomepageModel);
+        $HomepageModel = $this->eloqM::select('key', 'status')->where('pid', '!=', 0)->get();
+        $data = [];
+        foreach ($HomepageModel as $value) {
+            $data[$value->key] = $value->status;
+        }
+        return $this->msgOut(true, $data);
     }
 
     //轮播图
@@ -63,5 +67,12 @@ class HomepageController extends FrontendApiMainController
         $showNum = $this->eloqM::select('show_num')->where('key', 'activity')->first();
         $data = ActivityInfos::select('id', 'title', 'content', 'thumbnail_path', 'redirect_url')->where('status', 1)->orderBy('sort', 'asc')->limit($showNum->show_num)->get();
         return $this->msgOut(true, $data);
+    }
+
+    //LOGO
+    public function logo()
+    {
+        $logo = $this->eloqM::select('value')->where('key', 'logo')->get();
+        return $this->msgOut(true, $logo);
     }
 }
