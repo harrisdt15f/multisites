@@ -16,8 +16,8 @@ class HomepageRotationChartController extends BackEndApiMainController
     public function detail()
     {
         $searchAbleFields = ['title', 'type'];
-        $datas = $this->eloqM::get();
-        return $this->msgOut(true, $datas);
+        $data = $this->eloqM::orderBy('sort', 'asc')->get()->toArray();
+        return $this->msgOut(true, $data);
     }
 
     public function add()
