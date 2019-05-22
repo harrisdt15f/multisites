@@ -30,7 +30,7 @@ class HomepageController extends FrontendApiMainController
             ->with(['activity' => function ($query) {
                 $query->select('id', 'redirect_url');
             }])
-            ->where('status', 1)->get();
+            ->where('status', 1)->get()->toArray();
         return $this->msgOut(true, $data);
     }
 
@@ -38,26 +38,35 @@ class HomepageController extends FrontendApiMainController
     public function popularLotteriesOne()
     {
         $showNum = $this->eloqM::select('show_num')->where('key', 'popularLotteries.one')->first();
-        $data = PopularLotteries::select('id', 'lotteries_id', 'pic_path')->with(['lotteries' => function ($query) {
+        $dataEloq = PopularLotteries::select('id', 'lotteries_id', 'pic_path')->with(['lotteries' => function ($query) {
             $query->select('id', 'day_issue');
         }])->where('type', 1)->limit($showNum->show_num)->get();
-        return $this->msgOut(true, $data);
+        $datas = [];
+        foreach ($dataEloq as $key => $dataIthem) {
+            $datas[$key]['pic_path'] = $dataIthem->pic_path;
+            $datas[$key]['day_issue'] = $dataIthem->lotteries->day_issue;
+        }
+        return $this->msgOut(true, $datas);
     }
 
     //热门彩种二
     public function popularLotteriesTwo()
     {
         $showNum = $this->eloqM::select('show_num')->where('key', 'popularLotteries.two')->first();
-        $data = PopularLotteries::select('id', 'lotteries_id')->with(['lotteries' => function ($query) {
+        $dataEloq = PopularLotteries::select('id', 'lotteries_id')->with(['lotteries' => function ($query) {
             $query->select('id', 'cn_name');
         }])->where('type', 2)->limit($showNum->show_num)->get();
-        return $this->msgOut(true, $data);
+        $datas = [];
+        foreach ($dataEloq as $value) {
+            $datas[$value->lotteries->id] = $value->lotteries->cn_name;
+        }
+        return $this->msgOut(true, $datas);
     }
 
     //二维码
     public function qrCode()
     {
-        $qrCode = $this->eloqM::select('value')->where('key', 'qr.code')->get();
+        $qrCode = $this->eloqM::select('value')->where('key', 'qr.code')->get()->toArray();
         return $this->msgOut(true, $qrCode);
     }
 
@@ -65,14 +74,14 @@ class HomepageController extends FrontendApiMainController
     public function activity()
     {
         $showNum = $this->eloqM::select('show_num')->where('key', 'activity')->first();
-        $data = ActivityInfos::select('id', 'title', 'content', 'thumbnail_path', 'redirect_url')->where('status', 1)->orderBy('sort', 'asc')->limit($showNum->show_num)->get();
+        $data = ActivityInfos::select('id', 'title', 'content', 'thumbnail_path', 'redirect_url')->where('status', 1)->orderBy('sort', 'asc')->limit($showNum->show_num)->get()->toArray();
         return $this->msgOut(true, $data);
     }
 
     //LOGO
     public function logo()
     {
-        $logo = $this->eloqM::select('value')->where('key', 'logo')->get();
+        $logo = $this->eloqM::select('value')->where('key', 'logo')->get()->toArray();
         return $this->msgOut(true, $logo);
     }
 }
