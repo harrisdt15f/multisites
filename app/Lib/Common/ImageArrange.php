@@ -5,26 +5,31 @@ class ImageArrange
 {
 
     //图片上传
-    public function uploadImg($file, $url_path)
+    public function uploadImg($file, $path)
     {
         // 检验一下上传的文件是否有效.
         if ($file->isValid()) {
+            $folder = 'uploaded_files';
+            if (file_exists($folder)) {
+                if (!is_writable($folder)) {
+                    return ['success' => false, 'msg' => '文件夹' . $folder . '没有写入权限'];
+                } else {
+                    if (!is_writable($path)) {
+                        mkdir($path, 0777, true);
+                        chmod($path, 0777);
+                    }
+                }
+            } else {
+                return ['success' => false, 'msg' => '文件夹' . $folder . '不存在'];
+            }
             // 缓存在tmp文件夹中的文件名 例如 php8933.tmp 这种类型的.
             $clientName = $file->getClientOriginalName();
             // 上传文件的后缀.
             $entension = $file->getClientOriginalExtension();
             $newName = md5(date("Y-m-d H:i:s") . $clientName) . "." . $entension;
-            if (!file_exists($url_path)) {
-                mkdir($url_path, 0777, true);
-                chmod($url_path, 0777);
-            }
-            if (!is_writable(dirname($url_path))) {
-                return ['success' => false];
-            } else {
-                $file->move($url_path, $newName);
-            }
+            $file->move($path, $newName);
             //文件名
-            $namePath = $url_path . '/' . $newName;
+            $namePath = $path . '/' . $newName;
             return ['success' => true, 'name' => $newName, 'path' => $namePath];
         }
     }

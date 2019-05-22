@@ -61,7 +61,7 @@ class HomepageRotationChartController extends BackEndApiMainController
         $depositPath = $ImageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
         $pic = $ImageClass->uploadImg($this->inputs['pic'], $depositPath);
         if ($pic['success'] === false) {
-            return $this->msgOut(false, [], '101803');
+            return $this->msgOut(false, [], '400', $pic['msg']);
         }
         //生成缩略图
         $thumbnail = $ImageClass->creatThumbnail($pic['path'], 100, 200, 'sm_');

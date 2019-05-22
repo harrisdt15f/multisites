@@ -14,16 +14,16 @@ class PopularLotteriesController extends BackEndApiMainController
 
     public function detailOne()
     {
-        $datas = $this->eloqM::select('id','lotteries_id','pic_path','sort')->with(['lotteries'=>function($query){
-            $query->select('id','cn_name');
+        $datas = $this->eloqM::select('id', 'lotteries_id', 'pic_path', 'sort')->with(['lotteries' => function ($query) {
+            $query->select('id', 'cn_name');
         }])->where('type', 1)->orderBy('sort', 'asc')->get();
         return $this->msgOut(true, $datas);
     }
 
     public function detailTwo()
     {
-        $datas = $this->eloqM::select('id','lotteries_id','sort')->with(['lotteries'=>function($query){
-            $query->select('id','cn_name');
+        $datas = $this->eloqM::select('id', 'lotteries_id', 'sort')->with(['lotteries' => function ($query) {
+            $query->select('id', 'cn_name');
         }])->where('type', 2)->orderBy('sort', 'asc')->get();
         return $this->msgOut(true, $datas);
     }
@@ -66,7 +66,7 @@ class PopularLotteriesController extends BackEndApiMainController
             $depositPath = $imgClass->depositPath('popular_lotteries', $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
             $pic = $imgClass->uploadImg($this->inputs['pic'], $depositPath);
             if ($pic['success'] === false) {
-                return $this->msgOut(false, [], '102002');
+                return $this->msgOut(false, [], '400', $pic['msg']);
             }
             $addData['pic_path'] = '/' . $pic['path'];
         }
@@ -104,7 +104,7 @@ class PopularLotteriesController extends BackEndApiMainController
         $depositPath = $imgClass->depositPath('popular_lotteries', $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
         $pic = $imgClass->uploadImg($this->inputs['pic'], $depositPath);
         if ($pic['success'] === false) {
-            return $this->msgOut(false, [], '102002');
+            return $this->msgOut(false, [], '400', $pic['msg']);
         }
         $pastData->pic_path = '/' . $pic['path'];
         try {

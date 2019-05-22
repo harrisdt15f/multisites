@@ -82,13 +82,13 @@ class HomepageController extends BackEndApiMainController
         $depositPath = $imgClass->depositPath($this->inputs['key'], $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
         $pic = $imgClass->uploadImg($this->inputs['pic'], $depositPath);
         if ($pic['success'] === false) {
-            return $this->msgOut(false, [], '101904');
+            return $this->msgOut(false, [], '400', $pic['msg']);
         }
         $pastLogoPath = $pastData->value;
         try {
             $pastData->value = '/' . $pic['path'];
             $pastData->save();
-            //删除原LOGO
+            //删除原图
             if (!is_null($pastLogoPath)) {
                 $imgClass->deletePic(substr($pastLogoPath, 1));
             }

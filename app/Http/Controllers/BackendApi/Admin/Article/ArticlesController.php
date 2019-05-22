@@ -285,7 +285,7 @@ class ArticlesController extends BackEndApiMainController
         //进行上传
         $pic = $ImageClass->uploadImg($file, $depositPath);
         if ($pic['success'] === false) {
-            return $this->msgOut(false, [], '100502');
+            return $this->msgOut(false, [], '400', $pic['msg']);
         }
         $minutes = 2 * 24 * 60;
         $pic['expire_time'] = (time() + 60 * 30) . '';

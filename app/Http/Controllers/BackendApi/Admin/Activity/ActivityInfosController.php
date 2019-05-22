@@ -57,7 +57,7 @@ class ActivityInfosController extends BackEndApiMainController
         //进行上传
         $pic = $ImageClass->uploadImg($this->inputs['pic'], $depositPath);
         if ($pic['success'] === false) {
-            return $this->msgOut(false, [], '100302');
+            return $this->msgOut(false, [], '400', $pic['msg']);
         }
         //生成缩略图
         $thumbnail_path = $ImageClass->creatThumbnail($pic['path'], 100, 200, 'sm_');
@@ -133,7 +133,7 @@ class ActivityInfosController extends BackEndApiMainController
             //进行上传
             $picdata = $ImageClass->uploadImg($this->inputs['pic'], $depositPath);
             if ($picdata['success'] === false) {
-                return $this->msgOut(false, [], '100302');
+                return $this->msgOut(false, [], '400', $picdata['msg']);
             }
             $editDataEloq->pic_path = '/' . $picdata['path'];
             //生成缩略图
