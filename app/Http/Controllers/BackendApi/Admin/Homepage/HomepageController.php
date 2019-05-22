@@ -18,7 +18,7 @@ class HomepageController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $datas = $this->eloqM::where('pid', $this->inputs['pid'])->get();
+        $datas = $this->eloqM::where('pid', $this->inputs['pid'])->get()->toArray();
         return $this->msgOut(true, $datas);
     }
 

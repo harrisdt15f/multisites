@@ -16,7 +16,7 @@ class PopularLotteriesController extends BackEndApiMainController
     {
         $datas = $this->eloqM::select('id', 'lotteries_id', 'pic_path', 'sort')->with(['lotteries' => function ($query) {
             $query->select('id', 'cn_name');
-        }])->where('type', 1)->orderBy('sort', 'asc')->get();
+        }])->where('type', 1)->orderBy('sort', 'asc')->get()->toArray();
         return $this->msgOut(true, $datas);
     }
 
@@ -24,7 +24,7 @@ class PopularLotteriesController extends BackEndApiMainController
     {
         $datas = $this->eloqM::select('id', 'lotteries_id', 'sort')->with(['lotteries' => function ($query) {
             $query->select('id', 'cn_name');
-        }])->where('type', 2)->orderBy('sort', 'asc')->get();
+        }])->where('type', 2)->orderBy('sort', 'asc')->get()->toArray();
         return $this->msgOut(true, $datas);
     }
 

@@ -11,7 +11,7 @@ class AdvertisementTypeController extends BackEndApiMainController
 
     public function detail()
     {
-        $datas = $this->eloqM::select('id','name','type','status','ext_type','l_size','w_size','size')->get();
+        $datas = $this->eloqM::select('id', 'name', 'type', 'status', 'ext_type', 'l_size', 'w_size', 'size')->get()->toArray();
         return $this->msgOut(true, $datas);
     }
 
