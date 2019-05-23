@@ -41,12 +41,12 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
         'backend-api' => [
-            'throttle:10,1',
+            'throttle:60,1',
             'bindings',
             'cors',
         ],
         'frontend-api' => [
-            'throttle:10,1',
+            'throttle:100,1',
             'bindings',
             'cors',
         ],
