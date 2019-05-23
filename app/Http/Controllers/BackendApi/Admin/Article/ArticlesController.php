@@ -205,10 +205,23 @@ class ArticlesController extends BackEndApiMainController
             'rearways_id' => 'required|numeric|gt:0',
             'front_sort' => 'required|numeric|gt:0',
             'rearways_sort' => 'required|numeric|gt:0',
-            'sort_type' => 'required|in:1,2',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
+        }
+        $pastFrontData = $this->eloqM::find($this->inputs['front_id']);
+        $pastRearwaysData = $this->eloqM::find($this->inputs['rearways_id']);
+        if (is_null($pastFrontData) || is_null($pastRearwaysData)) {
+            return $this->msgOut(false, [], '100501');
+        }
+        //上拉
+        if ($pastFrontData->sort > $pastRearwaysData->sort) {
+            $sort_type = 1;
+            //下拉
+        } elseif ($pastFrontData->sort < $pastRearwaysData->sort) {
+            $sort_type = 2;
+        } else {
+            return $this->msgOut(false, [], '100503');
         }
         DB::beginTransaction();
         try {
@@ -218,23 +231,17 @@ class ArticlesController extends BackEndApiMainController
                     ->where('sort', '<=', $this->inputs['rearways_sort']);
             })->lockForUpdate();
             //上拉排序
-            if ($this->inputs['sort_type'] == 1) {
-                $frontData = $this->eloqM::find($this->inputs['front_id']);
-                if (!isset($frontData)) {
-                    return $this->msgOut(false, [], '100501');
-                }
-                $frontData->sort = $this->inputs['front_sort'];
+            if ($sort_type === 1) {
+                $stationaryData = $pastFrontData;
+                $stationaryData->sort = $this->inputs['front_sort'];
                 $this->eloqM::where('sort', '>=', $this->inputs['front_sort'])->where('sort', '<', $this->inputs['rearways_sort'])->increment('sort');
                 //下拉排序
-            } elseif ($this->inputs['sort_type'] == 2) {
-                $frontData = $this->eloqM::find($this->inputs['rearways_id']);
-                if (!isset($frontData)) {
-                    return $this->msgOut(false, [], '100501');
-                }
-                $frontData->sort = $this->inputs['rearways_sort'];
+            } elseif ($sort_type === 2) {
+                $stationaryData = $pastRearwaysData;
+                $stationaryData->sort = $this->inputs['rearways_sort'];
                 $this->eloqM::where('sort', '>', $this->inputs['front_sort'])->where('sort', '<=', $this->inputs['rearways_sort'])->decrement('sort');
             }
-            $frontData->save();
+            $stationaryData->save();
             DB::commit();
             return $this->msgOut(true);
         } catch (\Exception $e) {
