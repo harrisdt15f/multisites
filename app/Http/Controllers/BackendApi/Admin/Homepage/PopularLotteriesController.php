@@ -163,6 +163,7 @@ class PopularLotteriesController extends BackEndApiMainController
             'rearways_id' => 'required|numeric|gt:0',
             'front_sort' => 'required|numeric|gt:0',
             'rearways_sort' => 'required|numeric|gt:0',
+            'sort_type' => 'required|numeric|in:1,2',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
@@ -175,15 +176,6 @@ class PopularLotteriesController extends BackEndApiMainController
         if ($pastFrontData->type !== $pastRearwaysData->type) {
             return $this->msgOut(false, [], '102007');
         }
-        //上拉
-        if ($pastFrontData->sort > $pastRearwaysData->sort) {
-            $sort_type = 1;
-            //下拉
-        } elseif ($pastFrontData->sort < $pastRearwaysData->sort) {
-            $sort_type = 2;
-        } else {
-            return $this->msgOut(false, [], '102009');
-        }
         $type = $pastFrontData->type;
         DB::beginTransaction();
         try {
@@ -194,7 +186,7 @@ class PopularLotteriesController extends BackEndApiMainController
                     ->where('sort', '<=', $this->inputs['rearways_sort']);
             })->lockForUpdate();
             //上拉排序
-            if ($sort_type == 1) {
+            if ($this->inputs['sort_type'] == 1) {
                 $stationaryData = $this->eloqM::find($this->inputs['front_id']);
                 $stationaryData->sort = $this->inputs['front_sort'];
                 $this->eloqM::where(function ($query) use ($type) {
@@ -202,7 +194,7 @@ class PopularLotteriesController extends BackEndApiMainController
                         ->where('sort', '>=', $this->inputs['front_sort'])
                         ->where('sort', '<', $this->inputs['rearways_sort']);
                 })->increment('sort');
-            } elseif ($sort_type == 2) {
+            } elseif ($this->inputs['sort_type'] == 2) {
                 //下拉排序
                 $stationaryData = $this->eloqM::find($this->inputs['rearways_id']);
                 $stationaryData->sort = $this->inputs['rearways_sort'];
