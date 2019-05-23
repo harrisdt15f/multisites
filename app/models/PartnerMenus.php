@@ -67,7 +67,7 @@ class PartnerMenus extends BaseModel
     public function createMenuDatas($redisKey = '*', $role = '*')
     {
         $menuForFE = [];
-        $menuLists = self::getFirstLevelList();
+        $menuLists = self::getFirstLevelList($role);
         foreach ($menuLists as $key => $firstMenu) {
             if ($firstMenu->pid === 0) {
                 $menuForFE[$firstMenu->id] = $firstMenu->toArray();
@@ -104,9 +104,19 @@ class PartnerMenus extends BaseModel
         return true;
     }
 
-    public static function getFirstLevelList()
+    /**
+     * @param  string  $role
+     * @return mixed
+     */
+    public static function getFirstLevelList($role = '*')
     {
-        return self::where('pid', 0)->orderBy('sort')->get();
+        if ($role == '*') {
+            return self::where('pid', 0)->orderBy('sort')->get();
+        } else {
+            return self::where('pid', 0)
+                ->whereIn('id', $role)
+                ->orderBy('sort')->get();
+        }
     }
 
     public function childs(): HasMany
