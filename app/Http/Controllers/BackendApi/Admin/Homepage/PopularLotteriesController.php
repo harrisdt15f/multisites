@@ -163,7 +163,6 @@ class PopularLotteriesController extends BackEndApiMainController
             'rearways_id' => 'required|numeric|gt:0',
             'front_sort' => 'required|numeric|gt:0',
             'rearways_sort' => 'required|numeric|gt:0',
-            'sort_type' => 'required|in:1,2',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
@@ -176,29 +175,44 @@ class PopularLotteriesController extends BackEndApiMainController
         if ($pastFrontData->type !== $pastRearwaysData->type) {
             return $this->msgOut(false, [], '102007');
         }
+        //上拉
+        if ($pastFrontData->sort > $pastRearwaysData->sort) {
+            $sort_type = 1;
+            //下拉
+        } elseif ($pastFrontData->sort < $pastRearwaysData->sort) {
+            $sort_type = 2;
+        } else {
+            return $this->msgOut(false, [], '102009');
+        }
         $type = $pastFrontData->type;
         DB::beginTransaction();
         try {
+            //lockForUpdate
+            $this->eloqM::where(function ($query) {
+                $query->where('type', $type)
+                    ->where('sort', '>=', $this->inputs['front_sort'])
+                    ->where('sort', '<=', $this->inputs['rearways_sort']);
+            })->lockForUpdate();
             //上拉排序
-            if ($this->inputs['sort_type'] == 1) {
-                $frontData = $this->eloqM::find($this->inputs['front_id']);
-                $frontData->sort = $this->inputs['front_sort'];
+            if ($sort_type == 1) {
+                $stationaryData = $this->eloqM::find($this->inputs['front_id']);
+                $stationaryData->sort = $this->inputs['front_sort'];
                 $this->eloqM::where(function ($query) use ($type) {
                     $query->where('type', $type)
                         ->where('sort', '>=', $this->inputs['front_sort'])
                         ->where('sort', '<', $this->inputs['rearways_sort']);
                 })->increment('sort');
-            } elseif ($this->inputs['sort_type'] == 2) {
+            } elseif ($sort_type == 2) {
                 //下拉排序
-                $frontData = $this->eloqM::find($this->inputs['rearways_id']);
-                $frontData->sort = $this->inputs['rearways_sort'];
+                $stationaryData = $this->eloqM::find($this->inputs['rearways_id']);
+                $stationaryData->sort = $this->inputs['rearways_sort'];
                 $this->eloqM::where(function ($query) use ($type) {
                     $query->where('type', $type)
                         ->where('sort', '>', $this->inputs['front_sort'])
                         ->where('sort', '<=', $this->inputs['rearways_sort']);
                 })->decrement('sort');
             }
-            $frontData->save();
+            $stationaryData->save();
             DB::commit();
             return $this->msgOut(true);
         } catch (\Exception $e) {
