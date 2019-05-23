@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 class HomepageController extends FrontendApiMainController
 {
     protected $eloqM = 'HomepageModel';
+    protected $offMsg = '当前模块为关闭状态';
 
     //需要展示的前台模块
     public function showHomepageModel()
@@ -28,7 +29,7 @@ class HomepageController extends FrontendApiMainController
     {
         $status = $this->eloqM::select('status')->where('key', 'banner')->first();
         if ($status->status !== 1) {
-            return $this->msgOut(false, [], '400', '当前模块为关闭状态');
+            return $this->msgOut(false, [], '400', $this->offMsg);
         }
         $data = HomepageRotationChart::select('id', 'title', 'pic_path', 'content', 'type', 'redirect_url', 'activity_id')
             ->with(['activity' => function ($query) {
@@ -43,7 +44,7 @@ class HomepageController extends FrontendApiMainController
     {
         $lotteriesEloq = $this->eloqM::select('show_num', 'status')->where('key', 'popularLotteries.one')->first();
         if ($lotteriesEloq->status !== 1) {
-            return $this->msgOut(false, [], '400', '当前模块为关闭状态');
+            return $this->msgOut(false, [], '400', $this->offMsg);
         }
         $dataEloq = PopularLotteries::select('id', 'lotteries_id', 'pic_path')->with(['lotteries' => function ($query) {
             $query->select('id', 'day_issue');
@@ -61,7 +62,7 @@ class HomepageController extends FrontendApiMainController
     {
         $lotteriesEloq = $this->eloqM::select('show_num', 'status')->where('key', 'popularLotteries.two')->first();
         if ($lotteriesEloq->status !== 1) {
-            return $this->msgOut(false, [], '400', '当前模块为关闭状态');
+            return $this->msgOut(false, [], '400', $this->offMsg);
         }
         $dataEloq = PopularLotteries::select('id', 'lotteries_id')->with(['lotteries' => function ($query) {
             $query->select('id', 'cn_name');
@@ -78,7 +79,7 @@ class HomepageController extends FrontendApiMainController
     {
         $qrCodeEloq = $this->eloqM::select('value', 'status')->where('key', 'qr.code')->first()->toArray();
         if ($qrCodeEloq['status'] !== 1) {
-            return $this->msgOut(false, [], '400', '当前模块为关闭状态');
+            return $this->msgOut(false, [], '400', $this->offMsg);
         }
         unset($qrCodeEloq['status']);
         return $this->msgOut(true, $qrCodeEloq);
@@ -89,7 +90,7 @@ class HomepageController extends FrontendApiMainController
     {
         $activityEloq = $this->eloqM::select('show_num', 'status')->where('key', 'activity')->first();
         if ($activityEloq['status'] !== 1) {
-            return $this->msgOut(false, [], '400', '当前模块为关闭状态');
+            return $this->msgOut(false, [], '400', $this->offMsg);
         }
         $data = ActivityInfos::select('id', 'title', 'content', 'thumbnail_path', 'redirect_url')->where('status', 1)->orderBy('sort', 'asc')->limit($activityEloq->show_num)->get()->toArray();
         return $this->msgOut(true, $data);
@@ -100,7 +101,7 @@ class HomepageController extends FrontendApiMainController
     {
         $logoEloq = $this->eloqM::select('value', 'status')->where('key', 'logo')->first()->toArray();
         if ($logoEloq['status'] !== 1) {
-            return $this->msgOut(false, [], '400', '当前模块为关闭状态');
+            return $this->msgOut(false, [], '400', $this->offMsg);
         }
         unset($logoEloq['status']);
         return $this->msgOut(true, $logoEloq);

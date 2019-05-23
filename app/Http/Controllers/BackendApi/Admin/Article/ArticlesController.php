@@ -205,7 +205,7 @@ class ArticlesController extends BackEndApiMainController
             'rearways_id' => 'required|numeric|gt:0',
             'front_sort' => 'required|numeric|gt:0',
             'rearways_sort' => 'required|numeric|gt:0',
-            'sort_type' => 'required|numeric|in:0,1',
+            'sort_type' => 'required|numeric|in:1,2',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
@@ -223,12 +223,12 @@ class ArticlesController extends BackEndApiMainController
                     ->where('sort', '<=', $this->inputs['rearways_sort']);
             })->lockForUpdate();
             //上拉排序
-            if ($this->inputs['sort_type'] === 1) {
+            if ($this->inputs['sort_type'] == 1) {
                 $stationaryData = $pastFrontData;
                 $stationaryData->sort = $this->inputs['front_sort'];
                 $this->eloqM::where('sort', '>=', $this->inputs['front_sort'])->where('sort', '<', $this->inputs['rearways_sort'])->increment('sort');
                 //下拉排序
-            } elseif ($this->inputs['sort_type'] === 2) {
+            } elseif ($this->inputs['sort_type'] == 2) {
                 $stationaryData = $pastRearwaysData;
                 $stationaryData->sort = $this->inputs['rearways_sort'];
                 $this->eloqM::where('sort', '>', $this->inputs['front_sort'])->where('sort', '<=', $this->inputs['rearways_sort'])->decrement('sort');

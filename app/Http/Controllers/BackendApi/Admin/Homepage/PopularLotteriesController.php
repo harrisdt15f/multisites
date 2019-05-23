@@ -163,7 +163,7 @@ class PopularLotteriesController extends BackEndApiMainController
             'rearways_id' => 'required|numeric|gt:0',
             'front_sort' => 'required|numeric|gt:0',
             'rearways_sort' => 'required|numeric|gt:0',
-            'sort_type' => 'required|numeric|in:0,1',
+            'sort_type' => 'required|numeric|in:1,2',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
