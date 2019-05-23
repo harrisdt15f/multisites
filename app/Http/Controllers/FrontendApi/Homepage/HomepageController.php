@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\FrontendApi\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\models\ActivityInfos;
-use App\models\HomepageRotationChart;
-use App\models\Notice;
-use App\models\PopularLotteries;
+use App\Models\ActivityInfos;
+use App\Models\HomepageRotationChart;
+use App\Models\Notice;
+use App\Models\PopularLotteries;
 use Illuminate\Support\Facades\Validator;
 
 class HomepageController extends FrontendApiMainController

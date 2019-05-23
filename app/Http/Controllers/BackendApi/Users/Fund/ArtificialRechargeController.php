@@ -4,12 +4,12 @@ namespace App\Http\Controllers\BackendApi\Users\Fund;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\FundOperationRecharge;
-use App\models\ArtificialRechargeLog;
-use App\models\AuditFlow;
-use App\models\FundOperation;
-use App\models\UserHandleModel;
-use App\models\UserRechargeHistory;
-use App\models\UserRechargeLog;
+use App\Models\ArtificialRechargeLog;
+use App\Models\AuditFlow;
+use App\Models\FundOperation;
+use App\Models\UserHandleModel;
+use App\Models\UserRechargeHistory;
+use App\Models\UserRechargeLog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 

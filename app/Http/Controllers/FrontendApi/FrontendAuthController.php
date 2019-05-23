@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\FrontendApi;
 
-use App\models\PartnerSysConfigures;
+use App\Models\PartnerSysConfigures;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

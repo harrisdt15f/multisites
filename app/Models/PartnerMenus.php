@@ -1,0 +1,127 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+
+class PartnerMenus extends BaseModel
+{
+    protected $table = 'partner_admin_menus';
+
+    protected $redisFirstTag = 'ms_menu';
+
+    /**
+     * @param  PartnerAdminGroupAccess  $accessGroupEloq
+     * @return array
+     * TODO : 由于快速开发 后续需要弄缓存与异常处理
+     */
+    public function menuLists(PartnerAdminGroupAccess $accessGroupEloq)
+    {
+        $parent_menu = [];
+        $role = $accessGroupEloq->role;
+        if ($role == '*') {
+            $parent_menu = $this->forStar();
+        } else {
+            $parent_menu = $this->getUserMenuDatas($accessGroupEloq);
+        }
+        return $parent_menu;
+    }
+
+    public function forStar()
+    {
+        $redisKey = '*';
+        if (Cache::tags([$this->redisFirstTag])->has($redisKey)) {
+            $parent_menu = Cache::tags([$this->redisFirstTag])->get($redisKey);
+        } else {
+            $parent_menu = self::createMenuDatas();
+        }
+        return $parent_menu;
+    }
+
+    /**
+     * @param  PartnerAdminGroupAccess  $accessGroupEloq
+     * @return array|mixed
+     */
+    public function getUserMenuDatas(PartnerAdminGroupAccess $accessGroupEloq)
+    {
+        $redisKey = $accessGroupEloq->id;
+        if (Cache::tags([$this->redisFirstTag])->has($redisKey)) {
+            $parent_menu = Cache::tags([$this->redisFirstTag])->get($redisKey);
+        } else {
+            $role = json_decode($accessGroupEloq->role); //[1,2,3,4,5]
+            $menuLists = self::whereIn('id', $role)->get();
+            $parent_menu = self::createMenuDatas($accessGroupEloq->id, $role);
+        }
+        return $parent_menu;
+    }
+
+    /**
+     * @param  string  $redisKey
+     * @param  string  $role
+     * @return array
+     */
+    public function createMenuDatas($redisKey = '*', $role = '*')
+    {
+        $menuForFE = [];
+        $menuLists = self::getFirstLevelList($role);
+        foreach ($menuLists as $key => $firstMenu) {
+            if ($firstMenu->pid === 0) {
+                $menuForFE[$firstMenu->id] = $firstMenu->toArray();
+                if ($firstMenu->childs()->exists()) {
+                    $firstChilds = $role == '*' ? $firstMenu->childs->sortBy('sort') : $firstMenu->childs->whereIn('id',
+                        $role)->sortBy('sort');
+                    foreach ($firstChilds as $secondMenu) {
+                        $menuForFE[$firstMenu->id]['child'][$secondMenu->id] = $secondMenu->toArray();
+                        if ($secondMenu->childs()->exists()) {
+                            $secondChilds = $role == '*' ? $secondMenu->childs->sortBy('sort') : $secondMenu->childs->whereIn('id',
+                                $role)->sortBy('sort');
+                            foreach ($secondChilds as $thirdMenu) {
+                                $menuForFE[$firstMenu->id]['child'][$secondMenu->id]['child'][$thirdMenu->id] = $thirdMenu->toArray();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        //            $hourToStore = 24;
+//            $expiresAt = Carbon::now()->addHours($hourToStore)->diffInMinutes();
+//            Cache::put('ms_menus', $parent_menu, $expiresAt);
+        Cache::tags([$this->redisFirstTag])->forever($redisKey, $menuForFE);
+//        Cache::forever($redisKey, $menuForFE);
+        return $menuForFE;
+    }
+
+    /**
+     * @return bool
+     */
+    public function refreshStar(): bool
+    {
+        Cache::tags([$this->redisFirstTag])->flush();
+        return true;
+    }
+
+    /**
+     * @param  string  $role
+     * @return mixed
+     */
+    public static function getFirstLevelList($role = '*')
+    {
+        if ($role == '*') {
+            return self::where('pid', 0)->orderBy('sort')->get();
+        } else {
+            return self::where('pid', 0)
+                ->whereIn('id', $role)
+                ->orderBy('sort')->get();
+        }
+    }
+
+    public function childs(): HasMany
+    {
+        $data = $this->hasMany(__CLASS__, 'pid', 'id');
+        return $data;
+    }
+}

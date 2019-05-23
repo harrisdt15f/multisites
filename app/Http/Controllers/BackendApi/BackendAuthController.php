@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\BackendApi;
 
-use App\models\FundOperation;
-use App\models\PartnerAdminGroupAccess;
-use App\models\PartnerAdminUsers;
-use App\models\PartnerMenus;
+use App\Models\FundOperation;
+use App\Models\PartnerAdminGroupAccess;
+use App\Models\PartnerAdminUsers;
+use App\Models\PartnerMenus;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

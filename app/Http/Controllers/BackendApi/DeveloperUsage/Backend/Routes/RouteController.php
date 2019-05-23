@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\BackendApi\DeveloperUsage\Backend\Routes;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\models\PartnerMenus;
+use App\Models\PartnerMenus;
 use Illuminate\Support\Facades\Validator;
 
 class RouteController extends BackEndApiMainController

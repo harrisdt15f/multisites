@@ -4,7 +4,7 @@ namespace App\Http\Controllers\BackendApi\Admin\Article;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\ImageArrange;
-use App\models\AuditFlow;
+use App\Models\AuditFlow;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;

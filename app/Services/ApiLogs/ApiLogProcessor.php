@@ -8,8 +8,8 @@
 
 namespace App\Services\ApiLogs;
 
-use App\models\PartnerAdminRoute;
-use App\models\PartnerLogsApi;
+use App\Models\PartnerAdminRoute;
+use App\Models\PartnerLogsApi;
 use Jenssegers\Agent\Agent;
 
 class ApiLogProcessor
