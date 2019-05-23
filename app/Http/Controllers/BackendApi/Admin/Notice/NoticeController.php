@@ -12,8 +12,13 @@ class NoticeController extends BackEndApiMainController
 
     public function detail()
     {
-        $datas = $this->eloqM::select('id', 'type', 'title', 'content', 'start_time', 'end_time', 'sort', 'status', 'admin_id')->orderBy('sort', 'asc')->get()->toArray();
-        return $this->msgOut(true, $datas);
+        $noticeDatas = $this->eloqM::select('id', 'type', 'title', 'content', 'start_time', 'end_time', 'sort', 'status', 'admin_id')->with('admin')->orderBy('sort', 'asc')->get()->toArray();
+        foreach ($noticeDatas as $key => $data) {
+            $noticeDatas[$key]['admin_name'] = $data['admin']['name'];
+            unset($noticeDatas[$key]['admin_id']);
+            unset($noticeDatas[$key]['admin']);
+        }
+        return $this->msgOut(true, $noticeDatas);
     }
 
     public function add()
@@ -123,6 +128,7 @@ class NoticeController extends BackEndApiMainController
             'rearways_id' => 'required|numeric|gt:0',
             'front_sort' => 'required|numeric|gt:0',
             'rearways_sort' => 'required|numeric|gt:0',
+            'sort_type' => 'required|numeric|in:0,1',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
@@ -132,15 +138,6 @@ class NoticeController extends BackEndApiMainController
         if (is_null($pastFrontData) || is_null($pastRearwaysData)) {
             return $this->msgOut(false, [], '102102');
         }
-        //上拉
-        if ($pastFrontData->sort > $pastRearwaysData->sort) {
-            $sort_type = 1;
-            //下拉
-        } elseif ($pastFrontData->sort < $pastRearwaysData->sort) {
-            $sort_type = 2;
-        } else {
-            return $this->msgOut(false, [], '102103');
-        }
         DB::beginTransaction();
         try {
             //lockForUpdate
@@ -149,12 +146,12 @@ class NoticeController extends BackEndApiMainController
                     ->where('sort', '<=', $this->inputs['rearways_sort']);
             })->lockForUpdate();
             //上拉排序
-            if ($sort_type === 1) {
+            if ($this->inputs['sort_type'] === 1) {
                 $stationaryData = $pastFrontData;
                 $stationaryData->sort = $this->inputs['front_sort'];
                 $this->eloqM::where('sort', '>=', $this->inputs['front_sort'])->where('sort', '<', $this->inputs['rearways_sort'])->increment('sort');
                 //下拉排序
-            } elseif ($sort_type === 2) {
+            } elseif ($this->inputs['sort_type'] === 2) {
                 $stationaryData = $pastRearwaysData;
                 $stationaryData->sort = $this->inputs['rearways_sort'];
                 $this->eloqM::where('sort', '>', $this->inputs['front_sort'])->where('sort', '<=', $this->inputs['rearways_sort'])->decrement('sort');
