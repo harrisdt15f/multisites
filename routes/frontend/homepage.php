@@ -23,4 +23,6 @@ Route::group(['prefix' => 'homepage', 'namespace' => 'Homepage'], function () {
     Route::match(['get', 'options'], 'activity', ['as' => $namePrefix . 'activity', 'uses' => $controller . 'activity']);
     //LOGO
     Route::match(['get', 'options'], 'logo', ['as' => $namePrefix . 'logo', 'uses' => $controller . 'logo']);
+    //公告
+    Route::match(['get', 'options'], 'notice', ['as' => $namePrefix . 'notice', 'uses' => $controller . 'notice']);
 });

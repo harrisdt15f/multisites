@@ -5,6 +5,7 @@ namespace App\Http\Controllers\FrontendApi\Homepage;
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\models\ActivityInfos;
 use App\models\HomepageRotationChart;
+use App\models\Notice;
 use App\models\PopularLotteries;
 use Illuminate\Support\Facades\Validator;
 
@@ -31,12 +32,19 @@ class HomepageController extends FrontendApiMainController
         if ($status->status !== 1) {
             return $this->msgOut(false, [], '400', $this->offMsg);
         }
-        $data = HomepageRotationChart::select('id', 'title', 'pic_path', 'content', 'type', 'redirect_url', 'activity_id')
+        $datas = HomepageRotationChart::select('id', 'title', 'pic_path', 'content', 'type', 'redirect_url', 'activity_id')
             ->with(['activity' => function ($query) {
                 $query->select('id', 'redirect_url');
             }])
             ->where('status', 1)->get()->toArray();
-        return $this->msgOut(true, $data);
+        foreach ($datas as $key => $data) {
+            if ($data['type'] === 2) {
+                $datas[$key]['redirect_url'] = $data['activity']['redirect_url'];
+            }
+            unset($datas[$key]['activity']);
+            unset($datas[$key]['activity_id']);
+        }
+        return $this->msgOut(true, $datas);
     }
 
     //热门彩种一
@@ -77,19 +85,19 @@ class HomepageController extends FrontendApiMainController
     //二维码
     public function qrCode()
     {
-        $qrCodeEloq = $this->eloqM::select('value', 'status')->where('key', 'qr.code')->first()->toArray();
-        if ($qrCodeEloq['status'] !== 1) {
+        $data = $this->eloqM::select('value', 'status')->where('key', 'qr.code')->first()->toArray();
+        if ($data['status'] !== 1) {
             return $this->msgOut(false, [], '400', $this->offMsg);
         }
-        unset($qrCodeEloq['status']);
-        return $this->msgOut(true, $qrCodeEloq);
+        unset($data['status']);
+        return $this->msgOut(true, $data);
     }
 
     //活动
     public function activity()
     {
         $activityEloq = $this->eloqM::select('show_num', 'status')->where('key', 'activity')->first();
-        if ($activityEloq['status'] !== 1) {
+        if ($activityEloq->status !== 1) {
             return $this->msgOut(false, [], '400', $this->offMsg);
         }
         $data = ActivityInfos::select('id', 'title', 'content', 'thumbnail_path', 'redirect_url')->where('status', 1)->orderBy('sort', 'asc')->limit($activityEloq->show_num)->get()->toArray();
@@ -99,11 +107,22 @@ class HomepageController extends FrontendApiMainController
     //LOGO
     public function logo()
     {
-        $logoEloq = $this->eloqM::select('value', 'status')->where('key', 'logo')->first()->toArray();
-        if ($logoEloq['status'] !== 1) {
+        $data = $this->eloqM::select('value', 'status')->where('key', 'logo')->first()->toArray();
+        if ($data['status'] !== 1) {
             return $this->msgOut(false, [], '400', $this->offMsg);
         }
-        unset($logoEloq['status']);
-        return $this->msgOut(true, $logoEloq);
+        unset($data['status']);
+        return $this->msgOut(true, $data);
+    }
+
+    //公告
+    public function notice()
+    {
+        $noticeEloq = $this->eloqM::select('show_num', 'status')->where('key', 'notice')->first();
+        if ($noticeEloq->status !== 1) {
+            return $this->msgOut(false, [], '400', $this->offMsg);
+        }
+        $datas = Notice::select('id', 'title')->where('status', 1)->orderBy('sort', 'asc')->limit($noticeEloq->show_num)->get();
+        return $this->msgOut(true, $datas);
     }
 }

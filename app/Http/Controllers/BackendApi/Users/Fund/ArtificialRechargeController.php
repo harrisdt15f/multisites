@@ -40,7 +40,6 @@ class ArtificialRechargeController extends BackEndApiMainController
             return $this->msgOut(false, [], '101100');
         }
         $partnerAdmin = $this->partnerAdmin;
-        $partnerAdmin->id = 20;
         $adminFundData = FundOperation::where('admin_id', $partnerAdmin->id)->first();
         if (is_null($adminFundData)) {
             return $this->msgOut(false, [], '101101');
