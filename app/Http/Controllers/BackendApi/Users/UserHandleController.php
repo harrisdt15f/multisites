@@ -360,7 +360,7 @@ class UserHandleController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $datas = AccountChangeReport::select('user_name', 'type_name', 'type_sign', 'amount', 'before_balance', 'balance')
+        $datas = AccountChangeReport::select('username', 'type_name', 'type_sign', 'amount', 'before_balance', 'balance', 'created_at')
             ->with(['changeType' => function ($query) {
                 $query->select('sign', 'in_out');
             }])
@@ -388,7 +388,7 @@ class UserHandleController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $datas = UserRechargeHistory::select('user_name', 'amount', 'deposit_mode', 'status')->where(function ($query) {
+        $datas = UserRechargeHistory::select('user_name', 'amount', 'deposit_mode', 'status', 'created_at')->where(function ($query) {
             $query->where('user_id', $this->inputs['user_id'])
                 ->where('created_at', '>=', $this->inputs['start_time'])
                 ->where('created_at', '<', $this->inputs['end_time']);
