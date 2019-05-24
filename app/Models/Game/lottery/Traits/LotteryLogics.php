@@ -13,7 +13,7 @@ trait LotteryLogics
     public function getFormatMode()
     {
         $modeConfig = config('game.main.modes');
-        $currentModes = explode(",", $this->valid_modes);
+        $currentModes = explode(',', $this->valid_modes);
 
         $data = [];
         foreach ($currentModes as $index) {
