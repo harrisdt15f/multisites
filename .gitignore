@@ -15,3 +15,5 @@ yarn-error.log
 \.idea/
 
 \.phpintel/
+
+public/uploaded_files/
