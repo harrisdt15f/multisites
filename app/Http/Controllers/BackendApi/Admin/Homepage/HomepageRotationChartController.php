@@ -250,10 +250,7 @@ class HomepageRotationChartController extends BackEndApiMainController
      */
     public function replaceImage($pastImg, $thumbnail, $newImg, $ImageClass)
     {
-        $deleteStatus = $ImageClass->deletePic(substr($pastImg, 1));
-        if ($deleteStatus === false) {
-            return ['success' => false, 'code' => '101805'];
-        }
+        $ImageClass->deletePic(substr($pastImg, 1));
         $ImageClass->deletePic(substr($thumbnail, 1));
         $folderName = 'Homepagec_Rotation_chart';
         $depositPath = $ImageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
