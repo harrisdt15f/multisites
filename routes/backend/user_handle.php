@@ -36,4 +36,6 @@ Route::group(['prefix' => 'user-handle', 'namespace' => 'Users'], function () {
     Route::match(['post', 'options'], 'user_account_change', ['as' => $namePrefix . 'user_account_change', 'uses' => $controller . 'userAccountChange']);
     //用户充值记录
     Route::match(['post', 'options'], 'user_recharge_history', ['as' => $namePrefix . 'user_recharge_history', 'uses' => $controller . 'userRechargeHistory']);
+    //给用户扣款
+    Route::match(['post', 'options'], 'deduction_balance', ['as' => $namePrefix . 'deduction_balance', 'uses' => $controller . 'deductionBalance']);
 });

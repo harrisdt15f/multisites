@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\BackendApi\Users;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Lib\Common\AccountChange;
 use App\Models\AccountChangeReport;
+use App\Models\AccountChangeType;
 use App\Models\AuditFlow;
 use App\Models\HandleUserAccounts;
 use App\Models\PassworAuditLists;
@@ -394,5 +396,51 @@ class UserHandleController extends BackEndApiMainController
                 ->where('created_at', '<', $this->inputs['end_time']);
         })->get()->toArray();
         return $this->msgOut(true, $datas);
+    }
+
+    //人工扣除用户资金
+    public function deductionBalance()
+    {
+        $validator = Validator::make($this->inputs, [
+            'user_id' => 'required|numeric',
+            'amount' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
+        }
+        //检查是否存在 人工充值 的帐变类型表
+        $accountChangeTypeEloq = AccountChangeType::select('name', 'sign')->where('sign', 'ArtificialDeduction')->first();
+        if (is_null($accountChangeTypeEloq)) {
+            return $this->msgOut(false, [], '100103');
+        }
+        $userAccountsEloq = HandleUserAccounts::where('user_id', $this->inputs['user_id'])->first();
+        if ($userAccountsEloq->balance < $this->inputs['amount']) {
+            return $this->msgOut(false, [], '100104');
+        }
+        DB::beginTransaction();
+        try {
+            //扣除金额
+            $newBalance = $userAccountsEloq->balance - $this->inputs['amount'];
+            $editArr = ['balance' => $newBalance];
+            $editStatus = HandleUserAccounts::where(function ($query) use ($userAccountsEloq) {
+                $query->where('user_id', $this->inputs['user_id'])
+                    ->where('updated_at', $userAccountsEloq->updated_at);
+            })->update($editArr);
+            if ($editStatus === 0) {
+                return $this->msgOut(false, [], '100105');
+            }
+            //添加帐变记录
+            $userEloq = $this->eloqM::select('id', 'sign', 'top_id', 'parent_id', 'rid', 'username')->where('id', $this->inputs['user_id'])->first();
+            $accountChangeReportEloq = new AccountChangeReport();
+            $accountChangeClass = new AccountChange();
+            $accountChangeClass->addData($accountChangeReportEloq, $userEloq, $this->inputs['amount'], $userAccountsEloq->balance, $newBalance, $accountChangeTypeEloq);
+            DB::commit();
+            return $this->msgOut(true);
+        } catch (Exception $e) {
+            DB::rollBack();
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
+            return $this->msgOut(false, [], $sqlState, $msg);
+        }
     }
 }

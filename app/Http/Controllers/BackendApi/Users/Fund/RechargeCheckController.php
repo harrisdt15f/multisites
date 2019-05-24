@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BackendApi\Users\Fund;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Lib\Common\AccountChange;
 use App\Lib\Common\FundOperationRecharge;
 use App\Models\AccountChangeReport;
 use App\Models\AccountChangeType;
@@ -47,7 +48,7 @@ class RechargeCheckController extends BackEndApiMainController
             return $this->msgOut(false, [], '100900');
         }
         //检查是否存在 人工充值 的帐变类型表
-        $accountChangeTypeEloq = AccountChangeType::select('name', 'sign')->where('sign', 'ArtificialRecharge')->first();
+        $accountChangeTypeEloq = AccountChangeType::where('sign', 'ArtificialRecharge')->first();
         if (is_null($accountChangeTypeEloq)) {
             return $this->msgOut(false, [], '100901');
         }
@@ -68,12 +69,18 @@ class RechargeCheckController extends BackEndApiMainController
             $UserAccountsEdit = ['balance' => $balance];
             $this->auditFlowEdit($auditFlow, $this->partnerAdmin, $this->inputs['auditor_note']);
             $UserAccounts = HandleUserAccounts::where('user_id', $RechargeLog->user_id)->first();
-            HandleUserAccounts::where(function ($query) use ($UserAccounts) {
+            $editStatus = HandleUserAccounts::where(function ($query) use ($UserAccounts) {
                 $query->where('user_id', $UserAccounts->user_id)
                     ->where('updated_at', $UserAccounts->updated_at);
             })->update($UserAccountsEdit);
+            if ($editStatus === 0) {
+                DB::rollBack();
+                return $this->msgOut(false, [], '100902');
+            }
             //用户帐变表
-            $this->insertChangeReport($userData, $RechargeLog['amount'], $balance, $accountChangeTypeEloq);
+            $accountChangeReportEloq = new AccountChangeReport();
+            $accountChangeClass = new AccountChange();
+            $accountChangeClass->addData($accountChangeReportEloq, $userData, $RechargeLog['amount'], $UserAccounts->balance, $balance, $accountChangeTypeEloq, $accountChangeTypeEloq);
             DB::commit();
             return $this->msgOut(true);
         } catch (Exception $e) {
@@ -141,26 +148,6 @@ class RechargeCheckController extends BackEndApiMainController
             'auditor_note' => $auditor_note,
         ];
         $eloq->fill($editData);
-        $eloq->save();
-    }
-
-    public function insertChangeReport($user, $amount, $balance, $type)
-    {
-        $insertData = [
-            'sign' => $user->sign,
-            'user_id' => $user['id'],
-            'top_id' => $user['top_id'],
-            'parent_id' => $user['parent_id'],
-            'rid' => $user['rid'],
-            'username' => $user['username'],
-            'type_sign' => $type->sign,
-            'type_name' => $type->name,
-            'amount' => $amount,
-            'before_balance' => $user['account']['balance'],
-            'balance' => $balance,
-        ];
-        $eloq = new AccountChangeReport();
-        $eloq->fill($insertData);
         $eloq->save();
     }
 }
