@@ -113,7 +113,7 @@ class ArtificialRechargeController extends BackEndApiMainController
 
     /**
      * 插入user_recharge_history
-     * 人工充值 $deposit_mode=0 后面不需要在传参
+     * 人工充值 $deposit_mode=1 后面不需要在传参
      * @param $user_id
      * @param $user_name
      * @param $is_tester
@@ -150,7 +150,7 @@ class ArtificialRechargeController extends BackEndApiMainController
 
     /**
      * 插入user_recharge_log
-     * 人工充值 $deposit_mode=0 后面不需要在传参
+     * 人工充值 $deposit_mode=1 后面不需要在传参
      * @param $company_order_num
      * @param $log_num
      * @param $deposit_mode
