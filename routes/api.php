@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 */
 //Auth::routes();
 Route::group(['middleware' => ['backend-api'], 'namespace' => 'BackendApi', 'prefix' => 'api'], function () {
-    Route::match(['post', 'options'], 'login', ['as' => 'login', 'uses' => 'BackendAuthController@login']);
+    Route::match(['post', 'options'], 'login', ['as' => 'backend-api.login', 'uses' => 'BackendAuthController@login']);
 });
 Route::group([
     'middleware' => ['backend-api', 'auth:backend'],
@@ -31,7 +31,7 @@ Route::group([
 });
 
 Route::group(['middleware' => ['frontend-api'], 'namespace' => 'FrontendApi', 'prefix' => 'web-api'], function () {
-    Route::match(['post', 'options'], 'login', ['as' => 'login', 'uses' => 'FrontendAuthController@login']);
+    Route::match(['post', 'options'], 'login', ['as' => 'web-api.login', 'uses' => 'FrontendAuthController@login']);
 });
 Route::group([
     'middleware' => ['frontend-api', 'auth:frontend-web'],
