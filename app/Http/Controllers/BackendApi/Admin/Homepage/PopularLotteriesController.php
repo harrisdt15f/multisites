@@ -5,6 +5,7 @@ namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\ImageArrange;
 use App\Models\LotteriesModel;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -12,7 +13,7 @@ class PopularLotteriesController extends BackEndApiMainController
 {
     protected $eloqM = 'PopularLotteries';
 
-    public function detailOne()
+    public function detailOne(): JsonResponse
     {
         $datas = $this->eloqM::select('id', 'lotteries_id', 'pic_path', 'sort')->with(['lotteries' => function ($query) {
             $query->select('id', 'cn_name');
@@ -216,7 +217,7 @@ class PopularLotteriesController extends BackEndApiMainController
     }
 
     //彩种列表
-    public function lotteriesList()
+    public function lotteriesList(): JsonResponse
     {
         $lotteries = LotteriesModel::select('id', 'cn_name', 'en_name')->get();
         return $this->msgOut(true, $lotteries);
