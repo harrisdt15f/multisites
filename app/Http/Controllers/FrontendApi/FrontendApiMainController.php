@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\FrontendApi;
 
 use App\Http\Controllers\Controller;
-use App\models\PartnerAdminGroupAccess;
-use App\models\PartnerAdminRoute;
-use App\models\PartnerMenus;
-use App\models\PlatForms;
+use App\Models\PartnerAdminGroupAccess;
+use App\Models\PartnerAdminRoute;
+use App\Models\PartnerMenus;
+use App\Models\PlatForms;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -90,7 +90,7 @@ class FrontendApiMainController extends Controller
 
     protected function modelWithNameSpace($eloqM = null)
     {
-        return !is_null($eloqM) ? 'App\\models\\'.$eloqM : $eloqM;
+        return !is_null($eloqM) ? 'App\\Models\\'.$eloqM : $eloqM;
     }
 
     /**

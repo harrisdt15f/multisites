@@ -4,8 +4,8 @@ namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\ImageArrange;
-use App\models\ActivityInfos;
-use App\models\AdvertisementType;
+use App\Models\ActivityInfos;
+use App\Models\AdvertisementType;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 

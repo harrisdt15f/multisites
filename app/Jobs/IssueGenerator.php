@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\models\LotteriesModel;
+use App\Models\LotteriesModel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;

@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\BackendApi\Admin;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\models\FundOperation;
-use App\models\FundOperationGroup;
-use App\models\PartnerAdminUsers;
-use App\models\PartnerMenus;
+use App\Models\FundOperation;
+use App\Models\FundOperationGroup;
+use App\Models\PartnerAdminUsers;
+use App\Models\PartnerMenus;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;

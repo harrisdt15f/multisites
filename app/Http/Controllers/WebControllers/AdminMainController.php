@@ -4,7 +4,7 @@ namespace App\Http\Controllers\WebControllers;
 
 
 use App\Http\Controllers\Controller;
-use App\models\PartnerMenus;
+use App\Models\PartnerMenus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;

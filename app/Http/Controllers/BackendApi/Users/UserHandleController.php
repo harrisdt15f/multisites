@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\BackendApi\Users;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\models\AuditFlow;
-use App\models\HandleUserAccounts;
-use App\models\PassworAuditLists;
-use App\models\UserAdmitedFlowsModel;
-use App\models\UserHandleModel;
+use App\Models\AuditFlow;
+use App\Models\HandleUserAccounts;
+use App\Models\PassworAuditLists;
+use App\Models\UserAdmitedFlowsModel;
+use App\Models\UserHandleModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;

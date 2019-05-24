@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\FrontendApi\Game\Lottery;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\models\IssueModel;
-use App\models\LotteriesModel;
-use App\models\MethodsModel;
-use App\models\Project;
+use App\Models\IssueModel;
+use App\Models\LotteriesModel;
+use App\Models\MethodsModel;
+use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;

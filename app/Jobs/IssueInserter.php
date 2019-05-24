@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\models\IssueModel;
+use App\Models\IssueModel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;

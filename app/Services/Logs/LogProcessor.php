@@ -9,7 +9,7 @@
 namespace App\Services\Logs;
 
 
-use App\models\Logs;
+use App\Models\Logs;
 use Illuminate\Support\Facades\Log;
 use Jenssegers\Agent\Agent;
 

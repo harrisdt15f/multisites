@@ -1,7 +1,7 @@
 <?php
 
-use App\models\PartnerAdminUsers;
-use App\models\UserHandleModel;
+use App\Models\PartnerAdminUsers;
+use App\Models\UserHandleModel;
 
 return [
 

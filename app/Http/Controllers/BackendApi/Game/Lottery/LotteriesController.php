@@ -4,8 +4,8 @@ namespace App\Http\Controllers\BackendApi\Game\Lottery;
 
 use App\Events\IssueGenerateEvent;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\models\LotteriesModel;
-use App\models\MethodsModel;
+use App\Models\LotteriesModel;
+use App\Models\MethodsModel;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\BackendApi\DeveloperUsage\Backend\Menu;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\models\PartnerAdminRoute;
-use App\models\PartnerMenus;
+use App\Models\PartnerAdminRoute;
+use App\Models\PartnerMenus;
 use function GuzzleHttp\json_decode;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Route;
