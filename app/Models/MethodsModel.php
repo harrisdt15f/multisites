@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\Game\lottery\Traits\MethodsLogics;
+
 class MethodsModel extends BaseModel
 {
+    use MethodsLogics;
     protected $table = 'methods';
 
     /**
@@ -50,11 +53,5 @@ class MethodsModel extends BaseModel
             'created_at',
             'updated_at'
         ]);
-    }
-
-
-    public static function getMethodConfig($lotterySign)
-    {
-        return self::where("lottery_id", $lotterySign)->where('status', 1)->where('show', 1)->get();
     }
 }
