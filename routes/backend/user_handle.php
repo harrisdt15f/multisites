@@ -7,7 +7,7 @@
  */
 
 //管理总代用户与玩家
-Route::group(['prefix' => 'user-handle','namespace' => 'Users'], function () {
+Route::group(['prefix' => 'user-handle', 'namespace' => 'Users'], function () {
     $namePrefix = 'userhandle.';
     $controller = 'UserHandleController@';
     //创建总代
@@ -32,5 +32,8 @@ Route::group(['prefix' => 'user-handle','namespace' => 'Users'], function () {
     Route::match(['post', 'options'], 'deactivate', ['as' => $namePrefix . 'deactivate', 'uses' => $controller . 'deactivate']);
     //给用户冻结操作的历史
     Route::match(['post', 'options'], 'deactivated-detail', ['as' => $namePrefix . 'deactivated-detail', 'uses' => $controller . 'deactivateDetail']);
-
+    //用户帐变记录
+    Route::match(['post', 'options'], 'user_account_change', ['as' => $namePrefix . 'user_account_change', 'uses' => $controller . 'userAccountChange']);
+    //用户充值记录
+    Route::match(['post', 'options'], 'user_recharge_history', ['as' => $namePrefix . 'user_recharge_history', 'uses' => $controller . 'userRechargeHistory']);
 });

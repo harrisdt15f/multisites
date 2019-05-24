@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\BackendApi\Users;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Models\AccountChangeReport;
 use App\Models\AuditFlow;
 use App\Models\HandleUserAccounts;
 use App\Models\PassworAuditLists;
 use App\Models\UserAdmitedFlowsModel;
 use App\Models\UserHandleModel;
+use App\Models\UserRechargeHistory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -347,4 +349,50 @@ class UserHandleController extends BackEndApiMainController
 
     }
 
+    //用户帐变记录
+    public function userAccountChange()
+    {
+        $validator = Validator::make($this->inputs, [
+            'user_id' => 'required|numeric',
+            'start_time' => 'required|date',
+            'end_time' => 'required|date',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
+        }
+        $datas = AccountChangeReport::select('user_name', 'type_name', 'type_sign', 'amount', 'before_balance', 'balance')
+            ->with(['changeType' => function ($query) {
+                $query->select('sign', 'in_out');
+            }])
+            ->where(function ($query) {
+                $query->where('user_id', $this->inputs['user_id'])
+                    ->where('created_at', '>=', $this->inputs['start_time'])
+                    ->where('created_at', '<', $this->inputs['end_time']);
+            })->get()->toArray();
+        foreach ($datas as $key => $report) {
+            $datas[$key]['in_out'] = $report['change_type']['in_out'];
+            unset($datas[$key]['type_sign']);
+            unset($datas[$key]['change_type']);
+        }
+        return $this->msgOut(true, $datas);
+    }
+
+    //用户充值记录
+    public function userRechargeHistory()
+    {
+        $validator = Validator::make($this->inputs, [
+            'user_id' => 'required|numeric',
+            'start_time' => 'required|date',
+            'end_time' => 'required|date',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
+        }
+        $datas = UserRechargeHistory::select('user_name', 'amount', 'deposit_mode', 'status')->where(function ($query) {
+            $query->where('user_id', $this->inputs['user_id'])
+                ->where('created_at', '>=', $this->inputs['start_time'])
+                ->where('created_at', '<', $this->inputs['end_time']);
+        })->get()->toArray();
+        return $this->msgOut(true, $datas);
+    }
 }

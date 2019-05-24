@@ -178,6 +178,8 @@ class LotteriesController extends BackEndApiMainController
         try {
             $lotteriesEloq->status = $this->inputs['status'];
             $lotteriesEloq->save();
+            //清理彩种玩法缓存
+            $this->clearMethodCache();
             return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
@@ -208,6 +210,8 @@ class LotteriesController extends BackEndApiMainController
             $methodGroupIds = array_column($methodGroupEloq, 'id');
             $updateDate = ['status', $this->inputs['status']];
             MethodsModel::whereIn('id', $methodGroupIds)->update(['status' => $this->inputs['status']]);
+            //清理彩种玩法缓存
+            $this->clearMethodCache();
             return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
@@ -240,6 +244,8 @@ class LotteriesController extends BackEndApiMainController
             $methodGroupIds = array_column($methodGroupEloq, 'id');
             $updateDate = ['status', $this->inputs['status']];
             MethodsModel::whereIn('id', $methodGroupIds)->update(['status' => $this->inputs['status']]);
+            //清理彩种玩法缓存
+            $this->clearMethodCache();
             return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
@@ -265,11 +271,22 @@ class LotteriesController extends BackEndApiMainController
         try {
             $pastData->status = $this->inputs['status'];
             $pastData->save();
+            //清理彩种玩法缓存
+            $this->clearMethodCache();
             return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);
+        }
+    }
+
+    //
+    public function clearMethodCache()
+    {
+        $redisKey = 'play_method_list';
+        if (Cache::has($redisKey)) {
+            Cache::forget($redisKey);
         }
     }
 }
