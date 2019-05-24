@@ -46,6 +46,7 @@ return [
     '100801' => '编辑保存有误',
     //RechargeCheckController
     '100900' => '当前状态非待审核状态',
+    '100901' => '请先添加 sign=ArtificialRecharge的人工充值 帐变类型表',
     //RegionController
     '101000' => '县级行政区编码错误',
     '101001' => '行政区已经存在',
