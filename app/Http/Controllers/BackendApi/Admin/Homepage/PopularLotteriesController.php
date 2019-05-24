@@ -179,12 +179,6 @@ class PopularLotteriesController extends BackEndApiMainController
         $type = $pastFrontData->type;
         DB::beginTransaction();
         try {
-            //lockForUpdate
-            $this->eloqM::where(function ($query) {
-                $query->where('type', $type)
-                    ->where('sort', '>=', $this->inputs['front_sort'])
-                    ->where('sort', '<=', $this->inputs['rearways_sort']);
-            })->lockForUpdate();
             //上拉排序
             if ($this->inputs['sort_type'] == 1) {
                 $stationaryData = $this->eloqM::find($this->inputs['front_id']);

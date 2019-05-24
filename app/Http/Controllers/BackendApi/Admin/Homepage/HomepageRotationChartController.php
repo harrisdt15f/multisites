@@ -208,11 +208,6 @@ class HomepageRotationChartController extends BackEndApiMainController
         }
         DB::beginTransaction();
         try {
-            //lockForUpdate
-            $this->eloqM::where(function ($query) {
-                $query->where('sort', '>=', $this->inputs['front_sort'])
-                    ->where('sort', '<=', $this->inputs['rearways_sort']);
-            })->lockForUpdate();
             //上拉排序
             if ($this->inputs['sort_type'] == 1) {
                 $stationaryData = $pastFrontData;

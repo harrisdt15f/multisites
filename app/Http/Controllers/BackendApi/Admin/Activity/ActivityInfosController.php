@@ -168,11 +168,6 @@ class ActivityInfosController extends BackEndApiMainController
         if (!is_null($pastData)) {
             DB::beginTransaction();
             try {
-                //lockForUpdate
-                $this->eloqM::where(function ($query) use ($pastData) {
-                    $query->where('id', $this->inputs['id'])
-                        ->orwhere('sort', '>', $pastData['sort']);
-                })->lockForUpdate();
                 $this->eloqM::where('id', $this->inputs['id'])->delete();
                 //排序
                 $this->eloqM::where('sort', '>', $pastData['sort'])->decrement('sort');
@@ -212,11 +207,6 @@ class ActivityInfosController extends BackEndApiMainController
         }
         DB::beginTransaction();
         try {
-            //lockForUpdate
-            $this->eloqM::where(function ($query) {
-                $query->where('sort', '>=', $this->inputs['front_sort'])
-                    ->where('sort', '<=', $this->inputs['rearways_sort']);
-            })->lockForUpdate();
             //上拉排序
             if ($this->inputs['sort_type'] == 1) {
                 $stationaryData = $pastFrontData;
