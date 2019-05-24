@@ -44,7 +44,7 @@ class FrontendApiMainController extends Controller
             $this->inputs = Input::all(); //获取所有相关的传参数据
             //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
 //            $this->adminOperateLog();
-            $this->eloqM = 'App\\models\\'.$this->eloqM; // 当前的eloquent
+            $this->eloqM = 'App\\Models\\'.$this->eloqM; // 当前的eloquent
             return $next($request);
         });
     }
