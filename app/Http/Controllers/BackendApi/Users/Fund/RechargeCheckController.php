@@ -5,6 +5,7 @@ namespace App\Http\Controllers\BackendApi\Users\Fund;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\FundOperationRecharge;
 use App\Models\AccountChangeReport;
+use App\Models\AccountChangeType;
 use App\Models\AuditFlow;
 use App\Models\FundOperation;
 use App\Models\HandleUserAccounts;
@@ -62,13 +63,15 @@ class RechargeCheckController extends BackEndApiMainController
             $historyEloq->fill($historyEdit);
             $historyEloq->save();
             //用户金额表
-            $UserAccounts = HandleUserAccounts::where('user_id', $RechargeLog->user_id)->lockForUpdate()->first();
-            $userData = UserHandleModel::where('id', $RechargeLog->user_id)->with('account')->first()->toArray();
-            $balance = $userData['account']['balance'] + $RechargeLog['amount'];
+            $userData = UserHandleModel::where('id', $RechargeLog->user_id)->with('account')->first();
+            $balance = $userData->account->balance + $RechargeLog['amount'];
             $UserAccountsEdit = ['balance' => $balance];
             $this->auditFlowEdit($auditFlow, $this->partnerAdmin, $this->inputs['auditor_note']);
-            $UserAccounts->fill($UserAccountsEdit);
-            $UserAccounts->save();
+            $UserAccounts = HandleUserAccounts::where('user_id', $RechargeLog->user_id)->first();
+            HandleUserAccounts::where(function ($query) use ($UserAccounts) {
+                $query->where('user_id', $UserAccounts->user_id)
+                    ->where('updated_at', $UserAccounts->updated_at);
+            })->update($UserAccountsEdit);
             //用户帐变表
             $this->insertChangeReport($userData, $RechargeLog['amount'], $balance, $accountChangeTypeEloq);
             DB::commit();
@@ -144,7 +147,7 @@ class RechargeCheckController extends BackEndApiMainController
     public function insertChangeReport($user, $amount, $balance, $type)
     {
         $insertData = [
-            'sign' => $user['sign'],
+            'sign' => $user->sign,
             'user_id' => $user['id'],
             'top_id' => $user['top_id'],
             'parent_id' => $user['parent_id'],
