@@ -5,6 +5,7 @@ namespace App\Http\Controllers\BackendApi\Users\Fund;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\FundOperationRecharge;
 use App\models\AccountChangeReport;
+use App\models\AccountChangeType;
 use App\models\AuditFlow;
 use App\models\FundOperation;
 use App\models\UserAccounts;
@@ -45,6 +46,11 @@ class RechargeCheckController extends BackEndApiMainController
         if ($RechargeLog->status !== 0) {
             return $this->msgOut(false, [], '100900');
         }
+        //检查是否存在 人工充值 的帐变类型表
+        $accountChangeTypeEloq = AccountChangeType::select('name', 'sign')->where('sign', 'ArtificialRecharge')->first();
+        if (is_null($accountChangeTypeEloq)) {
+            return $this->msgOut(false, [], '100901');
+        }
         DB::beginTransaction();
         try {
             // 修改 artificial_recharge_log 表 的审核状态
@@ -65,7 +71,7 @@ class RechargeCheckController extends BackEndApiMainController
             $UserAccounts->fill($UserAccountsEdit);
             $UserAccounts->save();
             //用户帐变表
-            $this->insertChangeReport($userData, $RechargeLog['amount'], $balance);
+            $this->insertChangeReport($userData, $RechargeLog['amount'], $balance, $accountChangeTypeEloq);
             DB::commit();
             return $this->msgOut(true);
         } catch (Exception $e) {
@@ -136,10 +142,8 @@ class RechargeCheckController extends BackEndApiMainController
         $eloq->save();
     }
 
-    public function insertChangeReport($user, $amount, $balance)
+    public function insertChangeReport($user, $amount, $balance, $type)
     {
-        //type_sign
-        //type_name
         $insertData = [
             'sign' => $user['sign'],
             'user_id' => $user['id'],
@@ -147,8 +151,8 @@ class RechargeCheckController extends BackEndApiMainController
             'parent_id' => $user['parent_id'],
             'rid' => $user['rid'],
             'username' => $user['username'],
-            'type_sign' => '充值',
-            'type_name' => 'recharge',
+            'type_sign' => $type->sign,
+            'type_name' => $type->name,
             'amount' => $amount,
             'before_balance' => $user['account']['balance'],
             'balance' => $balance,
