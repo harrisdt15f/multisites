@@ -218,7 +218,7 @@ class PopularLotteriesController extends BackEndApiMainController
     //彩种列表
     public function lotteriesList()
     {
-        $lotteries = LotteriesModel::select('cn_name', 'en_name')->get();
+        $lotteries = LotteriesModel::select('id', 'cn_name', 'en_name')->get();
         return $this->msgOut(true, $lotteries);
     }
 }
