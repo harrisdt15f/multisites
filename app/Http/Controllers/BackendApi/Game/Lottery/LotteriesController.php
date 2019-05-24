@@ -29,7 +29,7 @@ class LotteriesController extends BackEndApiMainController
         $series = array_keys(Config::get('game.main.series'));
         $seriesStringImploded = implode(',', $series);
         $rule = [
-            'series_id' => 'required|in:' . $seriesStringImploded,
+            'series_id' => 'required|in:'.$seriesStringImploded,
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
@@ -65,12 +65,16 @@ class LotteriesController extends BackEndApiMainController
                 $lotteriesIds = $methodEloq->lotteriesIds; //        dd($lotteriesIds);
                 foreach ($lotteriesIds as $litems) {
                     $currentLotteryId = $litems->lottery_id;
-                    $temp[$seriesIthem][$currentLotteryId]['data'] = $this->eloqM::select('id', 'cn_name', 'status')->where('en_name', $currentLotteryId)->first()->toArray();
+                    $temp[$seriesIthem][$currentLotteryId]['data'] = $this->eloqM::select('id', 'cn_name',
+                        'status')->where('en_name', $currentLotteryId)->first()->toArray();
                     $temp[$seriesIthem][$currentLotteryId]['child'] = [];
                     $methodGrops = $litems->methodGroups;
                     foreach ($methodGrops as $mgitems) {
                         $curentMethodGroup = $mgitems->method_group;
-                        $checkOpenGroup = MethodsModel::where(function ($query) use ($currentLotteryId, $curentMethodGroup) {
+                        $checkOpenGroup = MethodsModel::where(function ($query) use (
+                            $currentLotteryId,
+                            $curentMethodGroup
+                        ) {
                             $query->where('lottery_id', $currentLotteryId)
                                 ->where('method_group', $curentMethodGroup)
                                 ->where('status', 1);
@@ -88,13 +92,21 @@ class LotteriesController extends BackEndApiMainController
                         foreach ($methodRows as $rowitems) {
                             $method_row = $rowitems->method_row;
                             //玩法行 data
-                            $checkOpenRow = MethodsModel::where(function ($query) use ($currentLotteryId, $curentMethodGroup, $method_row) {
+                            $checkOpenRow = MethodsModel::where(function ($query) use (
+                                $currentLotteryId,
+                                $curentMethodGroup,
+                                $method_row
+                            ) {
                                 $query->where('lottery_id', $currentLotteryId)
                                     ->where('method_group', $curentMethodGroup)
                                     ->where('method_row', $method_row)
                                     ->where('status', 1);
                             })->first();
-                            $methodRow = ['lottery_id' => $currentLotteryId, 'method_group' => $curentMethodGroup, 'method_row' => $method_row];
+                            $methodRow = [
+                                'lottery_id' => $currentLotteryId,
+                                'method_group' => $curentMethodGroup,
+                                'method_row' => $method_row
+                            ];
                             if (is_null($checkOpenGroup)) {
                                 $methodRow['status'] = 0;
                             } else {
@@ -102,12 +114,17 @@ class LotteriesController extends BackEndApiMainController
                             }
                             $temp[$seriesIthem][$currentLotteryId]['child'][$curentMethodGroup]['child'][$rowitems->method_row]['data'] = $methodRow;
                             //玩法信息
-                            $temp[$seriesIthem][$currentLotteryId]['child'][$curentMethodGroup]['child'][$rowitems->method_row]['child'] = $rowitems->select('id', 'method_name', 'status')->where(function ($query) use ($currentLotteryId, $curentMethodGroup, $method_row) {
+                            $temp[$seriesIthem][$currentLotteryId]['child'][$curentMethodGroup]['child'][$rowitems->method_row]['child'] = $rowitems->select('id',
+                                'method_name', 'status')->where(function ($query) use (
+                                $currentLotteryId,
+                                $curentMethodGroup,
+                                $method_row
+                            ) {
                                 $query->where('lottery_id', $currentLotteryId)
                                     ->where('method_group', $curentMethodGroup)
                                     ->where('method_row', $method_row);
                             })
-                            // ->with('methodDetails')
+                                // ->with('methodDetails')
                                 ->get()->toArray();
                         }
                     }

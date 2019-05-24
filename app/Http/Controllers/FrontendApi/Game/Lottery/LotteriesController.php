@@ -13,7 +13,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
-class LottriesController extends FrontendApiMainController
+class LotteriesController extends FrontendApiMainController
 {
     public function lotteryList(): JsonResponse
     {
@@ -236,6 +236,14 @@ class LottriesController extends FrontendApiMainController
         $count          = $this->inputs['count'];//10
         $data   = Project::getGamePageList($lotterySign, $start, $count);
         return $this->msgOut(true, $data);
+    }
+
+    public function bet()
+    {
+        $usr = $this->currentAuth->user();
+        $lotterySign    = $this->inputs['lottery_sign'];
+        $lottery        = Lottery::getLottery($lotterySign);
+
     }
 
 
