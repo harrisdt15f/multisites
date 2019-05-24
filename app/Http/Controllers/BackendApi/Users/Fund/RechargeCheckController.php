@@ -7,7 +7,7 @@ use App\Lib\Common\FundOperationRecharge;
 use App\Models\AccountChangeReport;
 use App\Models\AuditFlow;
 use App\Models\FundOperation;
-use App\Models\UserAccounts;
+use App\Models\HandleUserAccounts;
 use App\Models\UserHandleModel;
 use App\Models\UserRechargeHistory;
 use Illuminate\Support\Facades\DB;
@@ -62,7 +62,7 @@ class RechargeCheckController extends BackEndApiMainController
             $historyEloq->fill($historyEdit);
             $historyEloq->save();
             //用户金额表
-            $UserAccounts = UserAccounts::where('user_id', $RechargeLog->user_id)->lockForUpdate()->first();
+            $UserAccounts = HandleUserAccounts::where('user_id', $RechargeLog->user_id)->lockForUpdate()->first();
             $userData = UserHandleModel::where('id', $RechargeLog->user_id)->with('account')->first()->toArray();
             $balance = $userData['account']['balance'] + $RechargeLog['amount'];
             $UserAccountsEdit = ['balance' => $balance];
