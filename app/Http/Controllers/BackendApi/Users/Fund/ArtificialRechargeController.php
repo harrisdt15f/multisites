@@ -10,13 +10,16 @@ use App\Models\FundOperation;
 use App\Models\UserHandleModel;
 use App\Models\UserRechargeHistory;
 use App\Models\UserRechargeLog;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ArtificialRechargeController extends BackEndApiMainController
 {
     protected $eloqM = 'UserHandleModel';
-    public function users()
+
+    //人工充值 用户列表
+    public function users(): JsonResponse
     {
         $fixedJoin = 1;
         $withTable = 'account';
@@ -25,7 +28,9 @@ class ArtificialRechargeController extends BackEndApiMainController
         $data = $this->generateSearchQuery($this->eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields);
         return $this->msgOut(true, $data);
     }
-    public function recharge()
+
+    //给用户人工充值
+    public function recharge(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',

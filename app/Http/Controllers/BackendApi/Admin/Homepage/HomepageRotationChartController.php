@@ -6,6 +6,7 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\ImageArrange;
 use App\Models\ActivityInfos;
 use App\Models\AdvertisementType;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -13,14 +14,16 @@ class HomepageRotationChartController extends BackEndApiMainController
 {
     protected $eloqM = 'HomepageRotationChart';
 
-    public function detail()
+    //首页轮播图列表
+    public function detail(): JsonResponse
     {
         $searchAbleFields = ['title', 'type'];
         $data = $this->eloqM::orderBy('sort', 'asc')->get()->toArray();
         return $this->msgOut(true, $data);
     }
 
-    public function add()
+    //添加首页轮播图
+    public function add(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'title' => 'required|string',
@@ -88,7 +91,8 @@ class HomepageRotationChartController extends BackEndApiMainController
         }
     }
 
-    public function edit()
+    //编辑首页轮播图
+    public function edit(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -156,7 +160,8 @@ class HomepageRotationChartController extends BackEndApiMainController
         }
     }
 
-    public function delete()
+    //删除首页轮播图
+    public function delete(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -172,14 +177,11 @@ class HomepageRotationChartController extends BackEndApiMainController
         DB::beginTransaction();
         try {
             $ImageClass = new ImageArrange();
-            $deleteStatus = $ImageClass->deletePic(substr($pastDataEloq['pic_path'], 1));
-            if ($deleteStatus === false) {
-                return $this->msgOut(false, [], '101805');
-            }
             $pastDataEloq->delete();
             //往后的sort重新排序
             $this->eloqM::where('sort', '>', $pastData->sort)->decrement('sort');
             DB::commit();
+            $deleteStatus = $ImageClass->deletePic(substr($pastData['pic_path'], 1));
             return $this->msgOut(true);
         } catch (Exception $e) {
             DB::rollback();
@@ -189,7 +191,8 @@ class HomepageRotationChartController extends BackEndApiMainController
         }
     }
 
-    public function sort()
+    //首页轮播图排序
+    public function sort(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'front_id' => 'required|numeric|gt:0',
@@ -229,6 +232,7 @@ class HomepageRotationChartController extends BackEndApiMainController
             return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
+
     //操作轮播图时获取的活动列表
     public function activityList()
     {
@@ -243,7 +247,7 @@ class HomepageRotationChartController extends BackEndApiMainController
      * @param     $newImg     新图文件
      * @param     $ImageClass     图片类
      */
-    public function replaceImage($pastImg, $thumbnail, $newImg, $ImageClass)
+    public function replaceImage($pastImg, $thumbnail, $newImg, $ImageClass): array
     {
         $ImageClass->deletePic(substr($pastImg, 1));
         $ImageClass->deletePic(substr($thumbnail, 1));
@@ -258,7 +262,7 @@ class HomepageRotationChartController extends BackEndApiMainController
     }
 
     //上传图片的规格
-    public function picStandard()
+    public function picStandard(): JsonResponse
     {
         $standard = AdvertisementType::select('l_size', 'w_size', 'size')->where('type', 1)->first();
         return $this->msgOut(true, $standard);

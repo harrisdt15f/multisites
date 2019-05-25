@@ -3,20 +3,23 @@
 namespace App\Http\Controllers\BackendApi\Users\Fund;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 
 class AccountChangeTypeController extends BackEndApiMainController
 {
     protected $eloqM = 'AccountChangeType';
 
-    public function detail()
+    //帐变类型列表
+    public function detail(): JsonResponse
     {
         $searchAbleFields = ['name', 'sign', 'in_out', 'type'];
         $datas = $this->generateSearchQuery($this->eloqM, $searchAbleFields);
         return $this->msgout(true, $datas);
     }
 
-    public function add()
+    //添加帐变类型
+    public function add(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'name' => 'required|string',
@@ -43,7 +46,8 @@ class AccountChangeTypeController extends BackEndApiMainController
         }
     }
 
-    public function edit()
+    //编辑帐变类型
+    public function edit(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -78,7 +82,8 @@ class AccountChangeTypeController extends BackEndApiMainController
         }
     }
 
-    public function delete()
+    //删除帐变类型
+    public function delete(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',

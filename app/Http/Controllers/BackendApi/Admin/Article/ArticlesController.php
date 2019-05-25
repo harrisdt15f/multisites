@@ -5,6 +5,7 @@ namespace App\Http\Controllers\BackendApi\Admin\Article;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\ImageArrange;
 use App\Models\AuditFlow;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -12,8 +13,9 @@ use Illuminate\Support\Facades\Validator;
 class ArticlesController extends BackEndApiMainController
 {
     protected $eloqM = 'Articles';
+
     //文章列表
-    public function detail()
+    public function detail(): JsonResponse
     {
         $field = 'sort';
         $type = 'asc';
@@ -22,7 +24,7 @@ class ArticlesController extends BackEndApiMainController
         return $this->msgOut(true, $datas);
     }
     //发布文章
-    public function addArticles()
+    public function addArticles(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'category_id' => 'required|numeric',
@@ -90,8 +92,9 @@ class ArticlesController extends BackEndApiMainController
             return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
+
     //编辑文章
-    public function editArticles()
+    public function editArticles(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -159,8 +162,9 @@ class ArticlesController extends BackEndApiMainController
             return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
+
     //删除文章
-    public function deleteArticles()
+    public function deleteArticles(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -192,8 +196,9 @@ class ArticlesController extends BackEndApiMainController
             return $this->msgOut(false, [], '100501');
         }
     }
+
     //文章排序
-    public function sortArticles()
+    public function sortArticles(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'front_id' => 'required|numeric|gt:0',
@@ -233,8 +238,9 @@ class ArticlesController extends BackEndApiMainController
             return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
+
     //文章置顶
-    public function topArticles()
+    public function topArticles(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -257,8 +263,9 @@ class ArticlesController extends BackEndApiMainController
             return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
+
     //图片上传
-    public function uploadPic()
+    public function uploadPic(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'pic' => 'required|file',

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\BackendApi\Admin\Activity;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\ImageArrange;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -11,15 +12,17 @@ class ActivityInfosController extends BackEndApiMainController
 {
     protected $eloqM = 'ActivityInfos';
     protected $folderName = 'mobile_activity'; //活动图片存放的文件夹名称
+
     //活动列表
-    public function detail()
+    public function detail(): JsonResponse
     {
         $searchAbleFields = ['title', 'type', 'status', 'admin_name', 'is_time_interval'];
         $datas = $this->generateSearchQuery($this->eloqM, $searchAbleFields);
         return $this->msgOut(true, $datas);
     }
+
     //添加活动
-    public function add()
+    public function add(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'title' => 'required',
@@ -86,8 +89,9 @@ class ActivityInfosController extends BackEndApiMainController
             return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
+
     //编辑活动
-    public function edit()
+    public function edit(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -188,7 +192,8 @@ class ActivityInfosController extends BackEndApiMainController
         }
     }
 
-    public function sort()
+    //文章排序
+    public function sort(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'front_id' => 'required|numeric|gt:0',

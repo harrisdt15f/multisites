@@ -3,18 +3,23 @@
 namespace App\Http\Controllers\BackendApi\Admin\FundOperate;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 
 class BankController extends BackEndApiMainController
 {
     protected $eloqM = 'Banks';
-    public function detail()
+
+    //银行列表
+    public function detail(): JsonResponse
     {
         $searchAbleFields = ['title', 'code', 'pay_type', 'status'];
         $banksDatas = $this->generateSearchQuery($this->eloqM, $searchAbleFields);
         return $this->msgOut(true, $banksDatas);
     }
-    public function addBank()
+
+    //添加银行
+    public function addBank(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'title' => 'required|string',
@@ -43,7 +48,9 @@ class BankController extends BackEndApiMainController
             return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
-    public function editBank()
+
+    //编辑银行
+    public function editBank(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -74,7 +81,9 @@ class BankController extends BackEndApiMainController
             return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
-    public function deleteBank()
+
+    //删除银行
+    public function deleteBank(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',

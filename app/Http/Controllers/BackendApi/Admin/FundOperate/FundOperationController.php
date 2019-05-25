@@ -9,12 +9,14 @@ use App\Models\FundOperation;
 use App\Models\FundOperationGroup;
 use App\Models\PartnerAdminUsers;
 use App\Models\PartnerSysConfigures;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class FundOperationController extends BackEndApiMainController
 {
-    public function admins()
+    //额度管理列表
+    public function admins(): JsonResponse
     {
         $rule = ['name' => 'string'];
         $validator = Validator::make($this->inputs, $rule);
@@ -39,7 +41,9 @@ class FundOperationController extends BackEndApiMainController
         $finalData['dailyFundLimit'] = $SysConfiguresEloq['value'];
         return $this->msgOut(true, $finalData);
     }
-    public function addFund()
+
+    //给管理员添加人工充值额度
+    public function addFund(): JsonResponse
     {
         $rule = [
             'id' => 'required|numeric',
@@ -79,7 +83,9 @@ class FundOperationController extends BackEndApiMainController
             return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
-    public function everyDayFund()
+
+    //设置每日的管理员人工充值额度
+    public function everyDayFund(): JsonResponse
     {
         $rule = [
             'fund' => 'required|numeric',
@@ -103,7 +109,9 @@ class FundOperationController extends BackEndApiMainController
             return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
-    public function fundChangeLog()
+
+    //查看管理员人工充值额度记录
+    public function fundChangeLog(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'admin_id' => 'required|numeric',

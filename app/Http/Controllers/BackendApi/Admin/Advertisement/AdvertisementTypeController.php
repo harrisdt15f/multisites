@@ -3,13 +3,15 @@
 namespace App\Http\Controllers\BackendApi\Admin\Advertisement;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 
 class AdvertisementTypeController extends BackEndApiMainController
 {
     protected $eloqM = 'AdvertisementType';
 
-    public function detail()
+    //广告列表
+    public function detail(): JsonResponse
     {
         $datas = $this->eloqM::select('id', 'name', 'type', 'status', 'ext_type', 'l_size', 'w_size', 'size')->get()->toArray();
         return $this->msgOut(true, $datas);
@@ -18,7 +20,7 @@ class AdvertisementTypeController extends BackEndApiMainController
     /**
      * 编辑广告类型
      */
-    public function edit()
+    public function edit(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',

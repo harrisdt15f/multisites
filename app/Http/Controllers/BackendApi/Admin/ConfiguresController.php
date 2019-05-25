@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BackendApi\Admin;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 
 class ConfiguresController extends BackEndApiMainController
@@ -10,7 +11,7 @@ class ConfiguresController extends BackEndApiMainController
     protected $eloqM = 'PartnerSysConfigures';
 
     //获取全部配置
-    public function getConfiguresList()
+    public function getConfiguresList(): JsonResponse
     {
         $partnerSysConfigEloq = $this->eloqM::select('id', 'parent_id', 'pid', 'sign', 'name', 'description', 'value', 'add_admin_id', 'last_update_admin_id', 'status', 'created_at', 'updated_at')->get();
         $data = [];
@@ -24,7 +25,7 @@ class ConfiguresController extends BackEndApiMainController
     }
 
     //添加配置
-    public function add()
+    public function add(): JsonResponse
     {
         $rule = [
             'parent_id' => 'required|numeric',
@@ -64,7 +65,7 @@ class ConfiguresController extends BackEndApiMainController
     }
 
     //修改配置
-    public function edit()
+    public function edit(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -100,7 +101,7 @@ class ConfiguresController extends BackEndApiMainController
     }
 
     //删除配置
-    public function delete()
+    public function delete(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -124,7 +125,7 @@ class ConfiguresController extends BackEndApiMainController
     }
 
     //配置状态开关 0关  1开
-    public function configSwitch()
+    public function configSwitch(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',

@@ -4,13 +4,15 @@ namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\ImageArrange;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 
 class HomepageController extends BackEndApiMainController
 {
     protected $eloqM = 'HomepageModel';
 
-    public function detail()
+    //首页管理下的模块
+    public function detail(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'pid' => 'required|numeric|in:1,2,3,4,5,6',
@@ -22,7 +24,8 @@ class HomepageController extends BackEndApiMainController
         return $this->msgOut(true, $datas);
     }
 
-    public function edit()
+    //编辑首页模块
+    public function edit(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -64,7 +67,8 @@ class HomepageController extends BackEndApiMainController
         }
     }
 
-    public function uploadPic()
+    //修改首页模块下的图片
+    public function uploadPic(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'key' => 'required|string',
