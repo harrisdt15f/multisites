@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Advertisement;
+
+use App\Models\BaseModel;
 
 class AdvertisementType extends BaseModel
 {

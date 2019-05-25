@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 
 class AdvertisementTypeController extends BackEndApiMainController
 {
-    protected $eloqM = 'AdvertisementType';
+    protected $eloqM = 'Advertisement\AdvertisementType';
 
     //广告列表
     public function detail(): JsonResponse
