@@ -338,6 +338,8 @@ class UserHandleController extends BackEndApiMainController
     {
         $rule = [
             'user_id' => 'required|numeric',
+            'start_time' => 'required|date_format:Y-m-d H:i:s',
+            'end_time' => 'required|date_format:Y-m-d H:i:s',
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
@@ -345,7 +347,7 @@ class UserHandleController extends BackEndApiMainController
         }
         $userEloq = $this->eloqM::find($this->inputs['user_id']);
         if (!is_null($userEloq)) {
-            $data = $userEloq->userAdmitedFlow->toArray();
+            $data = UserAdmitedFlowsModel::where('user_id', $this->inputs['user_id'])->where('created_at', '>=', $this->inputs['start_time'])->where('created_at', '<', $this->inputs['end_time'])->orderBy('created_at', 'desc')->get()->toArray();
             return $this->msgOut(true, $data);
         }
 
