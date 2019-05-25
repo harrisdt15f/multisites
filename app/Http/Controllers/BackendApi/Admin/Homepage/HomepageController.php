@@ -11,16 +11,17 @@ class HomepageController extends BackEndApiMainController
 {
     protected $eloqM = 'HomepageModel';
 
-    //首页管理下的模块
-    public function detail(): JsonResponse
+    //导航一列表
+    public function navOne(): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'pid' => 'required|numeric|in:1,2,3,4,5,6',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $datas = $this->eloqM::where('pid', $this->inputs['pid'])->get()->toArray();
+        $datas = $this->eloqM::select('id', 'model_name', 'key', 'value', 'status')->where('pid', 1)->get()->toArray();
+        return $this->msgOut(true, $datas);
+    }
+
+    //主题板块列表
+    public function pageModel(): JsonResponse
+    {
+        $datas = $this->eloqM::select('id', 'model_name', 'key', 'value', 'show_num', 'status')->where('pid', 4)->orWhere('key', 'banner')->get()->toArray();
         return $this->msgOut(true, $datas);
     }
 

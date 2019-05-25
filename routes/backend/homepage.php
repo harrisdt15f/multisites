@@ -3,7 +3,8 @@
 Route::group(['prefix' => 'homepage', 'namespace' => 'Admin\Homepage'], function () {
     $namePrefix = 'homepage.';
     $controller = 'HomepageController@';
-    Route::match(['get', 'options'], 'detail', ['as' => $namePrefix . 'detail', 'uses' => $controller . 'detail']);
+    Route::match(['get', 'options'], 'nav-one', ['as' => $namePrefix . 'nav-one', 'uses' => $controller . 'navOne']);
+    Route::match(['get', 'options'], 'page-model', ['as' => $namePrefix . 'page-model', 'uses' => $controller . 'pageModel']);
     Route::match(['post', 'options'], 'edit', ['as' => $namePrefix . 'edit', 'uses' => $controller . 'edit']);
     Route::match(['post', 'options'], 'upload-pic', ['as' => $namePrefix . 'upload-pic', 'uses' => $controller . 'uploadPic']);
 });
