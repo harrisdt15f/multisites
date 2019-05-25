@@ -55,10 +55,11 @@ class HomepageController extends FrontendApiMainController
             return $this->msgOut(false, [], '400', $this->offMsg);
         }
         $dataEloq = PopularLotteries::select('id', 'lotteries_id', 'pic_path')->with(['lotteries' => function ($query) {
-            $query->select('id', 'day_issue');
+            $query->select('id', 'day_issue', 'en_name');
         }])->where('type', 1)->limit($lotteriesEloq->show_num)->get();
         $datas = [];
         foreach ($dataEloq as $key => $dataIthem) {
+            $datas[$key]['en_name'] = $dataIthem->lotteries->en_name;
             $datas[$key]['pic_path'] = $dataIthem->pic_path;
             $datas[$key]['day_issue'] = $dataIthem->lotteries->day_issue;
         }
@@ -73,11 +74,11 @@ class HomepageController extends FrontendApiMainController
             return $this->msgOut(false, [], '400', $this->offMsg);
         }
         $dataEloq = PopularLotteries::select('id', 'lotteries_id')->with(['lotteries' => function ($query) {
-            $query->select('id', 'cn_name');
+            $query->select('id', 'cn_name', 'en_name');
         }])->where('type', 2)->limit($lotteriesEloq->show_num)->get();
         $datas = [];
         foreach ($dataEloq as $dataIthem) {
-            $datas[$dataIthem->lotteries->id] = $dataIthem->lotteries->cn_name;
+            $datas[$dataIthem->lotteries->en_name] = $dataIthem->lotteries->cn_name;
         }
         return $this->msgOut(true, $datas);
     }
