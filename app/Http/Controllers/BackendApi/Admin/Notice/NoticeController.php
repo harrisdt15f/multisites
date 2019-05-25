@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BackendApi\Admin\Notice;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -10,7 +11,8 @@ class NoticeController extends BackEndApiMainController
 {
     protected $eloqM = 'Notice';
 
-    public function detail()
+    //公告列表
+    public function detail(): JsonResponse
     {
         $noticeDatas = $this->eloqM::select('id', 'type', 'title', 'content', 'start_time', 'end_time', 'sort', 'status', 'admin_id')->with('admin')->orderBy('sort', 'asc')->get()->toArray();
         foreach ($noticeDatas as $key => $data) {
@@ -21,7 +23,8 @@ class NoticeController extends BackEndApiMainController
         return $this->msgOut(true, $noticeDatas);
     }
 
-    public function add()
+    //添加公告
+    public function add(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'type' => 'required|numeric',
@@ -60,7 +63,8 @@ class NoticeController extends BackEndApiMainController
         }
     }
 
-    public function edit()
+    //编辑公告
+    public function edit(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -93,7 +97,8 @@ class NoticeController extends BackEndApiMainController
         }
     }
 
-    public function delete()
+    //删除公告
+    public function delete(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -121,7 +126,8 @@ class NoticeController extends BackEndApiMainController
         }
     }
 
-    public function sort()
+    //公告排序
+    public function sort(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'front_id' => 'required|numeric|gt:0',
@@ -155,6 +161,36 @@ class NoticeController extends BackEndApiMainController
             DB::commit();
             return $this->msgOut(true);
         } catch (\Exception $e) {
+            DB::rollback();
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+            return $this->msgOut(false, [], $sqlState, $msg);
+        }
+    }
+
+    //公告置顶
+    public function top()
+    {
+        $validator = Validator::make($this->inputs, [
+            'id' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
+        }
+        $pastEloq = $this->eloqM::find($this->inputs['id']);
+        if (is_null($pastEloq)) {
+            return $this->msgOut(false, [], '102101');
+        }
+        $pastSort = $pastEloq->sort;
+        DB::beginTransaction();
+        try {
+            $pastEloq->sort = 1;
+            $pastEloq->save();
+            //比这条数据sort小的   +1
+            $this->eloqM::where('sort', '<', $pastSort)->where('id', '!=', $this->inputs['id'])->increment('sort');
+            DB::commit();
+            return $this->msgOut(true);
+        } catch (Exception $e) {
             DB::rollback();
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
