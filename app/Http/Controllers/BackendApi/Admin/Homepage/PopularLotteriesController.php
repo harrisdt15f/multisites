@@ -13,6 +13,7 @@ class PopularLotteriesController extends BackEndApiMainController
 {
     protected $eloqM = 'PopularLotteries';
 
+    //热门彩种一 列表
     public function detailOne(): JsonResponse
     {
         $datas = $this->eloqM::select('id', 'lotteries_id', 'pic_path', 'sort')->with(['lotteries' => function ($query) {
@@ -21,7 +22,8 @@ class PopularLotteriesController extends BackEndApiMainController
         return $this->msgOut(true, $datas);
     }
 
-    public function detailTwo()
+    //热门彩种二 列表
+    public function detailTwo(): JsonResponse
     {
         $datas = $this->eloqM::select('id', 'lotteries_id', 'sort')->with(['lotteries' => function ($query) {
             $query->select('id', 'cn_name');
@@ -29,7 +31,8 @@ class PopularLotteriesController extends BackEndApiMainController
         return $this->msgOut(true, $datas);
     }
 
-    public function add()
+    //添加热门彩种
+    public function add(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'lotteries_id' => 'required|numeric',
@@ -84,11 +87,13 @@ class PopularLotteriesController extends BackEndApiMainController
         }
     }
 
-    public function edit()
+    //编辑热门彩种
+    public function edit(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
-            'pic' => 'required|image',
+            'pic' => 'image',
+            'lotteries_id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
@@ -97,30 +102,48 @@ class PopularLotteriesController extends BackEndApiMainController
         if (is_null($pastData)) {
             return $this->msgOut(false, [], '102003');
         }
-        if ($pastData->type === 2) {
-            return $this->msgOut(false, [], '102004');
+        //检查彩种是否存在
+        $checkLotteries = LotteriesModel::find($this->inputs['lotteries_id']);
+        if (is_null($checkLotteries)) {
+            return $this->msgOut(false, [], '102011');
         }
-        $pastPic = $pastData->pic_path;
-        $imgClass = new ImageArrange();
-        $depositPath = $imgClass->depositPath('popular_lotteries', $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
-        $pic = $imgClass->uploadImg($this->inputs['pic'], $depositPath);
-        if ($pic['success'] === false) {
-            return $this->msgOut(false, [], '400', $pic['msg']);
+        //热门类型一 并且修改了图片的操作
+        if ($pastData->type === 1) {
+            if (isset($this->inputs['pic'])) {
+                $pastPic = $pastData->pic_path;
+                $imgClass = new ImageArrange();
+                $depositPath = $imgClass->depositPath('popular_lotteries', $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
+                $pic = $imgClass->uploadImg($this->inputs['pic'], $depositPath);
+                if ($pic['success'] === false) {
+                    return $this->msgOut(false, [], '400', $pic['msg']);
+                }
+                $pastData->pic_path = '/' . $pic['path'];
+            }
         }
-        $pastData->pic_path = '/' . $pic['path'];
+        //检查该热门类型是否存在重复彩种
+        $checkData = $this->eloqM::where('lotteries_id', $this->inputs['lotteries_id'])->where('type', $pastData->type)->where('id', '!=', $this->inputs['id'])->first();
+        if (!is_null($checkData)) {
+            return $this->msgOut(false, [], '102010');
+        }
+        $pastData->lotteries_id = $this->inputs['lotteries_id'];
         try {
             $pastData->save();
-            $imgClass->deletePic(substr($pastPic, 1));
+            if (isset($pastPic)) {
+                $imgClass->deletePic(substr($pastPic, 1));
+            }
             return $this->msgOut(true);
         } catch (Exception $e) {
-            $imgClass->deletePic($pic['path']);
+            if (isset($pic)) {
+                $imgClass->deletePic($pic['path']);
+            }
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
 
-    public function delete()
+    //删除热门彩种
+    public function delete(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -157,7 +180,7 @@ class PopularLotteriesController extends BackEndApiMainController
     }
 
     //热门彩票拉动排序
-    public function lotteriesSort()
+    public function lotteriesSort(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'front_id' => 'required|numeric|gt:0',
@@ -210,7 +233,7 @@ class PopularLotteriesController extends BackEndApiMainController
         }
     }
 
-    //彩种列表
+    //选择的  彩种列表
     public function lotteriesList(): JsonResponse
     {
         $lotteries = LotteriesModel::select('id', 'cn_name', 'en_name')->get();
