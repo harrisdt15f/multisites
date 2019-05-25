@@ -17,7 +17,7 @@ class HomepageController extends FrontendApiMainController
     //需要展示的前台模块
     public function showHomepageModel()
     {
-        $HomepageModel = $this->eloqM::select('key', 'status')->where('pid', '!=', 0)->get();
+        $HomepageModel = $this->eloqM::select('key', 'status')->where('pid', '!=', 0)->orWhere('key', '=', 'banner')->get();
         $data = [];
         foreach ($HomepageModel as $value) {
             $data[$value->key] = $value->status;
