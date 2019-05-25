@@ -146,7 +146,7 @@ class BackEndApiMainController extends Controller
 
     protected function modelWithNameSpace($eloqM = null)
     {
-        return !is_null($eloqM) ? 'App\\models\\' . $eloqM : $eloqM;
+        return !is_null($eloqM) ? 'App\\Models\\' . $eloqM : $eloqM;
     }
 
     /**
