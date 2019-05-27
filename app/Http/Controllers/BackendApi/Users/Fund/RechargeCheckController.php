@@ -24,7 +24,7 @@ class RechargeCheckController extends BackEndApiMainController
         $fixedJoin = 1;
         $withTable = 'auditFlow';
         $withSearchAbleFields = ['apply_note'];
-        $searchAbleFields = ['status', 'type'];
+        $searchAbleFields = ['status', 'type', 'user_name'];
         $orderFields = 'id';
         $orderFlow = 'desc';
         $this->inputs['type'] = 2;
