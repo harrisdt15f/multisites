@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Admin;
 
-use Tymon\JWTAuth\Contracts\JWTSubject;
-use Illuminate\Notifications\Notifiable;
+use App\Models\Admin\PartnerAdminGroupAccess;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class PartnerAdminUsers extends Authenticatable implements JWTSubject
 {
@@ -73,6 +74,6 @@ class PartnerAdminUsers extends Authenticatable implements JWTSubject
 
     public function operateAmount()
     {
-        return $this->hasOne(FundOperation::class, 'admin_id', 'id');
+        return $this->hasOne(Admin\Fund\FundOperation::class, 'admin_id', 'id');
     }
 }

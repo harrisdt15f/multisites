@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Validator;
 
 class HomepageController extends BackEndApiMainController
 {
-    protected $eloqM = 'HomepageModel';
+    protected $eloqM = 'Admin\Homepage\HomepageModel';
 
     //导航一列表
     public function navOne(): JsonResponse

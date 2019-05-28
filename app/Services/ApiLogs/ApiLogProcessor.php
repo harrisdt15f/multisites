@@ -8,13 +8,12 @@
 
 namespace App\Services\ApiLogs;
 
-use App\Models\PartnerAdminRoute;
-use App\Models\PartnerLogsApi;
+use App\Models\Admin\PartnerLogsApi;
+use App\Models\DeveloperUsage\Backend\PartnerAdminRoute;
 use Jenssegers\Agent\Agent;
 
 class ApiLogProcessor
 {
-
 
     public function __invoke(array $record)
     {
@@ -39,10 +38,10 @@ class ApiLogProcessor
             $type = PartnerLogsApi::OTHER;
         }
         $messageArr = json_decode($record['message'], true);
-        $adminUser = auth()->user() ? auth()->user()->id : NULL;
+        $adminUser = auth()->user() ? auth()->user()->id : null;
         $record['extra'] = [
             'admin_id' => $adminUser,
-            'admin_name' => !is_null($adminUser) ? auth()->user()->name : NULL,
+            'admin_name' => !is_null($adminUser) ? auth()->user()->name : null,
             'origin' => request()->headers->get('origin'),
             'ip' => request()->ip(),
             'ips' => json_encode(request()->ips()),

@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\BackendApi\DeveloperUsage\Backend\Routes;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Models\PartnerMenus;
+use App\Models\DeveloperUsage\Menu\PartnerMenus;
 use Illuminate\Support\Facades\Validator;
 
 class RouteController extends BackEndApiMainController
 {
-    protected $eloqM = 'PartnerAdminRoute';
+    protected $eloqM = 'DeveloperUsage\Backend\PartnerAdminRoute';
 
     public function detail()
     {

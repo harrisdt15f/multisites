@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Game\Lottery;
 
-use App\Models\Game\lottery\Traits\MethodsLogics;
+use App\Models\BaseModel;
+use App\Models\Game\Lottery\Traits\MethodsLogics;
 
 class MethodsModel extends BaseModel
 {
@@ -24,7 +25,7 @@ class MethodsModel extends BaseModel
         'method_row, group_sort',
         'tab_sort',
         'method_sort',
-        'status'
+        'status',
     ];
 
     public function lotteriesIds()
@@ -51,7 +52,7 @@ class MethodsModel extends BaseModel
             'method_name',
             'status',
             'created_at',
-            'updated_at'
+            'updated_at',
         ]);
     }
 }

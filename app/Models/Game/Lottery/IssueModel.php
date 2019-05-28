@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Game\Lottery;
+
+use App\Models\BaseModel;
 
 class IssueModel extends BaseModel
 {
@@ -12,9 +14,8 @@ class IssueModel extends BaseModel
      * @var array
      */
     protected $fillable = [
-        'lottery_id', 'lottery_name', 'issue', 'issue_rule_id', 'begin_time', 'end_time', 'official_open_time', 'allow_encode_time', 'official_code', 'status_encode', 'status_calculated', 'status_prize', 'status_commission', 'status_trace', 'encode_time', 'calculated_time', 'prize_time', 'commission_time', 'trace_time', 'encode_id', 'encode_username', 'day'
+        'lottery_id', 'lottery_name', 'issue', 'issue_rule_id', 'begin_time', 'end_time', 'official_open_time', 'allow_encode_time', 'official_code', 'status_encode', 'status_calculated', 'status_prize', 'status_commission', 'status_trace', 'encode_time', 'calculated_time', 'prize_time', 'commission_time', 'trace_time', 'encode_id', 'encode_username', 'day',
     ];
-
 
     /**
      * 获取所有可投奖期
@@ -22,7 +23,8 @@ class IssueModel extends BaseModel
      * @param int $count
      * @return mixed
      */
-    public static function getCanBetIssue ($lotteryId, $count = 50) {
+    public static function getCanBetIssue($lotteryId, $count = 50)
+    {
         $time = time();
         return self::where('lottery_id', $lotteryId)->where('end_time', '>', $time)->orderBy('id', 'ASC')->skip(0)->take($count)->get();
     }
@@ -31,7 +33,8 @@ class IssueModel extends BaseModel
      * @param string $lotterySign
      * @return mixed
      */
-    public static function getLastIssue ($lotterySign) {
+    public static function getLastIssue($lotterySign)
+    {
         $time = time();
         return self::where('lottery_id', $lotterySign)->where('end_time', '<=', $time)->orderBy('id', 'DESC')->first();
     }

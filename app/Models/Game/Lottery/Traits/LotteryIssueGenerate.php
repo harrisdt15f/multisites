@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Models\Game\lottery\Traits;
+namespace App\Models\Game\Lottery\Traits;
 
 use App\Jobs\IssueInserter;
 use App\Jobs\IssueSeparateGenJob;
-use App\Models\IssueModel;
-use App\Models\IssueRulesModel;
+use App\Models\Game\Lottery\IssueModel;
+use App\Models\Game\Lottery\IssueRulesModel;
 use Illuminate\Support\Carbon;
 
 /**
@@ -104,7 +104,7 @@ trait LotteryIssueGenerate
                 $_day = $dayTime->diff($configTime)->days;
                 if (isset($_config['zero_start'])) {
                     $firstIssueNo = intval($_config['start_issue']) + $_day * $this->day_issue;
-                    $firstIssueNo = $_config['zero_start'].$firstIssueNo;
+                    $firstIssueNo = $_config['zero_start'] . $firstIssueNo;
                 } else {
                     $firstIssueNo = $_config['start_issue'] + $_day * $this->day_issue;
                 }
@@ -115,10 +115,10 @@ trait LotteryIssueGenerate
         $issueNo = $firstIssueNo ?: '';
         foreach ($rules as $rule) {
             $adjustTime = $rule->adjust_time;
-            $beginTimeString = $day.' '.$rule['begin_time'];
+            $beginTimeString = $day . ' ' . $rule['begin_time'];
             $beginTime = Carbon::parse($beginTimeString);
             // 结束时间的修正
-            $endTimeString = $day.' '.$rule['end_time'];
+            $endTimeString = $day . ' ' . $rule['end_time'];
             $endTimeOrigin = Carbon::parse($endTimeString);
             $endTime = $endTimeOrigin->copy();
             if ($rule['end_time'] == '00:00:00') {
@@ -134,7 +134,7 @@ trait LotteryIssueGenerate
             $index = 1;
             do {
                 if (1 === $index) {
-                    $issueTimeString = $day.' '.$rule['first_time'];
+                    $issueTimeString = $day . ' ' . $rule['first_time'];
                     $issueTime = Carbon::parse($issueTimeString);
                     $officialOpenTime = $issueTime->copy();
                     $issueEndTime = $issueTime->copy();
@@ -184,7 +184,7 @@ trait LotteryIssueGenerate
             }
             return true;
         } catch (\Exception $e) {
-            return '插入数据失败!!'.$e->getMessage();
+            return '插入数据失败!!' . $e->getMessage();
         }
     }
 
@@ -217,18 +217,18 @@ trait LotteryIssueGenerate
             if (strpos($formats[1], 'N') !== false) {
                 $suffix = $dayTime->format($formats[0]);
                 if ($issueNo) {
-                    return $suffix.$this->getNextNumber($issueNo, $numberLength);
+                    return $suffix . $this->getNextNumber($issueNo, $numberLength);
                 } else {
-                    return $suffix.str_pad(1, $numberLength, '0', STR_PAD_LEFT);
+                    return $suffix . str_pad(1, $numberLength, '0', STR_PAD_LEFT);
                 }
             }
             // 特殊号
             if (strpos($formats[1], 'T') !== false) {
                 $suffix = $dayTime->format($formats[0]);
                 if ($issueNo) {
-                    return $suffix.$this->getNextNumber($issueNo, $numberLength);
+                    return $suffix . $this->getNextNumber($issueNo, $numberLength);
                 } else {
-                    return $suffix.str_pad(1, $numberLength, '0', STR_PAD_LEFT);
+                    return $suffix . str_pad(1, $numberLength, '0', STR_PAD_LEFT);
                 }
             }
         }

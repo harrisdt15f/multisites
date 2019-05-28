@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Admin;
+use App\Models\BaseModel;
 
-
+use App\Models\DeveloperUsage\Backend\PartnerAdminRoute;
 class Logs extends BaseModel
 {
     protected $table = 'logs';

@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\BackendApi\Admin;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Models\FundOperation;
-use App\Models\FundOperationGroup;
-use App\Models\PartnerAdminUsers;
-use App\Models\PartnerMenus;
+use App\Models\Admin\Fund\FundOperation;
+use App\Models\Admin\Fund\FundOperationGroup;
+use App\Models\Admin\PartnerAdminUsers;
+use App\Models\DeveloperUsage\Menu\PartnerMenus;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -17,7 +17,7 @@ class PartnerAdminGroupController extends BackEndApiMainController
 {
     protected $postUnaccess = ['id', 'updated_at', 'created_at']; //不需要接收的字段
 
-    protected $eloqM = 'PartnerAdminGroupAccess';
+    protected $eloqM = 'Admin\PartnerAdminGroupAccess';
 
     /**
      * Display a listing of the resource.
@@ -172,7 +172,7 @@ class PartnerAdminGroupController extends BackEndApiMainController
      * 删除组管理员角色
      * @return JsonResponse
      */
-    public function destroy(): ?JsonResponse
+    public function destroy():  ? JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',

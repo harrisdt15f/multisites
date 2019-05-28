@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 
 class HomepageRotationChartController extends BackEndApiMainController
 {
-    protected $eloqM = 'HomepageRotationChart';
+    protected $eloqM = 'Admin\Homepage\HomepageRotationChart';
 
     //首页轮播图列表
     public function detail(): JsonResponse

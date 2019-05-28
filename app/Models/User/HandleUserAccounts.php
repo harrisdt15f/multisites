@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\User;
 
+use App\Models\User\UserHandleModel;
 use LaravelArdent\Ardent\Ardent;
 
 class HandleUserAccounts extends Ardent
@@ -17,7 +18,8 @@ class HandleUserAccounts extends Ardent
         'user_id', 'balance', 'frozen', 'status',
     ];
 
-    public function user(){
-        return $this->belongsTo(UserHandleModel::class,'id','user_id');
+    public function user()
+    {
+        return $this->belongsTo(UserHandleModel::class, 'id', 'user_id');
     }
 }

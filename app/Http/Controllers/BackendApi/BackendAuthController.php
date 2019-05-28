@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\BackendApi;
 
-use App\Models\FundOperation;
-use App\Models\PartnerAdminGroupAccess;
-use App\Models\PartnerAdminUsers;
-use App\Models\PartnerMenus;
+use App\Models\Admin\Fund\FundOperation;
+use App\Models\Admin\PartnerAdminGroupAccess;
+use App\Models\Admin\PartnerAdminUsers;
+use App\Models\DeveloperUsage\Menu\PartnerMenus;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -24,7 +24,7 @@ class BackendAuthController extends BackEndApiMainController
 
     public $successStatus = 200;
 
-    protected $eloqM = 'PartnerAdminUsers';
+    protected $eloqM = 'Admin\PartnerAdminUsers';
 
     /**
      * Login user and create token
@@ -40,8 +40,8 @@ class BackendAuthController extends BackEndApiMainController
             'remember_me' => 'boolean',
         ]);
         $credentials = request(['email', 'password']);
-        $this->maxAttempts = 1;//1 times
-        $this->decayMinutes = 1;//1 minutes
+        $this->maxAttempts = 1; //1 times
+        $this->decayMinutes = 1; //1 minutes
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
         // the IP address of the client making these requests into this application.
@@ -77,7 +77,7 @@ class BackendAuthController extends BackEndApiMainController
         $data = [
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'expires_at' => $expireAt
+            'expires_at' => $expireAt,
         ];
         return $this->msgOut(true, $data);
     }
@@ -173,7 +173,7 @@ class BackendAuthController extends BackEndApiMainController
      * 获取所有当前平台的商户管理员用户
      * @return JsonResponse
      */
-    public function allUser(): ?JsonResponse
+    public function allUser():  ? JsonResponse
     {
         try {
             $data = $this->currentPlatformEloq->partnerAdminUsers;
@@ -191,7 +191,7 @@ class BackendAuthController extends BackEndApiMainController
     /**
      * @return JsonResponse|null
      */
-    public function updateUserGroup(): ?JsonResponse
+    public function updateUserGroup() :  ? JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -215,7 +215,7 @@ class BackendAuthController extends BackEndApiMainController
      *
      * @return Response
      */
-    public function details(): Response
+    public function details() : Response
     {
         $user = $this->partnerAdmin;
         return $this->msgOut(true, $user);
@@ -228,7 +228,7 @@ class BackendAuthController extends BackEndApiMainController
      */
     public function logout(Request $request): JsonResponse
     {
-        $throtleKey = Str::lower($this->username().'|'.$request->ip());
+        $throtleKey = Str::lower($this->username() . '|' . $request->ip());
         $request->session()->invalidate();
         $this->limiter()->clear($throtleKey);
         $this->currentAuth->logout();
@@ -249,7 +249,7 @@ class BackendAuthController extends BackEndApiMainController
         return response()->json($request->user());
     }
 
-    public function deletePartnerAdmin(): ?JsonResponse
+    public function deletePartnerAdmin():  ? JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -278,7 +278,7 @@ class BackendAuthController extends BackEndApiMainController
         }
     }
 
-    public function updatePAdmPassword(): ?JsonResponse
+    public function updatePAdmPassword() :  ? JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',

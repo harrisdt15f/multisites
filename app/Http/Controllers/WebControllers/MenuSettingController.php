@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\WebControllers;
 
-use App\Models\PartnerMenus;
+use App\Models\DeveloperUsage\Menu\PartnerMenus;
 use function GuzzleHttp\json_decode;
 use Illuminate\Support\Facades\Route;
 
@@ -93,7 +93,7 @@ class MenuSettingController extends AdminMainController
         if (!empty($parseDatas)) {
             foreach ($parseDatas as $key => $value) {
                 $menuEloq = PartnerMenus::find($value['currentId']);
-                $menuEloq->pid = $value['currentParent'] === '#' ? 0 : (int)$value['currentParent'];
+                $menuEloq->pid = $value['currentParent'] === '#' ? 0 : (int) $value['currentParent'];
                 if ($menuEloq->save()) {
                     $pass['pass'] = $value['currentText'];
                     $itemProcess[] = $pass;
@@ -108,7 +108,6 @@ class MenuSettingController extends AdminMainController
             }
             return response()->json(['success' => true, $itemProcess]);
         }
-
 
     }
 }

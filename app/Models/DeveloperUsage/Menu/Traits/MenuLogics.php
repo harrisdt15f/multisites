@@ -2,7 +2,7 @@
 
 namespace App\Models\DeveloperUsage\Menu\Traits;
 
-use App\Models\PartnerAdminGroupAccess;
+use App\Models\Admin\PartnerAdminGroupAccess;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -87,8 +87,8 @@ trait MenuLogics
             }
         }
         //            $hourToStore = 24;
-//            $expiresAt = Carbon::now()->addHours($hourToStore)->diffInMinutes();
-//            Cache::put('ms_menus', $parent_menu, $expiresAt);
+        //            $expiresAt = Carbon::now()->addHours($hourToStore)->diffInMinutes();
+        //            Cache::put('ms_menus', $parent_menu, $expiresAt);
         Cache::tags([$this->redisFirstTag])->forever($redisKey, $menuForFE);
 //        Cache::forever($redisKey, $menuForFE);
         return $menuForFE;

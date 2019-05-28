@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\FrontendApi;
 
 use App\Http\Controllers\Controller;
-use App\Models\PartnerAdminGroupAccess;
-use App\Models\PartnerAdminRoute;
-use App\Models\PartnerMenus;
+use App\Models\Admin\PartnerAdminGroupAccess;
+use App\Models\DeveloperUsage\Backend\PartnerAdminRoute;
+use App\Models\DeveloperUsage\Menu\PartnerMenus;
 use App\Models\PlatForms;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
@@ -28,10 +28,9 @@ class FrontendApiMainController extends Controller
     protected $eloqM = ''; // 当前的eloquent
     protected $currentRouteName; //当前的route name;
     protected $routeAccessable = false;
-    protected $log_uuid;//当前的logId
-    protected $currentGuard ='frontend-web';
+    protected $log_uuid; //当前的logId
+    protected $currentGuard = 'frontend-web';
     protected $currentAuth;
-
 
     /**
      * AdminMainController constructor.
@@ -43,8 +42,8 @@ class FrontendApiMainController extends Controller
             $this->partnerAdmin = $this->currentAuth->user();
             $this->inputs = Input::all(); //获取所有相关的传参数据
             //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
-//            $this->adminOperateLog();
-            $this->eloqM = 'App\\Models\\'.$this->eloqM; // 当前的eloquent
+            //            $this->adminOperateLog();
+            $this->eloqM = 'App\\Models\\' . $this->eloqM; // 当前的eloquent
             return $next($request);
         });
     }
@@ -78,7 +77,7 @@ class FrontendApiMainController extends Controller
         } else {
             $code = $code == '' ? $defaultErrorCode : $code;
         }
-        $message = $message == '' ? __('frontend-codes-map.'.$code) : $message;
+        $message = $message == '' ? __('frontend-codes-map.' . $code) : $message;
         $datas = [
             'success' => $success,
             'code' => $code,
@@ -90,7 +89,7 @@ class FrontendApiMainController extends Controller
 
     protected function modelWithNameSpace($eloqM = null)
     {
-        return !is_null($eloqM) ? 'App\\Models\\'.$eloqM : $eloqM;
+        return !is_null($eloqM) ? 'App\\Models\\' . $eloqM : $eloqM;
     }
 
     /**
@@ -134,7 +133,7 @@ class FrontendApiMainController extends Controller
                     $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
                     if ($sign == 'LIKE') {
                         $sign = strtolower($sign);
-                        $value = '%'.$value.'%';
+                        $value = '%' . $value . '%';
                     }
                     $whereCriteria = [];
                     $whereCriteria[] = $key;
@@ -169,7 +168,7 @@ class FrontendApiMainController extends Controller
                         $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
                         if ($sign == 'LIKE') {
                             $sign = strtolower($sign);
-                            $value = '%'.$value.'%';
+                            $value = '%' . $value . '%';
                         }
                         $whereCriteria = [];
                         $whereCriteria[] = $key;
@@ -272,7 +271,7 @@ class FrontendApiMainController extends Controller
                                                 $queryConditions) ? $queryConditions[$key] : '=';
                                             if ($sign == 'LIKE') {
                                                 $sign = strtolower($sign);
-                                                $value = '%'.$value.'%';
+                                                $value = '%' . $value . '%';
                                             }
                                             $query->where($key, $sign, $value);
                                         }

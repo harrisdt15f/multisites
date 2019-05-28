@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Admin\Fund;
+
+use App\Models\BaseModel;
 
 class FundOperation extends BaseModel
 {

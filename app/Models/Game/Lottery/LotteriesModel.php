@@ -1,9 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Game\Lottery;
 
-use App\Models\Game\lottery\Traits\LotteryIssueGenerate;
-use App\Models\Game\lottery\Traits\LotteryLogics;
+use App\Models\BaseModel;
+use App\Models\Game\Lottery\IssueRulesModel;
+use App\Models\Game\Lottery\MethodsModel;
+use App\Models\Game\Lottery\Traits\LotteryIssueGenerate;
+use App\Models\Game\Lottery\Traits\LotteryLogics;
 
 class LotteriesModel extends BaseModel
 {

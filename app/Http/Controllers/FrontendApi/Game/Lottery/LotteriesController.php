@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\FrontendApi\Game\Lottery;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Models\IssueModel;
-use App\Models\LotteriesModel;
-use App\Models\MethodsModel;
+use App\Models\Game\Lottery\IssueModel;
+use App\Models\Game\Lottery\LotteriesModel;
+use App\Models\Game\Lottery\MethodsModel;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -36,7 +36,7 @@ class LotteriesController extends FrontendApiMainController
                 $data[$lottery->series_id] = [
                     'name' => $seriesConfig[$lottery->series_id],
                     'sign' => $lottery->series_id,
-                    'list' => []
+                    'list' => [],
                 ];
             }
             $data[$lottery->series_id]['list'][] = [
@@ -78,7 +78,7 @@ class LotteriesController extends FrontendApiMainController
                 foreach ($methods as $index => $method) {
                     $rowData[$method->method_group][$method->method_row][] = [
                         'method_name' => $method->method_name,
-                        'method_id' => $method->method_id
+                        'method_id' => $method->method_id,
                     ];
                 }
 
@@ -91,7 +91,7 @@ class LotteriesController extends FrontendApiMainController
                     }
 
                     if (!isset($hasRow[$method->method_group]) || !in_array($method->method_row,
-                            $hasRow[$method->method_group])) {
+                        $hasRow[$method->method_group])) {
                         $groupData[$method->method_group][] = [
                             'name' => $rowName[$method->method_row],
                             'sign' => $method->method_row,
@@ -117,7 +117,7 @@ class LotteriesController extends FrontendApiMainController
                         $methodData[] = [
                             'name' => $groupName[$lottery->series_id][$method->method_group],
                             'sign' => $method->method_group,
-                            'rows' => $groupData[$method->method_group]
+                            'rows' => $groupData[$method->method_group],
                         ];
 
                         $hasGroup[] = $method->method_group;
@@ -157,15 +157,15 @@ class LotteriesController extends FrontendApiMainController
         $data = [
             [
                 'issue_no' => '201809221',
-                'code' => '1,2,3,4,5'
+                'code' => '1,2,3,4,5',
             ],
             [
                 'issue_no' => '201809222',
-                'code' => '1,2,3,4,5'
+                'code' => '1,2,3,4,5',
             ],
             [
                 'issue_no' => '201809223',
-                'code' => '1,2,3,4,5'
+                'code' => '1,2,3,4,5',
             ],
         ];
         return $this->msgOut(true, $data);
@@ -194,14 +194,14 @@ class LotteriesController extends FrontendApiMainController
                     'issue_no' => $issue->issue,
                     'begin_time' => $issue->begin_time,
                     'end_time' => $issue->end_time,
-                    'open_time' => $issue->allow_encode_time
+                    'open_time' => $issue->allow_encode_time,
                 ];
             }
             $canBetIssueData[] = [
                 'issue_no' => $issue->issue,
                 'begin_time' => $issue->begin_time,
                 'end_time' => $issue->end_time,
-                'open_time' => $issue->allow_encode_time
+                'open_time' => $issue->allow_encode_time,
             ];
         }
         // 上一期
@@ -211,7 +211,7 @@ class LotteriesController extends FrontendApiMainController
             'begin_time' => $_lastIssue->begin_time,
             'end_time' => $_lastIssue->end_time,
             'open_time' => $_lastIssue->allow_encode_time,
-            'open_code' => '1,2,3,4,5'
+            'open_code' => '1,2,3,4,5',
         ];
         $data = [
             'issueInfo' => $canBetIssueData,
@@ -224,7 +224,7 @@ class LotteriesController extends FrontendApiMainController
     public function projectHistory()
     {
         $validator = Validator::make($this->inputs, [
-            'count'=>'required|integer|min:10|max:100',
+            'count' => 'required|integer|min:10|max:100',
             'lottery_sign' => 'required|string|min:4|max:10|exists:lotteries,en_name',
             'start' => 'required|integer',
         ]);
@@ -232,19 +232,18 @@ class LotteriesController extends FrontendApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $lotterySign = $this->inputs['lottery_sign'];
-        $start          = $this->inputs['start'];//0
-        $count          = $this->inputs['count'];//10
-        $data   = Project::getGamePageList($lotterySign, $start, $count);
+        $start = $this->inputs['start']; //0
+        $count = $this->inputs['count']; //10
+        $data = Project::getGamePageList($lotterySign, $start, $count);
         return $this->msgOut(true, $data);
     }
 
     public function bet()
     {
         $usr = $this->currentAuth->user();
-        $lotterySign    = $this->inputs['lottery_sign'];
-        $lottery        = Lottery::getLottery($lotterySign);
+        $lotterySign = $this->inputs['lottery_sign'];
+        $lottery = Lottery::getLottery($lotterySign);
 
     }
-
 
 }

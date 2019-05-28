@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers\WebControllers;
 
-
 use App\Http\Controllers\Controller;
-use App\Models\PartnerMenus;
+use App\Models\DeveloperUsage\Menu\PartnerMenus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
@@ -42,9 +41,9 @@ class AdminMainController extends Controller
     {
         $datas['input'] = $this->inputs;
         $datas['route'] = $this->currentOptRoute;
-        $log = json_encode($datas,JSON_UNESCAPED_UNICODE);
+        $log = json_encode($datas, JSON_UNESCAPED_UNICODE);
         Log::channel('byqueue')->info($log);
 //        Log::channel('operate')->debug($log);
-//        Log::stack(['operate','graylog'])->debug($log);
+        //        Log::stack(['operate','graylog'])->debug($log);
     }
 }

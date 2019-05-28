@@ -8,7 +8,7 @@
 
 namespace App\Listeners;
 
-use App\Models\Logs;
+use App\Models\Admin\Logs;
 use App\Services\Logs\LogMonologEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Carbon;

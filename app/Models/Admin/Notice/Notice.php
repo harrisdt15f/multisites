@@ -1,6 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Admin\Notice;
+
+use App\Models\Admin\PartnerAdminUsers;
+use App\Models\BaseModel;
 
 class Notice extends BaseModel
 {

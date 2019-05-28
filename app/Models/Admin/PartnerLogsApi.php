@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Admin;
 
+use App\Models\BaseModel;
 
 class PartnerLogsApi extends BaseModel
 {

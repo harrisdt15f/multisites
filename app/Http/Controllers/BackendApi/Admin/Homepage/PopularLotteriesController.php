@@ -4,7 +4,7 @@ namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\ImageArrange;
-use App\Models\LotteriesModel;
+use App\Models\Game\Lottery\LotteriesModel;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Validator;
 
 class PopularLotteriesController extends BackEndApiMainController
 {
-    protected $eloqM = 'PopularLotteries';
+    protected $eloqM = 'Admin\Homepage\PopularLotteries';
 
     //热门彩种一 列表
     public function detailOne(): JsonResponse

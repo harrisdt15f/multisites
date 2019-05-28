@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\BackendApi;
 
 use App\Http\Controllers\Controller;
-use App\Models\PartnerAdminGroupAccess;
-use App\Models\PartnerAdminRoute;
-use App\Models\PartnerMenus;
+use App\Models\Admin\PartnerAdminGroupAccess;
+use App\Models\DeveloperUsage\Backend\PartnerAdminRoute;
+use App\Models\DeveloperUsage\Menu\PartnerMenus;
 use App\Models\PlatForms;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;

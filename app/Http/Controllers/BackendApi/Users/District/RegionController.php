@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Validator;
 
 class RegionController extends BackEndApiMainController
 {
-    protected $eloqM = 'Region';
+    protected $eloqM = 'User\Region';
 
     //获取 省-市-县 列表
     public function detail()

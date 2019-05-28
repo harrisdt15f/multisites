@@ -4,14 +4,14 @@
  * @Author: LingPh
  * @Date:   2019-05-27 11:02:52
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-05-28 16:17:45
+ * @Last Modified time: 2019-05-28 18:27:15
  */
 namespace App\Http\Controllers\BackendApi\Report;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Models\UserRechargeHistory;
 use App\Models\User\Fund\AccountChangeReport;
 use App\Models\User\Fund\AccountChangeType;
+use App\Models\User\UserRechargeHistory;
 use Illuminate\Support\Facades\Validator;
 
 class reportManagementController extends BackEndApiMainController

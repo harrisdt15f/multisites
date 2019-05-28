@@ -4,19 +4,19 @@ namespace App\Http\Controllers\BackendApi\Users\Fund;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\FundOperationRecharge;
+use App\Models\Admin\Fund\FundOperation;
 use App\Models\AuditFlow;
-use App\Models\FundOperation;
-use App\Models\UserHandleModel;
-use App\Models\UserRechargeHistory;
-use App\Models\UserRechargeLog;
 use App\Models\User\Fund\ArtificialRechargeLog;
+use App\Models\User\UserHandleModel;
+use App\Models\User\UserRechargeHistory;
+use App\Models\User\UserRechargeLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ArtificialRechargeController extends BackEndApiMainController
 {
-    protected $eloqM = 'UserHandleModel';
+    protected $eloqM = 'User\UserHandleModel';
 
     //人工充值 用户列表
     public function users(): JsonResponse

@@ -4,15 +4,15 @@ namespace App\Http\Controllers\FrontendApi\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Models\Admin\Activity\ActivityInfos;
-use App\Models\HomepageRotationChart;
-use App\Models\Notice;
-use App\Models\PopularLotteries;
+use App\Models\Admin\Homepage\HomepageRotationChart;
+use App\Models\Admin\Homepage\PopularLotteries;
+use App\Models\Admin\Notice\Notice;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
 class HomepageController extends FrontendApiMainController
 {
-    protected $eloqM = 'HomepageModel';
+    protected $eloqM = 'Admin\Homepage\HomepageModel';
     protected $offMsg = '当前模块为关闭状态';
 
     //需要展示的前台模块

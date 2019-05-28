@@ -4,8 +4,8 @@ namespace App\Http\Controllers\BackendApi\Game\Lottery;
 
 use App\Events\IssueGenerateEvent;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Models\LotteriesModel;
-use App\Models\MethodsModel;
+use App\Models\Game\Lottery\LotteriesModel;
+use App\Models\Game\Lottery\MethodsModel;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 
 class LotteriesController extends BackEndApiMainController
 {
-    protected $eloqM = 'LotteriesModel';
+    protected $eloqM = 'Game\Lottery\LotteriesModel';
 
     public function seriesLists()
     {
@@ -29,7 +29,7 @@ class LotteriesController extends BackEndApiMainController
         $series = array_keys(Config::get('game.main.series'));
         $seriesStringImploded = implode(',', $series);
         $rule = [
-            'series_id' => 'required|in:'.$seriesStringImploded,
+            'series_id' => 'required|in:' . $seriesStringImploded,
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
@@ -105,7 +105,7 @@ class LotteriesController extends BackEndApiMainController
                             $methodRow = [
                                 'lottery_id' => $currentLotteryId,
                                 'method_group' => $curentMethodGroup,
-                                'method_row' => $method_row
+                                'method_row' => $method_row,
                             ];
                             if (is_null($checkOpenGroup)) {
                                 $methodRow['status'] = 0;
@@ -124,7 +124,7 @@ class LotteriesController extends BackEndApiMainController
                                     ->where('method_group', $curentMethodGroup)
                                     ->where('method_row', $method_row);
                             })
-                                // ->with('methodDetails')
+                            // ->with('methodDetails')
                                 ->get()->toArray();
                         }
                     }
@@ -142,7 +142,7 @@ class LotteriesController extends BackEndApiMainController
 
     public function lotteryIssueLists()
     {
-        $modelName = 'IssueModel';
+        $modelName = 'Game\Lottery\IssueModel';
         $eloqM = $this->modelWithNameSpace($modelName);
         $seriesId = $this->inputs['series_id'] ?? '';
 //        {"method":"whereIn","key":"id","value":["cqssc","xjssc","hljssc","zx1fc","txffc"]}

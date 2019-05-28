@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Admin;
 
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PartnerSysConfigures extends BaseModel
@@ -17,7 +18,7 @@ class PartnerSysConfigures extends BaseModel
         'value',
         'add_admin_id',
         'last_update_admin_id',
-        'status'
+        'status',
     ];
 
     public function childs(): HasMany
@@ -29,7 +30,7 @@ class PartnerSysConfigures extends BaseModel
      * @param  string  $key
      * @return string
      */
-    public static function getConfigValue($key = null): ?string
+    public static function getConfigValue($key = null):  ? string
     {
         if (empty($key)) {
             return $key;
@@ -37,6 +38,5 @@ class PartnerSysConfigures extends BaseModel
             return self::where('sign', $key)->value('value');
         }
     }
-
 
 }

@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Game\Lottery;
+
+use App\Models\BaseModel;
 
 class IssueRulesModel extends BaseModel
 {

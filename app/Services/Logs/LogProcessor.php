@@ -8,14 +8,12 @@
 
 namespace App\Services\Logs;
 
-
-use App\Models\Logs;
+use App\Models\Admin\Logs;
 use Illuminate\Support\Facades\Log;
 use Jenssegers\Agent\Agent;
 
 class LogProcessor
 {
-
 
     public function __invoke(array $record)
     {
@@ -39,9 +37,9 @@ class LogProcessor
         } else {
             $type = Logs::OTHER;
         }
-        $messageArr = json_decode($record['message'],true);
+        $messageArr = json_decode($record['message'], true);
         $record['extra'] = [
-            'user_id' => auth()->user() ? auth()->user()->id : NULL,
+            'user_id' => auth()->user() ? auth()->user()->id : null,
             'origin' => request()->headers->get('origin'),
             'ip' => request()->ip(),
             'ips' => json_encode(request()->ips()),

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\BackendApi\DeveloperUsage\Backend\Menu;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Models\PartnerAdminRoute;
-use App\Models\PartnerMenus;
+use App\Models\DeveloperUsage\Backend\PartnerAdminRoute;
+use App\Models\DeveloperUsage\Menu\PartnerMenus;
 use function GuzzleHttp\json_decode;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Route;
@@ -12,16 +12,16 @@ use Illuminate\Support\Facades\Validator;
 
 class MenuController extends BackEndApiMainController
 {
-    protected $eloqM = 'PartnerMenus';
+    protected $eloqM = 'DeveloperUsage\Menu\PartnerMenus';
 
     public function getAllMenu()
     {
-        return $this->msgOut(true,$this->fullMenuLists);
+        return $this->msgOut(true, $this->fullMenuLists);
     }
 
     public function currentPartnerMenu()
     {
-        return $this->msgOut(true,$this->partnerMenulists);
+        return $this->msgOut(true, $this->partnerMenulists);
     }
 
     /**
@@ -32,12 +32,12 @@ class MenuController extends BackEndApiMainController
 //        $firstlevelmenus = PartnerMenus::getFirstLevelList();
         $routeCollection = Route::getRoutes()->get();
 //        $editMenu = PartnerMenus::all();
-//        $routeMatchingName = $editMenu->where('route', '!=', '#')->keyBy('route')->toArray();
+        //        $routeMatchingName = $editMenu->where('route', '!=', '#')->keyBy('route')->toArray();
         $routeInfo = [];
         $registeredRoute = PartnerAdminRoute::pluck('route_name')->toArray();
         foreach ($routeCollection as $key => $r) {
             if (isset($r->action['as'])) {
-                if ($r->action['prefix'] !== '_debugbar' && !in_array($r->action['as'],$registeredRoute)) {
+                if ($r->action['prefix'] !== '_debugbar' && !in_array($r->action['as'], $registeredRoute)) {
                     $routeInfo[$r->action['as']] = $r->uri;
                 }
             }
@@ -45,7 +45,7 @@ class MenuController extends BackEndApiMainController
 //        $data['firstlevelmenus'] = $firstlevelmenus;
         $data['route_info'] = $routeInfo;
 //        $data['editMenu'] = $editMenu;
-//        $data['routeMatchingName'] = $routeMatchingName;
+        //        $data['routeMatchingName'] = $routeMatchingName;
         return $this->msgOut(true, $data);
     }
 
@@ -131,7 +131,7 @@ class MenuController extends BackEndApiMainController
      * (?!.*\.$) - don't allow . at end
      * @return JsonResponse
      */
-    public function edit(): ?JsonResponse
+    public function edit():  ? JsonResponse
     {
         $parent = false;
         $rule = [
@@ -174,7 +174,7 @@ class MenuController extends BackEndApiMainController
         }
     }
 
-    public function changeParent(): ?JsonResponse
+    public function changeParent() :  ? JsonResponse
     {
         $parseDatas = json_decode($this->inputs['dragResult'], true);
         $itemProcess = [];
@@ -182,7 +182,7 @@ class MenuController extends BackEndApiMainController
         if (!empty($parseDatas)) {
             foreach ($parseDatas as $key => $value) {
                 $menuEloq = PartnerMenus::find($value['currentId']);
-                $menuEloq->pid = $value['currentParent'] === '#' ? 0 : (int)$value['currentParent'];
+                $menuEloq->pid = $value['currentParent'] === '#' ? 0 : (int) $value['currentParent'];
                 $menuEloq->sort = $value['currentSort'];
                 if ($menuEloq->save()) {
                     $pass['pass'] = $value['currentText'];

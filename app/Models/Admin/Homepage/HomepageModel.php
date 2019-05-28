@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Admin\Homepage;
+
+use App\Models\BaseModel;
 
 class HomepageModel extends BaseModel
 {

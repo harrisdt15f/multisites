@@ -1,6 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\DeveloperUsage\Backend;
+
+use App\Models\BaseModel;
+use App\Models\DeveloperUsage\Menu\PartnerMenus;
 
 class PartnerAdminRoute extends BaseModel
 {

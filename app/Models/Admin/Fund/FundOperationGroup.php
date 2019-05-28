@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Admin\Fund;
 
+use App\Models\Admin\PartnerAdminUsers;
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class FundOperationGroup extends BaseModel

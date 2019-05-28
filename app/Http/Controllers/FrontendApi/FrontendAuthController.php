@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers\FrontendApi;
 
-use App\Models\PartnerSysConfigures;
+use App\Models\Admin\PartnerAdminGroupAccess;
+use App\Models\Admin\PartnerSysConfigures;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -22,8 +23,7 @@ class FrontendAuthController extends FrontendApiMainController
 
     public $successStatus = 200;
 
-    protected $eloqM = 'UserHandleModel';
-
+    protected $eloqM = 'User\UserHandleModel';
 
     public function username()
     {
@@ -44,8 +44,8 @@ class FrontendAuthController extends FrontendApiMainController
             'remember_me' => 'boolean',
         ]);
         $credentials = request(['username', 'password']);
-        $this->maxAttempts = 1;//1 times
-        $this->decayMinutes = 1;//1 minutes
+        $this->maxAttempts = 1; //1 times
+        $this->decayMinutes = 1; //1 minutes
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
         // the IP address of the client making these requests into this application.
@@ -83,7 +83,7 @@ class FrontendAuthController extends FrontendApiMainController
         $data = [
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'expires_at' => $expireAt
+            'expires_at' => $expireAt,
         ];
         return $this->msgOut(true, $data);
     }
@@ -95,23 +95,23 @@ class FrontendAuthController extends FrontendApiMainController
         $balance = $account->balance;
         $frozen = $account->frozen;
         $data = [
-            'user_id'       => $user->id,
-            'username'      => $user->username,
-            'prize_group'   => $user->prize_group,
-            'user_type'     => $user->type,
-            'is_tester'         => $user->is_tester,
-            'last_login_time'   => $user->last_login_time->toDateTimeString(),
-            'levels'            => $user->levels,
-            'can_withdraw'      => $user->frozen_type <= 0,//$user->frozen_type > 0 ? false : true
-            'today_withdraw'        => 0,//
-            'daysalary_percentage'  => 0,
-            'bonus_percentage'      => 0,
-            'allowed_transfer'      => true,
-            'balance'               => sprintf('%1.4f',substr($balance, 0, strrpos($balance, '.', 0)+1+4)),
-            'frozen_balance'        => sprintf('%1.4f',substr($frozen, 0, strrpos($frozen, '.', 0)+1+4)),
-            'has_funds_password'    => $user->fund_password ? true : false,
-            'download_url'          => PartnerSysConfigures::getConfigValue('app_download_url') .'/'. $user->invite_code,
-            'version'               => PartnerSysConfigures::getConfigValue('app_version'),
+            'user_id' => $user->id,
+            'username' => $user->username,
+            'prize_group' => $user->prize_group,
+            'user_type' => $user->type,
+            'is_tester' => $user->is_tester,
+            'last_login_time' => $user->last_login_time->toDateTimeString(),
+            'levels' => $user->levels,
+            'can_withdraw' => $user->frozen_type <= 0, //$user->frozen_type > 0 ? false : true
+            'today_withdraw' => 0, //
+            'daysalary_percentage' => 0,
+            'bonus_percentage' => 0,
+            'allowed_transfer' => true,
+            'balance' => sprintf('%1.4f', substr($balance, 0, strrpos($balance, '.', 0) + 1 + 4)),
+            'frozen_balance' => sprintf('%1.4f', substr($frozen, 0, strrpos($frozen, '.', 0) + 1 + 4)),
+            'has_funds_password' => $user->fund_password ? true : false,
+            'download_url' => PartnerSysConfigures::getConfigValue('app_download_url') . '/' . $user->invite_code,
+            'version' => PartnerSysConfigures::getConfigValue('app_version'),
         ];
         return $this->msgOut(true, $data);
     }
@@ -207,7 +207,7 @@ class FrontendAuthController extends FrontendApiMainController
      * 获取所有当前平台的商户管理员用户
      * @return JsonResponse
      */
-    public function allUser(): ?JsonResponse
+    public function allUser():  ? JsonResponse
     {
         try {
             $data = $this->currentPlatformEloq->partnerAdminUsers;
@@ -225,7 +225,7 @@ class FrontendAuthController extends FrontendApiMainController
     /**
      * @return JsonResponse|null
      */
-    public function updateUserGroup(): ?JsonResponse
+    public function updateUserGroup() :  ? JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -249,14 +249,14 @@ class FrontendAuthController extends FrontendApiMainController
      * @param  Request  $request
      * @return JsonResponse [string] message
      */
-    public function logout(Request $request): JsonResponse
+    public function logout(Request $request) : JsonResponse
     {
-        $throtleKey = Str::lower($this->username().'|'.$request->ip());
+        $throtleKey = Str::lower($this->username() . '|' . $request->ip());
         $request->session()->invalidate();
         $this->limiter()->clear($throtleKey);
         $this->currentAuth->logout();
         $this->currentAuth->invalidate();
-        return $this->msgOut(true, []);//'Successfully logged out'
+        return $this->msgOut(true, []); //'Successfully logged out'
     }
 
     /**
@@ -270,7 +270,7 @@ class FrontendAuthController extends FrontendApiMainController
         return response()->json($request->user());
     }
 
-    public function deletePartnerAdmin(): ?JsonResponse
+    public function deletePartnerAdmin():  ? JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -299,7 +299,7 @@ class FrontendAuthController extends FrontendApiMainController
         }
     }
 
-    public function updatePAdmPassword(): ?JsonResponse
+    public function updatePAdmPassword() :  ? JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',

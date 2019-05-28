@@ -8,7 +8,7 @@
 
 namespace App\Listeners;
 
-use App\Models\PartnerLogsApi;
+use App\Models\Admin\PartnerLogsApi;
 use App\Services\ApiLogs\ApiLogMonologEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Carbon;

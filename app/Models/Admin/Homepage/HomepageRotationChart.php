@@ -1,6 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Admin\Homepage;
+
+use App\Models\Admin\Activity\ActivityInfos;
+use App\Models\BaseModel;
 
 class HomepageRotationChart extends BaseModel
 {
@@ -12,7 +15,7 @@ class HomepageRotationChart extends BaseModel
 
     public function activity()
     {
-        $data = $this->hasOne(Admin\Activity\ActivityInfos::class, 'id', 'activity_id');
+        $data = $this->hasOne(ActivityInfos::class, 'id', 'activity_id');
         return $data;
     }
 }
