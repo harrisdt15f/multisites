@@ -4,7 +4,7 @@ namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\ImageArrange;
-use App\Models\ActivityInfos;
+use App\Models\Admin\Activity\ActivityInfos;
 use App\Models\Advertisement\AdvertisementType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;

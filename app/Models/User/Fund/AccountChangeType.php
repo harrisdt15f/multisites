@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\User\Fund;
+
+use App\Models\BaseModel;
 
 class AccountChangeType extends BaseModel
 {

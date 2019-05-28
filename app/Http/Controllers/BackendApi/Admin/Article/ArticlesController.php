@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ArticlesController extends BackEndApiMainController
 {
-    protected $eloqM = 'Articles';
+    protected $eloqM = 'Admin\Activity\Articles';
 
     //文章列表
     public function detail(): JsonResponse

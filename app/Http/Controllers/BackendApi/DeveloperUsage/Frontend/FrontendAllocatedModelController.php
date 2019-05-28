@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Validator;
 
 class FrontendAllocatedModelController extends BackEndApiMainController
 {
-    protected $eloqM = 'FrontendAllocatedModel';
+    protected $eloqM = 'DeveloperUsage\Frontend\FrontendAllocatedModel';
 
     public function detail()
     {

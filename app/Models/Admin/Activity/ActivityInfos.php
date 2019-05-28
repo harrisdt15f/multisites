@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Admin\Activity;
+
+use App\Models\BaseModel;
 
 class ActivityInfos extends BaseModel
 {

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 
 class BankController extends BackEndApiMainController
 {
-    protected $eloqM = 'Banks';
+    protected $eloqM = 'Admin\Fund\Banks';
 
     //银行列表
     public function detail(): JsonResponse

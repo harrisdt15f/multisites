@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Validator;
 
 class FrontendAppRouteController extends BackEndApiMainController
 {
-    protected $eloqM = 'FrontendAppRoute';
+    protected $eloqM = 'DeveloperUsage\Frontend\FrontendAppRoute';
 
     public function detail()
     {

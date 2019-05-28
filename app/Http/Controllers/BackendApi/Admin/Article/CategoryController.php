@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends BackEndApiMainController
 {
-    protected $eloqM = 'Category';
+    protected $eloqM = 'Admin\Activity\Category';
 
     //分类管理列表
     public function detail(): JsonResponse

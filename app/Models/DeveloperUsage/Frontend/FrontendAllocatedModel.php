@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\DeveloperUsage\Frontend;
+
+use App\Models\BaseModel;
 
 class FrontendAllocatedModel extends BaseModel
 {

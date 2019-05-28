@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
-use App\Models\ArtificialRechargeLog;
 use App\Models\FundOperation;
 use App\Models\FundOperationGroup;
 use App\Models\PartnerAdminUsers;
 use App\Models\PartnerSysConfigures;
+use App\Models\User\Fund\ArtificialRechargeLog;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

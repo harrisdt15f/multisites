@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\FrontendApi\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Models\ActivityInfos;
+use App\Models\Admin\Activity\ActivityInfos;
 use App\Models\HomepageRotationChart;
 use App\Models\Notice;
 use App\Models\PopularLotteries;

@@ -4,14 +4,14 @@ namespace App\Http\Controllers\BackendApi\Users;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\AccountChange;
-use App\Models\AccountChangeReport;
-use App\Models\AccountChangeType;
 use App\Models\AuditFlow;
 use App\Models\HandleUserAccounts;
 use App\Models\PassworAuditLists;
 use App\Models\UserAdmitedFlowsModel;
 use App\Models\UserHandleModel;
 use App\Models\UserRechargeHistory;
+use App\Models\User\Fund\AccountChangeReport;
+use App\Models\User\Fund\AccountChangeType;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
