@@ -1,7 +1,7 @@
 <?php
 //主页管理
 Route::group(['prefix' => 'homepage', 'namespace' => 'Admin\Homepage'], function () {
-    $namePrefix = 'homepage.';
+    $namePrefix = 'backend-api.homepage.';
     $controller = 'HomepageController@';
     Route::match(['get', 'options'], 'nav-one', ['as' => $namePrefix . 'nav-one', 'uses' => $controller . 'navOne']);
     Route::match(['get', 'options'], 'page-model', ['as' => $namePrefix . 'page-model', 'uses' => $controller . 'pageModel']);
@@ -11,7 +11,7 @@ Route::group(['prefix' => 'homepage', 'namespace' => 'Admin\Homepage'], function
 
 //热门彩票管理
 Route::group(['prefix' => 'popular-lotteries', 'namespace' => 'Admin\Homepage'], function () {
-    $namePrefix = 'popularLotteries.';
+    $namePrefix = 'backend-api.popularLotteries.';
     $controller = 'PopularLotteriesController@';
     Route::match(['get', 'options'], 'detail-one', ['as' => $namePrefix . 'detail-one', 'uses' => $controller . 'detailOne']);
     Route::match(['get', 'options'], 'detail-two', ['as' => $namePrefix . 'detail-two', 'uses' => $controller . 'detailTwo']);

@@ -8,7 +8,7 @@
 
 //管理总代用户与玩家
 Route::group(['prefix' => 'user-handle', 'namespace' => 'Users'], function () {
-    $namePrefix = 'userhandle.';
+    $namePrefix = 'backend-api.userhandle.';
     $controller = 'UserHandleController@';
     //创建总代
     Route::match(['post', 'options'], 'create-user', ['as' => $namePrefix . 'create-user', 'uses' => $controller . 'createUser']);

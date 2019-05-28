@@ -7,8 +7,8 @@
  */
 
 //管理总代用户与玩家
-Route::group(['prefix' => 'log','namespace' => 'Admin\Log'], function () {
-    $namePrefix = 'loghandle.';
+Route::group(['prefix' => 'log', 'namespace' => 'Admin\Log'], function () {
+    $namePrefix = 'backend-api.loghandle.';
     $controller = 'HandleLogController@';
     //搜索日志列表
     Route::match(['post', 'options'], 'list', ['as' => $namePrefix . 'list', 'uses' => $controller . 'details']);

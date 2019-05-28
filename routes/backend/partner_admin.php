@@ -9,8 +9,8 @@
 //商户用户相关
 Route::post('details', ['as' => 'detail', 'uses' => 'BackendAuthController@details']);
 Route::get('user', ['as' => 'user', 'uses' => 'BackendAuthController@user']);
-Route::match(['get', 'options'], 'logout', ['as' => 'logout', 'uses' => 'BackendAuthController@logout']);
-Route::match(['post', 'options'], 'partner-admin/register', ['as' => 'partnerAdmin.register', 'uses' => 'BackendAuthController@register']);
+Route::match(['get', 'options'], 'backend-api.logout', ['as' => 'logout', 'uses' => 'BackendAuthController@logout']);
+Route::match(['post', 'options'], 'backend-api.partner-admin/register', ['as' => 'partnerAdmin.register', 'uses' => 'BackendAuthController@register']);
 
 //管理员相关
 Route::group(['prefix' => 'partner-admin-user'], function () {

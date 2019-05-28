@@ -1,7 +1,7 @@
 <?php
 //玩家管理-充值审核
-Route::group(['prefix' => 'recharge-check','namespace' => 'Users\Fund'], function () {
-    $namePrefix = 'RechargeCheck.';
+Route::group(['prefix' => 'recharge-check', 'namespace' => 'Users\Fund'], function () {
+    $namePrefix = 'backend-api.RechargeCheck.';
     $controller = 'RechargeCheckController@';
     Route::match(['post', 'options'], 'detail', ['as' => $namePrefix . 'detail', 'uses' => $controller . 'detail']);
     Route::match(['post', 'options'], 'audit-success', ['as' => $namePrefix . 'audit-success', 'uses' => $controller . 'auditSuccess']);

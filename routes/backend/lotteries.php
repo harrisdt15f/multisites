@@ -8,7 +8,7 @@
 
 //游戏
 Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], function () {
-    $namePrefix = 'lotteries.';
+    $namePrefix = 'backend-api.lotteries.';
     $controller = 'LotteriesController@';
     //游戏series获取接口
     Route::match(['get', 'options'], 'series-lists', ['as' => $namePrefix . 'series-lists', 'uses' => $controller . 'seriesLists']);

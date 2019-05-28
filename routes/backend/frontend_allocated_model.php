@@ -1,7 +1,7 @@
 <?php
 //开发管理-前端模块管理
 Route::group(['prefix' => 'frontend-allocated-model', 'namespace' => 'DeveloperUsage\Frontend'], function () {
-    $namePrefix = 'frontendAllocatedModel.';
+    $namePrefix = 'backend-api.frontendAllocatedModel.';
     $controller = 'FrontendAllocatedModelController@';
     Route::match(['post', 'options'], 'detail', ['as' => $namePrefix . 'detail', 'uses' => $controller . 'detail']);
     Route::match(['post', 'options'], 'add', ['as' => $namePrefix . 'add', 'uses' => $controller . 'add']);

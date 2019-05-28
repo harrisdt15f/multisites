@@ -1,8 +1,8 @@
 <?php
 
 //内容管理
-Route::group(['prefix' => 'content','namespace' => 'Admin\Article'], function () {
-    $namePrefix = 'content.';
+Route::group(['prefix' => 'content', 'namespace' => 'Admin\Article'], function () {
+    $namePrefix = 'backend-api.content.';
     $controller = 'ArticlesController@';
     Route::match(['post', 'options'], 'detail', ['as' => $namePrefix . 'detail', 'uses' => $controller . 'detail']);
     Route::match(['post', 'options'], 'add-articles', ['as' => $namePrefix . 'add-articles', 'uses' => $controller . 'addArticles']);

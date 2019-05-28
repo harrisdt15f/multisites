@@ -7,8 +7,8 @@
  */
 
 //菜单相关
-Route::group(['prefix' => 'menu','namespace' => 'DeveloperUsage\Backend\Menu'], function () {
-    $namePrefix = 'menu.';
+Route::group(['prefix' => 'menu', 'namespace' => 'DeveloperUsage\Backend\Menu'], function () {
+    $namePrefix = 'backend-api.menu.';
     $controller = 'MenuController@';
     //获取商户用户的所有菜单
     Route::match(['get', 'options'], 'get-all-menu', ['as' => $namePrefix . 'allPartnerMenu', 'uses' => $controller . 'getAllMenu']);

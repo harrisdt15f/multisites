@@ -2,7 +2,7 @@
 
 //活动相关
 Route::group(['prefix' => 'activity', 'namespace' => 'Admin\Activity'], function () {
-    $namePrefix = 'activity.';
+    $namePrefix = 'backend-api.activity.';
     $controller = 'ActivityInfosController@';
     Route::match(['post', 'options'], 'detail', ['as' => $namePrefix . 'detail', 'uses' => $controller . 'detail']);
     Route::match(['post', 'options'], 'add', ['as' => $namePrefix . 'add', 'uses' => $controller . 'add']);

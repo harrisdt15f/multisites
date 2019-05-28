@@ -1,8 +1,8 @@
 <?php
 
 //配置相关
-Route::group(['prefix' => 'partner-sys-configures','namespace' => 'Admin'], function () {
-    $namePrefix = 'configures.';
+Route::group(['prefix' => 'partner-sys-configures', 'namespace' => 'Admin'], function () {
+    $namePrefix = 'backend-api.configures.';
     $controller = 'ConfiguresController@';
     Route::match(['get', 'options'], 'detail', ['as' => $namePrefix . 'detail', 'uses' => $controller . 'getConfiguresList']);
     Route::match(['post', 'options'], 'add', ['as' => $namePrefix . 'add', 'uses' => $controller . 'add']);

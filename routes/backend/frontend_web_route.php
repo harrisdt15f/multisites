@@ -1,7 +1,7 @@
 <?php
 //开发管理-web前端路由
 Route::group(['prefix' => 'frontend-web-route', 'namespace' => 'DeveloperUsage\Frontend'], function () {
-    $namePrefix = 'frontendWebRoute.';
+    $namePrefix = 'backend-api.frontendWebRoute.';
     $controller = 'FrontendWebRouteController@';
     Route::match(['post', 'options'], 'detail', ['as' => $namePrefix . 'detail', 'uses' => $controller . 'detail']);
     Route::match(['post', 'options'], 'add', ['as' => $namePrefix . 'add', 'uses' => $controller . 'add']);
