@@ -7,4 +7,6 @@ Route::group(['prefix' => 'reportManagement', 'namespace' => 'Report'], function
     Route::match(['post', 'options'], 'user-account-change', ['as' => $namePrefix . 'user-account-change', 'uses' => $controller . 'userAccountChange']);
     //玩家充值报表
     Route::match(['post', 'options'], 'user-recharge-history', ['as' => $namePrefix . 'user-recharge-history', 'uses' => $controller . 'userRechargeHistory']);
+    //搜索时获取的帐变类型接口
+    Route::match(['get', 'options'], 'account_change_type', ['as' => $namePrefix . 'account_change_type', 'uses' => $controller . 'accountChangeType']);
 });

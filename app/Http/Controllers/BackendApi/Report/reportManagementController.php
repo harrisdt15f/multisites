@@ -4,14 +4,14 @@
  * @Author: LingPh
  * @Date:   2019-05-27 11:02:52
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-05-27 15:04:55
+ * @Last Modified time: 2019-05-28 16:17:45
  */
 namespace App\Http\Controllers\BackendApi\Report;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Models\AccountChangeReport;
-use App\Models\AccountChangeType;
 use App\Models\UserRechargeHistory;
+use App\Models\User\Fund\AccountChangeReport;
+use App\Models\User\Fund\AccountChangeType;
 use Illuminate\Support\Facades\Validator;
 
 class reportManagementController extends BackEndApiMainController
@@ -34,6 +34,7 @@ class reportManagementController extends BackEndApiMainController
                 'amount' => $data['amount'],
                 'balance' => $data['balance'],
                 'type_name' => $data['type_name'],
+                'type_sign' => $data['type_sign'],
                 'in_out' => $data['change_type']['in_out'],
                 'created_at' => $data['created_at'],
             ];
@@ -51,6 +52,12 @@ class reportManagementController extends BackEndApiMainController
         $field = 'updated_at';
         $type = 'desc';
         $datas = $this->generateSearchQuery($RechargeHistoryEloq, $searchAbleFields, $fixedJoin, null, null, $field, $type);
+        return $this->msgOut(true, $datas);
+    }
+
+    public function accountChangeType()
+    {
+        $datas = AccountChangeType::select('name', 'sign')->get()->toArray();
         return $this->msgOut(true, $datas);
     }
 }

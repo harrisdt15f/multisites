@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 
 class AccountChangeTypeController extends BackEndApiMainController
 {
-    protected $eloqM = 'AccountChangeType';
+    protected $eloqM = 'User\Fund\AccountChangeType';
 
     //帐变类型列表
     public function detail(): JsonResponse
