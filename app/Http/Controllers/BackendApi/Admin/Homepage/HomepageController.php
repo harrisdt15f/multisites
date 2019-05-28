@@ -5,6 +5,7 @@ namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\ImageArrange;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
 class HomepageController extends BackEndApiMainController
@@ -60,6 +61,14 @@ class HomepageController extends BackEndApiMainController
         }
         try {
             $pastData->save();
+            //如果修改了展示状态  清楚首页展示model的缓存
+            if (isset($this->inputs['status'])) {
+                if (Cache::has('showModel')) {
+                    Cache::forget('showModel');
+                }
+            }
+            //删除前台首页缓存
+            $this->deleteCache($pastData->key);
             return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
@@ -97,12 +106,31 @@ class HomepageController extends BackEndApiMainController
             if (!is_null($pastLogoPath)) {
                 $imgClass->deletePic(substr($pastLogoPath, 1));
             }
+            //删除前台首页缓存
+            $this->deleteCache($pastData->key);
             return $this->msgOut(true);
         } catch (Exception $e) {
             $imgClass->deletePic($pic['path']);
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);
+        }
+    }
+
+    //删除前台首页缓存
+    public function deleteCache($key)
+    {
+        $homepageCache = [
+            'qr.code' => 'homepageQrCode',
+            'customer.service' => 11,
+            'notice' => 11,
+            'activity' => 'homepageActivity',
+            'logo' => 'homepageLogo',
+        ];
+        if (isset($homepageCache[$key])) {
+            if (Cache::has($homepageCache[$key])) {
+                Cache::forget($homepageCache[$key]);
+            }
         }
     }
 }

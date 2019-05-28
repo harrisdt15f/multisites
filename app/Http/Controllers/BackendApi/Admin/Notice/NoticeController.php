@@ -4,6 +4,7 @@ namespace App\Http\Controllers\BackendApi\Admin\Notice;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -55,6 +56,8 @@ class NoticeController extends BackEndApiMainController
             $noticeEloq = new $this->eloqM;
             $noticeEloq->fill($addData);
             $noticeEloq->save();
+            //删除前台首页缓存
+            $this->deleteCache();
             return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
@@ -89,6 +92,8 @@ class NoticeController extends BackEndApiMainController
         try {
             $this->editAssignment($pastEloq, $this->inputs);
             $pastEloq->save();
+            //删除前台首页缓存
+            $this->deleteCache();
             return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
@@ -117,6 +122,8 @@ class NoticeController extends BackEndApiMainController
             $pastEloq->delete();
             $this->eloqM::where('sort', '>', $sort)->decrement('sort');
             DB::commit();
+            //删除前台首页缓存
+            $this->deleteCache();
             return $this->msgOut(true);
         } catch (Exception $e) {
             DB::rollback();
@@ -159,6 +166,8 @@ class NoticeController extends BackEndApiMainController
             }
             $stationaryData->save();
             DB::commit();
+            //删除前台首页缓存
+            $this->deleteCache();
             return $this->msgOut(true);
         } catch (\Exception $e) {
             DB::rollback();
@@ -189,12 +198,22 @@ class NoticeController extends BackEndApiMainController
             //比这条数据sort小的   +1
             $this->eloqM::where('sort', '<', $pastSort)->where('id', '!=', $this->inputs['id'])->increment('sort');
             DB::commit();
+            //删除前台首页缓存
+            $this->deleteCache();
             return $this->msgOut(true);
         } catch (Exception $e) {
             DB::rollback();
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);
+        }
+    }
+
+    //删除前台首页缓存
+    public function deleteCache()
+    {
+        if (Cache::has('homepageNotice')) {
+            Cache::forget('homepageNotice');
         }
     }
 }

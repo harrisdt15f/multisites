@@ -7,6 +7,7 @@ use App\Lib\Common\ImageArrange;
 use App\Models\ActivityInfos;
 use App\Models\Advertisement\AdvertisementType;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -83,6 +84,8 @@ class HomepageRotationChartController extends BackEndApiMainController
             $rotationChartEloq = new $this->eloqM;
             $rotationChartEloq->fill($addData);
             $rotationChartEloq->save();
+            //清除首页banner缓存
+            $this->deleteCache();
             return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
@@ -152,6 +155,8 @@ class HomepageRotationChartController extends BackEndApiMainController
         try {
             $this->editAssignment($pastData, $editData);
             $pastData->save();
+            //清除首页banner缓存
+            $this->deleteCache();
             return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
@@ -182,6 +187,8 @@ class HomepageRotationChartController extends BackEndApiMainController
             $this->eloqM::where('sort', '>', $pastData->sort)->decrement('sort');
             DB::commit();
             $deleteStatus = $ImageClass->deletePic(substr($pastData['pic_path'], 1));
+            //清除首页banner缓存
+            $this->deleteCache();
             return $this->msgOut(true);
         } catch (Exception $e) {
             DB::rollback();
@@ -224,6 +231,8 @@ class HomepageRotationChartController extends BackEndApiMainController
             }
             $stationaryData->save();
             DB::commit();
+            //清除首页banner缓存
+            $this->deleteCache();
             return $this->msgOut(true);
         } catch (\Exception $e) {
             DB::rollback();
@@ -266,5 +275,13 @@ class HomepageRotationChartController extends BackEndApiMainController
     {
         $standard = AdvertisementType::select('l_size', 'w_size', 'size')->where('type', 1)->first();
         return $this->msgOut(true, $standard);
+    }
+
+    //清除首页banner缓存
+    public function deleteCache(): void
+    {
+        if (Cache::has('homepageBanner')) {
+            Cache::forget('homepageBanner');
+        }
     }
 }

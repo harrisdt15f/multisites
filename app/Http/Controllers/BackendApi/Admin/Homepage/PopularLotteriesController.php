@@ -6,6 +6,7 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\ImageArrange;
 use App\Models\LotteriesModel;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -78,6 +79,8 @@ class PopularLotteriesController extends BackEndApiMainController
             $popularLotteriesEloq = new $this->eloqM;
             $popularLotteriesEloq->fill($addData);
             $popularLotteriesEloq->save();
+            //清除首页热门彩种缓存
+            $this->deleteCache($popularLotteriesEloq->type);
             return $this->msgOut(true);
         } catch (Exception $e) {
             $imgClass->deletePic($pic['path']);
@@ -131,6 +134,8 @@ class PopularLotteriesController extends BackEndApiMainController
             if (isset($pastPic)) {
                 $imgClass->deletePic(substr($pastPic, 1));
             }
+            //清除首页热门彩种缓存
+            $this->deleteCache($pastData->type);
             return $this->msgOut(true);
         } catch (Exception $e) {
             if (isset($pic)) {
@@ -170,6 +175,8 @@ class PopularLotteriesController extends BackEndApiMainController
                 $imgClass = new ImageArrange();
                 $imgClass->deletePic(substr($pastData['pic_path'], 1));
             }
+            //清除首页热门彩种缓存
+            $this->deleteCache($pastData->type);
             return $this->msgOut(true);
         } catch (Exception $e) {
             DB::rollback();
@@ -224,6 +231,8 @@ class PopularLotteriesController extends BackEndApiMainController
             }
             $stationaryData->save();
             DB::commit();
+            //清除首页热门彩种缓存
+            $this->deleteCache($stationaryData->type);
             return $this->msgOut(true);
         } catch (\Exception $e) {
             DB::rollback();
@@ -238,5 +247,19 @@ class PopularLotteriesController extends BackEndApiMainController
     {
         $lotteries = LotteriesModel::select('id', 'cn_name', 'en_name')->get();
         return $this->msgOut(true, $lotteries);
+    }
+
+    //
+    public function deleteCache($type)
+    {
+        if ($type == 1) {
+            if (Cache::has('popularLotteriesOne')) {
+                Cache::forget('popularLotteriesOne');
+            }
+        } elseif ($type == 2) {
+            if (Cache::has('popularLotteriesTwo')) {
+                Cache::forget('popularLotteriesTwo');
+            }
+        }
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\BackendApi\Admin\Activity;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\ImageArrange;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -82,6 +83,8 @@ class ActivityInfosController extends BackEndApiMainController
             $configure = new $this->eloqM();
             $configure->fill($addDatas);
             $configure->save();
+            //删除前台首页缓存
+            $this->deleteCache();
             return $this->msgOut(true);
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
@@ -151,6 +154,8 @@ class ActivityInfosController extends BackEndApiMainController
                 $ImageClass->deletePic(substr($pastPic, 1));
                 $ImageClass->deletePic(substr($pastThumbnail, 1));
             }
+            //删除前台首页缓存
+            $this->deleteCache();
             return $this->msgOut(true);
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
@@ -180,6 +185,8 @@ class ActivityInfosController extends BackEndApiMainController
                 $ImageClass->deletePic(substr($pastData['pic_path'], 1));
                 $ImageClass->deletePic(substr($pastData['thumbnail_path'], 1));
                 DB::commit();
+                //删除前台首页缓存
+                $this->deleteCache();
                 return $this->msgOut(true);
             } catch (\Exception $e) {
                 DB::rollback();
@@ -192,7 +199,7 @@ class ActivityInfosController extends BackEndApiMainController
         }
     }
 
-    //文章排序
+    //活动排序
     public function sort(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
@@ -225,12 +232,22 @@ class ActivityInfosController extends BackEndApiMainController
             }
             $stationaryData->save();
             DB::commit();
+            //删除前台首页缓存
+            $this->deleteCache();
             return $this->msgOut(true);
         } catch (\Exception $e) {
             DB::rollback();
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);
+        }
+    }
+
+    //删除前台首页缓存
+    public function deleteCache()
+    {
+        if (Cache::has('homepageActivity')) {
+            Cache::forget('homepageActivity');
         }
     }
 }
