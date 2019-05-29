@@ -12,7 +12,7 @@ class FrontendAppRouteController extends BackEndApiMainController
     //APP路由列表
     public function detail()
     {
-        $datas = $this->eloqM::select('id', 'route_name', 'frontend_model_id', 'title', 'description')->get()->toArray();
+        $datas = $this->eloqM::select('id', 'route_name', 'frontend_model_id', 'title', 'description', 'is_open')->get()->toArray();
         return $this->msgOut(true, $datas);
     }
 
