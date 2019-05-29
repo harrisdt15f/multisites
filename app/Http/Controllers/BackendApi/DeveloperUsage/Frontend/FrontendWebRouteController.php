@@ -9,12 +9,14 @@ class FrontendWebRouteController extends BackEndApiMainController
 {
     protected $eloqM = 'DeveloperUsage\Frontend\FrontendWebRoute';
 
+    //web路由列表
     public function detail()
     {
-        $datas = $this->eloqM::get();
+        $datas = $this->eloqM::select('id', 'route_name', 'frontend_model_id', 'title', 'description')->get()->toArray();
         return $this->msgOut(true, $datas);
     }
 
+    //添加web路由
     public function add()
     {
         $validator = Validator::make($this->inputs, [
@@ -27,7 +29,7 @@ class FrontendWebRouteController extends BackEndApiMainController
         }
         $checkData = $this->eloqM::where('route_name', $this->inputs['route_name'])->first();
         if (!is_null($checkData)) {
-            return $this->msgOut(false, [], 101500);
+            return $this->msgOut(false, [], '101500');
         }
         try {
             $routeEloq = new $this->eloqM;
@@ -41,6 +43,7 @@ class FrontendWebRouteController extends BackEndApiMainController
         }
     }
 
+    //删除web路由
     public function delete()
     {
         $validator = Validator::make($this->inputs, [
@@ -51,10 +54,35 @@ class FrontendWebRouteController extends BackEndApiMainController
         }
         $checkData = $this->eloqM::find($this->inputs['id']);
         if (is_null($checkData)) {
-            return $this->msgOut(false, [], 101501);
+            return $this->msgOut(false, [], '101501');
         }
         try {
             $this->eloqM::where('id', $this->inputs['id'])->delete();
+            return $this->msgOut(true);
+        } catch (Exception $e) {
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+            return $this->msgOut(false, [], $sqlState, $msg);
+        }
+    }
+
+    //设置web路由是否开放
+    public function isOpen()
+    {
+        $validator = Validator::make($this->inputs, [
+            'id' => 'required|numeric',
+            'is_open' => 'required|numeric|in:0,1',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
+        }
+        $pastData = $this->eloqM::find($this->inputs['id']);
+        if (is_null($pastData)) {
+            return $this->msgOut(false, [], '101501');
+        }
+        try {
+            $pastData->is_open = $this->inputs['is_open'];
+            $pastData->save();
             return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
