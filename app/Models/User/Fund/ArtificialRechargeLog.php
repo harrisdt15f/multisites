@@ -2,6 +2,7 @@
 
 namespace App\Models\User\Fund;
 
+use App\Models\AuditFlow;
 use App\Models\BaseModel;
 
 class ArtificialRechargeLog extends BaseModel
