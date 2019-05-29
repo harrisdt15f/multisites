@@ -2,11 +2,13 @@
 
 namespace App\Models\Admin;
 
+use App\Models\Admin\Traits\SysConfiguresTraits;
 use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PartnerSysConfigures extends BaseModel
 {
+    use SysConfiguresTraits;
     protected $table = 'partner_sys_configures';
 
     protected $fillable = [
@@ -25,18 +27,4 @@ class PartnerSysConfigures extends BaseModel
     {
         return $this->hasMany(__CLASS__, 'parent_id', 'id');
     }
-
-    /**
-     * @param  string  $key
-     * @return string
-     */
-    public static function getConfigValue($key = null):  ? string
-    {
-        if (empty($key)) {
-            return $key;
-        } else {
-            return self::where('sign', $key)->value('value');
-        }
-    }
-
 }
