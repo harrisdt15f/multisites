@@ -2,6 +2,7 @@
 
 namespace App\Models\Admin;
 
+use App\Models\AuditFlow;
 use App\Models\BaseModel;
 
 class PassworAuditLists extends BaseModel

@@ -220,7 +220,7 @@ class UserHandleController extends BackEndApiMainController
     private function commonAppliedPasswordHandle()
     {
         //main model
-        $eloqM = $this->modelWithNameSpace('PassworAuditLists');
+        $eloqM = $this->modelWithNameSpace('Admin\PassworAuditLists');
         //target model to join
         $fixedJoin = 1; //number of joining tables
         $withTable = 'auditFlow';
