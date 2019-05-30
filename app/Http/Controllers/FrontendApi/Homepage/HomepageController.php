@@ -156,10 +156,8 @@ class HomepageController extends FrontendApiMainController
     public function notice()
     {
         if (Cache::has('homepageNotice')) {
-            echo 1;
             $datas = Cache::get('homepageNotice');
         } else {
-            echo 2;
             $noticeEloq = $this->eloqM::select('show_num', 'status')->where('key', 'notice')->first();
             if ($noticeEloq->status !== 1) {
                 return $this->msgOut(false, [], '400', $this->offMsg);
