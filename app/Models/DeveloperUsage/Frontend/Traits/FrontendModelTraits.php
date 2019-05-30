@@ -6,14 +6,19 @@ namespace App\Models\DeveloperUsage\Frontend\Traits;
  * @Author: LingPh
  * @Date:   2019-05-29 17:38:37
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-05-29 17:39:54
+ * @Last Modified time: 2019-05-30 11:00:00
  */
 trait FrontendModelTraits
 {
 
-    public function allFrontendModel()
+    public function allFrontendModel($type)
     {
-        $parentFrontendModel = self::Parent();
+        if ($type == 2) {
+            $typeArr = [1, 2];
+        } elseif ($type == 3) {
+            $typeArr = [1, 3];
+        }
+        $parentFrontendModel = self::ParentModel($typeArr);
         $frontendModelList = [];
         foreach ($parentFrontendModel as $id => $frontendModel) {
             $frontendModelList[$id] = $frontendModel;
@@ -26,8 +31,8 @@ trait FrontendModelTraits
         return $frontendModelList;
     }
 
-    public function Parent()
+    public function ParentModel($typeArr)
     {
-        return self::where('level', 1)->get();
+        return self::where('level', 1)->whereIn('type', $typeArr)->get();
     }
 }

@@ -11,8 +11,14 @@ class FrontendAllocatedModelController extends BackEndApiMainController
 
     public function detail()
     {
+        $validator = Validator::make($this->inputs, [
+            'type' => 'required|numeric|in:2,3',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
+        }
         $eloqM = new $this->eloqM;
-        $allFrontendModel = $eloqM->allFrontendModel();
+        $allFrontendModel = $eloqM->allFrontendModel($this->inputs['type']);
         return $this->msgOut(true, $allFrontendModel);
     }
 
