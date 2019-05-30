@@ -45,7 +45,7 @@ class HomepageController extends FrontendApiMainController
                 ->with(['activity' => function ($query) {
                     $query->select('id', 'redirect_url');
                 }])
-                ->where('status', 1)->get()->toArray();
+                ->where('status', 1)->orderBy('sort', 'asc')->get()->toArray();
             foreach ($datas as $key => $data) {
                 if ($data['type'] === 2) {
                     $datas[$key]['redirect_url'] = $data['activity']['redirect_url'];
