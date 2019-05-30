@@ -115,7 +115,7 @@ class LotteriesController extends BackEndApiMainController
                             $temp[$seriesIthem][$currentLotteryId]['child'][$curentMethodGroup]['child'][$rowitems->method_row]['data'] = $methodRow;
                             //玩法信息
                             $temp[$seriesIthem][$currentLotteryId]['child'][$curentMethodGroup]['child'][$rowitems->method_row]['child'] = $rowitems->select('id',
-                                'method_name', 'status')->where(function ($query) use (
+                                'method_name', 'status', 'total')->where(function ($query) use (
                                 $currentLotteryId,
                                 $curentMethodGroup,
                                 $method_row
@@ -298,12 +298,37 @@ class LotteriesController extends BackEndApiMainController
         }
     }
 
-    //
+    //清理玩法缓存
     public function clearMethodCache()
     {
         $redisKey = 'play_method_list';
         if (Cache::has($redisKey)) {
             Cache::forget($redisKey);
+        }
+    }
+
+    //编辑玩法
+    public function editMethod()
+    {
+        $validator = Validator::make($this->inputs, [
+            'id' => 'required|numeric',
+            'total' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
+        }
+        $pastData = MethodsModel::find($this->inputs['id']);
+        if (empty($pastData)) {
+            return $this->msgOut(false, [], '101703');
+        }
+        try {
+            $pastData->total = $this->inputs['total'];
+            $pastData->save();
+            return $this->msgOut(true);
+        } catch (Exception $e) {
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
 }

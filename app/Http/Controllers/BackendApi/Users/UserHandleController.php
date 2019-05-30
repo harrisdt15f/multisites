@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Validator;
 class UserHandleController extends BackEndApiMainController
 {
     protected $eloqM = 'User\UserHandleModel';
-
+    protected $withNameSpace = 'Admin\PassworAuditLists';
     /**
      * 创建总代时获取当前平台的奖金组
      * @return \Illuminate\Http\JsonResponse
@@ -220,7 +220,7 @@ class UserHandleController extends BackEndApiMainController
     private function commonAppliedPasswordHandle()
     {
         //main model
-        $eloqM = $this->modelWithNameSpace('Admin\PassworAuditLists');
+        $eloqM = $this->modelWithNameSpace($this->withNameSpace);
         //target model to join
         $fixedJoin = 1; //number of joining tables
         $withTable = 'auditFlow';
