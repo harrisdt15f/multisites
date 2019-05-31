@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\User;
+namespace App\Models\User\Fund;
 
 use App\Models\User\UserHandleModel;
 use LaravelArdent\Ardent\Ardent;

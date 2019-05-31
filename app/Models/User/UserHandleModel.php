@@ -3,6 +3,7 @@
 namespace App\Models\User;
 
 use App\Models\Admin\UserAdmitedFlowsModel;
+use App\Models\User\Fund\HandleUserAccounts;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;

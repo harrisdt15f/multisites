@@ -9,7 +9,7 @@ use App\Models\Admin\Fund\FundOperation;
 use App\Models\AuditFlow;
 use App\Models\User\Fund\AccountChangeReport;
 use App\Models\User\Fund\AccountChangeType;
-use App\Models\User\HandleUserAccounts;
+use App\Models\User\Fund\HandleUserAccounts;
 use App\Models\User\UserHandleModel;
 use App\Models\User\UserRechargeHistory;
 use Illuminate\Support\Facades\DB;
