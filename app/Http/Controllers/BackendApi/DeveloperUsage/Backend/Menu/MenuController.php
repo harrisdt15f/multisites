@@ -49,11 +49,9 @@ class MenuController extends BackEndApiMainController
         $routeInfo = [];
         $registeredRoute = PartnerAdminRoute::pluck('route_name')->toArray();
         foreach ($routeCollection as $key => $r) {
-            if (isset($r->action['as'])) {
-                if ($r->action['prefix'] !== '_debugbar' && preg_match('#^'.$routeEndKey.'#',
-                        $r->action['as']) === 1 && !in_array($r->action['as'], $registeredRoute)) {
-                    $routeInfo[$r->action['as']] = $r->uri;
-                }
+            if (isset($r->action['as']) && $r->action['prefix'] !== '_debugbar' && preg_match('#^'.$routeEndKey.'#',
+                    $r->action['as']) === 1 && !in_array($r->action['as'], $registeredRoute)) {
+                $routeInfo[$r->action['as']] = $r->uri;
             }
         }
 //        $data['firstlevelmenus'] = $firstlevelmenus;

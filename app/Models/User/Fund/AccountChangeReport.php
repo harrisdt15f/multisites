@@ -3,9 +3,12 @@
 namespace App\Models\User\Fund;
 
 use App\Models\BaseModel;
+use App\Models\User\Fund\Logics\AccountChangeReportLogics;
 
 class AccountChangeReport extends BaseModel
 {
+    use AccountChangeReportLogics;
+
     protected $table = 'account_change_report';
 
     protected $fillable = [
