@@ -139,6 +139,8 @@ class HomepageController extends BackEndApiMainController
         try {
             $pastData->value = '/' . $ico['path'];
             $pastData->save();
+            //删除前台首页缓存
+            $this->deleteCache($pastData->key);
             //删除原图
             if (!is_null($pastIco)) {
                 $ImageClass->deletePic(substr($pastIco, 1));
@@ -162,6 +164,7 @@ class HomepageController extends BackEndApiMainController
             'notice' => 11,
             'activity' => 'homepageActivity',
             'logo' => 'homepageLogo',
+            'frontend.ico' => 'homepageIco',
         ];
         if (isset($homepageCache[$key])) {
             if (Cache::has($homepageCache[$key])) {

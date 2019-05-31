@@ -167,4 +167,20 @@ class HomepageController extends FrontendApiMainController
         }
         return $this->msgOut(true, $datas);
     }
+
+    //前台网站头ico
+    public function ico()
+    {
+        if (Cache::has('homepageIco')) {
+            $data = Cache::get('homepageIco');
+        } else {
+            $icoEloq = $this->eloqM::select('value', 'status')->where('key', 'frontend.ico')->first();
+            if ($icoEloq->status !== 1) {
+                return $this->msgOut(false, [], '400', $this->offMsg);
+            };
+            $data = $icoEloq->value;
+            Cache::forever('homepageIco', $data);
+        }
+        return $this->msgOut(true, $data);
+    }
 }
