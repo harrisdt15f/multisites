@@ -14,6 +14,4 @@ Route::group(['prefix' => 'partner-sys-configures', 'namespace' => 'Admin'], fun
     Route::match(['post', 'options'], 'delete', ['as' => $namePrefix . 'delete', 'uses' => $controller . 'delete']);
     //配置开关
     Route::match(['post', 'options'], 'switch', ['as' => $namePrefix . 'switch', 'uses' => $controller . 'configSwitch']);
-    //配置ico
-    Route::match(['post', 'options'], 'upload-ico', ['as' => $namePrefix . 'upload-ico', 'uses' => $controller . 'uploadIco']);
 });
