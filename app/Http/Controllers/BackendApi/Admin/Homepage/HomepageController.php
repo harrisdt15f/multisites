@@ -117,8 +117,44 @@ class HomepageController extends BackEndApiMainController
         }
     }
 
+    //上传前台网站头ico
+    public function uploadIco(): JsonResponse
+    {
+        $validator = Validator::make($this->inputs, [
+            'ico' => 'required|file|dimensions:width=16,height=16',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
+        }
+        $pastData = $this->eloqM::where('key', 'frontend.ico')->first();
+        if (is_null($pastData)) {
+            return $this->msgOut(false, [], '101905');
+        }
+        //上传ico
+        $ImageClass = new ImageArrange();
+        $folderName = 'frontend';
+        $depositPath = $ImageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name) . '/ico';
+        $ico = $ImageClass->uploadImg($this->inputs['ico'], $depositPath);
+        $pastIco = $pastData->value;
+        try {
+            $pastData->value = '/' . $ico['path'];
+            $pastData->save();
+            //删除原图
+            if (!is_null($pastIco)) {
+                $ImageClass->deletePic(substr($pastIco, 1));
+            }
+            return $this->msgOut(true);
+        } catch (Exception $e) {
+            //删除上传成功的图片
+            $ImageClass->deletePic($ico['path']);
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+            return $this->msgOut(false, [], $sqlState, $msg);
+        }
+    }
+
     //删除前台首页缓存
-    public function deleteCache($key)
+    public function deleteCache($key): void
     {
         $homepageCache = [
             'qr.code' => 'homepageQrCode',
