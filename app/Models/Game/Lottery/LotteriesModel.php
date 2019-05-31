@@ -39,6 +39,14 @@ class LotteriesModel extends BaseModel
         'status',
     ];
 
+    public static $rules = [
+        'cn_name'           => 'required|min:4|max:32',
+        'en_name'           => 'required|min:4|max:32',
+        'series_id'         => 'required|min:2|max:32',
+        'max_trace_number'  => 'required|min:1|max:32',
+        'issue_format'      => 'required|min:2|max:32',
+    ];
+
     public function issueRule()
     {
         return $this->hasOne(IssueRulesModel::class, 'lottery_id', 'en_name');

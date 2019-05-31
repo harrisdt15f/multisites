@@ -3,14 +3,18 @@
 namespace App\Http\Controllers\FrontendApi\Game\Lottery;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
+use App\Lib\Locker\AccountLocker;
+use App\Lib\Logic\AccountChange;
 use App\Models\Game\Lottery\IssueModel;
 use App\Models\Game\Lottery\LotteriesModel;
-use App\Models\Game\Lottery\MethodsModel;
+use App\Models\MethodsModel;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class LotteriesController extends FrontendApiMainController
@@ -91,7 +95,7 @@ class LotteriesController extends FrontendApiMainController
                     }
 
                     if (!isset($hasRow[$method->method_group]) || !in_array($method->method_row,
-                        $hasRow[$method->method_group])) {
+                            $hasRow[$method->method_group])) {
                         $groupData[$method->method_group][] = [
                             'name' => $rowName[$method->method_row],
                             'sign' => $method->method_row,
@@ -240,10 +244,200 @@ class LotteriesController extends FrontendApiMainController
 
     public function bet()
     {
+        $validator = Validator::make($this->inputs, [
+            'lottery_sign' => 'required|string|min:4|max:10|exists:lotteries,en_name',
+            'trace_issues' => ['required', 'regex:/^\{(\d{11,15}\:(true|false)\,?)+\}$/'],
+            //{20180405001:true,20180405001:false,20180405001:true}
+            'balls' => 'required',
+            'trace_win_stop' => 'required|integer',
+            'total_cost' => 'required|integer',
+            'from' => 'integer',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
+        }
+        $inputBalls = json_decode($this->inputs['balls'], true);
+        $validator = Validator::make($inputBalls, [
+            '*.method_id' => 'required|exists:methods,method_id',
+            '*.method_name' => 'required',//中文
+            '*.codes' => ['required', 'regex:/^(?!\|)(?!.*\|$)((?!\&)(?!.*\&$)(?!.*?\&\&)[0-9&]{1,19}\|?){1,5}$/'],
+            //0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9
+            '*.count' => 'required|integer',
+            '*.times' => 'required|integer',
+            '*.cost' => 'required|integer',
+            '*.mode' => 'required|integer',
+            '*.prize_group' => 'required|integer',
+            '*.price' => 'required|integer',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
+        }
+        $this->inputs['balls'] = $inputBalls;
         $usr = $this->currentAuth->user();
         $lotterySign = $this->inputs['lottery_sign'];
-        $lottery = Lottery::getLottery($lotterySign);
+        $lottery = LotteriesModel::getLottery($lotterySign);
+        $betDetail = [];
+        $_totalCost = 0;
+        // 初次解析
+        $_balls = [];
+        foreach ($this->inputs['balls'] as $item) {
+            $methodId = $item['method_id'];
+            $method = $lottery->getMethod($methodId);
+            $validator = Validator::make($method, [
+                'status' => 'required|in:1',//玩法状态
+                'object' => 'required',//玩法对象
+                'method_name' => 'required',// 玩法未定义
+            ]);
+            if ($validator->fails()) {
+                return $this->msgOut(false, [], '400', $validator->errors()->first());
+            }
+            $oMethod = $method['object']; // 玩法 - 对象
+            // 转换格式
+            $project['codes'] = $oMethod->resolve($oMethod->parse64($item['codes']));
 
+            if ($oMethod->supportExpand) {
+                $position = [];
+                if (isset($item['position'])) {
+                    $position = (array)$item['position'];
+                }
+                if (!$oMethod->checkPos($position)) {
+                    return "对不起, 玩法{$method['name']}位置不正确!";
+                }
+                $expands = $oMethod->expand($item['codes'], $position);
+                foreach ($expands as $expand) {
+                    $item['method_id'] = $expand['method_id'];
+                    $item['codes'] = $expand['codes'];
+                    $item['count'] = $expand['count'];
+                    $item['cost'] = $item['mode'] * $item['times'] * $item['price'];
+                    $_balls[] = $item;
+                }
+            } else {
+                $_balls[] = $item;
+            }
+        }
+        $this->inputs['balls'] = $_balls;
+        foreach ($this->inputs['balls'] as $item) {
+            $methodId = $item['method_id'];
+            $method = $lottery->getMethod($methodId);
+            $oMethod = $method['object'];
+            // 模式
+            $mode = $item['mode'];
+            $modes = config('game.main.modes_array');
+            if (!in_array($mode, $modes)) {
+                return "对不起, 模式{$mode}, 不存在!";
+            }
+            // 奖金组 - 游戏
+            $prizeGroup = intval($item['prize_group']);
+            if (!$lottery->isValidPrizeGroup($prizeGroup)) {
+                return "对不起, 奖金组{$prizeGroup}, 游戏未开放!";
+            }
+            // 奖金组 - 用户
+            if ($this->prize_group < $prizeGroup) {
+                return "对不起, 奖金组{$prizeGroup}, 用户不合法!";
+            }
+            // 投注号码
+            $ball = $item['codes'];
+            if (!$oMethod->regexp($ball)) {
+                return "对不起, 玩法{$methodId}, 注单号码不合法!";
+            }
+            // 倍数
+            $times = intval($item['times']);
+            if (!$lottery->isValidTimes($times)) {
+                return "对不起, 倍数{$times}, 不合法!";
+            }
+            $price = intval($item['price']);
+            $priceConfig = config('game.main.price', [1, 2]);
+            if (!$price || !in_array($price, $priceConfig)) {
+                return "对不起, 单价{$price}, 不合法!";
+            }
+
+            // 单价花费
+            $singleCost = $mode * $times * $price * $item['count'];
+            if ($singleCost != $item['cost']) {
+                return '对不起, 总价计算错误!';
+            }
+            $_totalCost += $singleCost;
+            $betDetail[] = [
+                'method_id' => $methodId,
+                'method_name' => $method['method_name'],
+                'mode' => $mode,
+                'prize_group' => $prizeGroup,
+                'times' => $times,
+                'price' => $price,
+                'total_price' => $singleCost,
+                'code' => $ball,
+            ];
+        }
+        // 投注期号
+        $traceData = $this->inputs['trace_issues'];
+        // 检测追号奖期
+        $traceData = $lottery->checkTraceData($traceData);
+        if (!is_array($traceData)) {
+            return $traceData;
+            if (is_string($traceData)) {
+                $traceDataMessage = $traceData;
+            } else {
+                if (is_array($traceData)) {
+                    $traceDataMessage = json_encode($traceData);
+                } else {
+                    if (is_object()) {
+                        $traceDataMessage = json_encode($traceData);
+                    }
+                }
+            }
+            return $this->msgOut(false, [], '', $traceDataMessage);
+        }
+        // 获取当前奖期
+        $currentIssue = IssueModel::getCurrentIssue($lottery->en_name);
+        if (!$currentIssue) {
+            return $this->msgOut(false, [], '', '对不起, 奖期已过期!');
+        }
+        // 奖期和追号
+        if ($currentIssue->issue != $traceData[0]) {
+            return $this->msgOut(false, [], '', '对不起, 奖期已过期!');
+        }
+        $accountLocker = new AccountLocker($this->id);
+        if (!$accountLocker->getLock()) {
+            return $this->msgOut(false, [], '', '对不起, 获取账户锁失败!');
+        }
+        $account = $usr->account();
+        if ($account->balance < $_totalCost * 10000) {
+            $accountLocker->release();
+            return $this->msgOut(false, [], '', '对不起, 当前余额不足!');
+        }
+        DB::beginTransaction();
+        try {
+            $traceData = array_slice($traceData, 1);
+            $data = Project::addProject($this, $lottery, $currentIssue, $betDetail, $traceData, $this->inputs['from']);
+            // 帐变
+            $accountChange = new AccountChange();
+            $accountChange->setReportMode(AccountChange::MODE_REPORT_AFTER);
+            $accountChange->setChangeMode(AccountChange::MODE_CHANGE_AFTER);
+            foreach ($data['project'] as $item) {
+                $params = [
+                    'user_id' => $this->id,
+                    'amount' => $item['cost'] * 10000,
+                    'lottery_id' => $item['lottery_id'],
+                    'method_id' => $item['method_id'],
+                    'project_id' => $item['id'],
+                    'issue' => $currentIssue->issue,
+                ];
+                $res = $accountChange->doChange($account, 'bet_cost', $params);
+                if ($res !== true) {
+                    DB::rollBack();
+                    $accountLocker->release();
+                    return $this->msgOut(false, [], '', '对不起, '.$res);
+                }
+            }
+            $accountChange->triggerSave();
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $accountLocker->release();
+            Log::info('投注-异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine());//Clog::userBet
+            return $this->msgOut(false, [], '', '对不起, '.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine());
+        }
+        $accountLocker->release();
+        return $this->msgOut(true, $data);
     }
-
 }
