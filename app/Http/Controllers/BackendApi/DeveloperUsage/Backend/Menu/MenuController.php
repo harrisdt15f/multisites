@@ -29,6 +29,19 @@ class MenuController extends BackEndApiMainController
      */
     public function allRequireInfos(): JsonResponse
     {
+        $rule = [
+            'type' => 'required|integer|in:1,2,3',
+        ];
+        $validator = Validator::make($this->inputs, $rule);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
+        }
+        $type = [
+            1 => 'backend-api',
+            2 => 'web-api',
+            3 => 'mobile-api',
+        ];
+        $routeEndKey = $type[$this->inputs['type']] ?? $type[1];
 //        $firstlevelmenus = PartnerMenus::getFirstLevelList();
         $routeCollection = Route::getRoutes()->get();
 //        $editMenu = PartnerMenus::all();
@@ -37,7 +50,8 @@ class MenuController extends BackEndApiMainController
         $registeredRoute = PartnerAdminRoute::pluck('route_name')->toArray();
         foreach ($routeCollection as $key => $r) {
             if (isset($r->action['as'])) {
-                if ($r->action['prefix'] !== '_debugbar' && !in_array($r->action['as'], $registeredRoute)) {
+                if ($r->action['prefix'] !== '_debugbar' && preg_match('#^'.$routeEndKey.'#',
+                        $r->action['as']) === 1 && !in_array($r->action['as'], $registeredRoute)) {
                     $routeInfo[$r->action['as']] = $r->uri;
                 }
             }
@@ -131,7 +145,7 @@ class MenuController extends BackEndApiMainController
      * (?!.*\.$) - don't allow . at end
      * @return JsonResponse
      */
-    public function edit():  ? JsonResponse
+    public function edit(): ?JsonResponse
     {
         $parent = false;
         $rule = [
@@ -174,7 +188,7 @@ class MenuController extends BackEndApiMainController
         }
     }
 
-    public function changeParent() :  ? JsonResponse
+    public function changeParent(): ?JsonResponse
     {
         $parseDatas = json_decode($this->inputs['dragResult'], true);
         $itemProcess = [];
@@ -182,7 +196,7 @@ class MenuController extends BackEndApiMainController
         if (!empty($parseDatas)) {
             foreach ($parseDatas as $key => $value) {
                 $menuEloq = PartnerMenus::find($value['currentId']);
-                $menuEloq->pid = $value['currentParent'] === '#' ? 0 : (int) $value['currentParent'];
+                $menuEloq->pid = $value['currentParent'] === '#' ? 0 : (int)$value['currentParent'];
                 $menuEloq->sort = $value['currentSort'];
                 if ($menuEloq->save()) {
                     $pass['pass'] = $value['currentText'];
