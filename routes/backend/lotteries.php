@@ -21,7 +21,7 @@ Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], function 
     //奖期生成接口
     Route::match(['post', 'options'], 'lotteries-issue-generate', ['as' => $namePrefix . 'lotteries-issue-generate', 'uses' => $controller . 'generateIssue']);
     //彩种开关
-    Route::match(['post', 'options'], 'lotteries-switch', ['as' => $namePrefix . 'lotteries-issue-generate', 'uses' => $controller . 'lotteriesSwitch']);
+    Route::match(['post', 'options'], 'lotteries-switch', ['as' => $namePrefix . 'lotteries-switch', 'uses' => $controller . 'lotteriesSwitch']);
     //玩法组开关
     Route::match(['post', 'options'], 'method-group-switch', ['as' => $namePrefix . 'method-group-switch', 'uses' => $controller . 'methodGroupSwitch']);
     //玩法行开关
