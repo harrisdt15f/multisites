@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-01 14:29:10
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-01 17:31:58
+ * @Last Modified time: 2019-06-01 17:56:53
  */
 
 namespace App\Http\Controllers\BackendApi\Admin\Message;
@@ -21,25 +21,12 @@ class NoticeMessagesController extends BackEndApiMainController
     protected $eloqM = 'Admin\Message\InternalNotice';
 
     /**
-     * 获取单个管理员的站内信息
+     * 当前管理员的站内信息
      * @return JsonResponse $messages
      */
     public function adminMessages()
     {
-        $validator = Validator::make($this->inputs, [
-            'admin_id' => 'required|numeric',
-            'status' => 'numeric|in:0,1,2',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $where['admin_id'] = $this->inputs['admin_id'];
-        if (isset($this->inputs['status'])) {
-            if ($this->inputs['status'] == 0 || $this->inputs['status'] == 1) {
-                $where['status'] = $this->inputs['status'];
-            }
-        }
-        $messagesEloq = $this->eloqM::where($where)->with('noticeMessage')->orderBy('created_at', 'desc')->get();
+        $messagesEloq = $this->eloqM::where('admin_id', $this->partnerAdmin->id)->with('noticeMessage')->orderBy('created_at', 'desc')->get();
         $messages = [];
         foreach ($messagesEloq as $messageEloq) {
             $data = [
