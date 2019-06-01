@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-05-27 11:02:52
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-05-28 18:27:15
+ * @Last Modified time: 2019-06-01 18:17:30
  */
 namespace App\Http\Controllers\BackendApi\Report;
 
@@ -46,12 +46,12 @@ class reportManagementController extends BackEndApiMainController
     //玩家充值报表
     public function userRechargeHistory()
     {
-        $RechargeHistoryEloq = new UserRechargeHistory();
+        $rechargeHistoryEloq = new UserRechargeHistory();
         $searchAbleFields = ['user_name', 'company_order_num', 'deposit_mode', 'status'];
         $fixedJoin = 0;
         $field = 'updated_at';
         $type = 'desc';
-        $datas = $this->generateSearchQuery($RechargeHistoryEloq, $searchAbleFields, $fixedJoin, null, null, $field, $type);
+        $datas = $this->generateSearchQuery($rechargeHistoryEloq, $searchAbleFields, $fixedJoin, null, null, $field, $type);
         return $this->msgOut(true, $datas);
     }
 

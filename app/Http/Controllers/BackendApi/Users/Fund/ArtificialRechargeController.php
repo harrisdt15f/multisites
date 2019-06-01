@@ -102,10 +102,10 @@ class ArtificialRechargeController extends BackEndApiMainController
             'admin_name' => $admin_name,
             'apply_note' => $apply_note,
         ];
-        $AuditFlow = new AuditFlow();
-        $AuditFlow->fill($insertData);
-        $AuditFlow->save();
-        return $AuditFlow->id;
+        $auditFlow = new AuditFlow();
+        $auditFlow->fill($insertData);
+        $auditFlow->save();
+        return $auditFlow->id;
     }
 
     /**

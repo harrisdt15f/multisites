@@ -131,10 +131,10 @@ class HomepageController extends BackEndApiMainController
             return $this->msgOut(false, [], '101905');
         }
         //上传ico
-        $ImageClass = new ImageArrange();
+        $imageClass = new ImageArrange();
         $folderName = 'frontend';
-        $depositPath = $ImageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name) . '/ico';
-        $ico = $ImageClass->uploadImg($this->inputs['ico'], $depositPath);
+        $depositPath = $imageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name) . '/ico';
+        $ico = $imageClass->uploadImg($this->inputs['ico'], $depositPath);
         $pastIco = $pastData->value;
         try {
             $pastData->value = '/' . $ico['path'];
@@ -143,12 +143,12 @@ class HomepageController extends BackEndApiMainController
             $this->deleteCache($pastData->key);
             //删除原图
             if (!is_null($pastIco)) {
-                $ImageClass->deletePic(substr($pastIco, 1));
+                $imageClass->deletePic(substr($pastIco, 1));
             }
             return $this->msgOut(true);
         } catch (Exception $e) {
             //删除上传成功的图片
-            $ImageClass->deletePic($ico['path']);
+            $imageClass->deletePic($ico['path']);
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);

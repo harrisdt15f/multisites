@@ -21,9 +21,9 @@ class HomepageController extends FrontendApiMainController
         if (Cache::has('showModel')) {
             $data = Cache::get('showModel');
         } else {
-            $HomepageModel = $this->eloqM::select('key', 'status')->where('pid', '!=', 0)->orWhere('key', '=', 'banner')->get();
+            $homepageModel = $this->eloqM::select('key', 'status')->where('pid', '!=', 0)->orWhere('key', '=', 'banner')->get();
             $data = [];
-            foreach ($HomepageModel as $value) {
+            foreach ($homepageModel as $value) {
                 $data[$value->key] = $value->status;
             }
             Cache::forever('showModel', $data);

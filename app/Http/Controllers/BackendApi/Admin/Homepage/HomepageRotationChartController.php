@@ -60,15 +60,15 @@ class HomepageRotationChartController extends BackEndApiMainController
             }
         }
         //上传图片
-        $ImageClass = new ImageArrange();
+        $imageClass = new ImageArrange();
         $folderName = 'Homepagec_Rotation_chart';
-        $depositPath = $ImageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
-        $pic = $ImageClass->uploadImg($this->inputs['pic'], $depositPath);
+        $depositPath = $imageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
+        $pic = $imageClass->uploadImg($this->inputs['pic'], $depositPath);
         if ($pic['success'] === false) {
             return $this->msgOut(false, [], '400', $pic['msg']);
         }
         //生成缩略图
-        $thumbnail = $ImageClass->creatThumbnail($pic['path'], 100, 200, 'sm_');
+        $thumbnail = $imageClass->creatThumbnail($pic['path'], 100, 200, 'sm_');
         $addData = $this->inputs;
         unset($addData['pic']);
         $addData['pic_path'] = '/' . $pic['path'];
@@ -142,13 +142,13 @@ class HomepageRotationChartController extends BackEndApiMainController
         unset($editData['pic']);
         //如果要修改图片  删除原图  上传新图
         if (array_key_exists('pic', $this->inputs)) {
-            $ImageClass = new ImageArrange();
+            $imageClass = new ImageArrange();
             $picData = $this->replaceImage($pastData['pic_path'], $pastData['thumbnail_path'], $this->inputs['pic'], $ImageClass);
             if ($picData['success'] === false) {
                 return $this->msgOut(false, [], $picData['code']);
             }
             //上传缩略图
-            $thumbnail = $ImageClass->creatThumbnail($picData['path'], 100, 200, 'sm_');
+            $thumbnail = $imageClass->creatThumbnail($picData['path'], 100, 200, 'sm_');
             $editData['pic_path'] = '/' . $picData['path'];
             $editData['thumbnail_path'] = '/' . $thumbnail;
         }
@@ -181,12 +181,12 @@ class HomepageRotationChartController extends BackEndApiMainController
         $pastData = $pastDataEloq;
         DB::beginTransaction();
         try {
-            $ImageClass = new ImageArrange();
+            $imageClass = new ImageArrange();
             $pastDataEloq->delete();
             //往后的sort重新排序
             $this->eloqM::where('sort', '>', $pastData->sort)->decrement('sort');
             DB::commit();
-            $deleteStatus = $ImageClass->deletePic(substr($pastData['pic_path'], 1));
+            $deleteStatus = $imageClass->deletePic(substr($pastData['pic_path'], 1));
             //清除首页banner缓存
             $this->deleteCache();
             return $this->msgOut(true);
@@ -254,15 +254,15 @@ class HomepageRotationChartController extends BackEndApiMainController
      * @param     $pastImg     原图路径
      * @param     $thumbnail     缩略图路径
      * @param     $newImg     新图文件
-     * @param     $ImageClass     图片类
+     * @param     $imageClass     图片类
      */
-    public function replaceImage($pastImg, $thumbnail, $newImg, $ImageClass): array
+    public function replaceImage($pastImg, $thumbnail, $newImg, $imageClass): array
     {
-        $ImageClass->deletePic(substr($pastImg, 1));
-        $ImageClass->deletePic(substr($thumbnail, 1));
+        $imageClass->deletePic(substr($pastImg, 1));
+        $imageClass->deletePic(substr($thumbnail, 1));
         $folderName = 'Homepagec_Rotation_chart';
-        $depositPath = $ImageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
-        $picData = $ImageClass->uploadImg($newImg, $depositPath);
+        $depositPath = $imageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
+        $picData = $imageClass->uploadImg($newImg, $depositPath);
         if ($picData['success'] === true) {
             return $picData;
         } else {
