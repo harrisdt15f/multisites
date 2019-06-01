@@ -5,6 +5,7 @@ namespace App\Http\Controllers\BackendApi\Admin;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\ImageArrange;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
 class ConfiguresController extends BackEndApiMainController
@@ -42,26 +43,25 @@ class ConfiguresController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
+        $pastData = $this->eloqM::where('sign', $this->inputs['sign'])->exists();
+        if ($pastData === true) {
+            return $this->msgOut(false, [], '100700');
+        }
         $addDatas = $this->inputs;
         $addDatas['pid'] = $this->currentPlatformEloq->platform_id;
         $adminId = $this->partnerAdmin->id;
         $addDatas['add_admin_id'] = $adminId;
         $addDatas['last_update_admin_id'] = $adminId;
         $addDatas['status'] = 1;
-        $pastData = $this->eloqM::where('sign', $this->inputs['sign'])->first();
-        if (is_null($pastData)) {
-            try {
-                $configure = new $this->eloqM();
-                $configure->fill($addDatas);
-                $configure->save();
-                return $this->msgOut(true);
-            } catch (\Exception $e) {
-                $errorObj = $e->getPrevious()->getPrevious();
-                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-                return $this->msgOut(false, [], $sqlState, $msg);
-            }
-        } else {
-            return $this->msgOut(false, [], '100700');
+        try {
+            $configure = new $this->eloqM();
+            $configure->fill($addDatas);
+            $configure->save();
+            return $this->msgOut(true);
+        } catch (\Exception $e) {
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
 
@@ -74,30 +74,28 @@ class ConfiguresController extends BackEndApiMainController
             'sign' => 'required',
             'name' => 'required',
             'description' => 'required',
+            'value' => 'string',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $pastData = $this->eloqM::where('sign', $this->inputs['sign'])->where('id', '!=', $this->inputs['id'])->first();
-        if (is_null($pastData)) {
-            $editDataEloq = $this->eloqM::find($this->inputs['id']);
-            $editDatas = $this->inputs;
-            unset($editDatas['id'], $editDatas['parent_id']);
-            //不是顶级可修改值
-            if ($this->inputs['parent_id'] === 0) {
-                unset($editDatas['value']);
-            }
-            $this->editAssignment($editDataEloq, $editDatas);
-            try {
-                $editDataEloq->save();
-                return $this->msgOut(true);
-            } catch (\Exception $e) {
-                $errorObj = $e->getPrevious()->getPrevious();
-                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-                return $this->msgOut(false, [], $sqlState, $msg);
-            }
-        } else {
+        $checkSign = $this->eloqM::where('sign', $this->inputs['sign'])->where('id', '!=', $this->inputs['id'])->exists();
+        if ($pastData === true) {
             return $this->msgOut(false, [], '100700');
+        }
+        $pastDataEloq = $this->eloqM::find($this->inputs['id']);
+        if (is_null($pastData)) {
+            return $this->msgOut(false, [], '100701');
+        }
+        $editDatas = $this->inputs;
+        $this->editAssignment($pastDataEloq, $editDatas);
+        try {
+            $pastDataEloq->save();
+            return $this->msgOut(true);
+        } catch (\Exception $e) {
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
 
@@ -111,18 +109,18 @@ class ConfiguresController extends BackEndApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
-        if (!is_null($pastData)) {
-            try {
-                $this->eloqM::where('id', $this->inputs['id'])->delete();
-                return $this->msgOut(true);
-            } catch (\Exception $e) {
-                $errorObj = $e->getPrevious()->getPrevious();
-                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-                return $this->msgOut(false, [], $sqlState, $msg);
-            }
-        } else {
+        if (is_null($pastData)) {
             return $this->msgOut(false, [], '100701');
         }
+        try {
+            $pastData->delete();
+            return $this->msgOut(true);
+        } catch (\Exception $e) {
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+            return $this->msgOut(false, [], $sqlState, $msg);
+        }
+
     }
 
     //配置状态开关 0关  1开
@@ -140,23 +138,45 @@ class ConfiguresController extends BackEndApiMainController
             return $this->msgOut(false, [], '100702');
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
-        if (!is_null($pastData)) {
-            if ($this->inputs['status'] == 0) {
-                $editStatus = 1;
-            } else {
-                $editStatus = 0;
-            }
-            $pastData->status = $editStatus;
-            try {
-                $pastData->save();
-                return $this->msgOut(true);
-            } catch (\Exception $e) {
-                $errorObj = $e->getPrevious()->getPrevious();
-                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-                return $this->msgOut(false, [], $sqlState, $msg);
-            }
-        } else {
+        if (is_null($pastData)) {
             return $this->msgOut(false, [], '100701');
+        }
+        try {
+            $pastData->status = $this->inputs['status'];
+            $pastData->save();
+            return $this->msgOut(true);
+        } catch (\Exception $e) {
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+            return $this->msgOut(false, [], $sqlState, $msg);
+        }
+
+    }
+
+    //配置获取奖期时间
+    public function generateIssueTime()
+    {
+        $validator = Validator::make($this->inputs, [
+            'value' => 'required|date_format:H:i',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
+        }
+        $pastDataEloq = $this->eloqM::where('sign', 'generate_issue_time')->first();
+        if (is_null($pastDataEloq)) {
+            return $this->msgOut(false, [], '100703');
+        }
+        try {
+            $pastDataEloq->value = $this->inputs['value'];
+            $pastDataEloq->save();
+            if (Cache::has('generateIssueTime')) {
+                $generateIssueTime = Cache::forget('generateIssueTime');
+            }
+            return $this->msgOut(true);
+        } catch (Exception $e) {
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
 }

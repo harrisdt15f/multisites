@@ -14,4 +14,6 @@ Route::group(['prefix' => 'partner-sys-configures', 'namespace' => 'Admin'], fun
     Route::match(['post', 'options'], 'delete', ['as' => $namePrefix . 'delete', 'uses' => $controller . 'delete']);
     //配置开关
     Route::match(['post', 'options'], 'switch', ['as' => $namePrefix . 'switch', 'uses' => $controller . 'configSwitch']);
+    //配置获取奖期时间
+    Route::match(['post', 'options'], 'generate-issue-time', ['as' => $namePrefix . 'generate-issue-time', 'uses' => $controller . 'generateIssueTime']);
 });
