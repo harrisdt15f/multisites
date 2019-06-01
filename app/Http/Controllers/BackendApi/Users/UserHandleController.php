@@ -55,6 +55,7 @@ class UserHandleController extends BackEndApiMainController
         $this->inputs['platform_id'] = $this->currentPlatformEloq->platform_id;
         $this->inputs['sign'] = $this->currentPlatformEloq->platform_sign;
         $this->inputs['vip_level'] = 0;
+        $this->inputs['parent_id'] = 0;
         $this->inputs['register_ip'] = request()->ip();
         DB::beginTransaction();
         try {
