@@ -17,7 +17,7 @@ return [
     '100100' => '更改密码已有申请',
     '100101' => '更改资金密码已有申请',
     '100102' => '没有此条信息',
-    '100103' => '请先添加 sign=ArtificialDeduction的人工扣款 帐变类型',
+    '100103' => '请先添加 sign=artificial_deduction的人工扣款 帐变类型',
     '100104' => '用户剩余金额少于需要扣除的金额',
     '100105' => '扣除金额失败，请重新操作',
     //AdminGroupController
@@ -50,7 +50,7 @@ return [
     '100801' => '编辑保存有误',
     //RechargeCheckController
     '100900' => '当前状态非待审核状态',
-    '100901' => '请先添加 sign=ArtificialRecharge的人工充值 帐变类型',
+    '100901' => '请先添加 sign=artificial_recharge的人工充值 帐变类型',
     '100902' => '给用户添加金额时失败，请重新操作',
     //RegionController
     '101000' => '县级行政区编码错误',

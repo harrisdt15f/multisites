@@ -412,7 +412,7 @@ class UserHandleController extends BackEndApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         //检查是否存在 人工充值 的帐变类型表
-        $accountChangeTypeEloq = AccountChangeType::select('name', 'sign')->where('sign', 'ArtificialDeduction')->first();
+        $accountChangeTypeEloq = AccountChangeType::select('name', 'sign')->where('sign', 'artificial_deduction')->first();
         if (is_null($accountChangeTypeEloq)) {
             return $this->msgOut(false, [], '100103');
         }

@@ -48,7 +48,7 @@ class RechargeCheckController extends BackEndApiMainController
             return $this->msgOut(false, [], '100900');
         }
         //检查是否存在 人工充值 的帐变类型表
-        $accountChangeTypeEloq = AccountChangeType::where('sign', 'ArtificialRecharge')->first();
+        $accountChangeTypeEloq = AccountChangeType::where('sign', 'artificial_recharge')->first();
         if (is_null($accountChangeTypeEloq)) {
             return $this->msgOut(false, [], '100901');
         }
