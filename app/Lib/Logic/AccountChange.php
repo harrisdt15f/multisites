@@ -2,8 +2,10 @@
 namespace App\Lib\Logic;
 
 use App\Lib\Clog;
+use App\Models\User\Fund\AccountChangeReport;
 use App\Models\User\Fund\AccountChangeType;
 use App\Models\User\UserHandleModel;
+use Illuminate\Support\Facades\DB;
 
 /**
  * 帐变主逻辑
@@ -69,7 +71,7 @@ class AccountChange
      */
     public function doChange($account, $typeSign, $params)
     {
-        $user       = $account->user();
+        $user       = $account->user()->first();
         $typeConfig = AccountChangeType::getTypeBySign($typeSign);
 
         //　1. 获取帐变配置
@@ -77,7 +79,6 @@ class AccountChange
             Clog::account("error-{$user->id}-{$typeSign}不存在!");
             return "对不起, {$typeSign}不存在!";
         }
-
         // 2. 参数检测
         foreach ($typeConfig as $key => $value) {
             if (in_array($key, ['id', 'name', 'sign', 'type', 'frozen_type'])) {
@@ -108,7 +109,7 @@ class AccountChange
             if (!$relatedUser) {
                 return '对不起, 必须存在关联用户!';
             }
-            $relatedAccount = $relatedUser->account();
+            $relatedAccount = $relatedUser->account()->first();
             $frozen         = $relatedAccount->frozen;
             if ($frozen < $amount) {
                 return '对不起, 相关用户可用冻结金额不足!';
@@ -197,7 +198,7 @@ class AccountChange
         } else {
             $updated_at = date('Y-m-d H:i:s');
             $sql = "update `user_accounts` set `balance`=`balance`+'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}'";
-            $ret= db()->update($sql) > 0 ;
+            $ret= DB::update($sql) > 0 ;
             if($ret){
                 $account->balance += $money;
             }
@@ -226,7 +227,7 @@ class AccountChange
             return true;
         } else {
             $updated_at = date('Y-m-d H:i:s');
-            $ret= db()->update("update `user_accounts` set `balance`=`balance`-'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}' and `balance`>='{$money}'") > 0 ;
+            $ret= DB::update("update `user_accounts` set `balance`=`balance`-'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}' and `balance`>='{$money}'") > 0 ;
             if($ret){
                 $account->balance = $account->balance - $money;
             }
@@ -256,7 +257,7 @@ class AccountChange
             return true;
         } else {
             $updated_at = date('Y-m-d H:i:s');
-            $ret = db()->update("update `user_accounts` set `balance`=`balance`-'{$money}', `frozen`=`frozen`+ '{$money}'  , `updated_at`='$updated_at' where `user_id` ='{$account->user_id}' and `balance`>='{$money}'") > 0;
+            $ret = DB::update("update `user_accounts` set `balance`=`balance`-'{$money}', `frozen`=`frozen`+ '{$money}'  , `updated_at`='$updated_at' where `user_id` ='{$account->user_id}' and `balance`>='{$money}'") > 0;
             if ($ret) {
                 $account->balance -= $money;
                 $account->frozen += $money;
@@ -285,7 +286,7 @@ class AccountChange
         } else {
             $updated_at = date('Y-m-d H:i:s');
 
-            $ret = db()->update("update `user_accounts` set `balance`=`balance`+'{$money}', `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}'") > 0;
+            $ret = DB::update("update `user_accounts` set `balance`=`balance`+'{$money}', `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}'") > 0;
 
             if ($ret) {
                 $account->balance += $money;
@@ -318,7 +319,7 @@ class AccountChange
             return true;
         } else {
             $updated_at = date('Y-m-d H:i:s');
-            $ret = db()->update("update `user_accounts` set  `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}'") > 0;
+            $ret = DB::update("update `user_accounts` set  `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}'") > 0;
             if ($ret) {
                 $account->frozen -= $money;
             }
@@ -333,7 +334,7 @@ class AccountChange
     public function triggerSave() {
         // 报表保存
         if ($this->reports) {
-            $ret = db()->table('account_change_report')->insert( $this->reports );
+            $ret = AccountChangeReport::insert( $this->reports );
             if(!$ret) {
                 return false;
             }
@@ -389,7 +390,7 @@ class AccountChange
                 // 更新时间
                 $updated_at = date('Y-m-d H:i:s');
                 $sql .= " `updated_at`='$updated_at'  where `user_id` ='{$userId}'";
-                $ret = db()->update($sql);
+                $ret = DB::update($sql);
                 if (!$ret) {
                     return false;
                 }
@@ -409,7 +410,7 @@ class AccountChange
         if ($this->reportMode == self::MODE_REPORT_AFTER) {
             $this->reports[] = $report;
         } else {
-            $ret = db()->table('account_change_report')->insert( $report );
+            $ret = AccountChangeReport::insert( $report );
             if(!$ret) {
                 return false;
             }

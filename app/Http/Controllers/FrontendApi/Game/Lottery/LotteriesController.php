@@ -246,7 +246,8 @@ class LotteriesController extends FrontendApiMainController
     {
         $validator = Validator::make($this->inputs, [
             'lottery_sign' => 'required|string|min:4|max:10|exists:lotteries,en_name',
-            'trace_issues' => ['required', 'regex:/^\{(\d{11,15}\:(true|false)\,?)+\}$/'],
+            'trace_issues' => 'required',
+//            'trace_issues' => ['required', 'regex:/^\{(\d{9,15}\:(true|false)\,?)+\}$/'],
             //{20180405001:true,20180405001:false,20180405001:true}
             'balls' => 'required',
             'trace_win_stop' => 'required|integer',
@@ -332,7 +333,7 @@ class LotteriesController extends FrontendApiMainController
                 return "对不起, 奖金组{$prizeGroup}, 游戏未开放!";
             }
             // 奖金组 - 用户
-            if ($this->prize_group < $prizeGroup) {
+            if ($usr->prize_group < $prizeGroup) {
                 return "对不起, 奖金组{$prizeGroup}, 用户不合法!";
             }
             // 投注号码
@@ -369,53 +370,46 @@ class LotteriesController extends FrontendApiMainController
             ];
         }
         // 投注期号
-        $traceData = $this->inputs['trace_issues'];
+        $traceData = json_decode($this->inputs['trace_issues'], true);
         // 检测追号奖期
-        $traceData = $lottery->checkTraceData($traceData);
-        if (!is_array($traceData)) {
-            return $traceData;
-            if (is_string($traceData)) {
-                $traceDataMessage = $traceData;
-            } else {
-                if (is_array($traceData)) {
-                    $traceDataMessage = json_encode($traceData);
-                } else {
-                    if (is_object()) {
-                        $traceDataMessage = json_encode($traceData);
-                    }
-                }
-            }
-            return $this->msgOut(false, [], '', $traceDataMessage);
+        if (!$traceData || !is_array($traceData)) {
+            return '对不起, 无效的追号奖期数据!';
         }
+        $traceDataCollection = $lottery->checkTraceData($traceData);
+        if (count($traceData) !== $traceDataCollection->count()) {
+            return '对不起, 追号奖期不正确!';
+        }
+        $traceData = $traceDataCollection->pluck('issue');
         // 获取当前奖期
         $currentIssue = IssueModel::getCurrentIssue($lottery->en_name);
         if (!$currentIssue) {
             return $this->msgOut(false, [], '', '对不起, 奖期已过期!');
         }
         // 奖期和追号
-        if ($currentIssue->issue != $traceData[0]) {
+        /*if ($currentIssue->issue != $traceData[0]) {
             return $this->msgOut(false, [], '', '对不起, 奖期已过期!');
-        }
-        $accountLocker = new AccountLocker($this->id);
+        }*/
+        $accountLocker = new AccountLocker($usr->id);
         if (!$accountLocker->getLock()) {
             return $this->msgOut(false, [], '', '对不起, 获取账户锁失败!');
         }
-        $account = $usr->account();
+        $account = $usr->account()->first();
         if ($account->balance < $_totalCost * 10000) {
             $accountLocker->release();
             return $this->msgOut(false, [], '', '对不起, 当前余额不足!');
         }
         DB::beginTransaction();
         try {
-            $traceData = array_slice($traceData, 1);
-            $data = Project::addProject($this, $lottery, $currentIssue, $betDetail, $traceData, $this->inputs['from']);
+            $traceData = count($traceData) > 1 ? array_slice($traceData, 1) : [];
+            $from = $this->inputs['from'] ?? 1;
+            $data = Project::addProject($usr, $lottery, $currentIssue, $betDetail, $traceData, $from);
             // 帐变
             $accountChange = new AccountChange();
             $accountChange->setReportMode(AccountChange::MODE_REPORT_AFTER);
             $accountChange->setChangeMode(AccountChange::MODE_CHANGE_AFTER);
             foreach ($data['project'] as $item) {
                 $params = [
-                    'user_id' => $this->id,
+                    'user_id' => $usr->id,
                     'amount' => $item['cost'] * 10000,
                     'lottery_id' => $item['lottery_id'],
                     'method_id' => $item['method_id'],

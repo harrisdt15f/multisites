@@ -8,13 +8,14 @@ use App\Models\User\Fund\Logics\AccountChangeTypeLogics;
 class AccountChangeType extends BaseModel
 {
     use AccountChangeTypeLogics;
+
     protected $table = 'account_change_type';
 
     protected $fillable = [
         'name', 'sign', 'in_out', 'type',
     ];
 
-    public $rules = [
+    public static $rules = [
         'name'              => 'required|min:2|max:32',
         'sign'              => 'required|min:2|max:32',
         'type'              => 'required|in:1,2',
