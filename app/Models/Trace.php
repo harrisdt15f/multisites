@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Traits\TraceTraits;
+use App\Models\Logics\TraceTraits;
 
 class Trace extends BaseModel
 {

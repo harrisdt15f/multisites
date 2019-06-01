@@ -3,7 +3,7 @@
 namespace App\Models\Game\Lottery;
 
 use App\Models\BaseModel;
-use App\Models\Game\Lottery\Traits\IssueLogics;
+use App\Models\Game\Lottery\Logics\IssueLogics;
 
 class IssueModel extends BaseModel
 {

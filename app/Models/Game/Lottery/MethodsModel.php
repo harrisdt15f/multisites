@@ -3,7 +3,7 @@
 namespace App\Models\Game\Lottery;
 
 use App\Models\BaseModel;
-use App\Models\Game\Lottery\Traits\MethodsLogics;
+use App\Models\Game\Lottery\Logics\MethodsLogics;
 
 class MethodsModel extends BaseModel
 {
