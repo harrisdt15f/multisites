@@ -2,6 +2,8 @@
 
 namespace App\Models\Logics;
 
+use App\Models\Trace;
+
 /**
  * @Author: LingPh
  * @Date:   2019-05-29 17:49:50
@@ -13,7 +15,7 @@ trait TraceTraits
     // 获取列表
     public static function getList($condition)
     {
-        $query = self::orderBy('id', 'desc');
+        $query = Trace::orderBy('id', 'desc');
         if (isset($condition['en_name'])) {
             $query->where('en_name', '=', $condition['en_name']);
         }

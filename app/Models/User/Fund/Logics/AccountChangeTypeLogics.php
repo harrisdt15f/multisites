@@ -1,6 +1,8 @@
 <?php
 namespace App\Models\User\Fund\Logics;
 
+use App\Lib\BaseCache;
+
 /**
  * Created by PhpStorm.
  * author: Harris
@@ -9,6 +11,8 @@ namespace App\Models\User\Fund\Logics;
  */
 trait AccountChangeTypeLogics
 {
+    use BaseCache;
+
     public static function getList($c) {
         $query  = self::orderBy('id', 'desc');
 
@@ -51,17 +55,12 @@ trait AccountChangeTypeLogics
      */
     static function getTypeBySign($sign) {
         $data = self::getDataListFromCache();
-
-        if (isset($data[$sign])) {
-            return $data[$sign];
-        }
-
-        return [];
+        return $data[$sign] ?? [];
     }
 
     // 获取所有配置 缓存
-    static function getDataListFromCache() {
-        $key = "account_change_type";
+    public static function getDataListFromCache() {
+        $key = 'account_change_type';
         if (self::_hasCache($key)) {
             return self::_getCacheData($key);
         } else {
@@ -69,20 +68,17 @@ trait AccountChangeTypeLogics
             if ($allCache) {
                 self::_saveCacheData($key, $allCache);
             }
-
             return $allCache;
         }
     }
 
     // 获取所有数据 无缓存
-    static function getDataFromDb() {
+    public static function getDataFromDb() {
         $items = self::orderBy('id', 'desc')->get();
-
         $data = [];
         foreach ($items as $item) {
             $data[$item->sign] = $item->toArray();
         }
-
         return $data;
     }
 

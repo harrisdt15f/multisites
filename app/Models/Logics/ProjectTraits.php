@@ -4,6 +4,8 @@ namespace App\Models\Logics;
 
 use App\Models\Trace;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Request;
+
 /**
  * @Author: LingPh
  * @Date:   2019-05-29 17:44:08
@@ -24,7 +26,6 @@ trait ProjectTraits
         if (isset($condition['en_name'])) {
             $query->where('en_name', '=', $condition['en_name']);
         }
-
         $currentPage = isset($condition['page_index']) ? intval($condition['page_index']) : 1;
         $pageSize = isset($condition['page_size']) ? intval($condition['page_size']) : 15;
         $offset = ($currentPage - 1) * $pageSize;
@@ -42,7 +43,7 @@ trait ProjectTraits
      * @param int $count
      * @return array
      */
-    public static function getGamePageList($lotterySign, $start = 0, $count = 10)
+    public static function getGamePageList($lotterySign, $start = 0, $count = 10): array
     {
         if ($count > 100) {
             $count = 100;
@@ -107,8 +108,8 @@ trait ProjectTraits
                 'is_tester' => $user->is_tester,
                 'series_id' => $lottery->series_id,
                 'lottery_sign' => $lottery->en_name,
-                'method_sign' => $_item["method_id"],
-                'method_name' => $_item["method_name"],
+                'method_sign' => $_item['method_id'],
+                'method_name' => $_item['method_name'],
                 'user_prize_group' => $user->prize_group,
                 'bet_prize_group' => $_item['prize_group'],
                 'mode' => $_item['mode'],
@@ -117,16 +118,13 @@ trait ProjectTraits
                 'total_cost' => $_item['total_price'],
                 'bet_number' => $_item['code'],
                 'issue' => $currentIssue->issue,
-
                 'prize_set' => '',
-
-                'ip' => real_ip(),
-                'proxy_ip' => real_ip(),
-
+                'ip' => Request::ip(),
+                'proxy_ip' => json_encode(Request::ip()),
                 'bet_from' => $from,
                 'time_bought' => time(),
             ];
-
+            $id = DB::table('projects')->insertGetId($projectData);
             if ($traceData) {
                 $traceMainData[] = [
                     'user_id' => $user->id,
@@ -140,36 +138,62 @@ trait ProjectTraits
                     'method_sign' => $_item['method_id'],
                     'method_name' => $_item['method_name'],
                     'bet_number' => $_item['code'],
-
                     'user_prize_group' => $user->prize_group,
                     'bet_prize_group' => $_item['prize_group'],
                     'mode' => $_item['mode'],
                     'times' => $_item['times'],
                     'single_price' => $_item['price'],
                     'total_price' => $_item['total_price'],
-
                     'total_issues' => count($traceData),
                     'finished_issues' => 0,
                     'canceled_issues' => 0,
-
                     'start_issue' => $traceData[1],
                     'now_issue' => '',
                     'end_issue' => $traceData[count($traceData) - 1],
                     'stop_issue' => '',
                     'issue_process' => json_encode($traceData),
-
                     'add_time' => time(),
                     'stop_time' => 0,
                     'cancel_time' => 0,
-
-                    'ip' => real_ip(),
-                    'proxy_ip' => real_ip(),
-
+                    'ip' => Request::ip(),
+                    'proxy_ip' => json_encode(Request::ip()),
                     'day' => date('Ymd'),
                     'bet_from' => $from,
                 ];
+                // 保存追号主
+                DB::table('traces')->insert($traceMainData);
+                // 保存追号
+                $traceListData = [];
+                foreach ($traceData as $issue => $mark) {
+                    foreach ($data as $_item) {
+                        $traceListData[] = [
+                            'user_id' => $user->id,
+                            'username' => $user->username,
+                            'top_id' => $user->top_id,
+                            'rid' => $user->rid,
+                            'parent_id' => $user->parent_id,
+                            'is_tester' => $user->is_tester,
+                            'series_id' => $lottery->series_id,
+                            'lottery_sign' => $lottery->en_name,
+                            'method_sign' => $_item['method_id'],
+                            'method_name' => $_item['method_name'],
+                            'issue' => $issue,
+                            'bet_number' => $_item['code'],
+                            'mode' => $_item['mode'],
+                            'times' => $_item['times'],
+                            'single_price' => $_item['price'],
+                            'total_price' => $_item['total_price'],
+                            'user_prize_group' => $user->prize_group,
+                            'bet_prize_group' => $_item['prize_group'],
+                            'ip' => Request::ip(),
+                            'proxy_ip' => json_encode(Request::ip()),
+                            'day' => date('Ymd'),
+                            'bet_from' => $from,
+                        ];
+                    }
+                }
+                DB::table('trace_list')->insert($traceListData);
             }
-            $id = DB::table('projects')->insertGetId($projectData);
             $returnData['project'][] = [
                 'id' => $id,
                 'cost' => $_item['total_price'],
@@ -177,43 +201,6 @@ trait ProjectTraits
                 'method_id' => $_item['method_id'],
             ];
         }
-        // 保存追号主
-        if ($traceMainData) {
-            DB::table('traces')->insert($traceMainData);
-        }
-        // 保存追号
-        $traceListData = [];
-        foreach ($traceData as $issue => $mark) {
-            foreach ($data as $_item) {
-                $traceListData[] = [
-                    'user_id' => $user->id,
-                    'username' => $user->username,
-                    'top_id' => $user->top_id,
-                    'rid' => $user->rid,
-                    'parent_id' => $user->parent_id,
-                    'is_tester' => $user->is_tester,
-                    'series_id' => $lottery->series_id,
-                    'lottery_sign' => $lottery->en_name,
-                    'method_sign' => $_item["method_id"],
-                    'method_name' => $_item["method_name"],
-                    'issue' => $issue,
-                    'bet_number' => $_item['code'],
-                    'mode' => $_item['mode'],
-                    'times' => $_item['times'],
-                    'single_price' => $_item['price'],
-                    'total_price' => $_item['total_price'],
-
-                    'user_prize_group' => $user->prize_group,
-                    'bet_prize_group' => $_item['prize_group'],
-                    'bet_number' => $_item['code'],
-                    'ip' => real_ip(),
-                    'proxy_ip' => real_ip(),
-                    'day' => date("Ymd"),
-                    'bet_from' => $from,
-                ];
-            }
-        }
-        DB::table('trace_list')->insert($traceListData);
         return $returnData;
     }
 

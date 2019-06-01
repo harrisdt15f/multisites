@@ -1,6 +1,7 @@
 <?php namespace App\Lib\Locker;
 
 use App\Lib\Clog;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * cache 必须支持 tags
@@ -10,7 +11,7 @@ use App\Lib\Clog;
 class AccountLocker
 {
 
-    static $tag = 'account_lock';
+    public static $tag = 'account_lock';
 
     // 缓存
     protected $memKey = '';
@@ -30,10 +31,8 @@ class AccountLocker
     {
         $this->memKey = $this->prefix.$key;
         $this->memValue = $key.'_'.date('Y-m-d H:i:s');
-
         $this->cacheTimeout = $cacheTimeout;
         $this->lockerTimeout = $lockerTimeout;
-
         $this->sleep = $sleep;
     }
 
@@ -42,7 +41,7 @@ class AccountLocker
     {
         $time = time();
         while (time() - $time < $this->lockerTimeout) {
-            if (cache()->tags(self::$tag)->add($this->memKey, $this->memValue, $this->cacheTimeout)) {
+            if (Cache::tags(self::$tag)->add($this->memKey, $this->memValue, $this->cacheTimeout)) {
                 return true;
             }
             usleep($this->sleep);
@@ -57,12 +56,11 @@ class AccountLocker
     public function release()
     {
         try {
-            $ret = cache()->tags(self::$tag)->forget($this->memKey);
+            $ret = Cache::tags(self::$tag)->forget($this->memKey);
         } catch (\Exception $e) {
             Clog::lockError('账户锁-释放锁失败-'.$e->getMessage(), $this->context);
             $ret = false;
         }
-
         return $ret;
     }
 
@@ -75,6 +73,6 @@ class AccountLocker
     // 释放所有
     static function releaseAll()
     {
-        cache()->tags(self::$tag)->flush();
+        Cache::tags(self::$tag)->flush();
     }
 }

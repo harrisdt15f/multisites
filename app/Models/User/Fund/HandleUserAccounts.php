@@ -3,6 +3,7 @@
 namespace App\Models\User\Fund;
 
 use App\Models\User\Fund\Logics\UserAccountLogics;
+use App\Models\User\UserHandleModel;
 use LaravelArdent\Ardent\Ardent;
 
 class HandleUserAccounts extends Ardent
@@ -37,6 +38,6 @@ class HandleUserAccounts extends Ardent
 
     public function user()
     {
-        return $this->belongsTo(UserHandleModel::class, 'id', 'user_id');
+        return $this->belongsTo(UserHandleModel::class, 'user_id', 'id');
     }
 }
