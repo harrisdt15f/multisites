@@ -22,7 +22,7 @@ class HomepageController extends BackEndApiMainController
     //主题板块列表
     public function pageModel(): JsonResponse
     {
-        $datas = $this->eloqM::select('id', 'model_name', 'key', 'value', 'show_num', 'status')->where('pid', 4)->orWhere('key', 'banner')->get()->toArray();
+        $datas = $this->eloqM::select('id', 'model_name', 'key', 'value', 'show_num', 'status')->where('pid', 4)->orWhere('key', 'banner')->orWhere('key', 'frontend_ico')->get()->toArray();
         return $this->msgOut(true, $datas);
     }
 
