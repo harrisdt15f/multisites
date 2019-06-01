@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Game\Lottery\Traits;
+namespace App\Models\Game\Lottery\Logics;
 
 /**
  * Created by PhpStorm.

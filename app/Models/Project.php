@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Traits\ProjectTraits;
+use App\Models\Logics\ProjectTraits;
 
 class Project extends BaseModel
 {

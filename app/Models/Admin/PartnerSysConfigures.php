@@ -2,7 +2,7 @@
 
 namespace App\Models\Admin;
 
-use App\Models\Admin\Traits\SysConfiguresTraits;
+use App\Models\Admin\Logics\SysConfiguresTraits;
 use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 

@@ -5,8 +5,8 @@ namespace App\Models\Game\Lottery;
 use App\Models\BaseModel;
 use App\Models\Game\Lottery\IssueRulesModel;
 use App\Models\Game\Lottery\MethodsModel;
-use App\Models\Game\Lottery\Traits\LotteryIssueGenerate;
-use App\Models\Game\Lottery\Traits\LotteryLogics;
+use App\Models\Game\Lottery\Logics\LotteryIssueGenerate;
+use App\Models\Game\Lottery\Logics\LotteryLogics;
 
 class LotteriesModel extends BaseModel
 {

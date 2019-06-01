@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Traits;
+namespace App\Models\Logics;
 
 use App\Models\Trace;
 use Illuminate\Support\Facades\DB;
