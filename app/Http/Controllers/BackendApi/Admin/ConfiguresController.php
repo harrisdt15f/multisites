@@ -179,4 +179,12 @@ class ConfiguresController extends BackEndApiMainController
             return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
+
+    //获取目前的生成奖期时间
+    public function getGenerateIssueTime()
+    {
+        $sysConfiguresEloq = new $this->eloqM;
+        $time = $sysConfiguresEloq->getConfigValue('generate_issue_time');
+        return $this->msgOut(true, $time);
+    }
 }
