@@ -180,11 +180,17 @@ class ConfiguresController extends BackEndApiMainController
         }
     }
 
-    //获取目前的生成奖期时间
-    public function getGenerateIssueTime()
+    //获取某个配置的值
+    public function getSysConfigureValue()
     {
+        $validator = Validator::make($this->inputs, [
+            'key' => 'required|string',
+        ]);
+        if ($validator->fails()) {
+            return $this->msgOut(false, [], '400', $validator->errors()->first());
+        }
         $sysConfiguresEloq = new $this->eloqM;
-        $time = $sysConfiguresEloq->getConfigValue('generate_issue_time');
+        $time = $sysConfiguresEloq->getConfigValue($this->inputs['key']);
         return $this->msgOut(true, $time);
     }
 }
