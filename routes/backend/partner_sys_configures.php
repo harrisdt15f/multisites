@@ -16,6 +16,6 @@ Route::group(['prefix' => 'partner-sys-configures', 'namespace' => 'Admin'], fun
     Route::match(['post', 'options'], 'switch', ['as' => $namePrefix . 'switch', 'uses' => $controller . 'configSwitch']);
     //配置生成奖期时间
     Route::match(['post', 'options'], 'generate-issue-time', ['as' => $namePrefix . 'generate-issue-time', 'uses' => $controller . 'generateIssueTime']);
-    //获取某个配置的值
-    Route::match(['post', 'options'], 'get-sys-configure-value', ['as' => $namePrefix . 'get-sys-configure-value', 'uses' => $controller . 'getSysConfigureValue']);
+    //获取某个系统配置的值
+    Route::match(['post', 'options'], 'sys-configure-value', ['as' => $namePrefix . 'sys-configure-value', 'uses' => $controller . 'getSysConfigureValue']);
 });

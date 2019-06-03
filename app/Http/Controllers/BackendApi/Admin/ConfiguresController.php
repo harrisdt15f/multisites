@@ -6,6 +6,7 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\ImageArrange;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ConfiguresController extends BackEndApiMainController
@@ -15,7 +16,7 @@ class ConfiguresController extends BackEndApiMainController
     //获取全部配置
     public function getConfiguresList(): JsonResponse
     {
-        $partnerSysConfigEloq = $this->eloqM::select('id', 'parent_id', 'pid', 'sign', 'name', 'description', 'value', 'add_admin_id', 'last_update_admin_id', 'status', 'created_at', 'updated_at')->get();
+        $partnerSysConfigEloq = $this->eloqM::select('id', 'parent_id', 'pid', 'sign', 'name', 'description', 'value', 'add_admin_id', 'last_update_admin_id', 'status', 'created_at', 'updated_at')->where('display', 1)->get();
         $data = [];
         foreach ($partnerSysConfigEloq as $partnerSysConfigItem) {
             if ($partnerSysConfigItem->parent_id === 0) {
@@ -163,14 +164,18 @@ class ConfiguresController extends BackEndApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastDataEloq = $this->eloqM::where('sign', 'generate_issue_time')->first();
-        if (is_null($pastDataEloq)) {
-            return $this->msgOut(false, [], '100703');
-        }
         try {
-            $pastDataEloq->value = $this->inputs['value'];
-            $pastDataEloq->save();
-            if (Cache::has('generateIssueTime')) {
-                $generateIssueTime = Cache::forget('generateIssueTime');
+            if (!is_null($pastDataEloq)) {
+                $pastDataEloq->value = $this->inputs['value'];
+                $pastDataEloq->save();
+                if (Cache::has('generateIssueTime')) {
+                    $generateIssueTime = Cache::forget('generateIssueTime');
+                }
+            } else {
+                $bool = $this->createIssueConfigure($this->inputs['value']);
+                if ($bool === false) {
+                    return $this->msgOut(false, [], '100703');
+                }
             }
             return $this->msgOut(true);
         } catch (Exception $e) {
@@ -178,6 +183,56 @@ class ConfiguresController extends BackEndApiMainController
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);
         }
+    }
+
+    /**
+     * 生成奖期配置
+     * @param  date $time 自动生成奖期的时间
+     * @return void
+     */
+    public function createIssueConfigure($time)
+    {
+        DB::beginTransaction();
+        try {
+            //生成父级 奖期相关 系统配置
+            $adminId = $this->partnerAdmin->id;
+            $addData = [
+                'parent_id' => 0,
+                'pid' => 1,
+                'sign' => 'issue',
+                'name' => '奖期相关',
+                'description' => '奖期相关的所有配置',
+                'add_admin_id' => $adminId,
+                'last_update_admin_id' => $adminId,
+                'status' => 1,
+                'display' => 0,
+            ];
+            $configureEloq = new $this->eloqM();
+            $configureEloq->fill($addData);
+            $configureEloq->save();
+            //生成子级 生成奖期时间 系统配置
+            $data = [
+                'parent_id' => $configureEloq->id,
+                'pid' => 1,
+                'sign' => 'generate_issue_time',
+                'name' => '生成奖期时间',
+                'description' => '每天自动生成奖期的时间',
+                'value' => $time,
+                'add_admin_id' => $adminId,
+                'last_update_admin_id' => $adminId,
+                'status' => 1,
+                'display' => 0,
+            ];
+            $issueTimeEloq = new $this->eloqM();
+            $issueTimeEloq->fill($data);
+            $issueTimeEloq->save();
+            DB::commit();
+            return true;
+        } catch (Exception $e) {
+            DB::rollback();
+            return false;
+        }
+
     }
 
     //获取某个配置的值

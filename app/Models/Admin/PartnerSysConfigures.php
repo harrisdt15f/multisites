@@ -21,6 +21,7 @@ class PartnerSysConfigures extends BaseModel
         'add_admin_id',
         'last_update_admin_id',
         'status',
+        'display',
     ];
 
     public function childs(): HasMany
