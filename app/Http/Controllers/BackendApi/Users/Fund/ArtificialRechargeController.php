@@ -45,8 +45,8 @@ class ArtificialRechargeController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $userData = UserHandleModel::find($this->inputs['id']);
-        if (is_null($userData)) {
+        $userEloq = UserHandleModel::find($this->inputs['id']);
+        if (is_null($userEloq)) {
             return $this->msgOut(false, [], '101100');
         }
         $partnerAdmin = $this->partnerAdmin;
@@ -69,26 +69,12 @@ class ArtificialRechargeController extends BackEndApiMainController
             //插入审核表
             $auditFlowID = $this->insertAuditFlow($partnerAdmin->id, $partnerAdmin->name, $this->inputs['apply_note']);
             //添加管理员额度明细表
-            $ArtificialRechargeLog = new ArtificialRechargeLog();
-            $type = ArtificialRechargeLog::ADMIN;
-            $in_out = ArtificialRechargeLog::DECREMENT;
-            $comment = '[给用户人工充值]==>-' . $this->inputs['amount'] . '|[目前额度]==>' . $newFund;
-            $fundOperationClass = new FundOperationRecharge();
-            $fundOperationClass->insertOperationDatas($ArtificialRechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $userData->id, $userData->nickname, $this->inputs['amount'], $comment, $auditFlowID);
+            $this->insertFundLog($partnerAdmin, $userEloq, $auditFlowID, $newFund);
             //用户 user_recharge_history 表
-            $userRechargeHistory = new UserRechargeHistory();
             $deposit_mode = UserRechargeHistory::ARTIFICIAL;
-            $status = UserRechargeHistory::UNDERWAYAUDIT;
-            $audit_flow_id = $auditFlowID;
-            $rechargeHistoryArr = $this->insertRechargeHistoryArr($userData->id, $userData->nickname, $userData->is_tester, $userData->top_id, $this->inputs['amount'], $audit_flow_id, $status, $deposit_mode);
-            $userRechargeHistory->fill($rechargeHistoryArr);
-            $userRechargeHistory->save();
+            $companyOrderNum = $this->insertRechargeHistory($userEloq, $auditFlowID, $deposit_mode);
             // 用户 user_recharge_log 表
-            $rchargeLogeEloq = new UserRechargeLog();
-            $log_num = $this->log_uuid;
-            $rechargeLogArr = $this->insertRechargeLogArr($userRechargeHistory->company_order_num, $log_num, $deposit_mode);
-            $rchargeLogeEloq->fill($rechargeLogArr);
-            $rchargeLogeEloq->save();
+            $this->insertRechargeLog($companyOrderNum, $deposit_mode);
             //发送站内消息 提醒有权限的管理员审核
             $this->sendMessage();
             DB::commit();
@@ -219,5 +205,55 @@ class ArtificialRechargeController extends BackEndApiMainController
         if (!is_null($admins)) {
             $messageClass->insertMessage($type, $this->message, $admins->toArray());
         }
+    }
+
+    /**
+     * 插入充值额度记录
+     * @param  object $partnerAdmin 管理员eloq
+     * @param  object $userEloq     用户eloq
+     * @param  int $auditFlowID  audit_flow审核表id
+     * @param  int $newFund  变动后的额度
+     * @return void
+     */
+    public function insertFundLog($partnerAdmin, $userEloq, $auditFlowID, $newFund)
+    {
+        $artificialRechargeLog = new ArtificialRechargeLog();
+        $type = ArtificialRechargeLog::ADMIN;
+        $in_out = ArtificialRechargeLog::DECREMENT;
+        $comment = '[给用户人工充值]==>-' . $this->inputs['amount'] . '|[目前额度]==>' . $newFund;
+        $fundOperationClass = new FundOperationRecharge();
+        $fundOperationClass->insertOperationDatas($artificialRechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $userEloq->id, $userEloq->nickname, $this->inputs['amount'], $comment, $auditFlowID);
+    }
+
+    /**
+     * 插入user_recharge_history表
+     * @param  objact $userEloq    用户eloq
+     * @param  int $auditFlowID audit_flow审核表id
+     * @param  int $deposit_mode 充值模式 0自动 1手动
+     * @return string
+     */
+    public function insertRechargeHistory($userEloq, $auditFlowID, $deposit_mode)
+    {
+        $userRechargeHistory = new UserRechargeHistory();
+        $status = UserRechargeHistory::UNDERWAYAUDIT;
+        $rechargeHistoryArr = $this->insertRechargeHistoryArr($userEloq->id, $userEloq->nickname, $userEloq->is_tester, $userEloq->top_id, $this->inputs['amount'], $auditFlowID, $status, $deposit_mode);
+        $userRechargeHistory->fill($rechargeHistoryArr);
+        $userRechargeHistory->save();
+        return $userRechargeHistory->company_order_num;
+    }
+
+    /**
+     * 插入user_recharge_log表
+     * @param  string $companyOrderNum 充值订单号
+     * @param  int $deposit_mode 充值模式 0自动 1手动
+     * @return [type]                  [description]
+     */
+    public function insertRechargeLog($companyOrderNum, $deposit_mode)
+    {
+        $rchargeLogeEloq = new UserRechargeLog();
+        $log_num = $this->log_uuid;
+        $rechargeLogArr = $this->insertRechargeLogArr($companyOrderNum, $log_num, $deposit_mode);
+        $rchargeLogeEloq->fill($rechargeLogArr);
+        $rchargeLogeEloq->save();
     }
 }
