@@ -325,7 +325,7 @@ class ArticlesController extends BackEndApiMainController
 
     /**
      * 发送站内消息给管理员审核
-     * @return [type] [description]
+     * @return void
      */
     public function sendMessage()
     {

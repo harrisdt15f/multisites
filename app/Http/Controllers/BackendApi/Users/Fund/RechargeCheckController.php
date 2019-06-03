@@ -163,6 +163,12 @@ class RechargeCheckController extends BackEndApiMainController
         $eloq->save();
     }
 
+    /**
+     * 发送站内消息给申请人
+     * @param  int $adminId 申请人id
+     * @param  string $message 消息内容
+     * @return void
+     */
     public function sendMessage($adminId, $message)
     {
         $messageClass = new InternalNoticeMessage();

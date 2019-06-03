@@ -192,7 +192,10 @@ class ArtificialRechargeController extends BackEndApiMainController
         return $insertSqlArr;
     }
 
-    //发送站内消息 提醒有权限的管理员审核
+    /**
+     * 发送站内消息 提醒有权限的管理员审核
+     * @return void
+     */
     public function sendMessage()
     {
         $messageClass = new InternalNoticeMessage();

@@ -87,6 +87,8 @@ class ActivityInfosController extends BackEndApiMainController
             $this->deleteCache();
             return $this->msgOut(true);
         } catch (\Exception $e) {
+            $ImageClass->deletePic($pic['path']);
+            $ImageClass->deletePic($thumbnail_path);
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);
@@ -128,7 +130,7 @@ class ActivityInfosController extends BackEndApiMainController
             return $this->msgOut(false, [], '100301');
         }
         $editData = $this->inputs;
-        //如果修改了图片 删除原图并且上传新图片
+        //如果修改了图片 上传新图片
         if (isset($this->inputs['pic'])) {
             //
             unset($editData['pic']);
@@ -180,11 +182,11 @@ class ActivityInfosController extends BackEndApiMainController
                 $this->eloqM::where('id', $this->inputs['id'])->delete();
                 //排序
                 $this->eloqM::where('sort', '>', $pastData['sort'])->decrement('sort');
+                DB::commit();
                 //删除图片
                 $ImageClass = new ImageArrange();
                 $ImageClass->deletePic(substr($pastData['pic_path'], 1));
                 $ImageClass->deletePic(substr($pastData['thumbnail_path'], 1));
-                DB::commit();
                 //删除前台首页缓存
                 $this->deleteCache();
                 return $this->msgOut(true);
