@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-01 16:09:24
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-01 17:31:31
+ * @Last Modified time: 2019-06-03 11:02:22
  */
 namespace App\Lib\Common;
 
@@ -52,5 +52,14 @@ class InternalNoticeMessage
             $noticeMessage->fill($data);
             $noticeMessage->save();
         }
+    }
+
+    /**
+     * 插入站内消息
+     */
+    public function insertMessage($type, $message, $adminsArr, $send_id = null)
+    {
+        $message_id = $this->createNoticeMessages($type, $message);
+        $this->createInternalNotice($adminsArr, $message_id, $send_id);
     }
 }

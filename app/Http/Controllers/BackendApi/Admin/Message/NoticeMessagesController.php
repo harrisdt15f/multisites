@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-01 14:29:10
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-01 18:01:25
+ * @Last Modified time: 2019-06-03 10:58:54
  */
 
 namespace App\Http\Controllers\BackendApi\Admin\Message;
@@ -60,10 +60,7 @@ class NoticeMessagesController extends BackEndApiMainController
             $messageClass = new InternalNoticeMessage();
             $type = NoticeMessage::ARTIFICIAL;
             $message = $this->inputs['message'];
-            //插入notice_messages表
-            $messageId = $messageClass->createNoticeMessages($type, $message);
-            //插入internal_messages表
-            $messageClass->createInternalNotice($adminsArr, $messageId, $this->partnerAdmin->id);
+            $messageId = $messageClass->insertMessage($type, $message, $adminsArr, $this->partnerAdmin->id);
             DB::commit();
             return $this->msgOut(true);
         } catch (Exception $e) {
