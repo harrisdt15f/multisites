@@ -68,12 +68,13 @@ class RechargeCheckController extends BackEndApiMainController
             $historyEdit = ['status' => $historyEloq::AUDITSUCCESS];
             $historyEloq->fill($historyEdit);
             $historyEloq->save();
-            //用户金额表
+            //修改audit_flow审核表
             $userData = UserHandleModel::where('id', $rechargeLog->user_id)->with('account')->first();
-            $balance = $userData->account->balance + $rechargeLog['amount'];
-            $UserAccountsEdit = ['balance' => $balance];
+            $balance = $userData->account->balance + $rechargeLog->amount;
             $this->auditFlowEdit($auditFlow, $this->partnerAdmin, $this->inputs['auditor_note']);
+            //修改用户金额
             $UserAccounts = HandleUserAccounts::where('user_id', $rechargeLog->user_id)->first();
+            $UserAccountsEdit = ['balance' => $balance];
             $editStatus = HandleUserAccounts::where(function ($query) use ($UserAccounts) {
                 $query->where('user_id', $UserAccounts->user_id)
                     ->where('updated_at', $UserAccounts->updated_at);
