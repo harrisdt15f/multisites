@@ -4,8 +4,13 @@ namespace App\Http\Controllers\BackendApi\Users\Fund;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\FundOperationRecharge;
+use App\Lib\Common\InternalNoticeMessage;
 use App\Models\Admin\Fund\FundOperation;
+use App\Models\Admin\Message\NoticeMessage;
+use App\Models\Admin\PartnerAdminGroupAccess;
+use App\Models\Admin\PartnerAdminUsers;
 use App\Models\AuditFlow;
+use App\Models\DeveloperUsage\Menu\PartnerMenus;
 use App\Models\User\Fund\ArtificialRechargeLog;
 use App\Models\User\UserHandleModel;
 use App\Models\User\UserRechargeHistory;
@@ -17,7 +22,7 @@ use Illuminate\Support\Facades\Validator;
 class ArtificialRechargeController extends BackEndApiMainController
 {
     protected $eloqM = 'User\UserHandleModel';
-
+    protected $message = '有新的人工充值需要审核';
     //人工充值 用户列表
     public function users(): JsonResponse
     {
@@ -84,6 +89,8 @@ class ArtificialRechargeController extends BackEndApiMainController
             $rechargeLogArr = $this->insertRechargeLogArr($userRechargeHistory->company_order_num, $log_num, $deposit_mode);
             $rchargeLogeEloq->fill($rechargeLogArr);
             $rchargeLogeEloq->save();
+            //发送站内消息 提醒有权限的管理员审核
+            $this->sendMessage();
             DB::commit();
             return $this->msgOut(true, [], '200', '操作成功，请等待管理员审核');
         } catch (Exception $e) {
@@ -185,4 +192,29 @@ class ArtificialRechargeController extends BackEndApiMainController
         return $insertSqlArr;
     }
 
+    //发送站内消息 提醒有权限的管理员审核
+    public function sendMessage()
+    {
+        $messageClass = new InternalNoticeMessage();
+        $type = NoticeMessage::AUDIT;
+        $roleId = PartnerMenus::where('en_name', 'recharge.check')->value('id');
+        $allGroup = PartnerAdminGroupAccess::select('id', 'role')->get();
+        $groupIds = [];
+        //获取有人工充值权限的组
+        foreach ($allGroup as $group) {
+            if ($group->role === '*') {
+                $groupIds[] = $group->id;
+            } else {
+                $roleArr = json_decode($group->role, true);
+                if (array_key_exists($roleId, $roleArr)) {
+                    $groupIds[] = $group->id;
+                }
+            }
+        }
+        //获取有人工充值权限的管理员
+        $admins = PartnerAdminUsers::select('id', 'group_id')->whereIn('group_id', $groupIds)->get();
+        if (!is_null($admins)) {
+            $messageClass->insertMessage($type, $this->message, $admins->toArray());
+        }
+    }
 }

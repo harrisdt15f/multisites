@@ -5,7 +5,10 @@ namespace App\Http\Controllers\BackendApi\Users\Fund;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\AccountChange;
 use App\Lib\Common\FundOperationRecharge;
+use App\Lib\Common\InternalNoticeMessage;
 use App\Models\Admin\Fund\FundOperation;
+use App\Models\Admin\Message\NoticeMessage;
+use App\Models\Admin\PartnerAdminUsers;
 use App\Models\AuditFlow;
 use App\Models\User\Fund\AccountChangeReport;
 use App\Models\User\Fund\AccountChangeType;
@@ -18,6 +21,8 @@ use Illuminate\Support\Facades\Validator;
 class RechargeCheckController extends BackEndApiMainController
 {
     protected $eloqM = 'User\Fund\ArtificialRechargeLog';
+    protected $successMessage = '你的人工充值申请已通过';
+    protected $failureMessage = '你的人工充值申请被驳回';
 
     public function detail()
     {
@@ -81,6 +86,8 @@ class RechargeCheckController extends BackEndApiMainController
             $accountChangeReportEloq = new AccountChangeReport();
             $accountChangeClass = new AccountChange();
             $accountChangeClass->addData($accountChangeReportEloq, $userData, $rechargeLog['amount'], $UserAccounts->balance, $balance, $accountChangeTypeEloq, $accountChangeTypeEloq);
+            //发送站内消息提醒管理员
+            $this->sendMessage($rechargeLog->admin_id, $this->successMessage);
             DB::commit();
             return $this->msgOut(true);
         } catch (Exception $e) {
@@ -105,6 +112,9 @@ class RechargeCheckController extends BackEndApiMainController
             return $this->msgOut(false, [], '100900');
         }
         $adminFundData = FundOperation::where('admin_id', $rechargeLog->admin_id)->first();
+        if (is_null($adminFundData)) {
+            return $this->msgOut(false, [], '100903');
+        }
         $newFund = $adminFundData->fund + $rechargeLog->amount;
         DB::beginTransaction();
         try {
@@ -130,6 +140,8 @@ class RechargeCheckController extends BackEndApiMainController
             $comment = '[充值审核失败额度返还]==>+' . $rechargeLog['amount'] . '|[目前额度]==>' . $newFund;
             $fundOperationClass = new FundOperationRecharge();
             $fundOperationClass->insertOperationDatas($rechargeLogeloqM, $type, $in_out, null, null, $auditFlow->admin_id, $auditFlow->admin_name, $rechargeLog->amount, $comment, null);
+            //发送站内消息提醒管理员
+            $this->sendMessage($rechargeLog->admin_id, $this->failureMessage);
             DB::commit();
             return $this->msgOut(true);
         } catch (Exception $e) {
@@ -149,5 +161,15 @@ class RechargeCheckController extends BackEndApiMainController
         ];
         $eloq->fill($editData);
         $eloq->save();
+    }
+
+    public function sendMessage($adminId, $message)
+    {
+        $messageClass = new InternalNoticeMessage();
+        $type = NoticeMessage::AUDIT;
+        $admin = PartnerAdminUsers::select('id', 'group_id')->find($adminId);
+        if (!is_null($admin)) {
+            $messageClass->insertMessage($type, $message, $admin->toArray());
+        }
     }
 }
