@@ -4,6 +4,9 @@ namespace App\Http\Controllers\BackendApi\Admin\Article;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\ImageArrange;
+use App\Lib\Common\InternalNoticeMessage;
+use App\Models\Admin\Message\NoticeMessage;
+use App\Models\Admin\PartnerAdminUsers;
 use App\Models\AuditFlow;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -13,6 +16,7 @@ use Illuminate\Support\Facades\Validator;
 class ArticlesController extends BackEndApiMainController
 {
     protected $eloqM = 'Admin\Activity\Articles';
+    protected $message = '有新的文章需要审核';
 
     //文章列表
     public function detail(): JsonResponse
@@ -44,47 +48,35 @@ class ArticlesController extends BackEndApiMainController
         if (!is_null($pastData)) {
             return $this->msgOut(false, [], '100500');
         }
-        $sortdata = $this->eloqM::orderBy('sort', 'desc')->first();
-        if (is_null($sortdata)) {
-            $sort = 1;
-        } else {
-            $sort = $sortdata['sort'] + 1;
-        }
-        $addDatas = $this->inputs;
-        unset($addDatas['pic_name']);
-        $addDatas['status'] = 0;
-        $addDatas['add_admin_id'] = $this->partnerAdmin['id'];
-        $addDatas['last_update_admin_id'] = $this->partnerAdmin['id'];
-        $addDatas['sort'] = $sort;
-        if (array_key_exists('pic_path', $this->inputs) && !empty($this->inputs['pic_path'])) {
-            $addDatas['pic_path'] = implode('|', $this->inputs['pic_path']);
-        }
-        $flowDatas = [
-            'admin_id' => $this->partnerAdmin['id'],
-            'apply_note' => $this->inputs['apply_note'],
-            'admin_name' => $this->partnerAdmin['name'],
-        ];
         try {
-            $flowConfigure = new AuditFlow;
-            $flowConfigure->fill($flowDatas);
-            $flowConfigure->save();
-            $configure = new $this->eloqM();
-            $addDatas['audit_flow_id'] = $flowConfigure->id;
-            $configure->fill($addDatas);
-            $configure->save();
+            //插入 audit_flow 审核表
+            $auditFlowId = $this->insertAuditFlow($this->inputs['apply_note']);
+            //插入 partner_articles 文章表
+            $addDatas = $this->inputs;
+            unset($addDatas['pic_name']);
+            $sortdata = $this->eloqM::orderBy('sort', 'desc')->first();
+            if (is_null($sortdata)) {
+                $sort = 1;
+            } else {
+                $sort = $sortdata['sort'] + 1;
+            }
+            $addDatas['sort'] = $sort;
+            $addDatas['status'] = 0;
+            $addDatas['add_admin_id'] = $this->partnerAdmin['id'];
+            $addDatas['last_update_admin_id'] = $this->partnerAdmin['id'];
+            if (array_key_exists('pic_path', $this->inputs) && !empty($this->inputs['pic_path'])) {
+                $addDatas['pic_path'] = implode('|', $this->inputs['pic_path']);
+            }
+            $articlesEloq = new $this->eloqM();
+            $addDatas['audit_flow_id'] = $auditFlowId;
+            $articlesEloq->fill($addDatas);
+            $articlesEloq->save();
             //文章发布成功  销毁缓存
             if (array_key_exists('pic_path', $this->inputs)) {
-                if (Cache::has('CachePic')) {
-                    $CachePic = Cache::get('CachePic');
-                    foreach ($this->inputs['pic_name'] as $k => $v) {
-                        if (array_key_exists($v, $CachePic)) {
-                            unset($CachePic[$v]);
-                        }
-                    }
-                    $minutes = 2 * 24 * 60;
-                    Cache::put('CachePic', $CachePic, $minutes);
-                }
+                $this->deleteCachePic($this->inputs['pic_name']);
             }
+            //发送站内消息给管理员审核
+            $this->sendMessage();
             return $this->msgOut(true);
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
@@ -115,46 +107,34 @@ class ArticlesController extends BackEndApiMainController
         if (!is_null($pastData)) {
             return $this->msgOut(false, [], '100500');
         }
-        $editDataEloq = $this->eloqM::find($this->inputs['id']);
-        $past_pic_path = $editDataEloq->pic_path;
-        $editDatas = $this->inputs;
-        unset($editDatas['pic_name']);
-        unset($editDatas['pic_name']);
-        unset($editDatas['apply_note']);
-        $this->editAssignment($editDataEloq, $editDatas);
-        $editDataEloq->status = 0;
-        $editDataEloq->last_update_admin_id = $this->partnerAdmin['id'];
-        $flowDatas = [
-            'admin_id' => $this->partnerAdmin['id'],
-            'apply_note' => $this->inputs['apply_note'],
-            'admin_name' => $this->partnerAdmin['name'],
-        ];
         try {
-            //获取图片路径
+            //插入 audit_flow 审核表
+            $auditFlowId = $this->insertAuditFlow($this->inputs['apply_note']);
+            $editDataEloq->audit_flow_id = $auditFlowId;
+            //
+            $editDataEloq = $this->eloqM::find($this->inputs['id']);
+            $pastPicPath = $editDataEloq->pic_path;
+            $editDatas = $this->inputs;
+            unset($editDatas['pic_name']);
+            unset($editDatas['pic_name']);
+            unset($editDatas['apply_note']);
+            $this->editAssignment($editDataEloq, $editDatas);
+            $editDataEloq->status = 0;
+            $editDataEloq->last_update_admin_id = $this->partnerAdmin['id'];
+            //查看是否修改图片
             $new_pic_path = $this->inputs['pic_path'];
-            if ($new_pic_path != $past_pic_path) {
+            if ($new_pic_path != $pastPicPath) {
                 //销毁缓存
-                $CachePic = Cache::get('CachePic');
-                foreach ($this->inputs['pic_name'] as $k => $v) {
-                    if (array_key_exists($v, $CachePic)) {
-                        unset($CachePic[$v]);
-                    }
-                }
-                $minutes = 2 * 24 * 60;
-                Cache::put('CachePic', $CachePic, $minutes);
+                $this->deleteCachePic($this->inputs['pic_name']);
                 //删除原图
-                $ImageClass = new ImageArrange();
-                $past_pic_path_arr = explode('|', $past_pic_path);
-                foreach ($past_pic_path_arr as $k => $v) {
-                    $ImageClass->deletePic($v);
-                }
+                $pastPicPathArr = explode('|', $pastPicPath);
+                $this->deleteImg($pastPicPathArr);
+                //
                 $editDataEloq->pic_path = implode('|', $new_pic_path);
             }
-            $flowConfigure = new AuditFlow;
-            $flowConfigure->fill($flowDatas);
-            $flowConfigure->save();
-            $editDataEloq->audit_flow_id = $flowConfigure->id;
             $editDataEloq->save();
+            //发送站内消息给管理员审核
+            $this->sendMessage();
             return $this->msgOut(true);
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
@@ -173,17 +153,15 @@ class ArticlesController extends BackEndApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
-        $pic_path = explode('|', $pastData['pic_path']);
+        $picPathArr = explode('|', $pastData['pic_path']);
         if (!is_null($pastData)) {
             DB::beginTransaction();
             try {
                 $this->eloqM::where('id', $this->inputs['id'])->delete();
                 //排序
                 $this->eloqM::where('sort', '>', $pastData['sort'])->decrement('sort');
-                $ImageClass = new ImageArrange();
-                foreach ($pic_path as $k => $v) {
-                    $ImageClass->deletePic($v);
-                }
+                //删除图片
+                $this->deleteImg($picPathArr);
                 DB::commit();
                 return $this->msgOut(true);
             } catch (\Exception $e) {
@@ -293,5 +271,68 @@ class ArticlesController extends BackEndApiMainController
         }
         Cache::put('CachePic', $CachePic, $minutes);
         return $this->msgOut(true, $pic);
+    }
+
+    /**
+     * 删除图片缓存
+     * @param  array $picNames 图片名称
+     * @return void
+     */
+    public function deleteCachePic(array $picNames)
+    {
+        if (Cache::has('CachePic')) {
+            $CachePic = Cache::get('CachePic');
+            foreach ($picNames as $picName) {
+                if (array_key_exists($picName, $CachePic)) {
+                    unset($CachePic[$picName]);
+                }
+            }
+            $minutes = 2 * 24 * 60;
+            Cache::put('CachePic', $CachePic, $minutes);
+        }
+    }
+
+    /**
+     * insertAuditFlow 插入审核表
+     * @param string $apply_note 备注
+     * @return int $id
+     */
+    public function insertAuditFlow($apply_note)
+    {
+        $flowDatas = [
+            'admin_id' => $this->partnerAdmin['id'],
+            'apply_note' => $apply_note,
+            'admin_name' => $this->partnerAdmin['name'],
+        ];
+        $flowConfigure = new AuditFlow;
+        $flowConfigure->fill($flowDatas);
+        $flowConfigure->save();
+        return $flowConfigure->id;
+    }
+
+    /**
+     * 删除图片
+     * @param  array $imgArr
+     * @return void
+     */
+    public function deleteImg(array $imgArr)
+    {
+        $ImageClass = new ImageArrange();
+        foreach ($imgArr as $imgPath) {
+            $ImageClass->deletePic($imgPath);
+        }
+    }
+
+    /**
+     * 发送站内消息给管理员审核
+     * @return [type] [description]
+     */
+    public function sendMessage()
+    {
+        $messageClass = new InternalNoticeMessage();
+        $type = NoticeMessage::AUDIT;
+        $message = $this->message;
+        $adminsArr = PartnerAdminUsers::select('id', 'group_id')->where('group_id', 1)->get()->toArray();
+        $messageClass->insertMessage($type, $message, $adminsArr);
     }
 }
