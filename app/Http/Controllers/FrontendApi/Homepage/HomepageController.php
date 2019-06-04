@@ -6,6 +6,7 @@ use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Models\Admin\Activity\ActivityInfos;
 use App\Models\Admin\Homepage\HomepageRotationChart;
 use App\Models\Admin\Homepage\PopularLotteries;
+use App\Models\Admin\Homepage\PopularMethods;
 use App\Models\Admin\Notice\Notice;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
@@ -58,11 +59,11 @@ class HomepageController extends FrontendApiMainController
         return $this->msgOut(true, $datas);
     }
 
-    //热门彩种一
-    public function popularLotteriesOne()
+    //热门彩票
+    public function popularLotteries()
     {
-        if (Cache::has('popularLotteriesOne')) {
-            $datas = Cache::get('popularLotteriesOne');
+        if (Cache::has('popularLotteries')) {
+            $datas = Cache::get('popularLotteries');
         } else {
             $lotteriesEloq = $this->eloqM::select('show_num', 'status')->where('key', 'popularLotteries.one')->first();
             if ($lotteriesEloq->status !== 1) {
@@ -70,36 +71,39 @@ class HomepageController extends FrontendApiMainController
             }
             $dataEloq = PopularLotteries::select('id', 'lotteries_id', 'pic_path')->with(['lotteries' => function ($query) {
                 $query->select('id', 'day_issue', 'en_name');
-            }])->where('type', 1)->orderBy('sort', 'asc')->limit($lotteriesEloq->show_num)->get();
+            }])->orderBy('sort', 'asc')->limit($lotteriesEloq->show_num)->get();
             $datas = [];
             foreach ($dataEloq as $key => $dataIthem) {
                 $datas[$key]['en_name'] = $dataIthem->lotteries->en_name;
                 $datas[$key]['pic_path'] = $dataIthem->pic_path;
                 $datas[$key]['day_issue'] = $dataIthem->lotteries->day_issue;
             }
-            Cache::forever('popularLotteriesOne', $datas);
+            Cache::forever('popularLotteries', $datas);
         }
         return $this->msgOut(true, $datas);
     }
 
-    //热门彩种二
-    public function popularLotteriesTwo()
+    //热门玩法
+    public function popularMethods()
     {
-        if (Cache::has('popularLotteriesTwo')) {
-            $datas = Cache::get('popularLotteriesTwo');
+        if (Cache::has('popularMethods')) {
+            $datas = Cache::get('popularMethods');
         } else {
             $lotteriesEloq = $this->eloqM::select('show_num', 'status')->where('key', 'popularLotteries.two')->first();
             if ($lotteriesEloq->status !== 1) {
                 return $this->msgOut(false, [], '400', $this->offMsg);
             }
-            $dataEloq = PopularLotteries::select('id', 'lotteries_id')->with(['lotteries' => function ($query) {
-                $query->select('id', 'cn_name', 'en_name');
-            }])->where('type', 2)->orderBy('sort', 'asc')->limit($lotteriesEloq->show_num)->get();
+            $methodsEloq = popularMethods::orderBy('sort', 'asc')->limit($lotteriesEloq->show_num)->with('method')->get();
             $datas = [];
-            foreach ($dataEloq as $dataIthem) {
-                $datas[$dataIthem->lotteries->en_name] = $dataIthem->lotteries->cn_name;
+            foreach ($methodsEloq as $method) {
+                $data = [
+                    'method_id' => $method->method_id,
+                    'lottery_name' => $method->method->lottery_name,
+                    'method_name' => $method->method->method_name,
+                ];
+                $datas[] = $data;
             }
-            Cache::forever('popularLotteriesTwo', $datas);
+            Cache::forever('popularMethods', $datas);
         }
         return $this->msgOut(true, $datas);
     }

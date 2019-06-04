@@ -13,10 +13,10 @@ Route::group(['prefix' => 'homepage', 'namespace' => 'Homepage'], function () {
     Route::match(['get', 'options'], 'show-homepage-model', ['as' => $namePrefix . 'show-homepage-model', 'uses' => $controller . 'showHomepageModel']);
     //轮播图
     Route::match(['get', 'options'], 'banner', ['as' => $namePrefix . 'banner', 'uses' => $controller . 'banner']);
-    //热门彩种一
-    Route::match(['get', 'options'], 'popular-lotteries-one', ['as' => $namePrefix . 'popular-lotteries-one', 'uses' => $controller . 'popularLotteriesOne']);
-    //热门彩种二
-    Route::match(['get', 'options'], 'popular-lotteries-two', ['as' => $namePrefix . 'popular-lotteries-two', 'uses' => $controller . 'popularLotteriesTwo']);
+    //热门彩票
+    Route::match(['get', 'options'], 'popular-lotteries', ['as' => $namePrefix . 'popular-lotteries', 'uses' => $controller . 'popularLotteries']);
+    //热门玩法
+    Route::match(['get', 'options'], 'popular-methods', ['as' => $namePrefix . 'popular-methods', 'uses' => $controller . 'popularMethods']);
     //二维码
     Route::match(['get', 'options'], 'qrcode', ['as' => $namePrefix . 'qrcode', 'uses' => $controller . 'qrCode']);
     //热门活动
