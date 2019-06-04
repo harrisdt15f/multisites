@@ -3,17 +3,10 @@
 namespace App\Http\Controllers\FrontendApi;
 
 use App\Http\Controllers\Controller;
-use App\Models\Admin\PartnerAdminGroupAccess;
-use App\Models\DeveloperUsage\Backend\PartnerAdminRoute;
-use App\Models\DeveloperUsage\Menu\PartnerMenus;
-use App\Models\PlatForms;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
 class FrontendApiMainController extends Controller
@@ -37,6 +30,7 @@ class FrontendApiMainController extends Controller
      */
     public function __construct()
     {
+        $this->middleware('auth:frontend-web', ['except' => ['logo','login']]);
         $this->middleware(function ($request, $next) {
             $this->currentAuth = auth($this->currentGuard);
             $this->partnerAdmin = $this->currentAuth->user();

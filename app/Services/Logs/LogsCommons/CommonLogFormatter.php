@@ -6,12 +6,12 @@
  * Time: 9:59 AM
  */
 
-namespace App\Services\ApiLogs;
+namespace App\Services\Logs\LogsCommons;
 
 use Illuminate\Support\Str;
 use Monolog\Formatter\NormalizerFormatter;
 
-class ApiLogFormatter extends NormalizerFormatter
+class CommonLogFormatter extends NormalizerFormatter
 {
     /**
      * type

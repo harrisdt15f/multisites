@@ -6,42 +6,39 @@
  * Time: 9:51 AM
  */
 
-namespace App\Services\ApiLogs;
+namespace App\Services\WebLogs;
 
-use App\Models\Admin\PartnerLogsApi;
-use App\Models\DeveloperUsage\Backend\PartnerAdminRoute;
+use App\Models\Admin\Logs;
+use Illuminate\Support\Facades\Log;
 use Jenssegers\Agent\Agent;
 
-class ApiLogProcessor
+class LogProcessor
 {
 
     public function __invoke(array $record)
     {
         $agent = new Agent();
-
         $os = $agent->platform();
         $osVersion = $agent->version($os);
         $browser = $agent->browser();
         $bsVersion = $agent->version($browser);
         $robot = $agent->robot();
         if ($agent->isRobot()) {
-            $type = PartnerLogsApi::ROBOT;
+            $type = Logs::ROBOT;
         } elseif ($agent->isDesktop()) {
-            $type = PartnerLogsApi::DESKSTOP;
+            $type = Logs::DESKSTOP;
         } elseif ($agent->isTablet()) {
-            $type = PartnerLogsApi::TABLET;
+            $type = Logs::TABLET;
         } elseif ($agent->isMobile()) {
-            $type = PartnerLogsApi::MOBILE;
+            $type = Logs::MOBILE;
         } elseif ($agent->isPhone()) {
-            $type = PartnerLogsApi::PHONE;
+            $type = Logs::PHONE;
         } else {
-            $type = PartnerLogsApi::OTHER;
+            $type = Logs::OTHER;
         }
         $messageArr = json_decode($record['message'], true);
-        $adminUser = auth()->user() ? auth()->user()->id : null;
         $record['extra'] = [
-            'admin_id' => $adminUser,
-            'admin_name' => !is_null($adminUser) ? auth()->user()->name : null,
+            'user_id' => auth()->user() ? auth()->user()->id : null,
             'origin' => request()->headers->get('origin'),
             'ip' => request()->ip(),
             'ips' => json_encode(request()->ips()),
@@ -52,7 +49,6 @@ class ApiLogProcessor
             'browser' => $browser,
             'bs_version' => $bsVersion,
             'device_type' => $type,
-            'log_uuid' => $messageArr['log_uuid'],
         ];
         if ($osVersion) {
             $record['extra']['os_version'] = $osVersion;
@@ -65,13 +61,6 @@ class ApiLogProcessor
         }
         if (isset($messageArr['route'])) {
             $record['extra']['route'] = json_encode($messageArr['route']);
-            $routeEloq = PartnerAdminRoute::where('route_name', $messageArr['route']['action']['as'])->first();
-            if (!is_null($routeEloq)) {
-                $record['extra']['route_id'] = $routeEloq->id;
-                $record['extra']['menu_id'] = $routeEloq->menu->id ?? null;
-                $record['extra']['menu_label'] = $routeEloq->menu->label ?? null;
-                $record['extra']['menu_path'] = $routeEloq->menu->route ?? null;
-            }
             $record['message'] = '网络操作信息';
         }
         return $record;

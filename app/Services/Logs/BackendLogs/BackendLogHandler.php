@@ -6,12 +6,13 @@
  * Time: 9:48 AM
  */
 
-namespace App\Services\Logs;
+namespace App\Services\Logs\BackendLogs;
 
+use App\Services\Logs\LogsCommons\CommonLogFormatter;
 use Monolog\Logger;
 use Monolog\Handler\AbstractProcessingHandler;
 
-class LogHandler extends AbstractProcessingHandler
+class BackendLogHandler extends AbstractProcessingHandler
 {
     public function __construct($level = Logger::DEBUG)
     {
@@ -21,7 +22,7 @@ class LogHandler extends AbstractProcessingHandler
     protected function write(array $record)
     {
         // Queue implementation
-         event(new LogMonologEvent($record));
+        event(new BackendLogMonologEvent($record));
     }
 
     /**
@@ -29,7 +30,7 @@ class LogHandler extends AbstractProcessingHandler
      */
     protected function getDefaultFormatter()
     {
-        return new LogFormatter();
+        return new CommonLogFormatter();
     }
 
 }

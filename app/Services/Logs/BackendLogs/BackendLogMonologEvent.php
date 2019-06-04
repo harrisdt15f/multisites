@@ -6,11 +6,11 @@
  * Time: 10:37 AM
  */
 
-namespace App\Services\ApiLogs;
+namespace App\Services\Logs\BackendLogs;
 
 use Illuminate\Queue\SerializesModels;
 
-class ApiLogMonologEvent
+class BackendLogMonologEvent
 {
     use SerializesModels;
     /**
