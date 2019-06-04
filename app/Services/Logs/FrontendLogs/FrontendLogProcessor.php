@@ -37,10 +37,10 @@ class FrontendLogProcessor
             $type = PartnerLogsApi::OTHER;
         }
         $messageArr = json_decode($record['message'], true);
-        $adminUser = auth()->user() ? auth()->user()->id : null;
+        $userId = auth()->user() ? auth()->user()->id : null;
         $record['extra'] = [
-            'admin_id' => $adminUser,
-            'admin_name' => !is_null($adminUser) ? auth()->user()->name : null,
+            'user_id' => $userId,
+            'username' => !is_null($userId) ? auth()->user()->username : null,
             'origin' => request()->headers->get('origin'),
             'ip' => request()->ip(),
             'ips' => json_encode(request()->ips()),
@@ -62,7 +62,7 @@ class FrontendLogProcessor
         if (isset($messageArr['input'])) {
             $record['extra']['inputs'] = json_encode($messageArr['input']);
         }
-        if (isset($messageArr['route'])) {
+        /*if (isset($messageArr['route'])) {
             $record['extra']['route'] = json_encode($messageArr['route']);
             $routeEloq = PartnerAdminRoute::where('route_name', $messageArr['route']['action']['as'])->first();
             if (!is_null($routeEloq)) {
@@ -72,7 +72,7 @@ class FrontendLogProcessor
                 $record['extra']['menu_path'] = $routeEloq->menu->route ?? null;
             }
             $record['message'] = '网络操作信息';
-        }
+        }*/
         return $record;
     }
 }

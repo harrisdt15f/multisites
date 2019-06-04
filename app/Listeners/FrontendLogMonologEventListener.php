@@ -8,7 +8,7 @@
 
 namespace App\Listeners;
 
-use App\Models\Admin\Logs;
+use App\Models\Admin\FrontendApiLog;
 use App\Services\Logs\FrontendLogs\FrontendLogMonologEvent;
 use App\Services\WebLogs\LogMonologEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -22,7 +22,7 @@ class FrontendLogMonologEventListener implements ShouldQueue
     protected $log;
     protected $recordedDays;
 
-    public function __construct(Logs $log)
+    public function __construct(FrontendApiLog $log)
     {
         $this->log = $log;
     }
