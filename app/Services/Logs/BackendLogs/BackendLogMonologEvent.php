@@ -6,11 +6,11 @@
  * Time: 10:37 AM
  */
 
-namespace App\Services\Logs\LogsCommons;
+namespace App\Services\Logs\BackendLogs;
 
 use Illuminate\Queue\SerializesModels;
 
-class CommonLogMonologEvent
+class BackendLogMonologEvent
 {
     use SerializesModels;
     /**

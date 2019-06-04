@@ -8,7 +8,6 @@
 
 namespace App\Services\Logs\BackendLogs;
 
-use App\Services\Logs\LogsCommons\CommonLogHandler;
 use Monolog\Logger;
 
 class BackendLogMonolog
@@ -22,7 +21,7 @@ class BackendLogMonolog
     public function __invoke(array $config)
     {
         $logger = new Logger('apibyqueue');
-        $logger->pushHandler(new CommonLogHandler());
+        $logger->pushHandler(new BackendLogHandler());
         $logger->pushProcessor(new BackendLogProcessor());
         return $logger;
     }
