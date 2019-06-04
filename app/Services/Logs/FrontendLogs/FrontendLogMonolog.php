@@ -6,13 +6,11 @@
  * Time: 9:45 AM
  */
 
-namespace App\Services\WebLogs;
+namespace App\Services\Logs\FrontendLogs;
 
-
-use App\Services\LogsCommons\CommonLogHandler;
 use Monolog\Logger;
 
-class LogMonolog
+class FrontendLogMonolog
 {
     /**
      * Create a custom Monolog instance.
@@ -22,9 +20,9 @@ class LogMonolog
      */
     public function __invoke(array $config)
     {
-        $logger = new Logger('byqueue');
-        $logger->pushHandler(new CommonLogHandler());
-        $logger->pushProcessor(new LogProcessor());
+        $logger = new Logger('frontend-by-queue');
+        $logger->pushHandler(new FrontendLogHandler());
+        $logger->pushProcessor(new FrontendLogProcessor());
         return $logger;
     }
 

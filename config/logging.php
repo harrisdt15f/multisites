@@ -2,7 +2,7 @@
 
 use App\Services\GraylogSetup;
 use App\Services\Logs\BackendLogs\BackendLogMonolog;
-use App\Services\WebLogs\LogMonolog;
+use App\Services\Logs\FrontendLogs\FrontendLogMonolog;
 use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -111,9 +111,14 @@ return [
             ],
             'formatter' => GelfMessageFormatter::class
         ],
-        'byqueue' => [
+        /*'byqueue' => [
             'driver' => 'custom',
             'via' => LogMonolog::class,
+
+        ],*/
+        'frontend-by-queue' => [
+            'driver' => 'custom',
+            'via' => FrontendLogMonolog::class,
 
         ],
         'apibyqueue' => [

@@ -3,8 +3,8 @@
 namespace App\Providers;
 
 use App\Events\IssueGenerateEvent;
-use App\Listeners\ApiLogMonologEventListener;
-use App\Listeners\LogMonologEventListener;
+use App\Listeners\BackendLogMonologEventListener;
+use App\Listeners\FrontendLogMonologEventListener;
 use App\Listeners\IssueGenerateEventListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -27,8 +27,8 @@ class EventServiceProvider extends ServiceProvider
     ];
 
     protected $subscribe = [
-        LogMonologEventListener::class,
-        ApiLogMonologEventListener::class,
+        FrontendLogMonologEventListener::class,
+        BackendLogMonologEventListener::class,
     ];
 
     /**
