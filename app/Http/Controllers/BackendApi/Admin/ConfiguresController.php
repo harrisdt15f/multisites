@@ -81,11 +81,11 @@ class ConfiguresController extends BackEndApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $checkSign = $this->eloqM::where('sign', $this->inputs['sign'])->where('id', '!=', $this->inputs['id'])->exists();
-        if ($pastData === true) {
+        if ($checkSign === true) {
             return $this->msgOut(false, [], '100700');
         }
         $pastDataEloq = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastData)) {
+        if (is_null($pastDataEloq)) {
             return $this->msgOut(false, [], '100701');
         }
         $editDatas = $this->inputs;
