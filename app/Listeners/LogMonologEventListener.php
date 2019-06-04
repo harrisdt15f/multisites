@@ -10,6 +10,7 @@ namespace App\Listeners;
 
 use App\Models\Admin\Logs;
 use App\Services\Logs\LogMonologEvent;
+use App\Services\LogsCommons\CommonLogMonologEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -54,7 +55,7 @@ class LogMonologEventListener implements ShouldQueue
     {
         try {
             $events->listen(
-                LogMonologEvent::class,
+                CommonLogMonologEvent::class,
                 'App\Listeners\LogMonologEventListener@onLog'
             );
         } catch (\Exception $e) {

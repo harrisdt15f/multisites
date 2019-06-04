@@ -9,6 +9,7 @@
 namespace App\Services\Logs;
 
 
+use App\Services\LogsCommons\CommonLogHandler;
 use Monolog\Logger;
 
 class LogMonolog
@@ -17,12 +18,12 @@ class LogMonolog
      * Create a custom Monolog instance.
      *
      * @param  array  $config
-     * @return \Monolog\Logger
+     * @return Logger
      */
     public function __invoke(array $config)
     {
         $logger = new Logger('byqueue');
-        $logger->pushHandler(new LogHandler());
+        $logger->pushHandler(new CommonLogHandler());
         $logger->pushProcessor(new LogProcessor());
         return $logger;
     }

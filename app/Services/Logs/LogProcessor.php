@@ -18,7 +18,6 @@ class LogProcessor
     public function __invoke(array $record)
     {
         $agent = new Agent();
-
         $os = $agent->platform();
         $osVersion = $agent->version($os);
         $browser = $agent->browser();
