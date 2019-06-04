@@ -6,13 +6,12 @@
  * Time: 9:45 AM
  */
 
-namespace App\Services\Logs;
-
+namespace App\Services\BackendLogs;
 
 use App\Services\LogsCommons\CommonLogHandler;
 use Monolog\Logger;
 
-class LogMonolog
+class ApiLogMonolog
 {
     /**
      * Create a custom Monolog instance.
@@ -22,9 +21,9 @@ class LogMonolog
      */
     public function __invoke(array $config)
     {
-        $logger = new Logger('byqueue');
+        $logger = new Logger('apibyqueue');
         $logger->pushHandler(new CommonLogHandler());
-        $logger->pushProcessor(new LogProcessor());
+        $logger->pushProcessor(new ApiLogProcessor());
         return $logger;
     }
 

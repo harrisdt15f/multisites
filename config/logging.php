@@ -1,8 +1,8 @@
 <?php
 
 use App\Services\GraylogSetup;
-use App\Services\ApiLogs\ApiLogMonolog;
-use App\Services\Logs\LogMonolog;
+use App\Services\BackendLogs\ApiLogMonolog;
+use App\Services\WebLogs\LogMonolog;
 use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;

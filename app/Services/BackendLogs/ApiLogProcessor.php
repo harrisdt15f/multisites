@@ -6,7 +6,7 @@
  * Time: 9:51 AM
  */
 
-namespace App\Services\ApiLogs;
+namespace App\Services\BackendLogs;
 
 use App\Models\Admin\PartnerLogsApi;
 use App\Models\DeveloperUsage\Backend\PartnerAdminRoute;

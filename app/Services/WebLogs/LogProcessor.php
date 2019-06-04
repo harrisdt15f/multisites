@@ -6,7 +6,7 @@
  * Time: 9:51 AM
  */
 
-namespace App\Services\Logs;
+namespace App\Services\WebLogs;
 
 use App\Models\Admin\Logs;
 use Illuminate\Support\Facades\Log;
