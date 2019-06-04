@@ -21,6 +21,8 @@ class FrontendAppRouteController extends BackEndApiMainController
     {
         $validator = Validator::make($this->inputs, [
             'route_name' => 'required|string',
+            'controller' => 'required|string',
+            'method' => 'required|string',
             'frontend_model_id' => 'required|numeric',
             'title' => 'required|string',
         ]);
