@@ -52,6 +52,8 @@ class RouteController extends BackEndApiMainController
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
+            'controller' => 'required|string',
+            'method' => 'required|string',
             'menu_group_id' => 'required|numeric',
             'title' => 'required|string',
         ]);
