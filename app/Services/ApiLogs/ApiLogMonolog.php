@@ -8,7 +8,7 @@
 
 namespace App\Services\ApiLogs;
 
-
+use App\Services\LogsCommons\CommonLogHandler;
 use Monolog\Logger;
 
 class ApiLogMonolog
@@ -17,12 +17,12 @@ class ApiLogMonolog
      * Create a custom Monolog instance.
      *
      * @param  array  $config
-     * @return \Monolog\Logger
+     * @return Logger
      */
     public function __invoke(array $config)
     {
         $logger = new Logger('apibyqueue');
-        $logger->pushHandler(new ApiLogHandler());
+        $logger->pushHandler(new CommonLogHandler());
         $logger->pushProcessor(new ApiLogProcessor());
         return $logger;
     }

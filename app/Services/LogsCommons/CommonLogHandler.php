@@ -6,12 +6,12 @@
  * Time: 9:48 AM
  */
 
-namespace App\Services\ApiLogs;
+namespace App\Services\LogsCommons;
 
 use Monolog\Logger;
 use Monolog\Handler\AbstractProcessingHandler;
 
-class ApiLogHandler extends AbstractProcessingHandler
+class CommonLogHandler extends AbstractProcessingHandler
 {
     public function __construct($level = Logger::DEBUG)
     {
@@ -21,7 +21,7 @@ class ApiLogHandler extends AbstractProcessingHandler
     protected function write(array $record)
     {
         // Queue implementation
-        event(new ApiLogMonologEvent($record));
+        event(new CommonLogMonologEvent($record));
     }
 
     /**
@@ -29,7 +29,7 @@ class ApiLogHandler extends AbstractProcessingHandler
      */
     protected function getDefaultFormatter()
     {
-        return new ApiLogFormatter();
+        return new CommonLogFormatter();
     }
 
 }

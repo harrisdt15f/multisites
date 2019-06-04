@@ -9,7 +9,7 @@
 namespace App\Listeners;
 
 use App\Models\Admin\PartnerLogsApi;
-use App\Services\ApiLogs\ApiLogMonologEvent;
+use App\Services\LogsCommons\CommonLogMonologEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -53,7 +53,7 @@ class ApiLogMonologEventListener implements ShouldQueue
     {
         try {
             $events->listen(
-                ApiLogMonologEvent::class,
+                CommonLogMonologEvent::class,
                 'App\Listeners\ApiLogMonologEventListener@onLog'
             );
         } catch (\Exception $e) {
