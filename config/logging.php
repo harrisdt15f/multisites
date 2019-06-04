@@ -1,7 +1,7 @@
 <?php
 
 use App\Services\GraylogSetup;
-use App\Services\BackendLogs\ApiLogMonolog;
+use App\Services\Logs\BackendLogs\BackendLogMonolog;
 use App\Services\WebLogs\LogMonolog;
 use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Handler\StreamHandler;
@@ -118,7 +118,7 @@ return [
         ],
         'apibyqueue' => [
             'driver' => 'custom',
-            'via' => ApiLogMonolog::class,
+            'via' => BackendLogMonolog::class,
         ],
 
     ],

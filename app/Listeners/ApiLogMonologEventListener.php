@@ -9,7 +9,7 @@
 namespace App\Listeners;
 
 use App\Models\Admin\PartnerLogsApi;
-use App\Services\LogsCommons\CommonLogMonologEvent;
+use App\Services\Logs\LogsCommons\CommonLogMonologEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;

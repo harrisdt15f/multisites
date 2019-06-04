@@ -6,7 +6,7 @@
  * Time: 9:59 AM
  */
 
-namespace App\Services\LogsCommons;
+namespace App\Services\Logs\LogsCommons;
 
 use Illuminate\Support\Str;
 use Monolog\Formatter\NormalizerFormatter;

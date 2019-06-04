@@ -6,7 +6,7 @@
  * Time: 9:48 AM
  */
 
-namespace App\Services\LogsCommons;
+namespace App\Services\Logs\LogsCommons;
 
 use Monolog\Logger;
 use Monolog\Handler\AbstractProcessingHandler;

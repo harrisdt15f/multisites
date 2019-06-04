@@ -6,7 +6,7 @@
  * Time: 10:37 AM
  */
 
-namespace App\Services\LogsCommons;
+namespace App\Services\Logs\LogsCommons;
 
 use Illuminate\Queue\SerializesModels;
 

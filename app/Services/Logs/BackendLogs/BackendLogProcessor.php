@@ -6,13 +6,13 @@
  * Time: 9:51 AM
  */
 
-namespace App\Services\BackendLogs;
+namespace App\Services\Logs\BackendLogs;
 
 use App\Models\Admin\PartnerLogsApi;
 use App\Models\DeveloperUsage\Backend\PartnerAdminRoute;
 use Jenssegers\Agent\Agent;
 
-class ApiLogProcessor
+class BackendLogProcessor
 {
 
     public function __invoke(array $record)

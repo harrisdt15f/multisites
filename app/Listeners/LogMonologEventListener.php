@@ -9,8 +9,8 @@
 namespace App\Listeners;
 
 use App\Models\Admin\Logs;
+use App\Services\Logs\LogsCommons\CommonLogMonologEvent;
 use App\Services\WebLogs\LogMonologEvent;
-use App\Services\LogsCommons\CommonLogMonologEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
