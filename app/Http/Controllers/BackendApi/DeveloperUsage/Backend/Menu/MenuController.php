@@ -30,28 +30,44 @@ class MenuController extends BackEndApiMainController
     public function allRequireInfos(): JsonResponse
     {
         $rule = [
-            'type' => 'required|integer|in:1,2,3',
+            'type' => 'required|integer|in:1,2,3,0',
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $type = [
-            1 => 'backend-api',
-            2 => 'web-api',
-            3 => 'mobile-api',
-        ];
-        $routeEndKey = $type[$this->inputs['type']] ?? $type[1];
-//        $firstlevelmenus = PartnerMenus::getFirstLevelList();
         $routeCollection = Route::getRoutes()->get();
+        if ($this->inputs['type'] == 0) {
+            foreach ($routeCollection as $key => $r) {
+                if (isset($r->action['as']) && $r->action['prefix'] !== '_debugbar') {
+                    $routeShortData[$key]['url'] = $r->uri;
+                    $routeShortData[$key]['controller'] = $r->action['controller'];
+                    $routeShortData[$key]['route_name'] = $r->action['as'];
+                    $routeInfo[] = $routeShortData[$key];
+                }
+            }
+        } else {
+            $type = [
+                1 => 'backend-api',
+                2 => 'web-api',
+                3 => 'mobile-api',
+            ];
+            $routeEndKey = $type[$this->inputs['type']] ?? $type[1];
+//        $firstlevelmenus = PartnerMenus::getFirstLevelList();
+
 //        $editMenu = PartnerMenus::all();
-        //        $routeMatchingName = $editMenu->where('route', '!=', '#')->keyBy('route')->toArray();
-        $routeInfo = [];
-        $registeredRoute = PartnerAdminRoute::pluck('route_name')->toArray();
-        foreach ($routeCollection as $key => $r) {
-            if (isset($r->action['as']) && $r->action['prefix'] !== '_debugbar' && preg_match('#^'.$routeEndKey.'#',
-                    $r->action['as']) === 1 && !in_array($r->action['as'], $registeredRoute)) {
-                $routeInfo[$r->action['as']] = $r->uri;
+            //        $routeMatchingName = $editMenu->where('route', '!=', '#')->keyBy('route')->toArray();
+            $routeInfo = [];
+            $registeredRoute = PartnerAdminRoute::pluck('route_name')->toArray();
+            foreach ($routeCollection as $key => $r) {
+                if (isset($r->action['as']) && $r->action['prefix'] !== '_debugbar' && preg_match('#^'.$routeEndKey.'#',
+                        $r->action['as']) === 1 && !in_array($r->action['as'], $registeredRoute)) {
+                    $routeShortData[$key]['url'] = $r->uri;
+                    $routeShortData[$key]['controller'] = $r->action['controller'];
+                    $routeShortData[$key]['route_name'] = $r->action['as'];
+                    $routeInfo[] = $routeShortData[$key];
+//                $routeInfo[$r->action['as']] = $r->uri;
+                }
             }
         }
 //        $data['firstlevelmenus'] = $firstlevelmenus;

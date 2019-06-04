@@ -30,13 +30,10 @@ Route::group([
     unset($aRouteFiles);
 });
 
-Route::group(['middleware' => ['frontend-api'], 'namespace' => 'FrontendApi', 'prefix' => 'web-api'], function () {
-    Route::match(['post', 'options'], 'login', ['as' => 'web-api.login', 'uses' => 'FrontendAuthController@login']);
-});
 Route::group([
-    'middleware' => ['frontend-api', 'auth:frontend-web'],
+    'middleware' => ['frontend-api'],
     'namespace' => 'FrontendApi',
-    'prefix' => 'web-api'
+    'prefix' => 'web-api',
 ], function () {
     $sRouteDir = base_path().'/routes/frontend/';
     $aRouteFiles = glob($sRouteDir.'*.php');

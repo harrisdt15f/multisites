@@ -6,6 +6,7 @@
  * Time: 12:44 PM
  */
 
+Route::match(['post', 'options'], 'login', ['as' => 'web-api.login', 'uses' => 'FrontendAuthController@login']);
 //管理总代用户与玩家
 Route::group(['prefix' => 'user'], function () {
     $namePrefix = 'web-api.FrontendAuthController.';
