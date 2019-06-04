@@ -1,51 +1,61 @@
 <?php
 
+/**
+ * @Author: LingPh
+ * @Date:   2019-06-04 14:38:55
+ * @Last Modified by:   LingPh
+ * @Last Modified time: 2019-06-04 16:48:43
+ */
 namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Lib\Common\ImageArrange;
-use App\Models\Game\Lottery\LotteriesModel;
+use App\Models\Admin\Homepage\HomeDefaultBetMethods;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class PopularLotteriesController extends BackEndApiMainController
+class PopularMethodsController extends BackEndApiMainController
 {
-    protected $eloqM = 'Admin\Homepage\PopularLotteries';
+    protected $eloqM = 'Admin\Homepage\PopularMethods';
 
-    //热门彩票列表
+    //热门玩法列表
     public function detail(): JsonResponse
     {
-        $lotterieEloqs = $this->eloqM::select('id', 'lotteries_id', 'pic_path', 'sort')->with(['lotteries' => function ($query) {
-            $query->select('id', 'cn_name');
+        $methodEloqs = $this->eloqM::with(['method' => function ($query) {
+            $query->select('id', 'lottery_name', 'method_name');
         }])->orderBy('sort', 'asc')->get();
         $datas = [];
-        foreach ($lotterieEloqs as $lotterie) {
+        foreach ($methodEloqs as $method) {
             $data = [
-                'id' => $lotterie->id,
-                'pic_path' => $lotterie->pic_path,
-                'cn_name' => $lotterie->lotteries->cn_name,
-                'sort' => $lotterie->sort,
+                'id' => $method->id,
+                'method_id' => $method->method_id,
+                'lottery_name' => $method->method->lottery_name,
+                'method_name' => $method->method->method_name,
+                'sort' => $method->sort,
             ];
             $datas[] = $data;
         }
         return $this->msgOut(true, $datas);
     }
 
-    //添加热门彩票
+    //添加玩法彩种
     public function add(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'lotteries_id' => 'required|numeric',
-            'pic' => 'required|image',
+            'method_id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $checkLotterie = $this->eloqM::where('lotteries_id', $this->inputs['lotteries_id'])->first();
-        if (!is_null($checkLotterie)) {
-            return $this->msgOut(false, [], '102000');
+        $checkData = $this->eloqM::where('method_id', $this->inputs['method_id'])->first();
+        if (!is_null($checkData)) {
+            return $this->msgOut(false, [], '102012');
+        }
+        //检查玩法是否存在
+        $checkMethod = HomeDefaultBetMethods::find($this->inputs['method_id']);
+        if (is_null($checkMethod)) {
+            return $this->msgOut(false, [], '102013');
         }
         //sort
         $maxSort = $this->eloqM::orderBy('sort', 'desc')->first();
@@ -54,23 +64,15 @@ class PopularLotteriesController extends BackEndApiMainController
         } else {
             $sort = $maxSort->sort + 1;
         }
-        //上传图片
-        $imgClass = new ImageArrange();
-        $depositPath = $imgClass->depositPath('popular_lotteries', $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
-        $pic = $imgClass->uploadImg($this->inputs['pic'], $depositPath);
-        if ($pic['success'] === false) {
-            return $this->msgOut(false, [], '400', $pic['msg']);
-        }
         $addData = [
-            'lotteries_id' => $this->inputs['lotteries_id'],
+            'method_id' => $this->inputs['method_id'],
             'sort' => $sort,
-            'pic_path' => '/' . $pic['path'],
         ];
         try {
             $popularLotteriesEloq = new $this->eloqM;
             $popularLotteriesEloq->fill($addData);
             $popularLotteriesEloq->save();
-            //清除首页热门彩票缓存
+            //清除首页热门玩法缓存
             $this->deleteCache();
             return $this->msgOut(true);
         } catch (Exception $e) {
@@ -81,62 +83,44 @@ class PopularLotteriesController extends BackEndApiMainController
         }
     }
 
-    //编辑热门彩票
+    //编辑热门玩法
     public function edit(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
-            'pic' => 'image',
-            'lotteries_id' => 'required|numeric',
+            'method_id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
         if (is_null($pastData)) {
-            return $this->msgOut(false, [], '102003');
+            return $this->msgOut(false, [], '102014');
         }
-        //检查彩种是否存在
-        $checkLotteries = LotteriesModel::find($this->inputs['lotteries_id']);
-        if (is_null($checkLotteries)) {
-            return $this->msgOut(false, [], '102011');
+        //检查玩法是否存在
+        $checkMethod = HomeDefaultBetMethods::find($this->inputs['method_id']);
+        if (is_null($checkMethod)) {
+            return $this->msgOut(false, [], '102013');
         }
-        //检查该热门类型是否存在重复彩票
-        $checkData = $this->eloqM::where('lotteries_id', $this->inputs['lotteries_id'])->where('id', '!=', $this->inputs['id'])->first();
+        //检查是否存在重复彩种
+        $checkData = $this->eloqM::where('method_id', $this->inputs['method_id'])->where('id', '!=', $this->inputs['id'])->first();
         if (!is_null($checkData)) {
-            return $this->msgOut(false, [], '102010');
-        }
-        //修改了图片的操作
-        if (isset($this->inputs['pic'])) {
-            $pastPic = $pastData->pic_path;
-            $imgClass = new ImageArrange();
-            $depositPath = $imgClass->depositPath('popular_lotteries', $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
-            $pic = $imgClass->uploadImg($this->inputs['pic'], $depositPath);
-            if ($pic['success'] === false) {
-                return $this->msgOut(false, [], '400', $pic['msg']);
-            }
-            $pastData->pic_path = '/' . $pic['path'];
+            return $this->msgOut(false, [], '102012');
         }
         try {
-            $pastData->lotteries_id = $this->inputs['lotteries_id'];
+            $pastData->method_id = $this->inputs['method_id'];
             $pastData->save();
-            if (isset($pastPic)) {
-                $imgClass->deletePic(substr($pastPic, 1));
-            }
-            //清除首页热门彩票缓存
+            //清除首页热门玩法缓存
             $this->deleteCache();
             return $this->msgOut(true);
         } catch (Exception $e) {
-            if (isset($pic)) {
-                $imgClass->deletePic($pic['path']);
-            }
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
 
-    //删除热门彩票
+    //删除热门玩法
     public function delete(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
@@ -147,19 +131,16 @@ class PopularLotteriesController extends BackEndApiMainController
         }
         $pastDataEloq = $this->eloqM::find($this->inputs['id']);
         if (is_null($pastDataEloq)) {
-            return $this->msgOut(false, [], '102005');
+            return $this->msgOut(false, [], '102014');
         }
-        $pastData = $pastDataEloq;
+        $sort = $pastDataEloq->sort;
         DB::beginTransaction();
         try {
             $pastDataEloq->delete();
             //重新排序
-            $datas = $this->eloqM::where('sort', '>', $pastData->sort)->decrement('sort');
+            $datas = $this->eloqM::where('sort', '>', $sort)->decrement('sort');
             DB::commit();
-            //删除图片
-            $imgClass = new ImageArrange();
-            $imgClass->deletePic(substr($pastData['pic_path'], 1));
-            //清除首页热门彩票缓存
+            //清除首页热门玩法缓存
             $this->deleteCache();
             return $this->msgOut(true);
         } catch (Exception $e) {
@@ -170,7 +151,7 @@ class PopularLotteriesController extends BackEndApiMainController
         }
     }
 
-    //热门彩票拉动排序
+    //热门玩法拉动排序
     public function sort(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
@@ -186,7 +167,7 @@ class PopularLotteriesController extends BackEndApiMainController
         $pastFrontData = $this->eloqM::find($this->inputs['front_id']);
         $pastRearwaysData = $this->eloqM::find($this->inputs['rearways_id']);
         if (is_null($pastFrontData) || is_null($pastRearwaysData)) {
-            return $this->msgOut(false, [], '102008');
+            return $this->msgOut(false, [], '102014');
         }
         DB::beginTransaction();
         try {
@@ -209,7 +190,7 @@ class PopularLotteriesController extends BackEndApiMainController
             }
             $stationaryData->save();
             DB::commit();
-            //清除首页热门彩票缓存
+            //清除首页热门玩法缓存
             $this->deleteCache();
             return $this->msgOut(true);
         } catch (\Exception $e) {
@@ -220,18 +201,22 @@ class PopularLotteriesController extends BackEndApiMainController
         }
     }
 
-    //选择的  彩种列表
-    public function lotteriesList(): JsonResponse
+    //添加热门玩法时选择的玩法列表
+    public function methodsList(): JsonResponse
     {
-        $lotteries = LotteriesModel::select('id', 'cn_name', 'en_name')->get();
-        return $this->msgOut(true, $lotteries);
+        $lotterys = HomeDefaultBetMethods::groupBy('lottery_name')->orderBy('id', 'asc')->pluck('lottery_name')->toArray();
+        $data = [];
+        foreach ($lotterys as $key => $lottery) {
+            $data[$lottery] = HomeDefaultBetMethods::select('id as method_id', 'method_name')->where('lottery_name', $lottery)->get()->toArray();
+        }
+        return $this->msgOut(true, $data);
     }
 
-    //删除 前台首页热门彩票缓存
+    //清除首页热门玩法缓存
     public function deleteCache()
     {
-        if (Cache::has('popularLotteries')) {
-            Cache::forget('popularLotteries');
+        if (Cache::has('popularMethods')) {
+            Cache::forget('popularMethods');
         }
     }
 }

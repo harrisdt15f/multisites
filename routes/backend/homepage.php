@@ -19,10 +19,8 @@ Route::group(['prefix' => 'homepage', 'namespace' => 'Admin\Homepage'], function
 Route::group(['prefix' => 'popular-lotteries', 'namespace' => 'Admin\Homepage'], function () {
     $namePrefix = 'backend-api.popularLotteries.';
     $controller = 'PopularLotteriesController@';
-    //热门彩票一 列表
-    Route::match(['get', 'options'], 'detail-one', ['as' => $namePrefix . 'detail-one', 'uses' => $controller . 'detailOne']);
-    //热门彩票二 列表
-    Route::match(['get', 'options'], 'detail-two', ['as' => $namePrefix . 'detail-two', 'uses' => $controller . 'detailTwo']);
+    //热门彩票列表
+    Route::match(['get', 'options'], 'detail', ['as' => $namePrefix . 'detail', 'uses' => $controller . 'detail']);
     //添加热门彩票
     Route::match(['post', 'options'], 'add', ['as' => $namePrefix . 'add', 'uses' => $controller . 'add']);
     //编辑热门彩票
@@ -32,5 +30,23 @@ Route::group(['prefix' => 'popular-lotteries', 'namespace' => 'Admin\Homepage'],
     //编辑热门彩票时选择的彩票列表
     Route::match(['get', 'options'], 'lotteries-list', ['as' => $namePrefix . 'lotteries-list', 'uses' => $controller . 'lotteriesList']);
     //热门彩票排序
-    Route::match(['post', 'options'], 'lotteries-sort', ['as' => $namePrefix . 'lotteries-sort', 'uses' => $controller . 'lotteriesSort']);
+    Route::match(['post', 'options'], 'sort', ['as' => $namePrefix . 'sort', 'uses' => $controller . 'sort']);
+});
+
+//热门玩法管理
+Route::group(['prefix' => 'popular-methods', 'namespace' => 'Admin\Homepage'], function () {
+    $namePrefix = 'backend-api.popularMethods.';
+    $controller = 'PopularMethodsController@';
+    //热门玩法列表
+    Route::match(['get', 'options'], 'detail', ['as' => $namePrefix . 'detail', 'uses' => $controller . 'detail']);
+    //添加热门玩法
+    Route::match(['post', 'options'], 'add', ['as' => $namePrefix . 'add', 'uses' => $controller . 'add']);
+    //编辑热门玩法
+    Route::match(['post', 'options'], 'edit', ['as' => $namePrefix . 'edit', 'uses' => $controller . 'edit']);
+    //删除热门玩法
+    Route::match(['post', 'options'], 'delete', ['as' => $namePrefix . 'delete', 'uses' => $controller . 'delete']);
+    //编辑热门玩法时选择的玩法列表
+    Route::match(['get', 'options'], 'methods-list', ['as' => $namePrefix . 'methods-list', 'uses' => $controller . 'methodsList']);
+    //热门玩法排序
+    Route::match(['post', 'options'], 'sort', ['as' => $namePrefix . 'sort', 'uses' => $controller . 'sort']);
 });
