@@ -36,7 +36,7 @@ class FrontendApiMainController extends Controller
             $this->partnerAdmin = $this->currentAuth->user();
             $this->inputs = Input::all(); //获取所有相关的传参数据
             //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
-            //            $this->adminOperateLog();
+            $this->userOperateLog();
             $this->eloqM = 'App\\Models\\' . $this->eloqM; // 当前的eloquent
             return $next($request);
         });
@@ -45,14 +45,14 @@ class FrontendApiMainController extends Controller
     /**
      *记录后台管理员操作日志
      */
-    private function adminOperateLog(): void
+    private function userOperateLog(): void
     {
         $this->log_uuid = Str::orderedUuid()->getNodeHex();
         $datas['input'] = $this->inputs;
         $datas['route'] = $this->currentOptRoute;
         $datas['log_uuid'] = $this->log_uuid;
         $log = json_encode($datas, JSON_UNESCAPED_UNICODE);
-        Log::channel('apibyqueue')->info($log);
+        Log::channel('frontend-by-queue')->info($log);
     }
 
     /**

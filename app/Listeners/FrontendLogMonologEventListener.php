@@ -8,19 +8,21 @@
 
 namespace App\Listeners;
 
-use App\Models\Admin\PartnerLogsApi;
-use App\Services\Logs\BackendLogs\BackendLogMonologEvent;
+use App\Models\Admin\FrontendApiLog;
+use App\Services\Logs\FrontendLogs\FrontendLogMonologEvent;
+use App\Services\WebLogs\LogMonologEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 
-class ApiLogMonologEventListener implements ShouldQueue
+class FrontendLogMonologEventListener implements ShouldQueue
 {
-    public $queue = 'apilogs';
+    public $queue = 'logs';
+//    public $connection = 'beanstalkd';
     protected $log;
     protected $recordedDays;
 
-    public function __construct(PartnerLogsApi $log)
+    public function __construct(FrontendApiLog $log)
     {
         $this->log = $log;
     }
@@ -53,8 +55,8 @@ class ApiLogMonologEventListener implements ShouldQueue
     {
         try {
             $events->listen(
-                BackendLogMonologEvent::class,
-                'App\Listeners\ApiLogMonologEventListener@onLog'
+                FrontendLogMonologEvent::class,
+                'App\Listeners\FrontendLogMonologEventListener@onLog'
             );
         } catch (\Exception $e) {
             Log::channel('daily')->error(
