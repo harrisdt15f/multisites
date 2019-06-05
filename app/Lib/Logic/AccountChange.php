@@ -81,7 +81,7 @@ class AccountChange
         }
         // 2. 参数检测
         foreach ($typeConfig as $key => $value) {
-            if (in_array($key, ['id', 'name', 'sign', 'type', 'frozen_type'])) {
+            if (in_array($key, ['id', 'name', 'sign', 'in_out', 'frozen_type'])) {
                 continue;
             }
             if ($value == 1) {
@@ -159,7 +159,7 @@ class AccountChange
                 $ret = $this->unFrozenToPlayer($account, $amount);
                 break;
             default:
-                if ($typeConfig['type'] == 1) {
+                if ($typeConfig['in_out'] == 1) {
                     $ret = $this->add($account, $amount);
                 } else {
                     $ret = $this->cost($account, $amount);

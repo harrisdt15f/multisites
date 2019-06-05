@@ -30,7 +30,7 @@ trait AccountChangeTypeLogics
     public function saveItem($data, $adminId = 0) {
         $this->name             = $data['name'];
         $this->sign             = $data['sign'];
-        $this->type             = $data['type'];
+        $this->in_out             = $data['in_out'];
 
         $this->amount           = $data['amount'] > 0 ? 1 : 0;
         $this->user_id          = $data['user_id'] > 0 ? 1 : 0;
