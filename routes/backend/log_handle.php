@@ -12,4 +12,6 @@ Route::group(['prefix' => 'log', 'namespace' => 'Admin\Log'], function () {
     $controller = 'HandleLogController@';
     //搜索日志列表
     Route::match(['post', 'options'], 'list', ['as' => $namePrefix . 'list', 'uses' => $controller . 'details']);
+    //前台日志列表
+    Route::match(['post', 'options'], 'frontend-list', ['as' => $namePrefix . 'frontend-list', 'uses' => $controller . 'frontendLogs']);
 });
