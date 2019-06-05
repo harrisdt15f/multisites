@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\FrontendApi\Game\Lottery;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
+use App\Http\Requests\Frontend\Game\Lottery\LotteriesBetRequest;
 use App\Lib\Locker\AccountLocker;
 use App\Lib\Logic\AccountChange;
 use App\Models\Game\Lottery\IssueModel;
@@ -70,7 +71,6 @@ class LotteriesController extends FrontendApiMainController
         } else {
             foreach ($lotteries as $lottery) {
                 $lottery->valid_modes = $lottery->getFormatMode();
-
                 // 获取所有玩法
                 $methods = MethodsModel::getMethodConfig($lottery->en_name);
                 $methodData = [];
@@ -85,7 +85,6 @@ class LotteriesController extends FrontendApiMainController
                         'method_id' => $method->method_id,
                     ];
                 }
-
                 $groupData = [];
                 $hasRow = [];
                 foreach ($methods as $index => $method) {
@@ -114,21 +113,16 @@ class LotteriesController extends FrontendApiMainController
                         $defaultGroup = $method->method_group;
                         $defaultMethod = $method->method_id;
                     }
-
                     // 组
                     if (!in_array($method->method_group, $hasGroup)) {
-
                         $methodData[] = [
                             'name' => $groupName[$lottery->series_id][$method->method_group],
                             'sign' => $method->method_group,
                             'rows' => $groupData[$method->method_group],
                         ];
-
                         $hasGroup[] = $method->method_group;
                     }
-
                 }
-
                 $cacheData[$lottery->en_name] = [
                     'lottery' => $lottery,
                     'methodConfig' => $methodData,
@@ -242,46 +236,17 @@ class LotteriesController extends FrontendApiMainController
         return $this->msgOut(true, $data);
     }
 
-    public function bet()
+    public function bet(LotteriesBetRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'lottery_sign' => 'required|string|min:4|max:10|exists:lotteries,en_name',
-            'trace_issues' => 'required',
-//            'trace_issues' => ['required', 'regex:/^\{(\d{9,15}\:(true|false)\,?)+\}$/'],
-            //{20180405001:true,20180405001:false,20180405001:true}
-            'balls' => 'required',
-            'trace_win_stop' => 'required|integer',
-            'total_cost' => 'required|integer',
-            'from' => 'integer',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $inputBalls = json_decode($this->inputs['balls'], true);
-        $validator = Validator::make($inputBalls, [
-            '*.method_id' => 'required|exists:methods,method_id',
-            '*.method_name' => 'required',//中文
-            '*.codes' => ['required', 'regex:/^(?!\|)(?!.*\|$)((?!\&)(?!.*\&$)(?!.*?\&\&)[0-9&]{1,19}\|?){1,5}$/'],
-            //0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9
-            '*.count' => 'required|integer',
-            '*.times' => 'required|integer',
-            '*.cost' => 'required|integer',
-            '*.mode' => 'required|integer',
-            '*.prize_group' => 'required|integer',
-            '*.price' => 'required|integer',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $this->inputs['balls'] = $inputBalls;
+        $inputDatas = $request->validated();
         $usr = $this->currentAuth->user();
-        $lotterySign = $this->inputs['lottery_sign'];
+        $lotterySign = $inputDatas['lottery_sign'];
         $lottery = LotteriesModel::getLottery($lotterySign);
         $betDetail = [];
         $_totalCost = 0;
         // 初次解析
         $_balls = [];
-        foreach ($this->inputs['balls'] as $item) {
+        foreach ($inputDatas['balls'] as $item) {
             $methodId = $item['method_id'];
             $method = $lottery->getMethod($methodId);
             $validator = Validator::make($method, [
@@ -316,8 +281,8 @@ class LotteriesController extends FrontendApiMainController
                 $_balls[] = $item;
             }
         }
-        $this->inputs['balls'] = $_balls;
-        foreach ($this->inputs['balls'] as $item) {
+        $inputDatas['balls'] = $_balls;
+        foreach ($inputDatas['balls'] as $item) {
             $methodId = $item['method_id'];
             $method = $lottery->getMethod($methodId);
             $oMethod = $method['object'];
@@ -370,7 +335,7 @@ class LotteriesController extends FrontendApiMainController
             ];
         }
         // 投注期号
-        $traceData = json_decode($this->inputs['trace_issues'], true);
+        $traceData = $inputDatas['trace_issues'];
         // 检测追号奖期
         if (!$traceData || !is_array($traceData)) {
             return '对不起, 无效的追号奖期数据!';
@@ -401,7 +366,7 @@ class LotteriesController extends FrontendApiMainController
         DB::beginTransaction();
         try {
             $traceData = count($traceData) > 1 ? array_slice($traceData, 1) : [];
-            $from = $this->inputs['from'] ?? 1;
+            $from = $inputDatas['from'] ?? 1;
             $data = Project::addProject($usr, $lottery, $currentIssue, $betDetail, $traceData, $from);
             // 帐变
             $accountChange = new AccountChange();
