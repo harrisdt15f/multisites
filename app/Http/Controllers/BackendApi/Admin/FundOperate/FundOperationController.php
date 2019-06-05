@@ -61,17 +61,22 @@ class FundOperationController extends BackEndApiMainController
         if (is_null($FundOperationAdmin)) {
             return $this->msgOut(false, [], '101301');
         }
-        $newFund = $FundOperationAdmin->fund + $this->inputs['fund'];
-        $AdminEditData = ['fund' => $newFund];
-        $comment = '[人工充值额度操作]==>+' . $this->inputs['fund'] . '|[目前额度]==>' . $newFund;
-        $partnerAdmin = $this->partnerAdmin;
-        $type = ArtificialRechargeLog::SUPERADMIN;
-        $in_out = ArtificialRechargeLog::INCREMENT;
-        $ArtificialRechargeLog = new ArtificialRechargeLog();
+        //查看该管理员今日 手动添加的充值额度
+        $checkFund = $this->rechargeFundToday($this->inputs['id'], $this->inputs['fund']);
+        if ($checkFund['success'] === false) {
+            return $this->msgOut(false, [], '', $checkFund['msg']);
+        }
         DB::beginTransaction();
         try {
+            $newFund = $FundOperationAdmin->fund + $this->inputs['fund'];
+            $AdminEditData = ['fund' => $newFund];
             $FundOperationAdmin->fill($AdminEditData);
             $FundOperationAdmin->save();
+            $comment = '[人工充值额度操作]==>+' . $this->inputs['fund'] . '|[目前额度]==>' . $newFund;
+            $partnerAdmin = $this->partnerAdmin;
+            $type = ArtificialRechargeLog::SUPERADMIN;
+            $in_out = ArtificialRechargeLog::INCREMENT;
+            $ArtificialRechargeLog = new ArtificialRechargeLog();
             $fundOperationClass = new FundOperationRecharge();
             $fundOperationClass->insertOperationDatas($ArtificialRechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $admin_user->id, $admin_user->name, $this->inputs['fund'], $comment, null);
             DB::commit();
@@ -127,5 +132,26 @@ class FundOperationController extends BackEndApiMainController
                 ->where('created_at', '<', $this->inputs['end_time']);
         })->get()->toArray();
         return $this->msgout(true, $datas);
+    }
+
+    /**
+     * 查看该管理员今日 手动添加的充值额度是否在限额内
+     * @param  [int] $admin_id     [需要充值的管理员id]
+     * @param  [folat] $rechargeFund [充值的额度]
+     * @return [array]
+     */
+    public function rechargeFundToday($admin_id, $rechargeFund)
+    {
+        $maxRechargeFund = 90000;
+        $where = [
+            'type' => 1,
+            'admin_id' => $admin_id,
+        ];
+        $rechargeFundToday = ArtificialRechargeLog::where($where)->sum('amount');
+        if (($rechargeFundToday + $rechargeFund) > $maxRechargeFund) {
+            $restRechargeFund = $maxRechargeFund - $rechargeFundToday;
+            return ['success' => false, 'msg' => '管理员每日手动添加的最大充值额度为' . $maxRechargeFund . ',目前剩余额度' . $restRechargeFund];
+        }
+        return ['success' => true];
     }
 }
