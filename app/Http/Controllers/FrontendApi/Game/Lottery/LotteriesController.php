@@ -11,7 +11,6 @@ use App\Models\Game\Lottery\LotteriesModel;
 use App\Models\MethodsModel;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
