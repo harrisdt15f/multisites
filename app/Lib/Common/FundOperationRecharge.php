@@ -6,7 +6,7 @@ class FundOperationRecharge
     /**
      *
      * @param $eloqM
-     * @param $type  0系统对管理操作   1超管对管理操作  2管理对用户操作
+     * @param $type  0系统对管理操作   1超管对管理操作  2管理对用户操作  3超管对用户操作
      * @param $in_out  0减少   1增加
      * @param $OperationAdminId     操作人ID
      * @param $OperationAdminName   操作人NAME
@@ -50,7 +50,12 @@ class FundOperationRecharge
             $OperationDatas['user_id'] = $OperationId;
             $OperationDatas['user_name'] = $OperationName;
             $OperationDatas['status'] = 0;
-
+        } elseif ($type === 3) {
+            $OperationDatas['super_admin_id'] = $OperationAdminId;
+            $OperationDatas['super_admin_name'] = $OperationAdminName;
+            $OperationDatas['user_id'] = $OperationId;
+            $OperationDatas['user_name'] = $OperationName;
+            $OperationDatas['status'] = 1;
         }
         $eloqM->fill($OperationDatas);
         $eloqM->save();
