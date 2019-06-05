@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BackendApi\Users\Fund;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Lib\Common\AccountChange;
 use App\Lib\Common\FundOperationRecharge;
 use App\Lib\Common\InternalNoticeMessage;
 use App\Models\Admin\Fund\FundOperation;
@@ -11,7 +12,10 @@ use App\Models\Admin\PartnerAdminGroupAccess;
 use App\Models\Admin\PartnerAdminUsers;
 use App\Models\AuditFlow;
 use App\Models\DeveloperUsage\Menu\PartnerMenus;
+use App\Models\User\Fund\AccountChangeReport;
+use App\Models\User\Fund\AccountChangeType;
 use App\Models\User\Fund\ArtificialRechargeLog;
+use App\Models\User\Fund\HandleUserAccounts;
 use App\Models\User\UserHandleModel;
 use App\Models\User\UserRechargeHistory;
 use App\Models\User\UserRechargeLog;
@@ -44,41 +48,71 @@ class ArtificialRechargeController extends BackEndApiMainController
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        };
         $userEloq = UserHandleModel::find($this->inputs['id']);
         if (is_null($userEloq)) {
             return $this->msgOut(false, [], '101100');
         }
         $partnerAdmin = $this->partnerAdmin;
-        $adminFundData = FundOperation::where('admin_id', $partnerAdmin->id)->first();
-        if (is_null($adminFundData)) {
-            return $this->msgOut(false, [], '101101');
-        }
-        $adminOperationFund = $adminFundData->fund;
-        //可操作额度小于充值额度
-        if ($adminOperationFund < $this->inputs['amount']) {
-            return $this->msgOut(false, [], '101102');
-        }
         DB::beginTransaction();
         try {
-            //扣除管理员额度
-            $newFund = $adminOperationFund - $this->inputs['amount'];
-            $adminFundEdit = ['fund' => $newFund];
-            $adminFundData->fill($adminFundEdit);
-            $adminFundData->save();
-            //插入审核表
-            $auditFlowID = $this->insertAuditFlow($partnerAdmin->id, $partnerAdmin->name, $this->inputs['apply_note']);
-            //添加管理员额度明细表
+            //普通管理员人工充值需要审核的操作
+            if ($this->currentPartnerAccessGroup->role !== '*') {
+                //扣除管理员额度
+                $adminFundData = FundOperation::where('admin_id', $partnerAdmin->id)->first();
+                if (is_null($adminFundData)) {
+                    return $this->msgOut(false, [], '101101');
+                }
+                $adminOperationFund = $adminFundData->fund;
+                //可操作额度小于充值额度
+                if ($adminOperationFund < $this->inputs['amount']) {
+                    return $this->msgOut(false, [], '101102');
+                }
+                $newFund = $adminOperationFund - $this->inputs['amount'];
+                $adminFundEdit = ['fund' => $newFund];
+                $adminFundData->fill($adminFundEdit);
+                $adminFundData->save();
+                //插入审核表
+                $auditFlowID = $this->insertAuditFlow($partnerAdmin->id, $partnerAdmin->name, $this->inputs['apply_note']);
+                //发送站内消息 提醒有权限的管理员审核
+                $this->sendMessage();
+            } else {
+                //超管操作不需审核 直接给用户充值
+                //检查是否存在 人工充值 的帐变类型表
+                $accountChangeTypeEloq = AccountChangeType::where('sign', 'artificial_recharge')->first();
+                if (is_null($accountChangeTypeEloq)) {
+                    DB::rollBack();
+                    return $this->msgOut(false, [], '100901');
+                }
+                //修改用户金额
+                $UserAccounts = HandleUserAccounts::where('user_id', $this->inputs['id'])->first();
+                $balance = $UserAccounts->balance + $this->inputs['amount'];
+                $UserAccountsEdit = ['balance' => $balance];
+                $editStatus = HandleUserAccounts::where(function ($query) use ($UserAccounts) {
+                    $query->where('user_id', $UserAccounts->user_id)
+                        ->where('updated_at', $UserAccounts->updated_at);
+                })->update($UserAccountsEdit);
+                //充值失败回滚
+                if ($editStatus === 0) {
+                    DB::rollBack();
+                    return $this->msgOut(false, [], '101103');
+                }
+                //用户帐变表
+                $accountChangeReportEloq = new AccountChangeReport();
+                $accountChangeClass = new AccountChange();
+                $accountChangeClass->addData($accountChangeReportEloq, $userEloq->toArray(), $this->inputs['amount'], $UserAccounts->balance, $balance, $accountChangeTypeEloq);
+            }
+            //添加人工充值明细表
+            $auditFlowID = isset($auditFlowID) ? $auditFlowID : null;
+            $newFund = isset($newFund) ? $newFund : null;
             $this->insertFundLog($partnerAdmin, $userEloq, $auditFlowID, $newFund);
             //用户 user_recharge_history 表
             $deposit_mode = UserRechargeHistory::ARTIFICIAL;
             $companyOrderNum = $this->insertRechargeHistory($userEloq, $auditFlowID, $deposit_mode);
             // 用户 user_recharge_log 表
             $this->insertRechargeLog($companyOrderNum, $deposit_mode);
-            //发送站内消息 提醒有权限的管理员审核
-            $this->sendMessage();
             DB::commit();
-            return $this->msgOut(true, [], '200', '操作成功，请等待管理员审核');
+            return $this->msgOut(true);
         } catch (Exception $e) {
             DB::rollBack();
             $errorObj = $e->getPrevious()->getPrevious();
@@ -218,7 +252,7 @@ class ArtificialRechargeController extends BackEndApiMainController
     public function insertFundLog($partnerAdmin, $userEloq, $auditFlowID, $newFund)
     {
         $artificialRechargeLog = new ArtificialRechargeLog();
-        $type = ArtificialRechargeLog::ADMIN;
+        $type = $this->currentPartnerAccessGroup->role !== '*' ? ArtificialRechargeLog::ADMIN : 3;
         $in_out = ArtificialRechargeLog::DECREMENT;
         $comment = '[给用户人工充值]==>-' . $this->inputs['amount'] . '|[目前额度]==>' . $newFund;
         $fundOperationClass = new FundOperationRecharge();
@@ -235,7 +269,7 @@ class ArtificialRechargeController extends BackEndApiMainController
     public function insertRechargeHistory($userEloq, $auditFlowID, $deposit_mode)
     {
         $userRechargeHistory = new UserRechargeHistory();
-        $status = UserRechargeHistory::UNDERWAYAUDIT;
+        $status = $this->currentPartnerAccessGroup->role !== '*' ? UserRechargeHistory::UNDERWAYAUDIT : UserRechargeHistory::AUDITSUCCESS;
         $rechargeHistoryArr = $this->insertRechargeHistoryArr($userEloq->id, $userEloq->nickname, $userEloq->is_tester, $userEloq->top_id, $this->inputs['amount'], $auditFlowID, $status, $deposit_mode);
         $userRechargeHistory->fill($rechargeHistoryArr);
         $userRechargeHistory->save();

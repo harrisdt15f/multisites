@@ -86,7 +86,7 @@ class RechargeCheckController extends BackEndApiMainController
             //用户帐变表
             $accountChangeReportEloq = new AccountChangeReport();
             $accountChangeClass = new AccountChange();
-            $accountChangeClass->addData($accountChangeReportEloq, $userData, $rechargeLog['amount'], $UserAccounts->balance, $balance, $accountChangeTypeEloq, $accountChangeTypeEloq);
+            $accountChangeClass->addData($accountChangeReportEloq, $userData, $rechargeLog['amount'], $UserAccounts->balance, $balance, $accountChangeTypeEloq);
             //发送站内消息提醒管理员
             $this->sendMessage($rechargeLog->admin_id, $this->successMessage);
             DB::commit();
