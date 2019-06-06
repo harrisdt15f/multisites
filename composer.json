@@ -24,7 +24,8 @@
         "pda/pheanstalk": "^4.0",
         "php-curl-class/php-curl-class": "^8.5",
         "predis/predis": "^1.1",
-        "tymon/jwt-auth": "1.0.0-rc.4.1"
+        "tymon/jwt-auth": "1.0.0-rc.4.1",
+        "waavi/sanitizer": "~1.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.2",

@@ -184,6 +184,8 @@ return [
         Orangehill\Iseed\IseedServiceProvider::class,
         //jwt
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
+        //waavi sanitizer
+        Waavi\Sanitizer\Laravel\SanitizerServiceProvider::class,
     ],
 
     /*
@@ -235,6 +237,7 @@ return [
         'Agent' => Jenssegers\Agent\Facades\Agent::class,
         'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
+        'Sanitizer' => Waavi\Sanitizer\Laravel\Facade::class,
     ],
 
 ];

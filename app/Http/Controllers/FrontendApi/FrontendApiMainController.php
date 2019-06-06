@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\FrontendApi;
 
 use App\Http\Controllers\Controller;
+use App\Models\DeveloperUsage\Frontend\FrontendWebRoute;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Input;
@@ -14,13 +15,9 @@ class FrontendApiMainController extends Controller
     protected $inputs;
     protected $partnerAdmin; //当前的商户用户
     protected $currentOptRoute; //目前路由
-    protected $fullMenuLists; //所有的菜单
     protected $currentPlatformEloq = null; //当前商户存在的平台
-    protected $currentPartnerAccessGroup = null; //当前商户的权限组
-    protected $partnerMenulists; //目前所有的菜单为前端展示用的
     protected $eloqM = ''; // 当前的eloquent
-    protected $currentRouteName; //当前的route name;
-    protected $routeAccessable = false;
+    //当前的route name;
     protected $log_uuid; //当前的logId
     protected $currentGuard = 'frontend-web';
     protected $currentAuth;
@@ -30,7 +27,8 @@ class FrontendApiMainController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:frontend-web', ['except' => ['logo','login']]);
+        $open_route = FrontendWebRoute::where('is_open',1)->pluck('method')->toArray();
+        $this->middleware('auth:frontend-web', ['except' => $open_route]);
         $this->middleware(function ($request, $next) {
             $this->currentAuth = auth($this->currentGuard);
             $this->partnerAdmin = $this->currentAuth->user();
