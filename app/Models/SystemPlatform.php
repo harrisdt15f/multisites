@@ -4,10 +4,10 @@ namespace App\Models;
 
 use App\Models\Admin\BackendAdminUser;
 
-class PlatForms extends BaseModel
+class SystemPlatform extends BaseModel
 {
 
-    protected $table = 'platforms';
+    protected $table = 'system_platforms';
     public $timestamps = true;
 
     public function partnerAdminUsers()

@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin\BackendAdminAccessGroup;
 use App\Models\DeveloperUsage\Backend\BackendAdminRoute;
 use App\Models\DeveloperUsage\Menu\PartnerMenus;
-use App\Models\PlatForms;
+use App\Models\SystemPlatform;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -43,7 +43,7 @@ class BackEndApiMainController extends Controller
             if (!is_null($this->partnerAdmin)) {
                 //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
                 $this->currentPartnerAccessGroup = new BackendAdminAccessGroup();
-                $this->currentPlatformEloq = new PlatForms();
+                $this->currentPlatformEloq = new SystemPlatform();
                 if ($this->partnerAdmin->platform()->exists()) {
                     $this->currentPlatformEloq = $this->partnerAdmin->platform; //获取目前账号用户属于平台的对象
                     if ($this->partnerAdmin->accessGroup()->exists()) {

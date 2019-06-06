@@ -4,7 +4,7 @@ namespace App\Models\Admin;
 
 use App\Models\Admin\BackendAdminAccessGroup;
 use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
-use App\Models\PlatForms;
+use App\Models\SystemPlatform;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -66,7 +66,7 @@ class BackendAdminUser extends Authenticatable implements JWTSubject
 
     public function platform()
     {
-        return $this->hasOne(PlatForms::class, 'platform_id', 'platform_id');
+        return $this->hasOne(SystemPlatform::class, 'platform_id', 'platform_id');
     }
 
     public function accessGroup()

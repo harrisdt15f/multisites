@@ -6,7 +6,7 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\ImageArrange;
 use App\Lib\Common\InternalNoticeMessage;
 use App\Models\Admin\BackendAdminUser;
-use App\Models\Admin\Message\NoticeMessage;
+use App\Models\Admin\Message\BackendSystemNoticeList;
 use App\Models\BackendAdminAuditFlowList;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -330,7 +330,7 @@ class ArticlesController extends BackEndApiMainController
     public function sendMessage()
     {
         $messageClass = new InternalNoticeMessage();
-        $type = NoticeMessage::AUDIT;
+        $type = BackendSystemNoticeList::AUDIT;
         $message = $this->message;
         $adminsArr = BackendAdminUser::select('id', 'group_id')->where('group_id', 1)->get()->toArray();
         $messageClass->insertMessage($type, $message, $adminsArr);

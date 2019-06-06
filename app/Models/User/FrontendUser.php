@@ -3,6 +3,7 @@
 namespace App\Models\User;
 
 use App\Models\Admin\FrontendUsersPrivacyFlow;
+use App\Models\SystemPlatform;
 use App\Models\User\Fund\FrontendUsersAccount;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -70,7 +71,7 @@ class FrontendUser extends Authenticatable implements JWTSubject
 
     public function platform()
     {
-        return $this->hasOne(PlatForms::class, 'platform_id', 'platform_id');
+        return $this->hasOne(SystemPlatform::class, 'platform_id', 'platform_id');
     }
 
     public function account()

@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-01 14:29:10
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-06 12:07:52
+ * @Last Modified time: 2019-06-06 17:28:28
  */
 
 namespace App\Http\Controllers\BackendApi\Admin\Message;
@@ -12,13 +12,13 @@ namespace App\Http\Controllers\BackendApi\Admin\Message;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\InternalNoticeMessage;
 use App\Models\Admin\BackendAdminUser;
-use App\Models\Admin\Message\NoticeMessage;
+use App\Models\Admin\Message\BackendSystemNoticeList;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class NoticeMessagesController extends BackEndApiMainController
 {
-    protected $eloqM = 'Admin\Message\InternalNotice';
+    protected $eloqM = 'Admin\Message\BackendSystemInternalMessage';
 
     /**
      * 当前管理员的站内信息
@@ -58,7 +58,7 @@ class NoticeMessagesController extends BackEndApiMainController
         DB::beginTransaction();
         try {
             $messageClass = new InternalNoticeMessage();
-            $type = NoticeMessage::ARTIFICIAL;
+            $type = BackendSystemNoticeList::ARTIFICIAL;
             $message = $this->inputs['message'];
             $messageClass->insertMessage($type, $message, $adminsArr, $this->partnerAdmin->id);
             DB::commit();

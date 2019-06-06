@@ -9,7 +9,7 @@ use App\Lib\Common\InternalNoticeMessage;
 use App\Models\Admin\BackendAdminAccessGroup;
 use App\Models\Admin\BackendAdminUser;
 use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
-use App\Models\Admin\Message\NoticeMessage;
+use App\Models\Admin\Message\BackendSystemNoticeList;
 use App\Models\BackendAdminAuditFlowList;
 use App\Models\DeveloperUsage\Menu\PartnerMenus;
 use App\Models\User\FrontendUser;
@@ -219,7 +219,7 @@ class ArtificialRechargeController extends BackEndApiMainController
     public function sendMessage()
     {
         $messageClass = new InternalNoticeMessage();
-        $type = NoticeMessage::AUDIT;
+        $type = BackendSystemNoticeList::AUDIT;
         $roleId = PartnerMenus::where('en_name', 'recharge.check')->value('id');
         $allGroup = BackendAdminAccessGroup::select('id', 'role')->get();
         $groupIds = [];

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\FrontendApi\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Models\Admin\Activity\ActivityInfos;
+use App\Models\Admin\Activity\FrontendActivityContent;
 use App\Models\Admin\Homepage\FrontendLotteryFnfBetableList;
 use App\Models\Admin\Homepage\FrontendLotteryRedirectBetList;
 use App\Models\Admin\Homepage\FrontendPageBanner;
@@ -134,7 +134,7 @@ class HomepageController extends FrontendApiMainController
             if ($activityEloq->status !== 1) {
                 return $this->msgOut(false, [], '400', $this->offMsg);
             }
-            $data = ActivityInfos::select('id', 'title', 'content', 'thumbnail_path', 'redirect_url')->where('status', 1)->orderBy('sort', 'asc')->limit($activityEloq->show_num)->get()->toArray();
+            $data = FrontendActivityContent::select('id', 'title', 'content', 'thumbnail_path', 'redirect_url')->where('status', 1)->orderBy('sort', 'asc')->limit($activityEloq->show_num)->get()->toArray();
             Cache::forever('homepageActivity', $data);
         }
         return $this->msgOut(true, $data);

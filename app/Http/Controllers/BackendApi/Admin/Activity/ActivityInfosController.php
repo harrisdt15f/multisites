@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ActivityInfosController extends BackEndApiMainController
 {
-    protected $eloqM = 'Admin\Activity\ActivityInfos';
+    protected $eloqM = 'Admin\Activity\FrontendActivityContent';
     protected $folderName = 'mobile_activity'; //活动图片存放的文件夹名称
 
     //活动列表

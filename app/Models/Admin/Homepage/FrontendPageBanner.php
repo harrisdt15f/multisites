@@ -2,7 +2,7 @@
 
 namespace App\Models\Admin\Homepage;
 
-use App\Models\Admin\Activity\ActivityInfos;
+use App\Models\Admin\Activity\FrontendActivityContent;
 use App\Models\BaseModel;
 
 class FrontendPageBanner extends BaseModel
@@ -15,7 +15,7 @@ class FrontendPageBanner extends BaseModel
 
     public function activity()
     {
-        $data = $this->hasOne(ActivityInfos::class, 'id', 'activity_id');
+        $data = $this->hasOne(FrontendActivityContent::class, 'id', 'activity_id');
         return $data;
     }
 }

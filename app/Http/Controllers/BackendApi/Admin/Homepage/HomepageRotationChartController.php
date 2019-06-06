@@ -4,7 +4,7 @@ namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\ImageArrange;
-use App\Models\Admin\Activity\ActivityInfos;
+use App\Models\Admin\Activity\FrontendActivityContent;
 use App\Models\Advertisement\FrontendSystemAdsType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -54,7 +54,7 @@ class HomepageRotationChartController extends BackEndApiMainController
             if (!array_key_exists('activity_id', $this->inputs)) {
                 return $this->msgOut(false, [], '101802');
             }
-            $checkActivity = ActivityInfos::where('id', $this->inputs['activity_id'])->first();
+            $checkActivity = FrontendActivityContent::where('id', $this->inputs['activity_id'])->first();
             if (is_null($checkActivity)) {
                 return $this->msgOut(false, [], '101808');
             }
@@ -132,7 +132,7 @@ class HomepageRotationChartController extends BackEndApiMainController
             if (!array_key_exists('activity_id', $this->inputs)) {
                 return $this->msgOut(false, [], '101802');
             }
-            $checkActivity = ActivityInfos::where('id', $this->inputs['activity_id'])->first();
+            $checkActivity = FrontendActivityContent::where('id', $this->inputs['activity_id'])->first();
             if (is_null($checkActivity)) {
                 return $this->msgOut(false, [], '101808');
             }
@@ -245,7 +245,7 @@ class HomepageRotationChartController extends BackEndApiMainController
     //操作轮播图时获取的活动列表
     public function activityList()
     {
-        $activityList = ActivityInfos::select('id', 'title')->where('status', 1)->get();
+        $activityList = FrontendActivityContent::select('id', 'title')->where('status', 1)->get();
         return $this->msgOut(true, $activityList);
     }
 
