@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Facades\Log;
+use RicardoFontanelli\LaravelTelegram\Telegram;
 
 class Handler extends ExceptionHandler
 {
@@ -39,6 +40,19 @@ class Handler extends ExceptionHandler
         if ($this->shouldntReport($exception)) {
             return;
         }
+
+        //###### sending errors to tg //Harris ############
+        $error= [
+            'file'=>$exception->getFile(),
+            'line'=>$exception->getLine(),
+            'code' => $exception->getCode(),
+            'message' =>$exception->getMessage(),
+            'previous'=>$exception->getPrevious(),
+            'TraceAsString'=>$exception->getTraceAsString(),
+            'trace'=> $exception->getTrace(),
+        ];
+        $telegram = new Telegram(config('telegram.token'),config('telegram.botusername'));
+        $telegram->sendMessage(config('telegram.chats.default'), e(json_encode($error)));
         Log::channel('daily')->error(
             $exception->getMessage(),
             array_merge($this->context(), ['exception' => $exception])

@@ -186,6 +186,8 @@ return [
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
         //waavi sanitizer
         Waavi\Sanitizer\Laravel\SanitizerServiceProvider::class,
+        //telegram
+        RicardoFontanelli\LaravelTelegram\TelegramServiceProvider::class,
     ],
 
     /*
@@ -238,6 +240,7 @@ return [
         'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
         'Sanitizer' => Waavi\Sanitizer\Laravel\Facade::class,
+        'Telegram' => RicardoFontanelli\LaravelTelegram\TelegramFacade::class,
     ],
 
 ];

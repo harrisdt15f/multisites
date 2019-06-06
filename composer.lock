@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "69e48202e0df3adddf6e5bf6cb5ebac1",
+    "content-hash": "296051ec3187ac168ee26f03358833ee",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -3144,6 +3144,65 @@
                 "uuid"
             ],
             "time": "2018-07-19T23:38:55+00:00"
+        },
+        {
+            "name": "ricardofontanelli/laravel-telegram",
+            "version": "1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ricardofontanelli/laravel-telegram.git",
+                "reference": "4fd98d4d1ae050f63d2c9fe35531661e397c9882"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ricardofontanelli/laravel-telegram/zipball/4fd98d4d1ae050f63d2c9fe35531661e397c9882",
+                "reference": "4fd98d4d1ae050f63d2c9fe35531661e397c9882",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "4.*|5.*",
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "RicardoFontanelli\\LaravelTelegram\\TelegramServiceProvider"
+                    ],
+                    "aliases": {
+                        "Telegram": "RicardoFontanelli\\LaravelTelegram\\TelegramFacade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "RicardoFontanelli\\LaravelTelegram\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ricardo Fontanelli",
+                    "email": "ricardo.fontanelli@hotmail.com"
+                }
+            ],
+            "description": "A simple and lightweight Laravel 4 and 5 wrapper to interact with Telegram Bot.",
+            "homepage": "https://github.com/ricardofontanelli/laravel-telegram",
+            "keywords": [
+                "Laravel 4",
+                "bot",
+                "facade",
+                "laravel",
+                "laravel 5",
+                "messages",
+                "provider",
+                "service provider",
+                "telegram"
+            ],
+            "time": "2018-02-04T01:43:09+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -7162,7 +7221,8 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^7.1.3"
+        "php": "^7.1.3",
+        "ext-json": "*"
     },
     "platform-dev": []
 }
