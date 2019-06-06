@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\WebControllers;
 
-use App\Models\DeveloperUsage\Menu\PartnerMenus;
+use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
 use function GuzzleHttp\json_decode;
 use Illuminate\Support\Facades\Route;
 
@@ -11,9 +11,9 @@ class MenuSettingController extends AdminMainController
 
     public function index()
     {
-        $firstlevelmenus = PartnerMenus::getFirstLevelList();
+        $firstlevelmenus = BackendSystemMenu::getFirstLevelList();
         $routeCollection = Route::getRoutes()->get();
-        $editMenu = PartnerMenus::all();
+        $editMenu = BackendSystemMenu::all();
         $routeMatchingName = $editMenu->where('route', '!=', '#')->keyBy('route')->toArray();
         $rname = [];
         foreach ($routeCollection as $key => $r) {
@@ -28,7 +28,7 @@ class MenuSettingController extends AdminMainController
 
     public function add()
     {
-        $menuEloq = new PartnerMenus();
+        $menuEloq = new BackendSystemMenu();
         if (isset($this->inputs['isParent']) && $this->inputs['isParent'] === 'on') {
 
             $menuEloq->label = $this->inputs['menulabel'];
@@ -47,7 +47,7 @@ class MenuSettingController extends AdminMainController
 
     public function delete()
     {
-        $menuEloq = new PartnerMenus();
+        $menuEloq = new BackendSystemMenu();
         $toDelete = json_decode($this->inputs['toDelete'], true);
         if (!empty($toDelete)) {
 
@@ -65,7 +65,7 @@ class MenuSettingController extends AdminMainController
 
     public function edit()
     {
-        $menuEloq = PartnerMenus::find($this->inputs['menuid']);
+        $menuEloq = BackendSystemMenu::find($this->inputs['menuid']);
         if (isset($this->inputs['eisParent']) && $this->inputs['eisParent'] === 'on') {
 
             $menuEloq->label = $this->inputs['emenulabel'];
@@ -92,7 +92,7 @@ class MenuSettingController extends AdminMainController
         $atLeastOne = false;
         if (!empty($parseDatas)) {
             foreach ($parseDatas as $key => $value) {
-                $menuEloq = PartnerMenus::find($value['currentId']);
+                $menuEloq = BackendSystemMenu::find($value['currentId']);
                 $menuEloq->pid = $value['currentParent'] === '#' ? 0 : (int) $value['currentParent'];
                 if ($menuEloq->save()) {
                     $pass['pass'] = $value['currentText'];

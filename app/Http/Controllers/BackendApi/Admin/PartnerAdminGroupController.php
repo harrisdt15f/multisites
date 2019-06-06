@@ -6,7 +6,7 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Models\Admin\BackendAdminUser;
 use App\Models\Admin\Fund\BackendAdminRechargePermitGroup;
 use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
-use App\Models\DeveloperUsage\Menu\PartnerMenus;
+use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -54,7 +54,7 @@ class PartnerAdminGroupController extends BackEndApiMainController
             $objPartnerAdminGroup->fill($data);
             $objPartnerAdminGroup->save();
             //检查是否有人工充值权限
-            $fundOperationCriteriaEloq = PartnerMenus::select('id')->where('route', '/manage/recharge')->first();
+            $fundOperationCriteriaEloq = BackendSystemMenu::select('id')->where('route', '/manage/recharge')->first();
             $isManualRecharge = in_array($fundOperationCriteriaEloq['id'], $role);
             //如果有人工充值权限   添加 backend_admin_recharge_permit_groups 表
             if ($isManualRecharge === true) {
@@ -71,7 +71,7 @@ class PartnerAdminGroupController extends BackEndApiMainController
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);
         }
-        $partnerMenuObj = new PartnerMenus();
+        $partnerMenuObj = new BackendSystemMenu();
         $partnerMenuObj->createMenuDatas($objPartnerAdminGroup->id, $role);
         return $this->msgOut(true, $data);
     }
@@ -112,7 +112,7 @@ class PartnerAdminGroupController extends BackEndApiMainController
             try {
                 $datas->save();
                 //检查提交的权限中 是否有 人工充值权限  $isManualRecharge
-                $fundOperationCriteriaEloq = PartnerMenus::select('id')->where('route', '/manage/recharge')->first();
+                $fundOperationCriteriaEloq = BackendSystemMenu::select('id')->where('route', '/manage/recharge')->first();
                 $isManualRecharge = in_array($fundOperationCriteriaEloq->id, $role, true);
                 //检查资金操作权限表是 否已存在 在当前用户组  $check
                 $fundOperatinEloq = BackendAdminRechargePermitGroup::where('group_id', $datas->id)->first();
@@ -194,7 +194,7 @@ class PartnerAdminGroupController extends BackEndApiMainController
                 $datas->delete();
                 //检查是否有人工充值权限
                 $role = $datas->role == '*' ? Arr::wrap($datas->role) : Arr::wrap(json_decode($datas->role, true));
-                $fundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
+                $fundOperation = BackendSystemMenu::select('id')->where('route', '/manage/recharge')->first()->toArray();
                 $isManualRecharge = in_array($fundOperation['id'], $role, true);
                 //如果有有人工充值权限   删除  FundOperation  BackendAdminRechargePermitGroup 表
                 if ($isManualRecharge === true) {

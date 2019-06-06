@@ -6,10 +6,10 @@ use App\Models\BaseModel;
 use App\Models\DeveloperUsage\Menu\Traits\MenuLogics;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class PartnerMenus extends BaseModel
+class BackendSystemMenu extends BaseModel
 {
     use MenuLogics;
-    protected $table = 'partner_admin_menus';
+    protected $table = 'backend_system_menus';
 
     protected $redisFirstTag = 'ms_menu';
 
