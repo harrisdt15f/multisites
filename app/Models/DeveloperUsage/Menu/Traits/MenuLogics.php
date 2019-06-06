@@ -2,7 +2,7 @@
 
 namespace App\Models\DeveloperUsage\Menu\Traits;
 
-use App\Models\Admin\PartnerAdminGroupAccess;
+use App\Models\Admin\BackendAdminAccessGroup;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -14,11 +14,11 @@ use Illuminate\Support\Facades\Cache;
 trait MenuLogics
 {
     /**
-     * @param  PartnerAdminGroupAccess  $accessGroupEloq
+     * @param  BackendAdminAccessGroup  $accessGroupEloq
      * @return array
      * TODO : 由于快速开发 后续需要弄缓存与异常处理
      */
-    public function menuLists(PartnerAdminGroupAccess $accessGroupEloq)
+    public function menuLists(BackendAdminAccessGroup $accessGroupEloq)
     {
         $parent_menu = [];
         $role = $accessGroupEloq->role;
@@ -42,10 +42,10 @@ trait MenuLogics
     }
 
     /**
-     * @param  PartnerAdminGroupAccess  $accessGroupEloq
+     * @param  BackendAdminAccessGroup  $accessGroupEloq
      * @return array|mixed
      */
-    public function getUserMenuDatas(PartnerAdminGroupAccess $accessGroupEloq)
+    public function getUserMenuDatas(BackendAdminAccessGroup $accessGroupEloq)
     {
         $redisKey = $accessGroupEloq->id;
         if (Cache::tags([$this->redisFirstTag])->has($redisKey)) {

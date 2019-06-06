@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\BackendApi\Admin;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Models\Admin\Fund\FundOperation;
-use App\Models\Admin\Fund\FundOperationGroup;
-use App\Models\Admin\PartnerAdminUsers;
+use App\Models\Admin\BackendAdminUser;
+use App\Models\Admin\Fund\BackendAdminRechargePermitGroup;
+use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
 use App\Models\DeveloperUsage\Menu\PartnerMenus;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,7 +17,7 @@ class PartnerAdminGroupController extends BackEndApiMainController
 {
     protected $postUnaccess = ['id', 'updated_at', 'created_at']; //不需要接收的字段
 
-    protected $eloqM = 'Admin\PartnerAdminGroupAccess';
+    protected $eloqM = 'Admin\BackendAdminAccessGroup';
 
     /**
      * Display a listing of the resource.
@@ -38,7 +38,7 @@ class PartnerAdminGroupController extends BackEndApiMainController
     public function create()
     {
         $validator = Validator::make($this->inputs, [
-            'group_name' => 'required|unique:partner_access_group',
+            'group_name' => 'required|unique:backend_admin_access_groups',
             'role' => 'required',
         ]);
         if ($validator->fails()) {
@@ -56,15 +56,15 @@ class PartnerAdminGroupController extends BackEndApiMainController
             //检查是否有人工充值权限
             $fundOperationCriteriaEloq = PartnerMenus::select('id')->where('route', '/manage/recharge')->first();
             $isManualRecharge = in_array($fundOperationCriteriaEloq['id'], $role);
-            //如果有人工充值权限   添加 fund_operation_group 表
+            //如果有人工充值权限   添加 backend_admin_recharge_permit_groups 表
             if ($isManualRecharge === true) {
-                $FundOperationGroup = new FundOperationGroup();
-                $FundOperationData = [
+                $fundOperationGroup = new BackendAdminRechargePermitGroup();
+                $fundOperationData = [
                     'group_id' => $objPartnerAdminGroup->id,
                     'group_name' => $objPartnerAdminGroup->group_name,
                 ];
-                $FundOperationGroup->fill($FundOperationData);
-                $FundOperationGroup->save();
+                $fundOperationGroup->fill($fundOperationData);
+                $fundOperationGroup->save();
             }
         } catch (\Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
@@ -115,18 +115,18 @@ class PartnerAdminGroupController extends BackEndApiMainController
                 $fundOperationCriteriaEloq = PartnerMenus::select('id')->where('route', '/manage/recharge')->first();
                 $isManualRecharge = in_array($fundOperationCriteriaEloq->id, $role, true);
                 //检查资金操作权限表是 否已存在 在当前用户组  $check
-                $fundOperatinEloq = FundOperationGroup::where('group_id', $datas->id)->first();
-                $fundOperation = new FundOperation();
+                $fundOperatinEloq = BackendAdminRechargePermitGroup::where('group_id', $datas->id)->first();
+                $fundOperation = new BackendAdminRechargePocessAmount();
                 $fundOperationDatas = [];
                 if ($isManualRecharge === true) {
-                    //如果之前没有就需要添加到 fundoperation 表里面 如果之前有表示已添加
+                    //如果之前没有就需要添加到 backend_admin_recharge_pocess_amounts 表里面 如果之前有表示已添加
                     if (is_null($fundOperatinEloq)) {
-                        $FundOperationData = [
+                        $fundOperationData = [
                             'group_id' => $datas->id,
                             'group_name' => $datas->group_name,
                         ];
-                        $fundOperationGroup = new FundOperationGroup();
-                        $fundOperationGroup->fill($FundOperationData);
+                        $fundOperationGroup = new BackendAdminRechargePermitGroup();
+                        $fundOperationGroup->fill($fundOperationData);
                         $fundOperationGroup->save();
                         //要添加到 fundoperation 里面的 当前 资金权限的id  有的 管理员 取出来
                         if ($fundOperationGroup->admins()->exists()) {
@@ -152,7 +152,7 @@ class PartnerAdminGroupController extends BackEndApiMainController
                             $partnerAdminsIdArr = array_column($adminsData, 'id');
                             $fundOperation->whereIn('admin_id', $partnerAdminsIdArr)->delete();
                         }
-                        FundOperationGroup::where('group_id', $datas->id)->delete();
+                        BackendAdminRechargePermitGroup::where('group_id', $datas->id)->delete();
                     }
                 }
                 DB::commit();
@@ -194,15 +194,15 @@ class PartnerAdminGroupController extends BackEndApiMainController
                 $datas->delete();
                 //检查是否有人工充值权限
                 $role = $datas->role == '*' ? Arr::wrap($datas->role) : Arr::wrap(json_decode($datas->role, true));
-                $FundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
-                $isManualRecharge = in_array($FundOperation['id'], $role, true);
-                //如果有有人工充值权限   删除  FundOperation  FundOperationGroup 表
+                $fundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
+                $isManualRecharge = in_array($fundOperation['id'], $role, true);
+                //如果有有人工充值权限   删除  FundOperation  BackendAdminRechargePermitGroup 表
                 if ($isManualRecharge === true) {
-                    $FundOperationGroup = new FundOperationGroup();
-                    $FundOperationGroup->where('group_id', $id)->delete();
+                    $fundOperationGroup = new BackendAdminRechargePermitGroup();
+                    $fundOperationGroup->where('group_id', $id)->delete();
                     //需要删除的资金表 admin
-                    $fundOperationEloq = new FundOperation();
-                    $adminsData = PartnerAdminUsers::select('id')->where('group_id', $id)->get();
+                    $fundOperationEloq = new BackendAdminRechargePocessAmount();
+                    $adminsData = BackendAdminUser::select('id')->where('group_id', $id)->get();
                     $admins = array_column($adminsData->toArray(), 'id');
                     if (!is_null($adminsData)) {
                         $fundOperationEloq->whereIn('admin_id', $admins)->delete();

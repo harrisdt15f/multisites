@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\BackendApi;
 
-use App\Models\Admin\Fund\FundOperation;
-use App\Models\Admin\PartnerAdminGroupAccess;
-use App\Models\Admin\PartnerAdminUsers;
+use App\Models\Admin\BackendAdminAccessGroup;
+use App\Models\Admin\BackendAdminUser;
+use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
 use App\Models\DeveloperUsage\Menu\PartnerMenus;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
@@ -24,7 +24,7 @@ class BackendAuthController extends BackEndApiMainController
 
     public $successStatus = 200;
 
-    protected $eloqM = 'Admin\PartnerAdminUsers';
+    protected $eloqM = 'Admin\BackendAdminUser';
 
     /**
      * Login user and create token
@@ -138,8 +138,8 @@ class BackendAuthController extends BackEndApiMainController
     public function register(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'name' => 'required|unique:partner_admin_users',
-            'email' => 'required|email|unique:partner_admin_users',
+            'name' => 'required|unique:backend_admin_users',
+            'email' => 'required|email|unique:backend_admin_users',
             'password' => 'required',
             'is_test' => 'required|numeric',
             'group_id' => 'required|numeric',
@@ -147,20 +147,20 @@ class BackendAuthController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $group = PartnerAdminGroupAccess::find($this->inputs['group_id']);
+        $group = BackendAdminAccessGroup::find($this->inputs['group_id']);
         $role = $group->role == '*' ? Arr::wrap($group->role) : Arr::wrap(json_decode($group->role, true));
         $isManualRecharge = false;
-        $FundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
-        $isManualRecharge = in_array($FundOperation['id'], $role, true);
+        $fundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
+        $isManualRecharge = in_array($fundOperation['id'], $role, true);
         $input = $this->inputs;
         $input['password'] = bcrypt($input['password']);
         $input['platform_id'] = $this->currentPlatformEloq->platform_id;
-        $user = PartnerAdminUsers::create($input);
+        $user = BackendAdminUser::create($input);
         if ($isManualRecharge === true) {
             $insertData = ['admin_id' => $user->id];
-            $FundOperationEloq = new FundOperation();
-            $FundOperationEloq->fill($insertData);
-            $FundOperationEloq->save();
+            $fundOperationEloq = new BackendAdminRechargePocessAmount();
+            $fundOperationEloq->fill($insertData);
+            $fundOperationEloq->save();
         }
         $credentials = request(['email', 'password']);
         $token = $this->currentAuth->attempt($credentials);

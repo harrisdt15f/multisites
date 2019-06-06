@@ -5,7 +5,7 @@ namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\ImageArrange;
 use App\Models\Admin\Activity\ActivityInfos;
-use App\Models\Advertisement\AdvertisementType;
+use App\Models\Advertisement\FrontendSystemAdsType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 
 class HomepageRotationChartController extends BackEndApiMainController
 {
-    protected $eloqM = 'Admin\Homepage\HomepageRotationChart';
+    protected $eloqM = 'Admin\Homepage\FrontendPageBanner';
 
     //首页轮播图列表
     public function detail(): JsonResponse
@@ -273,7 +273,7 @@ class HomepageRotationChartController extends BackEndApiMainController
     //上传图片的规格
     public function picStandard(): JsonResponse
     {
-        $standard = AdvertisementType::select('l_size', 'w_size', 'size')->where('type', 1)->first();
+        $standard = FrontendSystemAdsType::select('l_size', 'w_size', 'size')->where('type', 1)->first();
         return $this->msgOut(true, $standard);
     }
 

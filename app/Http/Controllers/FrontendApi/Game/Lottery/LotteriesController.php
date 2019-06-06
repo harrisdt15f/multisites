@@ -6,9 +6,9 @@ use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesBetRequest;
 use App\Lib\Locker\AccountLocker;
 use App\Lib\Logic\AccountChange;
-use App\Models\Game\Lottery\IssueModel;
-use App\Models\Game\Lottery\LotteriesModel;
-use App\Models\MethodsModel;
+use App\Models\Game\Lottery\LotteryIssue;
+use App\Models\Game\Lottery\LotteryList;
+use App\Models\LotteryMethod;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
@@ -21,7 +21,7 @@ class LotteriesController extends FrontendApiMainController
 {
     public function lotteryList(): JsonResponse
     {
-        $lotteries = LotteriesModel::with(['issueRule:lottery_id,begin_time,end_time'])->get([
+        $lotteries = LotteryList::with(['issueRule:lottery_id,begin_time,end_time'])->get([
             'cn_name as name',
             'en_name',
             'series_id',
@@ -62,7 +62,7 @@ class LotteriesController extends FrontendApiMainController
 
     public function lotteryInfo(): JsonResponse
     {
-        $lotteries = LotteriesModel::where('status', 1)->get();
+        $lotteries = LotteryList::where('status', 1)->get();
         $cacheData = [];
         $redisKey = 'frontend.lottery.lotteryInfo';
         if (Cache::has($redisKey)) {
@@ -71,7 +71,7 @@ class LotteriesController extends FrontendApiMainController
             foreach ($lotteries as $lottery) {
                 $lottery->valid_modes = $lottery->getFormatMode();
                 // 获取所有玩法
-                $methods = MethodsModel::getMethodConfig($lottery->en_name);
+                $methods = LotteryMethod::getMethodConfig($lottery->en_name);
                 $methodData = [];
 
                 $groupName = config('game.method.group_name');
@@ -93,7 +93,7 @@ class LotteriesController extends FrontendApiMainController
                     }
 
                     if (!isset($hasRow[$method->method_group]) || !in_array($method->method_row,
-                            $hasRow[$method->method_group])) {
+                        $hasRow[$method->method_group])) {
                         $groupData[$method->method_group][] = [
                             'name' => $rowName[$method->method_row],
                             'sign' => $method->method_row,
@@ -181,8 +181,8 @@ class LotteriesController extends FrontendApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $lotterySign = $this->inputs['lottery_sign'];
-        $lottery = LotteriesModel::findBySign($lotterySign);
-        $canUserInfo = IssueModel::getCanBetIssue($lotterySign, $lottery->max_trace_number);
+        $lottery = LotteryList::findBySign($lotterySign);
+        $canUserInfo = LotteryIssue::getCanBetIssue($lotterySign, $lottery->max_trace_number);
         $canBetIssueData = [];
         $currentIssue = [];
         foreach ($canUserInfo as $index => $issue) {
@@ -202,7 +202,7 @@ class LotteriesController extends FrontendApiMainController
             ];
         }
         // 上一期
-        $_lastIssue = IssueModel::getLastIssue($lotterySign);
+        $_lastIssue = LotteryIssue::getLastIssue($lotterySign);
         $lastIssue = [
             'issue_no' => $_lastIssue->issue,
             'begin_time' => $_lastIssue->begin_time,
@@ -240,7 +240,7 @@ class LotteriesController extends FrontendApiMainController
         $inputDatas = $request->validated();
         $usr = $this->currentAuth->user();
         $lotterySign = $inputDatas['lottery_sign'];
-        $lottery = LotteriesModel::getLottery($lotterySign);
+        $lottery = LotteryList::getLottery($lotterySign);
         $betDetail = [];
         $_totalCost = 0;
         // 初次解析
@@ -249,9 +249,9 @@ class LotteriesController extends FrontendApiMainController
             $methodId = $item['method_id'];
             $method = $lottery->getMethod($methodId);
             $validator = Validator::make($method, [
-                'status' => 'required|in:1',//玩法状态
-                'object' => 'required',//玩法对象
-                'method_name' => 'required',// 玩法未定义
+                'status' => 'required|in:1', //玩法状态
+                'object' => 'required', //玩法对象
+                'method_name' => 'required', // 玩法未定义
             ]);
             if ($validator->fails()) {
                 return $this->msgOut(false, [], '400', $validator->errors()->first());
@@ -263,7 +263,7 @@ class LotteriesController extends FrontendApiMainController
             if ($oMethod->supportExpand) {
                 $position = [];
                 if (isset($item['position'])) {
-                    $position = (array)$item['position'];
+                    $position = (array) $item['position'];
                 }
                 if (!$oMethod->checkPos($position)) {
                     return "对不起, 玩法{$method['name']}位置不正确!";
@@ -345,13 +345,13 @@ class LotteriesController extends FrontendApiMainController
         }
         $traceData = $traceDataCollection->pluck('issue');
         // 获取当前奖期
-        $currentIssue = IssueModel::getCurrentIssue($lottery->en_name);
+        $currentIssue = LotteryIssue::getCurrentIssue($lottery->en_name);
         if (!$currentIssue) {
             return $this->msgOut(false, [], '', '对不起, 奖期已过期!');
         }
         // 奖期和追号
         /*if ($currentIssue->issue != $traceData[0]) {
-            return $this->msgOut(false, [], '', '对不起, 奖期已过期!');
+        return $this->msgOut(false, [], '', '对不起, 奖期已过期!');
         }*/
         $accountLocker = new AccountLocker($usr->id);
         if (!$accountLocker->getLock()) {
@@ -384,7 +384,7 @@ class LotteriesController extends FrontendApiMainController
                 if ($res !== true) {
                     DB::rollBack();
                     $accountLocker->release();
-                    return $this->msgOut(false, [], '', '对不起, '.$res);
+                    return $this->msgOut(false, [], '', '对不起, ' . $res);
                 }
             }
             $accountChange->triggerSave();
@@ -392,8 +392,8 @@ class LotteriesController extends FrontendApiMainController
         } catch (\Exception $e) {
             DB::rollBack();
             $accountLocker->release();
-            Log::info('投注-异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine());//Clog::userBet
-            return $this->msgOut(false, [], '', '对不起, '.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine());
+            Log::info('投注-异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine()); //Clog::userBet
+            return $this->msgOut(false, [], '', '对不起, ' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine());
         }
         $accountLocker->release();
         return $this->msgOut(true, $data);

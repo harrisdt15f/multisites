@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers\FrontendApi;
 
-use App\Models\Admin\PartnerAdminGroupAccess;
+use App\Models\Admin\BackendAdminAccessGroup;
+use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
 use App\Models\Admin\PartnerSysConfigures;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
@@ -23,7 +24,7 @@ class FrontendAuthController extends FrontendApiMainController
 
     public $successStatus = 200;
 
-    protected $eloqM = 'User\UserHandleModel';
+    protected $eloqM = 'User\FrontendUser';
 
     public function username()
     {
@@ -172,8 +173,8 @@ class FrontendAuthController extends FrontendApiMainController
     public function register(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'name' => 'required|unique:partner_admin_users',
-            'email' => 'required|email|unique:partner_admin_users',
+            'name' => 'required|unique:backend_admin_users',
+            'email' => 'required|email|unique:backend_admin_users',
             'password' => 'required',
             'is_test' => 'required|numeric',
             'group_id' => 'required|numeric',
@@ -181,7 +182,7 @@ class FrontendAuthController extends FrontendApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $group = PartnerAdminGroupAccess::find($this->inputs['group_id']);
+        $group = BackendAdminAccessGroup::find($this->inputs['group_id']);
         $role = $group->role == '*' ? Arr::wrap($group->role) : Arr::wrap(json_decode($group->role, true));
         $isManualRecharge = false;
         $FundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
@@ -189,10 +190,10 @@ class FrontendAuthController extends FrontendApiMainController
         $input = $this->inputs;
         $input['password'] = bcrypt($input['password']);
         $input['platform_id'] = $this->currentPlatformEloq->platform_id;
-        $user = PartnerAdminUsers::create($input);
+        $user = BackendAdminUser::create($input);
         if ($isManualRecharge === true) {
             $insertData = ['admin_id' => $user->id];
-            $FundOperationEloq = new FundOperation();
+            $FundOperationEloq = new BackendAdminRechargePocessAmount();
             $FundOperationEloq->fill($insertData);
             $FundOperationEloq->save();
         }

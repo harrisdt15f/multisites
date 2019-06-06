@@ -4,9 +4,9 @@ namespace App\Models\User;
 
 use App\Models\BaseModel;
 
-class UserRechargeHistory extends BaseModel
+class UsersRechargeHistorie extends BaseModel
 {
-    protected $table = 'user_recharge_history';
+    protected $table = 'users_recharge_histories';
 
     const ARTIFICIAL = 1; //人工充值
     const AUTOMATIC = 0; //自动充值

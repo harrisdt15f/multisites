@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Validator;
 
 class NoticeController extends BackEndApiMainController
 {
-    protected $eloqM = 'Admin\Notice\Notice';
+    protected $eloqM = 'Admin\Notice\FrontendMessageNotice';
 
     //公告列表
     public function detail(): JsonResponse

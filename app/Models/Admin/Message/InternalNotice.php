@@ -4,12 +4,12 @@
  * @Author: LingPh
  * @Date:   2019-06-01 14:51:08
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-03 11:03:20
+ * @Last Modified time: 2019-06-06 12:09:56
  */
 
 namespace App\Models\Admin\Message;
 
-use App\Models\Admin\PartnerAdminUsers;
+use App\Models\Admin\BackendAdminUser;
 use App\Models\BaseModel;
 
 class InternalNotice extends BaseModel

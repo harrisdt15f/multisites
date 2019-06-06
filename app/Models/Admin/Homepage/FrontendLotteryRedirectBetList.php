@@ -3,18 +3,18 @@
 namespace App\Models\Admin\Homepage;
 
 use App\Models\BaseModel;
-use App\Models\Game\Lottery\LotteriesModel;
+use App\Models\Game\Lottery\LotteryList;
 
-class PopularLotteries extends BaseModel
+class FrontendLotteryRedirectBetList extends BaseModel
 {
-    protected $table = 'popular_lotteries';
+    protected $table = 'frontend_lottery_redirect_bet_lists';
 
     protected $fillable = [
         'lotteries_id', 'pic_path', 'sort', 'created_at', 'updated_at',
     ];
     public function lotteries()
     {
-        $data = $this->hasOne(LotteriesModel::class, 'id', 'lotteries_id');
+        $data = $this->hasOne(LotteryList::class, 'id', 'lotteries_id');
         return $data;
     }
 }

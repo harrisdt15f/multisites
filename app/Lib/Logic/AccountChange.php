@@ -4,7 +4,7 @@ namespace App\Lib\Logic;
 use App\Lib\Clog;
 use App\Models\User\Fund\AccountChangeReport;
 use App\Models\User\Fund\AccountChangeType;
-use App\Models\User\UserHandleModel;
+use App\Models\User\FrontendUser;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -98,7 +98,7 @@ class AccountChange
         // 4. 关联用户是否存在
         $relatedUser = null;
         if (isset($params['related_id'])) {
-            $relatedUser = UserHandleModel::findByCache($params['related_id']);
+            $relatedUser = FrontendUser::findByCache($params['related_id']);
             if (!$relatedUser) {
                 return '对不起, 无效的关联用户!';
             }
@@ -197,7 +197,7 @@ class AccountChange
             return true;
         } else {
             $updated_at = date('Y-m-d H:i:s');
-            $sql = "update `user_accounts` set `balance`=`balance`+'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}'";
+            $sql = "update `frontend_users_accounts` set `balance`=`balance`+'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}'";
             $ret= DB::update($sql) > 0 ;
             if($ret){
                 $account->balance += $money;
@@ -227,7 +227,7 @@ class AccountChange
             return true;
         } else {
             $updated_at = date('Y-m-d H:i:s');
-            $ret= DB::update("update `user_accounts` set `balance`=`balance`-'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}' and `balance`>='{$money}'") > 0 ;
+            $ret= DB::update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}' and `balance`>='{$money}'") > 0 ;
             if($ret){
                 $account->balance = $account->balance - $money;
             }
@@ -257,7 +257,7 @@ class AccountChange
             return true;
         } else {
             $updated_at = date('Y-m-d H:i:s');
-            $ret = DB::update("update `user_accounts` set `balance`=`balance`-'{$money}', `frozen`=`frozen`+ '{$money}'  , `updated_at`='$updated_at' where `user_id` ='{$account->user_id}' and `balance`>='{$money}'") > 0;
+            $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}', `frozen`=`frozen`+ '{$money}'  , `updated_at`='$updated_at' where `user_id` ='{$account->user_id}' and `balance`>='{$money}'") > 0;
             if ($ret) {
                 $account->balance -= $money;
                 $account->frozen += $money;
@@ -286,7 +286,7 @@ class AccountChange
         } else {
             $updated_at = date('Y-m-d H:i:s');
 
-            $ret = DB::update("update `user_accounts` set `balance`=`balance`+'{$money}', `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}'") > 0;
+            $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`+'{$money}', `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}'") > 0;
 
             if ($ret) {
                 $account->balance += $money;
@@ -319,7 +319,7 @@ class AccountChange
             return true;
         } else {
             $updated_at = date('Y-m-d H:i:s');
-            $ret = DB::update("update `user_accounts` set  `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}'") > 0;
+            $ret = DB::update("update `frontend_users_accounts` set  `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}'") > 0;
             if ($ret) {
                 $account->frozen -= $money;
             }
@@ -372,7 +372,7 @@ class AccountChange
                 if ($balanceAdd === 0 && $frozenAdd === 0) {
                     continue;
                 }
-                $sql = 'update `user_accounts` set ';
+                $sql = 'update `frontend_users_accounts` set ';
                 // 冻结金额
                 if ($frozenAdd > 0) {
                     $sql .= " `frozen`=`frozen` + '{$frozenAdd}',";

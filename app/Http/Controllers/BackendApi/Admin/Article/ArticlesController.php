@@ -5,9 +5,9 @@ namespace App\Http\Controllers\BackendApi\Admin\Article;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\ImageArrange;
 use App\Lib\Common\InternalNoticeMessage;
+use App\Models\Admin\BackendAdminUser;
 use App\Models\Admin\Message\NoticeMessage;
-use App\Models\Admin\PartnerAdminUsers;
-use App\Models\AuditFlow;
+use App\Models\BackendAdminAuditFlowList;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ArticlesController extends BackEndApiMainController
 {
-    protected $eloqM = 'Admin\Activity\Articles';
+    protected $eloqM = 'Admin\Activity\BackendAdminMessageArticle';
     protected $message = '有新的文章需要审核';
 
     //文章列表
@@ -49,9 +49,9 @@ class ArticlesController extends BackEndApiMainController
             return $this->msgOut(false, [], '100500');
         }
         try {
-            //插入 audit_flow 审核表
+            //插入 backend_admin_audit_flow_lists 审核表
             $auditFlowId = $this->insertAuditFlow($this->inputs['apply_note']);
-            //插入 partner_articles 文章表
+            //插入 BackendAdminMessageArticle 文章表
             $addDatas = $this->inputs;
             unset($addDatas['pic_name']);
             $sortdata = $this->eloqM::orderBy('sort', 'desc')->first();
@@ -108,7 +108,7 @@ class ArticlesController extends BackEndApiMainController
             return $this->msgOut(false, [], '100500');
         }
         try {
-            //插入 audit_flow 审核表
+            //插入 backend_admin_audit_flow_lists 审核表
             $auditFlowId = $this->insertAuditFlow($this->inputs['apply_note']);
             $editDataEloq->audit_flow_id = $auditFlowId;
             //
@@ -304,7 +304,7 @@ class ArticlesController extends BackEndApiMainController
             'apply_note' => $apply_note,
             'admin_name' => $this->partnerAdmin['name'],
         ];
-        $flowConfigure = new AuditFlow;
+        $flowConfigure = new BackendAdminAuditFlowList;
         $flowConfigure->fill($flowDatas);
         $flowConfigure->save();
         return $flowConfigure->id;
@@ -332,7 +332,7 @@ class ArticlesController extends BackEndApiMainController
         $messageClass = new InternalNoticeMessage();
         $type = NoticeMessage::AUDIT;
         $message = $this->message;
-        $adminsArr = PartnerAdminUsers::select('id', 'group_id')->where('group_id', 1)->get()->toArray();
+        $adminsArr = BackendAdminUser::select('id', 'group_id')->where('group_id', 1)->get()->toArray();
         $messageClass->insertMessage($type, $message, $adminsArr);
     }
 }

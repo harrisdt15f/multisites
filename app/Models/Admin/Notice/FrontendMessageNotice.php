@@ -2,12 +2,12 @@
 
 namespace App\Models\Admin\Notice;
 
-use App\Models\Admin\PartnerAdminUsers;
+use App\Models\Admin\BackendAdminUser;
 use App\Models\BaseModel;
 
-class Notice extends BaseModel
+class FrontendMessageNotice extends BaseModel
 {
-    protected $table = 'partner_notice';
+    protected $table = 'frontend_message_notices';
 
     protected $fillable = [
         'type', 'title', 'content', 'start_time', 'end_time', 'sort', 'status', 'admin_id', 'created_at', 'updated_at',
@@ -15,7 +15,7 @@ class Notice extends BaseModel
 
     public function admin()
     {
-        $data = $this->hasOne(PartnerAdminUsers::class, 'id', 'admin_id');
+        $data = $this->hasOne(BackendAdminUser::class, 'id', 'admin_id');
         return $data;
     }
 }

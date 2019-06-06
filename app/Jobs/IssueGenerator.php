@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\Game\Lottery\LotteriesModel;
+use App\Models\Game\Lottery\LotteryList;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -34,7 +34,7 @@ class IssueGenerator implements ShouldQueue
     public function handle()
     {
         $lotteryId = $this->datas['lottery_id'];
-        $lottery = LotteriesModel::where('en_name', $lotteryId)->first();
+        $lottery = LotteryList::where('en_name', $lotteryId)->first();
         if (!$lottery) {
             Log::channel('issues')->error('游戏不存在');
         }

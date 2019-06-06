@@ -4,14 +4,14 @@
  * @Author: LingPh
  * @Date:   2019-05-27 11:02:52
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-01 18:17:30
+ * @Last Modified time: 2019-06-06 13:08:04
  */
 namespace App\Http\Controllers\BackendApi\Report;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Models\User\Fund\AccountChangeReport;
 use App\Models\User\Fund\AccountChangeType;
-use App\Models\User\UserRechargeHistory;
+use App\Models\User\UsersRechargeHistorie;
 use Illuminate\Support\Facades\Validator;
 
 class reportManagementController extends BackEndApiMainController
@@ -46,7 +46,7 @@ class reportManagementController extends BackEndApiMainController
     //玩家充值报表
     public function userRechargeHistory()
     {
-        $rechargeHistoryEloq = new UserRechargeHistory();
+        $rechargeHistoryEloq = new UsersRechargeHistorie();
         $searchAbleFields = ['user_name', 'company_order_num', 'deposit_mode', 'status'];
         $fixedJoin = 0;
         $field = 'updated_at';

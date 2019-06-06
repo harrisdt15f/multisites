@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\Game\Lottery\IssueModel;
+use App\Models\Game\Lottery\LotteryIssue;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -34,7 +34,7 @@ class IssueInserter implements ShouldQueue
     public function handle()
     {
         try {
-            IssueModel::insert($this->datas);
+            LotteryIssue::insert($this->datas);
             $message = 'Finished >>>>' . json_encode($this->datas, JSON_UNESCAPED_UNICODE) . "\n";
             Log::channel('issues')->info($message);
         } catch (\Exception $e) {

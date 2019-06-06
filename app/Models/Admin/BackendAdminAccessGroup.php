@@ -2,12 +2,12 @@
 
 namespace App\Models\Admin;
 
-use App\Models\Admin\PartnerAdminUsers;
+use App\Models\Admin\BackendAdminUser;
 use App\Models\BaseModel;
 
-class PartnerAdminGroupAccess extends BaseModel
+class BackendAdminAccessGroup extends BaseModel
 {
-    protected $table = 'partner_access_group';
+    protected $table = 'backend_admin_access_groups';
     protected $fillable = [
         'group_name', 'role', 'status',
     ];
@@ -24,6 +24,6 @@ class PartnerAdminGroupAccess extends BaseModel
      */
     public function adminUsers()
     {
-        return $this->hasMany(PartnerAdminUsers::class, 'group_id', 'id')->select(['id', 'name', 'email', 'is_test', 'status', 'platform_id', 'group_id']);
+        return $this->hasMany(BackendAdminUser::class, 'group_id', 'id')->select(['id', 'name', 'email', 'is_test', 'status', 'platform_id', 'group_id']);
     }
 }

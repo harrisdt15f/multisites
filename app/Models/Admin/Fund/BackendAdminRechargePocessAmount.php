@@ -4,9 +4,9 @@ namespace App\Models\Admin\Fund;
 
 use App\Models\BaseModel;
 
-class FundOperation extends BaseModel
+class BackendAdminRechargePocessAmount extends BaseModel
 {
-    protected $table = 'fund_operation';
+    protected $table = 'backend_admin_recharge_pocess_amounts';
 
     protected $fillable = [
         'admin_id', 'fund',

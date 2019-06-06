@@ -4,18 +4,18 @@
  * @Author: LingPh
  * @Date:   2019-05-30 14:28:04
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-05-30 16:21:07
+ * @Last Modified time: 2019-06-06 12:03:05
  */
-namespace App\Http\Controllers\BackendApi\DeveloperUsage\MethodLevel;
+namespace App\Http\Controllers\BackendApi\DeveloperUsage\LotteryMethodsWaysLevel;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Models\Game\Lottery\MethodsModel;
+use App\Models\Game\Lottery\LotteryMethod;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
 class MethodLevelController extends BackEndApiMainController
 {
-    protected $eloqM = 'DeveloperUsage\MethodLevel\MethodLevel';
+    protected $eloqM = 'DeveloperUsage\MethodLevel\LotteryMethodsWaysLevel';
 
     //玩法等级管理列表
     public function detail()
@@ -44,7 +44,7 @@ class MethodLevelController extends BackEndApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         //检查玩法
-        $checkMethods = MethodsModel::where('method_id', $this->inputs['method_id'])->first();
+        $checkMethods = LotteryMethod::where('method_id', $this->inputs['method_id'])->first();
         if (is_null($checkMethods)) {
             return $this->msgOut(false, [], '102200');
         }

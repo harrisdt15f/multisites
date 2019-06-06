@@ -3,7 +3,7 @@
 namespace App\Models\Admin;
 use App\Models\BaseModel;
 
-use App\Models\DeveloperUsage\Backend\PartnerAdminRoute;
+use App\Models\DeveloperUsage\Backend\BackendAdminRoute;
 class Logs extends BaseModel
 {
     protected $table = 'logs';
@@ -47,6 +47,6 @@ class Logs extends BaseModel
 
     public function route()
     {
-        return $this->hasOne(PartnerAdminRoute::class,'id','rout_id');
+        return $this->hasOne(BackendAdminRoute::class,'id','rout_id');
     }
 }

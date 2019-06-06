@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Admin\PartnerAdminUsers;
-use App\Models\User\UserHandleModel;
+use App\Models\Admin\BackendAdminUser;
+use App\Models\User\FrontendUser;
 
 return [
 
@@ -78,13 +78,13 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => UserHandleModel::class,
+            'model' => FrontendUser::class,
         ],
 
         // ** New provider**
         'admins' => [
             'driver' => 'eloquent',
-            'model' => PartnerAdminUsers::class,
+            'model' => BackendAdminUser::class,
         ],
 
         // 'users' => [

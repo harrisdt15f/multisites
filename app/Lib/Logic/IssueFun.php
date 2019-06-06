@@ -1,4 +1,5 @@
-<?php namespace App\Lib\Logic;
+<?php
+namespace App\Lib\Logic;
 
 use App\Models\Game\Issue;
 use App\Models\Game\IssueRule;
@@ -9,7 +10,8 @@ use Illuminate\Support\Facades\DB;
  * Class IssueFun
  * @package App\Lib\Logic
  */
-class IssueFun {
+class IssueFun
+{
 
     /** ================================= 奖期生成 ================================== */
 
@@ -24,7 +26,8 @@ class IssueFun {
      * @param $openTime string 开奖时间 六合彩专用
      * @return array|string
      */
-    static function genIssue($lottery, $startDay, $endDay, $openTime = null) {
+    public static function genIssue($lottery, $startDay, $endDay, $openTime = null)
+    {
         // 是否开启
         if ($lottery->status != 1) {
             return "对不起,彩种{$lottery->cn_name}未开启!!";
@@ -40,7 +43,7 @@ class IssueFun {
             return "对不起, 您选择的彩种需要开奖时间!";
         }
 
-        $rules  = IssueRule::where('lottery_id', $lottery->en_name)->orderBy('id', "ASC")->get();
+        $rules = IssueRule::where('lottery_id', $lottery->en_name)->orderBy('id', "ASC")->get();
 
         $daySet = self::getDaySet($startDay, $endDay);
 
@@ -59,7 +62,8 @@ class IssueFun {
      * @param $rules
      * @return bool|string
      */
-    public static function _genIssue($lottery, $day, $rules) {
+    public static function _genIssue($lottery, $day, $rules)
+    {
         if (!$rules) {
             return "对不起, 彩种{$lottery->cn_name}未配置奖期规则!!";
         }
@@ -73,15 +77,15 @@ class IssueFun {
         } else if ($issueCount == $lottery->day_issue) {
             return "对不起, 彩种{$lottery->cn_name}-{$intDay}-已经生成!!";
         }
-        $firstIssueNo   = '';
-        $data           = [];
+        $firstIssueNo = '';
+        $data = [];
         // 累加型的获取
         if ($lottery->issue_type == 'increase') {
             $config = config('game.issue.issue_fix');
             if (isset($config[$lottery->en_name])) {
-                $_config    = $config[$lottery->en_name];
-                $_day       = (strtotime($day) - strtotime($_config['day'])) / 86400;
-                $_day       = ceil($_day);
+                $_config = $config[$lottery->en_name];
+                $_day = (strtotime($day) - strtotime($_config['day'])) / 86400;
+                $_day = ceil($_day);
                 if (isset($_config['zero_start'])) {
                     $firstIssueNo = intval($_config['start_issue']) + $_day * $lottery->day_issue;
                     $firstIssueNo = $_config['zero_start'] . $firstIssueNo;
@@ -95,37 +99,37 @@ class IssueFun {
         foreach ($rules as $index => $rule) {
 
             $adjustTime = $rule->adjust_time;
-            $beginTime  = strtotime($day .' '. $rule['begin_time']);
+            $beginTime = strtotime($day . ' ' . $rule['begin_time']);
 
             // 结束时间的修正
             if ($rule['end_time'] == "00:00:00") {
-                $endTime    = strtotime($day . " " . $rule['end_time']) + 86400   - $adjustTime;
+                $endTime = strtotime($day . " " . $rule['end_time']) + 86400 - $adjustTime;
             } else {
-                $endTime    = strtotime($day .' '. $rule['end_time'])   - $adjustTime;
+                $endTime = strtotime($day . ' ' . $rule['end_time']) - $adjustTime;
                 // 如果跨天
-                if (strtotime($day .' '. $rule['begin_time']) > strtotime($day . " " . $rule['end_time'])) {
+                if (strtotime($day . ' ' . $rule['begin_time']) > strtotime($day . " " . $rule['end_time'])) {
                     $endTime = $endTime + 86400;
                 }
             }
-            $issueTime  = $rule['issue_seconds'];
-            $index   = 1;
+            $issueTime = $rule['issue_seconds'];
+            $index = 1;
             do {
                 if (1 == $index) {
-                    $issueEnd           = strtotime($day . " " . $rule['first_time']) - $adjustTime;
-                    $officialOpenTime   = strtotime($day . " " . $rule['first_time']);
+                    $issueEnd = strtotime($day . " " . $rule['first_time']) - $adjustTime;
+                    $officialOpenTime = strtotime($day . " " . $rule['first_time']);
                 } else {
-                    $issueEnd           = $beginTime + $issueTime;
-                    $officialOpenTime   = $beginTime + $issueTime + $adjustTime;
+                    $issueEnd = $beginTime + $issueTime;
+                    $officialOpenTime = $beginTime + $issueTime + $adjustTime;
                 }
                 $item = [
-                    'lottery_id'            => $lottery->en_name,
-                    'issue_rule_id'         => $rule->id,
-                    'lottery_name'          => $lottery->cn_name,
-                    'begin_time'            => $beginTime,
-                    'end_time'              => $issueEnd,
-                    'official_open_time'    => $officialOpenTime,
-                    'allow_encode_time'     => $officialOpenTime + $rule['encode_time'],
-                    'day'                   => $intDay,
+                    'lottery_id' => $lottery->en_name,
+                    'issue_rule_id' => $rule->id,
+                    'lottery_name' => $lottery->cn_name,
+                    'begin_time' => $beginTime,
+                    'end_time' => $issueEnd,
+                    'official_open_time' => $officialOpenTime,
+                    'allow_encode_time' => $officialOpenTime + $rule['encode_time'],
+                    'day' => $intDay,
                 ];
                 if ($firstIssueNo) {
                     $item['issue'] = $issueNo;
@@ -136,15 +140,15 @@ class IssueFun {
                 }
                 $data[] = $item;
                 $beginTime = $issueEnd;
-                $index ++;
-            }while($beginTime < $endTime);
+                $index++;
+            } while ($beginTime < $endTime);
         }
-        $totalGenCount  = count($data);
+        $totalGenCount = count($data);
         if ($totalGenCount != $lottery->day_issue) {
             return "生成的期数不正确, 应该：{$lottery->day_issue} - 实际:{$totalGenCount}";
         }
         // 插入
-        $res = DB::table('issues')->insert($data);
+        $res = DB::table('lottery_issues')->insert($data);
         if ($res) {
             return true;
         }
@@ -158,14 +162,15 @@ class IssueFun {
      * @param $day
      * @return mixed
      */
-    public static function getNextIssueNo($issueNo, $lottery, $rule, $day) {
-        $dayTime        = strtotime($day);
-        $issueFormat    = $lottery->issue_format;
+    public static function getNextIssueNo($issueNo, $lottery, $rule, $day)
+    {
+        $dayTime = strtotime($day);
+        $issueFormat = $lottery->issue_format;
         $formats = explode('|', $issueFormat);
         // C 开头
         if (count($formats) == 1 and strpos($formats[0], 'C') !== false) {
             $currentIssueNo = intval($issueNo);
-            $nextIssue      = $currentIssueNo + 1;
+            $nextIssue = $currentIssueNo + 1;
             if (strlen($currentIssueNo) == strlen($issueNo)) {
                 return $nextIssue;
             } else {
@@ -206,9 +211,10 @@ class IssueFun {
      * @param $count
      * @return string
      */
-    public static function getNextNumber($issueNo, $count) {
-        $currentNo  = substr($issueNo, -$count);
-        $nextNo     = intval($currentNo) + 1;
+    public static function getNextNumber($issueNo, $count)
+    {
+        $currentNo = substr($issueNo, -$count);
+        $nextNo = intval($currentNo) + 1;
         return str_pad($nextNo, $count, '0', STR_PAD_LEFT);
     }
 
@@ -218,10 +224,11 @@ class IssueFun {
      * @param $endDay
      * @return array
      */
-    public static function getDaySet($startDay, $endDay) {
+    public static function getDaySet($startDay, $endDay)
+    {
         $data = [];
         $dtStart = strtotime($startDay);
-        $dtEnd   = strtotime($endDay);
+        $dtEnd = strtotime($endDay);
 
         if ($dtStart > $dtEnd) {
             return $data;

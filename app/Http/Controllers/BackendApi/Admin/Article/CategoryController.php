@@ -8,12 +8,12 @@ use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends BackEndApiMainController
 {
-    protected $eloqM = 'Admin\Activity\Category';
+    protected $eloqM = 'Admin\Activity\FrontendInfoCategorie';
 
     //分类管理列表
     public function detail(): JsonResponse
     {
-        $datas = $this->eloqM::from('partner_category as self')->leftJoin('partner_category as secondary', 'self.parent', '=', 'secondary.id')->select('self.*', 'secondary.title as parent_title')->get()->toArray();
+        $datas = $this->eloqM::from('frontend_info_categories as self')->leftJoin('frontend_info_categories as secondary', 'self.parent', '=', 'secondary.id')->select('self.*', 'secondary.title as parent_title')->get()->toArray();
         return $this->msgOut(true, $datas);
     }
 

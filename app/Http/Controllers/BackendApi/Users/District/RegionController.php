@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Validator;
 
 class RegionController extends BackEndApiMainController
 {
-    protected $eloqM = 'User\Region';
+    protected $eloqM = 'User\UsersRegion';
 
     //获取 省-市-县 列表
     public function detail()
@@ -42,10 +42,10 @@ class RegionController extends BackEndApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $datas = $this->eloqM::select('a.*', 'b.region_name as country_name', 'c.region_name as city_name', 'd.region_name as province_name')
-            ->from('region as a')
-            ->leftJoin('region as b', 'a.region_parent_id', '=', 'b.region_id')
-            ->leftJoin('region as c', 'b.region_parent_id', '=', 'c.region_id')
-            ->leftJoin('region as d', 'c.region_parent_id', '=', 'd.region_id')
+            ->from('users_regions as a')
+            ->leftJoin('users_regions as b', 'a.region_parent_id', '=', 'b.region_id')
+            ->leftJoin('users_regions as c', 'b.region_parent_id', '=', 'c.region_id')
+            ->leftJoin('users_regions as d', 'c.region_parent_id', '=', 'd.region_id')
             ->where([['a.region_name', 'like', '%' . $this->inputs['search_name'] . '%'], ['a.region_level', 4]])
             ->get()->toArray();
         return $this->msgOut(true, $datas);

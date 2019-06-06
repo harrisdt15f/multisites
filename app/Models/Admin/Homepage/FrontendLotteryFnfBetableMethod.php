@@ -4,16 +4,15 @@
  * @Author: LingPh
  * @Date:   2019-06-04 14:53:23
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-04 14:54:56
+ * @Last Modified time: 2019-06-06 12:29:26
  */
 namespace App\Models\Admin\Homepage;
 
 use App\Models\BaseModel;
-use App\Models\Game\Lottery\LotteriesModel;
 
-class HomeDefaultBetMethods extends BaseModel
+class FrontendLotteryFnfBetableMethod extends BaseModel
 {
-    protected $table = 'home_default_bet_methods';
+    protected $table = 'frontend_lottery_fnf_betable_methods';
 
     protected $fillable = [
         'series_id',

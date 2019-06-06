@@ -2,10 +2,10 @@
 
 namespace App\Models\User\Fund;
 
-use App\Models\AuditFlow;
+use App\Models\BackendAdminAuditFlowList;
 use App\Models\BaseModel;
 
-class ArtificialRechargeLog extends BaseModel
+class BackendAdminRechargehumanLog extends BaseModel
 {
     public const DECREMENT = 0; //减少额度
     public const INCREMENT = 1; //增加额度
@@ -16,7 +16,7 @@ class ArtificialRechargeLog extends BaseModel
     public const AUDITSUCCESS = 1; //审核通过
     public const AUDITFAILURE = 2; //审核驳回
 
-    protected $table = 'artificial_recharge_log';
+    protected $table = 'backend_admin_rechargehuman_logs';
 
     protected $fillable = [
         'type', 'in_out', 'super_admin_id', 'super_admin_name', 'admin_id', 'admin_name', 'user_id', 'user_name', 'amount', 'comment', 'audit_flow_id', 'status', 'updated_at', 'created_at',
@@ -24,7 +24,7 @@ class ArtificialRechargeLog extends BaseModel
 
     public function auditFlow()
     {
-        $data = $this->hasOne(AuditFlow::class, 'id', 'audit_flow_id');
+        $data = $this->hasOne(BackendAdminAuditFlowList::class, 'id', 'audit_flow_id');
         return $data;
     }
 }

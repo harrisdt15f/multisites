@@ -4,9 +4,9 @@ namespace App\Models\Admin;
 
 use App\Models\BaseModel;
 
-class PartnerLogsApi extends BaseModel
+class BackendSystemLog extends BaseModel
 {
-    protected $table = 'parter_logs_api';
+    protected $table = 'backend_system_logs';
 
     public const PHONE = 1;
     public const DESKSTOP = 2;

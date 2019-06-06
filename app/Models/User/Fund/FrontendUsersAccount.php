@@ -3,14 +3,14 @@
 namespace App\Models\User\Fund;
 
 use App\Models\User\Fund\Logics\UserAccountLogics;
-use App\Models\User\UserHandleModel;
+use App\Models\User\FrontendUser;
 use LaravelArdent\Ardent\Ardent;
 
-class HandleUserAccounts extends Ardent
+class FrontendUsersAccount extends Ardent
 {
     use UserAccountLogics;
 
-    protected $table = 'user_accounts';
+    protected $table = 'frontend_users_accounts';
 
     /**
      * The attributes that are mass assignable.
@@ -38,6 +38,6 @@ class HandleUserAccounts extends Ardent
 
     public function user()
     {
-        return $this->belongsTo(UserHandleModel::class, 'user_id', 'id');
+        return $this->belongsTo(FrontendUser::class, 'user_id', 'id');
     }
 }

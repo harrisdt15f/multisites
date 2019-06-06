@@ -4,8 +4,8 @@ namespace App\Models\Game\Lottery\Logics;
 
 use App\Jobs\IssueInserter;
 use App\Jobs\IssueSeparateGenJob;
-use App\Models\Game\Lottery\IssueModel;
-use App\Models\Game\Lottery\IssueRulesModel;
+use App\Models\Game\Lottery\LotteryIssue;
+use App\Models\Game\Lottery\LotteryIssueRule;
 use Illuminate\Support\Carbon;
 
 /**
@@ -42,7 +42,7 @@ trait LotteryIssueGenerate
         if ($this->issue_type == 'random' && !$openTime) {
             return '您选择的彩种需要开奖时间!';
         }
-        $rules = IssueRulesModel::where('lottery_id', $this->en_name)->orderBy('id', "ASC")->get();
+        $rules = LotteryIssueRule::where('lottery_id', $this->en_name)->orderBy('id', "ASC")->get();
         $daySet = $this->getDaySet($startDay, $endDay);
         foreach ($daySet as $day) {
             dispatch(new IssueSeparateGenJob($day, $rules, $this))->onQueue('issues');
@@ -83,10 +83,10 @@ trait LotteryIssueGenerate
         // 整数形式的日期
         $intDay = date('Ymd', strtotime($day));
         // 检查是否存在奖期
-        $issueCount = IssueModel::where('lottery_id', $this->en_name)->where('day', $intDay)->count();
+        $issueCount = LotteryIssue::where('lottery_id', $this->en_name)->where('day', $intDay)->count();
         if ($issueCount > 0 && $issueCount < $this->day_issue) {
             // 删除重新来
-            IssueModel::where('lottery_id', $this->en_name)->where('day', $intDay)->delete();
+            LotteryIssue::where('lottery_id', $this->en_name)->where('day', $intDay)->delete();
         } else {
             if ($issueCount == $this->day_issue) {
                 return "对不起, 彩种{$this->cn_name}-{$intDay}-已经生成!!";

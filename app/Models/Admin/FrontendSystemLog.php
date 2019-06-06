@@ -4,7 +4,7 @@ namespace App\Models\Admin;
 
 use App\Models\BaseModel;
 
-class FrontendApiLog extends BaseModel
+class FrontendSystemLog extends BaseModel
 {
     public const PHONE = 1;
     public const DESKSTOP = 2;

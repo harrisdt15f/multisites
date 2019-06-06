@@ -4,10 +4,10 @@ namespace App\Http\Controllers\FrontendApi\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Models\Admin\Activity\ActivityInfos;
-use App\Models\Admin\Homepage\HomepageRotationChart;
-use App\Models\Admin\Homepage\PopularLotteries;
-use App\Models\Admin\Homepage\PopularMethods;
-use App\Models\Admin\Notice\Notice;
+use App\Models\Admin\Homepage\FrontendLotteryFnfBetableList;
+use App\Models\Admin\Homepage\FrontendLotteryRedirectBetList;
+use App\Models\Admin\Homepage\FrontendPageBanner;
+use App\Models\Admin\Notice\FrontendMessageNotice;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
@@ -42,7 +42,7 @@ class HomepageController extends FrontendApiMainController
             if ($status->status !== 1) {
                 return $this->msgOut(false, [], '400', $this->offMsg);
             }
-            $datas = HomepageRotationChart::select('id', 'title', 'pic_path', 'content', 'type', 'redirect_url', 'activity_id')
+            $datas = FrontendPageBanner::select('id', 'title', 'pic_path', 'content', 'type', 'redirect_url', 'activity_id')
                 ->with(['activity' => function ($query) {
                     $query->select('id', 'redirect_url');
                 }])
@@ -69,7 +69,7 @@ class HomepageController extends FrontendApiMainController
             if ($lotteriesEloq->status !== 1) {
                 return $this->msgOut(false, [], '400', $this->offMsg);
             }
-            $dataEloq = PopularLotteries::select('id', 'lotteries_id', 'pic_path')->with(['lotteries' => function ($query) {
+            $dataEloq = FrontendLotteryRedirectBetList::select('id', 'lotteries_id', 'pic_path')->with(['lotteries' => function ($query) {
                 $query->select('id', 'day_issue', 'en_name');
             }])->orderBy('sort', 'asc')->limit($lotteriesEloq->show_num)->get();
             $datas = [];
@@ -93,7 +93,7 @@ class HomepageController extends FrontendApiMainController
             if ($lotteriesEloq->status !== 1) {
                 return $this->msgOut(false, [], '400', $this->offMsg);
             }
-            $methodsEloq = popularMethods::orderBy('sort', 'asc')->limit($lotteriesEloq->show_num)->with('method')->get();
+            $methodsEloq = FrontendLotteryFnfBetableList::orderBy('sort', 'asc')->limit($lotteriesEloq->show_num)->with('method')->get();
             $datas = [];
             foreach ($methodsEloq as $method) {
                 $data = [
@@ -166,7 +166,7 @@ class HomepageController extends FrontendApiMainController
             if ($noticeEloq->status !== 1) {
                 return $this->msgOut(false, [], '400', $this->offMsg);
             }
-            $datas = Notice::select('id', 'title')->where('status', 1)->orderBy('sort', 'asc')->limit($noticeEloq->show_num)->get();
+            $datas = FrontendMessageNotice::select('id', 'title')->where('status', 1)->orderBy('sort', 'asc')->limit($noticeEloq->show_num)->get();
             Cache::forever('homepageNotice', $datas);
         }
         return $this->msgOut(true, $datas);

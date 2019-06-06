@@ -5,10 +5,10 @@ namespace App\Models\Game\Lottery;
 use App\Models\BaseModel;
 use App\Models\Game\Lottery\Logics\MethodsLogics;
 
-class MethodsModel extends BaseModel
+class LotteryMethod extends BaseModel
 {
     use MethodsLogics;
-    protected $table = 'methods';
+    protected $table = 'lottery_methods';
 
     /**
      * The attributes that are mass assignable.

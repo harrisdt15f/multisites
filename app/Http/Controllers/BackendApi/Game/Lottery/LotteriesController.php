@@ -4,8 +4,8 @@ namespace App\Http\Controllers\BackendApi\Game\Lottery;
 
 use App\Events\IssueGenerateEvent;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Models\Game\Lottery\LotteriesModel;
-use App\Models\Game\Lottery\MethodsModel;
+use App\Models\Game\Lottery\LotteryList;
+use App\Models\Game\Lottery\LotteryMethod;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 
 class LotteriesController extends BackEndApiMainController
 {
-    protected $eloqM = 'Game\Lottery\LotteriesModel';
+    protected $eloqM = 'Game\Lottery\LotteryList';
 
     public function seriesLists()
     {
@@ -59,7 +59,7 @@ class LotteriesController extends BackEndApiMainController
         } else {
             $seriesList = array_keys(Config::get('game.main.series'));
             foreach ($seriesList as $seriesIthem) {
-                $methodEloq = MethodsModel::where([
+                $methodEloq = LotteryMethod::where([
                     ['series_id', '=', $seriesIthem],
                 ])->first();
                 $lotteriesIds = $methodEloq->lotteriesIds; //        dd($lotteriesIds);
@@ -71,7 +71,7 @@ class LotteriesController extends BackEndApiMainController
                     $methodGrops = $litems->methodGroups;
                     foreach ($methodGrops as $mgitems) {
                         $curentMethodGroup = $mgitems->method_group;
-                        $checkOpenGroup = MethodsModel::where(function ($query) use (
+                        $checkOpenGroup = LotteryMethod::where(function ($query) use (
                             $currentLotteryId,
                             $curentMethodGroup
                         ) {
@@ -92,7 +92,7 @@ class LotteriesController extends BackEndApiMainController
                         foreach ($methodRows as $rowitems) {
                             $method_row = $rowitems->method_row;
                             //玩法行 data
-                            $checkOpenRow = MethodsModel::where(function ($query) use (
+                            $checkOpenRow = LotteryMethod::where(function ($query) use (
                                 $currentLotteryId,
                                 $curentMethodGroup,
                                 $method_row
@@ -142,13 +142,13 @@ class LotteriesController extends BackEndApiMainController
 
     public function lotteryIssueLists()
     {
-        $modelName = 'Game\Lottery\IssueModel';
+        $modelName = 'Game\Lottery\LotteryIssue';
         $eloqM = $this->modelWithNameSpace($modelName);
         $seriesId = $this->inputs['series_id'] ?? '';
 //        {"method":"whereIn","key":"id","value":["cqssc","xjssc","hljssc","zx1fc","txffc"]}
         //        $extraWhereConditions = Arr::wrap(json_decode($this->inputs['extra_where'], true));
         if (!empty($seriesId)) {
-            $lotteryEnNames = LotteriesModel::where('series_id', $seriesId)->get(['en_name']);
+            $lotteryEnNames = LotteryList::where('series_id', $seriesId)->get(['en_name']);
             foreach ($lotteryEnNames as $lotteryIthems) {
                 $tempLotteryId[] = $lotteryIthems->en_name;
             }
@@ -216,7 +216,7 @@ class LotteriesController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $methodGroupEloq = MethodsModel::select('id')->where(function ($query) {
+        $methodGroupEloq = LotteryMethod::select('id')->where(function ($query) {
             $query->where('lottery_id', $this->inputs['lottery_id'])
                 ->where('method_group', $this->inputs['method_group']);
         })->get()->toArray();
@@ -226,7 +226,7 @@ class LotteriesController extends BackEndApiMainController
         try {
             $methodGroupIds = array_column($methodGroupEloq, 'id');
             $updateDate = ['status', $this->inputs['status']];
-            MethodsModel::whereIn('id', $methodGroupIds)->update(['status' => $this->inputs['status']]);
+            LotteryMethod::whereIn('id', $methodGroupIds)->update(['status' => $this->inputs['status']]);
             //清理彩种玩法缓存
             $this->clearMethodCache();
             return $this->msgOut(true);
@@ -249,7 +249,7 @@ class LotteriesController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $methodGroupEloq = MethodsModel::select('id')->where(function ($query) {
+        $methodGroupEloq = LotteryMethod::select('id')->where(function ($query) {
             $query->where('lottery_id', $this->inputs['lottery_id'])
                 ->where('method_group', $this->inputs['method_group'])
                 ->where('method_row', $this->inputs['method_row']);
@@ -260,7 +260,7 @@ class LotteriesController extends BackEndApiMainController
         try {
             $methodGroupIds = array_column($methodGroupEloq, 'id');
             $updateDate = ['status', $this->inputs['status']];
-            MethodsModel::whereIn('id', $methodGroupIds)->update(['status' => $this->inputs['status']]);
+            LotteryMethod::whereIn('id', $methodGroupIds)->update(['status' => $this->inputs['status']]);
             //清理彩种玩法缓存
             $this->clearMethodCache();
             return $this->msgOut(true);
@@ -281,7 +281,7 @@ class LotteriesController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $pastData = MethodsModel::find($this->inputs['id']);
+        $pastData = LotteryMethod::find($this->inputs['id']);
         if (empty($pastData)) {
             return $this->msgOut(false, [], '101703');
         }
@@ -317,7 +317,7 @@ class LotteriesController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $pastData = MethodsModel::find($this->inputs['id']);
+        $pastData = LotteryMethod::find($this->inputs['id']);
         if (empty($pastData)) {
             return $this->msgOut(false, [], '101703');
         }

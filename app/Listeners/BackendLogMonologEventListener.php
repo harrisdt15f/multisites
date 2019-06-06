@@ -8,7 +8,7 @@
 
 namespace App\Listeners;
 
-use App\Models\Admin\PartnerLogsApi;
+use App\Models\Admin\BackendSystemLog;
 use App\Services\Logs\BackendLogs\BackendLogMonologEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Carbon;
@@ -20,7 +20,7 @@ class BackendLogMonologEventListener implements ShouldQueue
     protected $log;
     protected $recordedDays;
 
-    public function __construct(PartnerLogsApi $log)
+    public function __construct(BackendSystemLog $log)
     {
         $this->log = $log;
     }

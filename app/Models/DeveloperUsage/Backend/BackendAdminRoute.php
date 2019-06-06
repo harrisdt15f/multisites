@@ -5,9 +5,9 @@ namespace App\Models\DeveloperUsage\Backend;
 use App\Models\BaseModel;
 use App\Models\DeveloperUsage\Menu\PartnerMenus;
 
-class PartnerAdminRoute extends BaseModel
+class BackendAdminRoute extends BaseModel
 {
-    protected $table = 'partner_admin_route';
+    protected $table = 'backend_admin_routes';
 
     protected $fillable = [
         'route_name', 'controller', 'method', 'menu_group_id', 'title', 'description', 'created_at', 'updated_at',

@@ -5,9 +5,9 @@ namespace App\Models\Admin\Homepage;
 use App\Models\Admin\Activity\ActivityInfos;
 use App\Models\BaseModel;
 
-class HomepageRotationChart extends BaseModel
+class FrontendPageBanner extends BaseModel
 {
-    protected $table = 'homepage_rotation_chart';
+    protected $table = 'frontend_page_banners';
 
     protected $fillable = [
         'title', 'content', 'pic_path', 'thumbnail_path', 'type', 'redirect_url', 'activity_id', 'status', 'start_time', 'end_time', 'sort', 'created_at', 'updated_at',

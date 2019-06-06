@@ -4,9 +4,9 @@ namespace App\Models\Admin\Activity;
 
 use App\Models\BaseModel;
 
-class Category extends BaseModel
+class FrontendInfoCategorie extends BaseModel
 {
-    protected $table = 'partner_category';
+    protected $table = 'frontend_info_categories';
 
     protected $fillable = [
         'title', 'parent', 'template', 'platform_id', 'created_at', 'updated_at',

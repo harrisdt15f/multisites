@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Admin\PartnerAdminUsers;
+use App\Models\Admin\BackendAdminUser;
 
 class PlatForms extends BaseModel
 {
@@ -12,7 +12,7 @@ class PlatForms extends BaseModel
 
     public function partnerAdminUsers()
     {
-        return $this->hasMany(PartnerAdminUsers::class, 'platform_id', 'platform_id');
+        return $this->hasMany(BackendAdminUser::class, 'platform_id', 'platform_id');
     }
 
 }

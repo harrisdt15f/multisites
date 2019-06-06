@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\BackendApi\DeveloperUsage\Backend\Menu;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Models\DeveloperUsage\Backend\PartnerAdminRoute;
+use App\Models\DeveloperUsage\Backend\BackendAdminRoute;
 use App\Models\DeveloperUsage\Menu\PartnerMenus;
 use function GuzzleHttp\json_decode;
 use Illuminate\Http\JsonResponse;
@@ -58,10 +58,10 @@ class MenuController extends BackEndApiMainController
 //        $editMenu = PartnerMenus::all();
             //        $routeMatchingName = $editMenu->where('route', '!=', '#')->keyBy('route')->toArray();
             $routeInfo = [];
-            $registeredRoute = PartnerAdminRoute::pluck('route_name')->toArray();
+            $registeredRoute = BackendAdminRoute::pluck('route_name')->toArray();
             foreach ($routeCollection as $key => $r) {
-                if (isset($r->action['as']) && $r->action['prefix'] !== '_debugbar' && preg_match('#^'.$routeEndKey.'#',
-                        $r->action['as']) === 1 && !in_array($r->action['as'], $registeredRoute)) {
+                if (isset($r->action['as']) && $r->action['prefix'] !== '_debugbar' && preg_match('#^' . $routeEndKey . '#',
+                    $r->action['as']) === 1 && !in_array($r->action['as'], $registeredRoute)) {
                     $routeShortData[$key]['url'] = $r->uri;
                     $routeShortData[$key]['controller'] = $r->action['controller'];
                     $routeShortData[$key]['route_name'] = $r->action['as'];
@@ -159,7 +159,7 @@ class MenuController extends BackEndApiMainController
      * (?!.*\.$) - don't allow . at end
      * @return JsonResponse
      */
-    public function edit(): ?JsonResponse
+    public function edit():  ? JsonResponse
     {
         $parent = false;
         $rule = [
@@ -202,7 +202,7 @@ class MenuController extends BackEndApiMainController
         }
     }
 
-    public function changeParent(): ?JsonResponse
+    public function changeParent() :  ? JsonResponse
     {
         $parseDatas = json_decode($this->inputs['dragResult'], true);
         $itemProcess = [];
@@ -210,7 +210,7 @@ class MenuController extends BackEndApiMainController
         if (!empty($parseDatas)) {
             foreach ($parseDatas as $key => $value) {
                 $menuEloq = PartnerMenus::find($value['currentId']);
-                $menuEloq->pid = $value['currentParent'] === '#' ? 0 : (int)$value['currentParent'];
+                $menuEloq->pid = $value['currentParent'] === '#' ? 0 : (int) $value['currentParent'];
                 $menuEloq->sort = $value['currentSort'];
                 if ($menuEloq->save()) {
                     $pass['pass'] = $value['currentText'];

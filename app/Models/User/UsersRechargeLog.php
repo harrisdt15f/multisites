@@ -4,9 +4,9 @@ namespace App\Models\User;
 
 use App\Models\BaseModel;
 
-class UserRechargeLog extends BaseModel
+class UsersRechargeLog extends BaseModel
 {
-    protected $table = 'user_recharge_log';
+    protected $table = 'users_recharge_logs';
 
     const ARTIFICIAL = 1; //人工充值
     const AUTOMATIC = 0; //自动充值

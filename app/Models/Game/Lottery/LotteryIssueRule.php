@@ -4,9 +4,9 @@ namespace App\Models\Game\Lottery;
 
 use App\Models\BaseModel;
 
-class IssueRulesModel extends BaseModel
+class LotteryIssueRule extends BaseModel
 {
-    protected $table = 'issue_rules';
+    protected $table = 'lottery_issue_rules';
 
     /**
      * The attributes that are mass assignable.

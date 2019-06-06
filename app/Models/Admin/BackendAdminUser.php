@@ -2,18 +2,18 @@
 
 namespace App\Models\Admin;
 
-use App\Models\Admin\Fund\FundOperation;
-use App\Models\Admin\PartnerAdminGroupAccess;
+use App\Models\Admin\BackendAdminAccessGroup;
+use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
 use App\Models\PlatForms;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class PartnerAdminUsers extends Authenticatable implements JWTSubject
+class BackendAdminUser extends Authenticatable implements JWTSubject
 {
     use Notifiable;
 
-    protected $table = 'partner_admin_users';
+    protected $table = 'backend_admin_users';
 
     /**
      * The attributes that are mass assignable.
@@ -71,11 +71,11 @@ class PartnerAdminUsers extends Authenticatable implements JWTSubject
 
     public function accessGroup()
     {
-        return $this->hasOne(PartnerAdminGroupAccess::class, 'id', 'group_id');
+        return $this->hasOne(BackendAdminAccessGroup::class, 'id', 'group_id');
     }
 
     public function operateAmount()
     {
-        return $this->hasOne(FundOperation::class, 'admin_id', 'id');
+        return $this->hasOne(BackendAdminRechargePocessAmount::class, 'admin_id', 'id');
     }
 }

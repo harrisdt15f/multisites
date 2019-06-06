@@ -2,13 +2,13 @@
 
 namespace App\Models\Admin\Fund;
 
-use App\Models\Admin\PartnerAdminUsers;
+use App\Models\Admin\BackendAdminUser;
 use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class FundOperationGroup extends BaseModel
+class BackendAdminRechargePermitGroup extends BaseModel
 {
-    protected $table = 'fund_operation_group';
+    protected $table = 'backend_admin_recharge_permit_groups';
 
     protected $fillable = [
         'group_id', 'group_name',
@@ -16,6 +16,6 @@ class FundOperationGroup extends BaseModel
 
     public function admins(): HasMany
     {
-        return $this->hasMany(PartnerAdminUsers::class, 'group_id', 'group_id');
+        return $this->hasMany(BackendAdminUser::class, 'group_id', 'group_id');
     }
 }

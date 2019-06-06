@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\BackendApi\Admin\Log;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Models\Admin\FrontendApiLog;
+use App\Models\Admin\FrontendSystemLog;
 
 class HandleLogController extends BackEndApiMainController
 {
-    protected $eloqM = 'Admin\PartnerLogsApi';
+    protected $eloqM = 'Admin\BackendSystemLog';
 
     //后台日志列表
     public function details()
@@ -20,7 +20,7 @@ class HandleLogController extends BackEndApiMainController
     //前台日志列表
     public function frontendLogs()
     {
-        $logEloq = new FrontendApiLog();
+        $logEloq = new FrontendSystemLog();
         $searchAbleFields = ['origin', 'ip', 'device', 'os', 'os_version', 'browser', 'username', 'menu_label', 'device_type'];
         $data = $this->generateSearchQuery($logEloq, $searchAbleFields);
         return $this->msgOut(true, $data);

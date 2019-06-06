@@ -4,13 +4,13 @@ namespace App\Http\Controllers\BackendApi\Users;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\AccountChange;
-use App\Models\Admin\PassworAuditLists;
-use App\Models\Admin\UserAdmitedFlowsModel;
-use App\Models\AuditFlow;
+use App\Models\Admin\BackendAdminAuditPasswordsList;
+use App\Models\Admin\FrontendUsersPrivacyFlow;
+use App\Models\BackendAdminAuditFlowList;
+use App\Models\User\FrontendUser;
 use App\Models\User\Fund\AccountChangeReport;
 use App\Models\User\Fund\AccountChangeType;
-use App\Models\User\Fund\HandleUserAccounts;
-use App\Models\User\UserHandleModel;
+use App\Models\User\Fund\FrontendUsersAccount;
 use App\Models\User\UserRechargeHistory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -18,8 +18,8 @@ use Illuminate\Support\Facades\Validator;
 
 class UserHandleController extends BackEndApiMainController
 {
-    protected $eloqM = 'User\UserHandleModel';
-    protected $withNameSpace = 'Admin\PassworAuditLists';
+    protected $eloqM = 'User\FrontendUser';
+    protected $withNameSpace = 'Admin\BackendAdminAuditPasswordsList';
     /**
      * 创建总代时获取当前平台的奖金组
      * @return \Illuminate\Http\JsonResponse
@@ -61,7 +61,7 @@ class UserHandleController extends BackEndApiMainController
         try {
             $user = $this->eloqM::create($this->inputs);
             $user->rid = $user->id;
-            $userAccountEloq = new HandleUserAccounts();
+            $userAccountEloq = new FrontendUsersAccount();
             $userAccountData = [
                 'user_id' => $user->id,
                 'balance' => 0,
@@ -149,8 +149,8 @@ class UserHandleController extends BackEndApiMainController
         }
         $applyUserEloq = $this->eloqM::find($this->inputs['id']);
         if (!is_null($applyUserEloq)) {
-            $auditFlowEloq = new AuditFlow();
-            $adminApplyEloq = new PassworAuditLists();
+            $auditFlowEloq = new BackendAdminAuditFlowList();
+            $adminApplyEloq = new BackendAdminAuditPasswordsList();
             //###################
             $adminApplyCheckEloq = $adminApplyEloq::where([
                 ['user_id', '=', $applyUserEloq->id],
@@ -254,7 +254,7 @@ class UserHandleController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors());
         }
-        $eloqM = $this->modelWithNameSpace('PassworAuditLists');
+        $eloqM = $this->modelWithNameSpace('BackendAdminAuditPasswordsList');
         $applyUserEloq = $eloqM::where([
             ['id', '=', $this->inputs['id']],
             ['type', '=', $this->inputs['type']],
@@ -263,7 +263,7 @@ class UserHandleController extends BackEndApiMainController
         if (!is_null($applyUserEloq)) {
             $auditFlowEloq = $applyUserEloq->auditFlow;
             //handle User
-            $user = UserHandleModel::find($applyUserEloq->user_id);
+            $user = FrontendUser::find($applyUserEloq->user_id);
             if ($applyUserEloq->type == 1) {
                 $user->password = $applyUserEloq->audit_data;
             } else {
@@ -314,7 +314,7 @@ class UserHandleController extends BackEndApiMainController
             try {
                 $userEloq->frozen_type = $this->inputs['frozen_type'];
                 $userEloq->save();
-                $userAdmitFlowLog = new UserAdmitedFlowsModel();
+                $userAdmitFlowLog = new FrontendUsersPrivacyFlow();
                 $data = [
                     'admin_id' => $this->partnerAdmin->id,
                     'admin_name' => $this->partnerAdmin->name,
@@ -348,7 +348,7 @@ class UserHandleController extends BackEndApiMainController
         }
         $userEloq = $this->eloqM::find($this->inputs['user_id']);
         if (!is_null($userEloq)) {
-            $data = UserAdmitedFlowsModel::where('user_id', $this->inputs['user_id'])->where('created_at', '>=', $this->inputs['start_time'])->where('created_at', '<', $this->inputs['end_time'])->orderBy('created_at', 'desc')->get()->toArray();
+            $data = FrontendUsersPrivacyFlow::where('user_id', $this->inputs['user_id'])->where('created_at', '>=', $this->inputs['start_time'])->where('created_at', '<', $this->inputs['end_time'])->orderBy('created_at', 'desc')->get()->toArray();
             return $this->msgOut(true, $data);
         }
 
@@ -393,7 +393,7 @@ class UserHandleController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $datas = UserRechargeHistory::select('user_name', 'amount', 'deposit_mode', 'status', 'created_at')->where(function ($query) {
+        $datas = UsersRechargeHistorie::select('user_name', 'amount', 'deposit_mode', 'status', 'created_at')->where(function ($query) {
             $query->where('user_id', $this->inputs['user_id'])
                 ->where('created_at', '>=', $this->inputs['start_time'])
                 ->where('created_at', '<', $this->inputs['end_time']);
@@ -416,7 +416,7 @@ class UserHandleController extends BackEndApiMainController
         if (is_null($accountChangeTypeEloq)) {
             return $this->msgOut(false, [], '100103');
         }
-        $userAccountsEloq = HandleUserAccounts::where('user_id', $this->inputs['user_id'])->first();
+        $userAccountsEloq = FrontendUsersAccount::where('user_id', $this->inputs['user_id'])->first();
         if ($userAccountsEloq->balance < $this->inputs['amount']) {
             return $this->msgOut(false, [], '100104');
         }
@@ -425,7 +425,7 @@ class UserHandleController extends BackEndApiMainController
             //扣除金额
             $newBalance = $userAccountsEloq->balance - $this->inputs['amount'];
             $editArr = ['balance' => $newBalance];
-            $editStatus = HandleUserAccounts::where(function ($query) use ($userAccountsEloq) {
+            $editStatus = FrontendUsersAccount::where(function ($query) use ($userAccountsEloq) {
                 $query->where('user_id', $this->inputs['user_id'])
                     ->where('updated_at', $userAccountsEloq->updated_at);
             })->update($editArr);

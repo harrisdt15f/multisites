@@ -4,12 +4,12 @@
  * @Author: LingPh
  * @Date:   2019-06-04 14:38:55
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-04 16:48:43
+ * @Last Modified time: 2019-06-06 12:36:32
  */
 namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Models\Admin\Homepage\HomeDefaultBetMethods;
+use App\Models\Admin\Homepage\FrontendLotteryFnfBetableMethod;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Validator;
 
 class PopularMethodsController extends BackEndApiMainController
 {
-    protected $eloqM = 'Admin\Homepage\PopularMethods';
+    protected $eloqM = 'Admin\Homepage\FrontendLotteryFnfBetableList';
 
     //热门玩法列表
     public function detail(): JsonResponse
@@ -53,7 +53,7 @@ class PopularMethodsController extends BackEndApiMainController
             return $this->msgOut(false, [], '102012');
         }
         //检查玩法是否存在
-        $checkMethod = HomeDefaultBetMethods::find($this->inputs['method_id']);
+        $checkMethod = FrontendLotteryFnfBetableMethod::find($this->inputs['method_id']);
         if (is_null($checkMethod)) {
             return $this->msgOut(false, [], '102013');
         }
@@ -98,7 +98,7 @@ class PopularMethodsController extends BackEndApiMainController
             return $this->msgOut(false, [], '102014');
         }
         //检查玩法是否存在
-        $checkMethod = HomeDefaultBetMethods::find($this->inputs['method_id']);
+        $checkMethod = FrontendLotteryFnfBetableMethod::find($this->inputs['method_id']);
         if (is_null($checkMethod)) {
             return $this->msgOut(false, [], '102013');
         }
@@ -204,10 +204,10 @@ class PopularMethodsController extends BackEndApiMainController
     //添加热门玩法时选择的玩法列表
     public function methodsList(): JsonResponse
     {
-        $lotterys = HomeDefaultBetMethods::groupBy('lottery_name')->orderBy('id', 'asc')->pluck('lottery_name')->toArray();
+        $lotterys = FrontendLotteryFnfBetableMethod::groupBy('lottery_name')->orderBy('id', 'asc')->pluck('lottery_name')->toArray();
         $data = [];
         foreach ($lotterys as $key => $lottery) {
-            $data[$lottery] = HomeDefaultBetMethods::select('id as method_id', 'method_name')->where('lottery_name', $lottery)->get()->toArray();
+            $data[$lottery] = FrontendLotteryFnfBetableMethod::select('id as method_id', 'method_name')->where('lottery_name', $lottery)->get()->toArray();
         }
         return $this->msgOut(true, $data);
     }

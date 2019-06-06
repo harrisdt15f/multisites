@@ -8,8 +8,8 @@
 
 namespace App\Services\Logs\BackendLogs;
 
-use App\Models\Admin\PartnerLogsApi;
-use App\Models\DeveloperUsage\Backend\PartnerAdminRoute;
+use App\Models\Admin\BackendSystemLog;
+use App\Models\DeveloperUsage\Backend\BackendAdminRoute;
 use Jenssegers\Agent\Agent;
 
 class BackendLogProcessor
@@ -25,17 +25,17 @@ class BackendLogProcessor
         $bsVersion = $agent->version($browser);
         $robot = $agent->robot();
         if ($agent->isRobot()) {
-            $type = PartnerLogsApi::ROBOT;
+            $type = BackendSystemLog::ROBOT;
         } elseif ($agent->isDesktop()) {
-            $type = PartnerLogsApi::DESKSTOP;
+            $type = BackendSystemLog::DESKSTOP;
         } elseif ($agent->isTablet()) {
-            $type = PartnerLogsApi::TABLET;
+            $type = BackendSystemLog::TABLET;
         } elseif ($agent->isMobile()) {
-            $type = PartnerLogsApi::MOBILE;
+            $type = BackendSystemLog::MOBILE;
         } elseif ($agent->isPhone()) {
-            $type = PartnerLogsApi::PHONE;
+            $type = BackendSystemLog::PHONE;
         } else {
-            $type = PartnerLogsApi::OTHER;
+            $type = BackendSystemLog::OTHER;
         }
         $messageArr = json_decode($record['message'], true);
         $adminUser = auth()->user() ? auth()->user()->id : null;
@@ -65,7 +65,7 @@ class BackendLogProcessor
         }
         if (isset($messageArr['route'])) {
             $record['extra']['route'] = json_encode($messageArr['route']);
-            $routeEloq = PartnerAdminRoute::where('route_name', $messageArr['route']['action']['as'])->first();
+            $routeEloq = BackendAdminRoute::where('route_name', $messageArr['route']['action']['as'])->first();
             if (!is_null($routeEloq)) {
                 $record['extra']['route_id'] = $routeEloq->id;
                 $record['extra']['menu_id'] = $routeEloq->menu->id ?? null;

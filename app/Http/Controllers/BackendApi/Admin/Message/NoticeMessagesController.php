@@ -4,15 +4,15 @@
  * @Author: LingPh
  * @Date:   2019-06-01 14:29:10
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-03 14:43:54
+ * @Last Modified time: 2019-06-06 12:07:52
  */
 
 namespace App\Http\Controllers\BackendApi\Admin\Message;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\InternalNoticeMessage;
+use App\Models\Admin\BackendAdminUser;
 use App\Models\Admin\Message\NoticeMessage;
-use App\Models\Admin\PartnerAdminUsers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -54,7 +54,7 @@ class NoticeMessagesController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $adminsArr = PartnerAdminUsers::select('id', 'group_id')->whereIn('id', $this->inputs['admins_id'])->get()->toArray();
+        $adminsArr = BackendAdminUser::select('id', 'group_id')->whereIn('id', $this->inputs['admins_id'])->get()->toArray();
         DB::beginTransaction();
         try {
             $messageClass = new InternalNoticeMessage();

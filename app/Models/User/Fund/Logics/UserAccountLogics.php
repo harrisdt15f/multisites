@@ -4,7 +4,7 @@ namespace App\Models\User\Fund\Logics;
 
 use App\Lib\Clog;
 use App\Models\Account\AccountChangeType;
-use App\Models\User\HandleUserAccounts;
+use App\Models\User\FrontendUsersAccount;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -18,18 +18,18 @@ trait UserAccountLogics
 
     public static function getList($c)
     {
-        $query = HandleUserAccounts::select(
-            DB::raw('user_accounts.*'),
+        $query = FrontendUsersAccount::select(
+            DB::raw('frontend_users_accounts.*'),
             DB::raw('users.username'),
             DB::raw('users.prize_group')
-        )->leftJoin('users', 'user_accounts.user_id', '=', 'users.id')->orderBy('id', 'desc');
+        )->leftJoin('users', 'frontend_users_accounts.user_id', '=', 'users.id')->orderBy('id', 'desc');
         // 用户名
         if (isset($c['username']) && $c['username']) {
-            $query->where('user_accounts.username', $c['username']);
+            $query->where('frontend_users_accounts.username', $c['username']);
         }
         // 上级
         if (isset($c['parent_name']) && $c['parent_name']) {
-            $query->where('user_accounts.parent_name', $c['parent_name']);
+            $query->where('frontend_users_accounts.parent_name', $c['parent_name']);
         }
         $currentPage = isset($c['page_index']) ? intval($c['page_index']) : 1;
         $pageSize = isset($c['page_size']) ? intval($c['page_size']) : 15;
@@ -205,7 +205,7 @@ trait UserAccountLogics
     public function add($money)
     {
         $updated_at = date('Y-m-d H:i:s');
-        $sql = "update `user_accounts` set `balance`=`balance`+'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}'";
+        $sql = "update `frontend_users_accounts` set `balance`=`balance`+'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}'";
         $ret = db()->update($sql) > 0;
         if ($ret) {
             $this->balance += $money;
@@ -217,7 +217,7 @@ trait UserAccountLogics
     public function cost($money)
     {
         $updated_at = date('Y-m-d H:i:s');
-        $ret = db()->update("update `user_accounts` set `balance`=`balance`-'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}' and `balance`>='{$money}'") > 0;
+        $ret = db()->update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}' and `balance`>='{$money}'") > 0;
         if ($ret) {
             $this->balance = $this->balance - $money;
         }
@@ -228,7 +228,7 @@ trait UserAccountLogics
     public function frozen($money)
     {
         $updated_at = date('Y-m-d H:i:s');
-        $ret = db()->update("update `user_accounts` set `balance`=`balance`-'{$money}', `frozen`=`frozen`+ '{$money}'  , `updated_at`='$updated_at' where `user_id` ='{$this->user_id}' and `balance`>='{$money}'") > 0;
+        $ret = db()->update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}', `frozen`=`frozen`+ '{$money}'  , `updated_at`='$updated_at' where `user_id` ='{$this->user_id}' and `balance`>='{$money}'") > 0;
         if ($ret) {
             $this->balance -= $money;
             $this->frozen += $money;
@@ -240,7 +240,7 @@ trait UserAccountLogics
     public function unFrozen($money)
     {
         $updated_at = date('Y-m-d H:i:s');
-        $ret = db()->update("update `user_accounts` set `balance`=`balance`+'{$money}', `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}'") > 0;
+        $ret = db()->update("update `frontend_users_accounts` set `balance`=`balance`+'{$money}', `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}'") > 0;
         if ($ret) {
             $this->balance += $money;
             $this->frozen -= $money;
@@ -252,7 +252,7 @@ trait UserAccountLogics
     public function unFrozenToPlayer($money)
     {
         $updated_at = date('Y-m-d H:i:s');
-        $ret = db()->update("update `user_accounts` set  `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}'") > 0;
+        $ret = db()->update("update `frontend_users_accounts` set  `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}'") > 0;
         if ($ret) {
             $this->frozen -= $money;
         }

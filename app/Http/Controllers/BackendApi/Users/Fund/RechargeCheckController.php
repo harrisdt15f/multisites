@@ -6,21 +6,21 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\AccountChange;
 use App\Lib\Common\FundOperationRecharge;
 use App\Lib\Common\InternalNoticeMessage;
-use App\Models\Admin\Fund\FundOperation;
+use App\Models\Admin\BackendAdminUser;
+use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
 use App\Models\Admin\Message\NoticeMessage;
-use App\Models\Admin\PartnerAdminUsers;
-use App\Models\AuditFlow;
+use App\Models\BackendAdminAuditFlowList;
+use App\Models\User\FrontendUser;
 use App\Models\User\Fund\AccountChangeReport;
 use App\Models\User\Fund\AccountChangeType;
-use App\Models\User\Fund\HandleUserAccounts;
-use App\Models\User\UserHandleModel;
-use App\Models\User\UserRechargeHistory;
+use App\Models\User\Fund\FrontendUsersAccount;
+use App\Models\User\UsersRechargeHistorie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class RechargeCheckController extends BackEndApiMainController
 {
-    protected $eloqM = 'User\Fund\ArtificialRechargeLog';
+    protected $eloqM = 'User\Fund\BackendAdminRechargehumanLog';
     protected $successMessage = '你的人工充值申请已通过';
     protected $failureMessage = '你的人工充值申请被驳回';
 
@@ -48,7 +48,7 @@ class RechargeCheckController extends BackEndApiMainController
         }
         // 审核表
         $rechargeLog = $this->eloqM::find($this->inputs['id']);
-        $auditFlow = auditFlow::where('id', $rechargeLog->audit_flow_id)->first();
+        $auditFlow = BackendAdminAuditFlowList::where('id', $rechargeLog->audit_flow_id)->first();
         if ($rechargeLog->status !== 0) {
             return $this->msgOut(false, [], '100900');
         }
@@ -59,23 +59,23 @@ class RechargeCheckController extends BackEndApiMainController
         }
         DB::beginTransaction();
         try {
-            // 修改 artificial_recharge_log 表 的审核状态
+            // 修改 backend_admin_rechargehuman_logs 表 的审核状态
             $rechargeLogEdit = ['status' => $rechargeLog::AUDITSUCCESS];
             $rechargeLog->fill($rechargeLogEdit);
             $rechargeLog->save();
-            // 修改 user_recharge_history 表 的审核状态
-            $historyEloq = UserRechargeHistory::where('audit_flow_id', $rechargeLog->audit_flow_id)->first();
+            // 修改 users_recharge_histories 表 的审核状态
+            $historyEloq = UsersRechargeHistorie::where('audit_flow_id', $rechargeLog->audit_flow_id)->first();
             $historyEdit = ['status' => $historyEloq::AUDITSUCCESS];
             $historyEloq->fill($historyEdit);
             $historyEloq->save();
-            //修改audit_flow审核表
-            $userData = UserHandleModel::where('id', $rechargeLog->user_id)->with('account')->first();
+            //修改backend_admin_audit_flow_lists审核表
+            $userData = FrontendUser::where('id', $rechargeLog->user_id)->with('account')->first();
             $balance = $userData->account->balance + $rechargeLog->amount;
             $this->auditFlowEdit($auditFlow, $this->partnerAdmin, $this->inputs['auditor_note']);
             //修改用户金额
-            $UserAccounts = HandleUserAccounts::where('user_id', $rechargeLog->user_id)->first();
+            $UserAccounts = FrontendUsersAccount::where('user_id', $rechargeLog->user_id)->first();
             $UserAccountsEdit = ['balance' => $balance];
-            $editStatus = HandleUserAccounts::where(function ($query) use ($UserAccounts) {
+            $editStatus = FrontendUsersAccount::where(function ($query) use ($UserAccounts) {
                 $query->where('user_id', $UserAccounts->user_id)
                     ->where('updated_at', $UserAccounts->updated_at);
             })->update($UserAccountsEdit);
@@ -112,29 +112,29 @@ class RechargeCheckController extends BackEndApiMainController
         if ($rechargeLog->status !== 0) {
             return $this->msgOut(false, [], '100900');
         }
-        $adminFundData = FundOperation::where('admin_id', $rechargeLog->admin_id)->first();
+        $adminFundData = BackendAdminRechargePocessAmount::where('admin_id', $rechargeLog->admin_id)->first();
         if (is_null($adminFundData)) {
             return $this->msgOut(false, [], '100903');
         }
         $newFund = $adminFundData->fund + $rechargeLog->amount;
         DB::beginTransaction();
         try {
-            // 修改 artificial_recharge_log 表 的审核状态
+            // 修改 backend_admin_rechargehuman_logs 表 的审核状态
             $rechargeLogEdit = ['status' => $rechargeLog::AUDITFAILURE];
             $rechargeLog->fill($rechargeLogEdit);
             $rechargeLog->save();
-            // 修改 user_recharge_history 表 的审核状态
-            $historyEloq = UserRechargeHistory::where('audit_flow_id', $rechargeLog->audit_flow_id)->first();
+            // 修改 users_recharge_histories 表 的审核状态
+            $historyEloq = UsersRechargeHistorie::where('audit_flow_id', $rechargeLog->audit_flow_id)->first();
             $historyEdit = ['status' => $historyEloq::AUDITFAILURE];
             $historyEloq->fill($historyEdit);
             $historyEloq->save();
             //退还管理员人工充值额度
-            $auditFlow = auditFlow::where('id', $rechargeLog->audit_flow_id)->first();
+            $auditFlow = BackendAdminAuditFlowList::where('id', $rechargeLog->audit_flow_id)->first();
             $adminFundDataEdit = ['fund' => $newFund];
             $this->auditFlowEdit($auditFlow, $this->partnerAdmin, $this->inputs['auditor_note']);
             $adminFundData->fill($adminFundDataEdit);
             $adminFundData->save();
-            //返还额度后  插入artificial_recharge_log 记录表
+            //返还额度后  backend_admin_rechargehuman_logs 记录表
             $rechargeLogeloqM = new $this->eloqM;
             $type = $rechargeLogeloqM::SYSTEM;
             $in_out = $rechargeLogeloqM::INCREMENT;
@@ -174,7 +174,7 @@ class RechargeCheckController extends BackEndApiMainController
     {
         $messageClass = new InternalNoticeMessage();
         $type = NoticeMessage::AUDIT;
-        $admin = PartnerAdminUsers::select('id', 'group_id')->find($adminId);
+        $admin = BackendAdminUser::select('id', 'group_id')->find($adminId);
         if (!is_null($admin)) {
             $messageClass->insertMessage($type, $message, $admin->toArray());
         }

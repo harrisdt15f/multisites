@@ -3,7 +3,7 @@
 namespace App\Lib\Game;
 
 use App\Lib\BaseCache;
-use App\Models\LotteriesModel;
+use App\Models\LotteryList;
 
 /**
  * 游戏相关逻辑
@@ -14,9 +14,9 @@ class Lottery
 {
     use BaseCache;
 
-    static public $_lotteries = [];
-    static public $_methods = [];
-    static public $_config = [];
+    public static $_lotteries = [];
+    public static $_methods = [];
+    public static $_config = [];
 
     /**
      * 获取彩种详情 - 包含玩法数据
@@ -33,7 +33,7 @@ class Lottery
         }
 
         // 获取彩种
-        $lottery = LotteriesModel::where('en_name', $id)->where('status', 1)->first();
+        $lottery = LotteryList::where('en_name', $id)->where('status', 1)->first();
         if (!$lottery) {
             throw new \RuntimeException("彩种:{$lottery->cn_name}, 数据库配置 - 不存在!");
         }
@@ -43,7 +43,7 @@ class Lottery
         }
         // 获取玩法
         $series = $lottery->series;
-        $methods = @require(__DIR__."/Config/method_{$series}.php");
+        $methods = @require __DIR__ . "/Config/method_{$series}.php";
         if (!$methods) {
             throw new \RuntimeException("彩种:{$lottery->cn_name}, 玩法 - 不存在!");
         }
@@ -55,7 +55,7 @@ class Lottery
     // 获取所有彩种
     public static function getAllLottery()
     {
-        $lotteries = LotteriesModel::where('status', 1)->get();
+        $lotteries = LotteryList::where('status', 1)->get();
         foreach ($lotteries as $lottery) {
             // 检测游戏状态
             if ($lottery->status !== 1) {
@@ -64,7 +64,7 @@ class Lottery
             $series = $lottery->series_id;
             // 获取玩法
             if (empty(self::$_methods[$series])) {
-                $methods = include __DIR__."/config/method_{$series}.php";
+                $methods = include __DIR__ . "/config/method_{$series}.php";
                 if (!$methods) {
                     throw new \Exception("彩种:{$lottery->cn_name}, 玩法 - 不存在(get all lotteries)!");
                 }
@@ -92,7 +92,7 @@ class Lottery
             return "玩法{$methodId}配置:不存在!";
         }
         // 玩法
-        $class = "\\App\\Lib\\Game\\Method\\".ucfirst($series)."\\".$group."\\".$methodId;
+        $class = "\\App\\Lib\\Game\\Method\\" . ucfirst($series) . "\\" . $group . "\\" . $methodId;
         if (!class_exists($class)) {
             return "玩法:{$methodId} 不存在!";
         }
@@ -117,7 +117,7 @@ class Lottery
                 return $data[$seriesSign];
             }
         }
-        $config = include __DIR__."/config/method_{$seriesSign}.php";
+        $config = include __DIR__ . "/config/method_{$seriesSign}.php";
         if ($config) {
             $data[$seriesSign] = $config;
             self::_saveCacheData('method_config', $data);

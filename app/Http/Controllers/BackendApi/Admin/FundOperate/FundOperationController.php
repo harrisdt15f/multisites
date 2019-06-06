@@ -4,11 +4,11 @@ namespace App\Http\Controllers\BackendApi\Admin\FundOperate;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\FundOperationRecharge;
-use App\Models\Admin\Fund\FundOperation;
-use App\Models\Admin\Fund\FundOperationGroup;
-use App\Models\Admin\PartnerAdminUsers;
+use App\Models\Admin\BackendAdminUser;
+use App\Models\Admin\Fund\BackendAdminRechargePermitGroup;
+use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
 use App\Models\Admin\PartnerSysConfigures;
-use App\Models\User\Fund\ArtificialRechargeLog;
+use App\Models\User\Fund\BackendAdminRechargehumanLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -23,12 +23,12 @@ class FundOperationController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $groupArr = FundOperationGroup::select('group_id')->get()->toArray();
+        $groupArr = BackendAdminRechargePermitGroup::select('group_id')->get()->toArray();
         $group = array_column($groupArr, 'group_id');
         $this->inputs['extra_where']['method'] = 'whereIn';
         $this->inputs['extra_where']['key'] = 'group_id';
         $this->inputs['extra_where']['value'] = $group;
-        $eloqM = new PartnerAdminUsers();
+        $eloqM = new BackendAdminUser();
         $fixedJoin = 1; //number of joining tables
         $withTable = 'operateAmount';
         $searchAbleFields = ['name', 'group_id'];
@@ -53,11 +53,11 @@ class FundOperationController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $admin_user = PartnerAdminUsers::find($this->inputs['id']);
+        $admin_user = BackendAdminUser::find($this->inputs['id']);
         if (is_null($admin_user)) {
             return $this->msgOut(false, [], '101300');
         }
-        $FundOperationAdmin = FundOperation::where('admin_id', $this->inputs['id'])->first();
+        $FundOperationAdmin = BackendAdminRechargePocessAmount::where('admin_id', $this->inputs['id'])->first();
         if (is_null($FundOperationAdmin)) {
             return $this->msgOut(false, [], '101301');
         }
@@ -74,11 +74,11 @@ class FundOperationController extends BackEndApiMainController
             $FundOperationAdmin->save();
             $comment = '[人工充值额度操作]==>+' . $this->inputs['fund'] . '|[目前额度]==>' . $newFund;
             $partnerAdmin = $this->partnerAdmin;
-            $type = ArtificialRechargeLog::SUPERADMIN;
-            $in_out = ArtificialRechargeLog::INCREMENT;
-            $ArtificialRechargeLog = new ArtificialRechargeLog();
+            $type = BackendAdminRechargehumanLog::SUPERADMIN;
+            $in_out = BackendAdminRechargehumanLog::INCREMENT;
+            $rechargeLog = new BackendAdminRechargehumanLog();
             $fundOperationClass = new FundOperationRecharge();
-            $fundOperationClass->insertOperationDatas($ArtificialRechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $admin_user->id, $admin_user->name, $this->inputs['fund'], $comment, null);
+            $fundOperationClass->insertOperationDatas($rechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $admin_user->id, $admin_user->name, $this->inputs['fund'], $comment, null);
             DB::commit();
             return $this->msgOut(true);
         } catch (Exception $e) {
@@ -126,7 +126,7 @@ class FundOperationController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $datas = ArtificialRechargeLog::where(function ($query) {
+        $datas = BackendAdminRechargehumanLog::where(function ($query) {
             $query->where('admin_id', $this->inputs['admin_id'])
                 ->where('created_at', '>', $this->inputs['start_time'])
                 ->where('created_at', '<', $this->inputs['end_time']);
@@ -147,7 +147,7 @@ class FundOperationController extends BackEndApiMainController
             'type' => 1,
             'admin_id' => $admin_id,
         ];
-        $rechargeFundToday = ArtificialRechargeLog::where($where)->sum('amount');
+        $rechargeFundToday = BackendAdminRechargehumanLog::where($where)->sum('amount');
         if (($rechargeFundToday + $rechargeFund) > $maxRechargeFund) {
             $restRechargeFund = $maxRechargeFund - $rechargeFundToday;
             return ['success' => false, 'msg' => '管理员每日手动添加的最大充值额度为' . $maxRechargeFund . ',目前剩余额度' . $restRechargeFund];

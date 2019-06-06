@@ -4,7 +4,7 @@ namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Lib\Common\ImageArrange;
-use App\Models\Game\Lottery\LotteriesModel;
+use App\Models\Game\Lottery\LotteryList;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Validator;
 
 class PopularLotteriesController extends BackEndApiMainController
 {
-    protected $eloqM = 'Admin\Homepage\PopularLotteries';
+    protected $eloqM = 'Admin\Homepage\FrontendLotteryRedirectBetList';
 
     //热门彩票列表
     public function detail(): JsonResponse
@@ -97,7 +97,7 @@ class PopularLotteriesController extends BackEndApiMainController
             return $this->msgOut(false, [], '102003');
         }
         //检查彩种是否存在
-        $checkLotteries = LotteriesModel::find($this->inputs['lotteries_id']);
+        $checkLotteries = LotteryList::find($this->inputs['lotteries_id']);
         if (is_null($checkLotteries)) {
             return $this->msgOut(false, [], '102011');
         }
@@ -223,7 +223,7 @@ class PopularLotteriesController extends BackEndApiMainController
     //选择的  彩种列表
     public function lotteriesList(): JsonResponse
     {
-        $lotteries = LotteriesModel::select('id', 'cn_name', 'en_name')->get();
+        $lotteries = LotteryList::select('id', 'cn_name', 'en_name')->get();
         return $this->msgOut(true, $lotteries);
     }
 

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 
 class RouteController extends BackEndApiMainController
 {
-    protected $eloqM = 'DeveloperUsage\Backend\PartnerAdminRoute';
+    protected $eloqM = 'DeveloperUsage\Backend\BackendAdminRoute';
 
     public function detail()
     {

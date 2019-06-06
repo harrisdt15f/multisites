@@ -3,8 +3,8 @@
 namespace App\Models\Game\Lottery\Logics;
 
 use App\Lib\Game\Lottery;
-use App\Models\Game\Lottery\IssueModel;
-use App\Models\Game\Lottery\MethodsModel;
+use App\Models\Game\Lottery\LotteryIssue;
+use App\Models\Game\Lottery\LotteryMethod;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
@@ -41,7 +41,7 @@ trait LotteryLogics
             'data' => $data,
             'total' => $total,
             'currentPage' => $currentPage,
-            'totalPage' => intval(ceil($total / $pageSize))
+            'totalPage' => intval(ceil($total / $pageSize)),
         ];
     }
 
@@ -120,14 +120,13 @@ trait LotteryLogics
     // 检测追号数据
     public function checkTraceData($traceData)
     {
-        $issueItems = IssueModel::whereIn('issue', $traceData)->where([
+        $issueItems = LotteryIssue::whereIn('issue', $traceData)->where([
             ['lottery_id', '=', $this->en_name],
             ['end_time', '>=', time()],
         ])->orderBy('begin_time',
             'ASC')->get();
         return $issueItems;
     }
-
 
     /**
      * 获取 单个彩种
@@ -208,13 +207,13 @@ trait LotteryLogics
         $lotteries = self::where('status', 1)->get();
         $lotteryData = [];
         foreach ($lotteries as $lottery) {
-            $methods = MethodsModel::where('lottery_id', $lottery->en_name)->where('status', 1)->get();
+            $methods = LotteryMethod::where('lottery_id', $lottery->en_name)->where('status', 1)->get();
             $_methods = [];
             foreach ($methods as $method) {
                 $_method = $method->toArray();
                 $object = $lottery->getMethodObject($method['method_id']);
                 if (!$object) {
-                    Log::error($lottery->cn_name.'-'.$method['method_id'].'-不存在');
+                    Log::error($lottery->cn_name . '-' . $method['method_id'] . '-不存在');
                     continue;
                 }
                 $_method['object'] = $object;
@@ -271,12 +270,12 @@ trait LotteryLogics
                 return $data[$seriesId];
             }
         }
-        $methods = MethodsModel::where('series_id', $seriesId)->get();
+        $methods = LotteryMethod::where('series_id', $seriesId)->get();
         $_data = [];
         foreach ($methods as $item) {
             $methodObject = Lottery::getMethodObject($seriesId, $item->method_group, $item->method_id);
             if (!is_object($methodObject)) {
-                Log::error($seriesId.'-'.$item->method_id.'-'.$methodObject);
+                Log::error($seriesId . '-' . $item->method_id . '-' . $methodObject);
                 continue;
             }
             $_data[$item->method_id] = $methodObject;
@@ -302,7 +301,7 @@ trait LotteryLogics
      * @return array
      * @throws
      */
-    static function getAllLotteryToFrontEnd()
+    public static function getAllLotteryToFrontEnd()
     {
         if (self::_hasCache('lottery_for_frontend')) {
             return self::_getCacheData('lottery_for_frontend');
@@ -312,7 +311,7 @@ trait LotteryLogics
         foreach ($lotteries as $lottery) {
             $lottery->valid_modes = $lottery->getFormatMode();
             // 获取所有玩法
-            $methods = MethodsModel::getMethodConfig($lottery->en_name);
+            $methods = LotteryMethod::getMethodConfig($lottery->en_name);
             $methodData = [];
             $groupName = config('game.method.group_name');
             $rowName = config('game.method.row_name');
@@ -320,7 +319,7 @@ trait LotteryLogics
             foreach ($methods as $index => $method) {
                 $rowData[$method->method_group][$method->method_row][] = [
                     'method_name' => $method->method_name,
-                    'method_id' => $method->method_id
+                    'method_id' => $method->method_id,
                 ];
             }
             $groupData = [];
@@ -332,7 +331,7 @@ trait LotteryLogics
                 }
 
                 if (!isset($hasRow[$method->method_group]) || !in_array($method->method_row,
-                        $hasRow[$method->method_group])) {
+                    $hasRow[$method->method_group])) {
                     $groupData[$method->method_group][] = [
                         'name' => $rowName[$method->method_row],
                         'sign' => $method->method_row,
@@ -356,7 +355,7 @@ trait LotteryLogics
                     $methodData[] = [
                         'name' => $groupName[$lottery->series_id][$method->method_group],
                         'sign' => $method->method_group,
-                        'rows' => $groupData[$method->method_group]
+                        'rows' => $groupData[$method->method_group],
                     ];
                     $hasGroup[] = $method->method_group;
                 }
@@ -396,7 +395,7 @@ trait LotteryLogics
             return true;
         }
         // 乐透彩票
-        if (in_array($series, ['115',])) {
+        if (in_array($series, ['115'])) {
             $_code = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11'];
             foreach ($codeArr as $c) {
                 if (!in_array($c, $_code)) {

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\BackendApi;
 
 use App\Http\Controllers\Controller;
-use App\Models\Admin\PartnerAdminGroupAccess;
-use App\Models\DeveloperUsage\Backend\PartnerAdminRoute;
+use App\Models\Admin\BackendAdminAccessGroup;
+use App\Models\DeveloperUsage\Backend\BackendAdminRoute;
 use App\Models\DeveloperUsage\Menu\PartnerMenus;
 use App\Models\PlatForms;
 use Illuminate\Http\JsonResponse;
@@ -42,7 +42,7 @@ class BackEndApiMainController extends Controller
             $this->partnerAdmin = $this->currentAuth->user();
             if (!is_null($this->partnerAdmin)) {
                 //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
-                $this->currentPartnerAccessGroup = new PartnerAdminGroupAccess();
+                $this->currentPartnerAccessGroup = new BackendAdminAccessGroup();
                 $this->currentPlatformEloq = new PlatForms();
                 if ($this->partnerAdmin->platform()->exists()) {
                     $this->currentPlatformEloq = $this->partnerAdmin->platform; //获取目前账号用户属于平台的对象
@@ -81,8 +81,8 @@ class BackEndApiMainController extends Controller
     {
         $this->currentOptRoute = Route::getCurrentRoute();
         $this->currentRouteName = $this->currentOptRoute->action['as']; //当前的route name;
-        //$partnerAdREloq = PartnerAdminRoute::where('route_name',$this->currentRouteName)->first()->parentRoute->menu;
-        $partnerAdREloq = PartnerAdminRoute::where('route_name', $this->currentRouteName)->first();
+        //$partnerAdREloq = BackendAdminRoute::where('route_name',$this->currentRouteName)->first()->parentRoute->menu;
+        $partnerAdREloq = BackendAdminRoute::where('route_name', $this->currentRouteName)->first();
         if (!is_null($partnerAdREloq)) {
             $partnerMenuEloq = $partnerAdREloq->menu;
             //set if it is accissable or not

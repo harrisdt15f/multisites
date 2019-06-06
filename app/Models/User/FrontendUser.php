@@ -2,13 +2,13 @@
 
 namespace App\Models\User;
 
-use App\Models\Admin\UserAdmitedFlowsModel;
-use App\Models\User\Fund\HandleUserAccounts;
+use App\Models\Admin\FrontendUsersPrivacyFlow;
+use App\Models\User\Fund\FrontendUsersAccount;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class UserHandleModel extends Authenticatable implements JWTSubject
+class FrontendUser extends Authenticatable implements JWTSubject
 {
     use Notifiable;
 
@@ -16,7 +16,7 @@ class UserHandleModel extends Authenticatable implements JWTSubject
     const TYPE_AGENT = 2;
     const TYPE_USER = 3;
 
-    protected $table = 'users';
+    protected $table = 'frontend_users';
 
     /**
      * The attributes that are mass assignable.
@@ -75,11 +75,11 @@ class UserHandleModel extends Authenticatable implements JWTSubject
 
     public function account()
     {
-        return $this->hasOne(HandleUserAccounts::class, 'user_id', 'id');
+        return $this->hasOne(FrontendUsersAccount::class, 'user_id', 'id');
     }
     //用户冻结历史
     public function userAdmitedFlow()
     {
-        return $this->hasMany(UserAdmitedFlowsModel::class, 'user_id', 'id')->orderBy('created_at', 'desc');
+        return $this->hasMany(FrontendUsersPrivacyFlow::class, 'user_id', 'id')->orderBy('created_at', 'desc');
     }
 }
