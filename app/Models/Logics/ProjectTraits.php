@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Request;
  * @Author: LingPh
  * @Date:   2019-05-29 17:44:08
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-05-29 17:49:21
+ * @Last Modified time: 2019-06-06 17:39:01
  */
 trait ProjectTraits
 {
@@ -161,7 +161,7 @@ trait ProjectTraits
                     'bet_from' => $from,
                 ];
                 // 保存追号主
-                DB::table('traces')->insert($traceMainData);
+                DB::table('lottery_traces')->insert($traceMainData);
                 // 保存追号
                 $traceListData = [];
                 foreach ($traceData as $issue => $mark) {
@@ -192,7 +192,7 @@ trait ProjectTraits
                         ];
                     }
                 }
-                DB::table('trace_list')->insert($traceListData);
+                DB::table('lottery_trace_lists')->insert($traceListData);
             }
             $returnData['project'][] = [
                 'id' => $id,

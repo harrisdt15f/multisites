@@ -4,9 +4,9 @@ namespace App\Models;
 
 use App\Models\Logics\TraceTraits;
 
-class Trace extends BaseModel
+class LotteryTrace extends BaseModel
 {
     use TraceTraits;
-    protected $table = 'traces';
+    protected $table = 'lottery_traces';
 
 }
