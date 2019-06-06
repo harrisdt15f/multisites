@@ -4,7 +4,7 @@ namespace App\Http\Controllers\BackendApi\DeveloperUsage\Backend\Menu;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Models\DeveloperUsage\Backend\BackendAdminRoute;
-use App\Models\DeveloperUsage\Menu\PartnerMenus;
+use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
 use function GuzzleHttp\json_decode;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Route;
@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Validator;
 
 class MenuController extends BackEndApiMainController
 {
-    protected $eloqM = 'DeveloperUsage\Menu\PartnerMenus';
+    protected $eloqM = 'DeveloperUsage\Menu\BackendSystemMenu';
 
     public function getAllMenu()
     {
@@ -53,9 +53,9 @@ class MenuController extends BackEndApiMainController
                 3 => 'mobile-api',
             ];
             $routeEndKey = $type[$this->inputs['type']] ?? $type[1];
-//        $firstlevelmenus = PartnerMenus::getFirstLevelList();
+//        $firstlevelmenus = BackendSystemMenu::getFirstLevelList();
 
-//        $editMenu = PartnerMenus::all();
+//        $editMenu = BackendSystemMenu::all();
             //        $routeMatchingName = $editMenu->where('route', '!=', '#')->keyBy('route')->toArray();
             $routeInfo = [];
             $registeredRoute = BackendAdminRoute::pluck('route_name')->toArray();
@@ -103,7 +103,7 @@ class MenuController extends BackEndApiMainController
         if (!is_null($MenuEloq)) {
             return $this->msgOut(false, [], '100800');
         }
-        $menuEloq = new PartnerMenus();
+        $menuEloq = new BackendSystemMenu();
         $menuEloq->label = $this->inputs['label'];
         $menuEloq->en_name = $this->inputs['en_name'];
         $menuEloq->route = $this->inputs['route'];
@@ -135,7 +135,7 @@ class MenuController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $menuEloq = new PartnerMenus();
+        $menuEloq = new BackendSystemMenu();
         $toDelete = $this->inputs['toDelete'];
         if (!empty($toDelete)) {
             try {
@@ -181,7 +181,7 @@ class MenuController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $menuEloq = PartnerMenus::find($this->inputs['menuId']);
+        $menuEloq = BackendSystemMenu::find($this->inputs['menuId']);
         $menuEloq->label = $this->inputs['label'];
         $menuEloq->en_name = $this->inputs['en_name'];
         $menuEloq->display = $this->inputs['display'];
@@ -209,7 +209,7 @@ class MenuController extends BackEndApiMainController
         $atLeastOne = false;
         if (!empty($parseDatas)) {
             foreach ($parseDatas as $key => $value) {
-                $menuEloq = PartnerMenus::find($value['currentId']);
+                $menuEloq = BackendSystemMenu::find($value['currentId']);
                 $menuEloq->pid = $value['currentParent'] === '#' ? 0 : (int) $value['currentParent'];
                 $menuEloq->sort = $value['currentSort'];
                 if ($menuEloq->save()) {

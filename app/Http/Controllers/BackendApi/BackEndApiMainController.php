@@ -5,7 +5,7 @@ namespace App\Http\Controllers\BackendApi;
 use App\Http\Controllers\Controller;
 use App\Models\Admin\BackendAdminAccessGroup;
 use App\Models\DeveloperUsage\Backend\BackendAdminRoute;
-use App\Models\DeveloperUsage\Menu\PartnerMenus;
+use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
 use App\Models\SystemPlatform;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
@@ -69,7 +69,7 @@ class BackEndApiMainController extends Controller
      */
     private function menuAccess()
     {
-        $partnerEloq = new PartnerMenus();
+        $partnerEloq = new BackendSystemMenu();
         $this->fullMenuLists = $partnerEloq->forStar(); //所有的菜单
         $this->partnerMenulists = $partnerEloq->menuLists($this->currentPartnerAccessGroup); //目前所有的菜单为前端展示用的
     }

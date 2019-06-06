@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\BackendApi\DeveloperUsage\Backend\Routes;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Models\DeveloperUsage\Menu\PartnerMenus;
+use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
 use Illuminate\Support\Facades\Validator;
 
 class RouteController extends BackEndApiMainController
@@ -64,7 +64,7 @@ class RouteController extends BackEndApiMainController
         if (is_null($pastEloq)) {
             return $this->msgOut(false, [], '101401');
         }
-        $checkMeun = PartnerMenus::where('id', $this->inputs['menu_group_id'])->first();
+        $checkMeun = BackendSystemMenu::where('id', $this->inputs['menu_group_id'])->first();
         if (is_null($checkMeun)) {
             return $this->msgOut(false, [], '101402');
         }

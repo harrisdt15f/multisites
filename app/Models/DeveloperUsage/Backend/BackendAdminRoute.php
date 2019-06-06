@@ -3,7 +3,7 @@
 namespace App\Models\DeveloperUsage\Backend;
 
 use App\Models\BaseModel;
-use App\Models\DeveloperUsage\Menu\PartnerMenus;
+use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
 
 class BackendAdminRoute extends BaseModel
 {
@@ -14,6 +14,6 @@ class BackendAdminRoute extends BaseModel
     ];
     public function menu()
     {
-        return $this->belongsTo(PartnerMenus::class, 'menu_group_id', 'id');
+        return $this->belongsTo(BackendSystemMenu::class, 'menu_group_id', 'id');
     }
 }

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\WebControllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\DeveloperUsage\Menu\PartnerMenus;
+use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
@@ -26,7 +26,7 @@ class AdminMainController extends Controller
             $this->inputs = Input::all();
             $this->currentOptRoute = Route::getCurrentRoute();
             $this->adminOperateLog();
-            $menuObj = new PartnerMenus();
+            $menuObj = new BackendSystemMenu();
             $this->currentPartnerAccessGroup = $this->partnerAdmin->accessGroup;
             $menulists = $menuObj->menuLists($this->currentPartnerAccessGroup);
             View::share('menulists', $menulists);

@@ -8,7 +8,7 @@ use App\Lib\Common\FundOperationRecharge;
 use App\Lib\Common\InternalNoticeMessage;
 use App\Models\Admin\BackendAdminUser;
 use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
-use App\Models\Admin\Message\NoticeMessage;
+use App\Models\Admin\Message\BackendSystemNoticeList;
 use App\Models\BackendAdminAuditFlowList;
 use App\Models\User\FrontendUser;
 use App\Models\User\Fund\AccountChangeReport;
@@ -48,7 +48,14 @@ class RechargeCheckController extends BackEndApiMainController
         }
         // 审核表
         $rechargeLog = $this->eloqM::find($this->inputs['id']);
+        if (is_null($rechargeLog)) {
+            return $this->msgOut(false, [], '100904');
+        }
         $auditFlow = BackendAdminAuditFlowList::where('id', $rechargeLog->audit_flow_id)->first();
+        // var_dump($rechargeLog);exit;
+        if (is_null($rechargeLog)) {
+            return $this->msgOut(false, [], '100905');
+        }
         if ($rechargeLog->status !== 0) {
             return $this->msgOut(false, [], '100900');
         }
@@ -173,7 +180,7 @@ class RechargeCheckController extends BackEndApiMainController
     public function sendMessage($adminId, $message)
     {
         $messageClass = new InternalNoticeMessage();
-        $type = NoticeMessage::AUDIT;
+        $type = BackendSystemNoticeList::AUDIT;
         $admin = BackendAdminUser::select('id', 'group_id')->find($adminId);
         if (!is_null($admin)) {
             $messageClass->insertMessage($type, $message, $admin->toArray());

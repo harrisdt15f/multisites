@@ -11,7 +11,7 @@ use App\Models\Admin\BackendAdminUser;
 use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
 use App\Models\Admin\Message\BackendSystemNoticeList;
 use App\Models\BackendAdminAuditFlowList;
-use App\Models\DeveloperUsage\Menu\PartnerMenus;
+use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
 use App\Models\User\FrontendUser;
 use App\Models\User\Fund\AccountChangeReport;
 use App\Models\User\Fund\AccountChangeType;
@@ -220,7 +220,7 @@ class ArtificialRechargeController extends BackEndApiMainController
     {
         $messageClass = new InternalNoticeMessage();
         $type = BackendSystemNoticeList::AUDIT;
-        $roleId = PartnerMenus::where('en_name', 'recharge.check')->value('id');
+        $roleId = BackendSystemMenu::where('en_name', 'recharge.check')->value('id');
         $allGroup = BackendAdminAccessGroup::select('id', 'role')->get();
         $groupIds = [];
         //获取有人工充值权限的组
