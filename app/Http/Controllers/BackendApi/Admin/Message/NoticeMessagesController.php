@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-01 14:29:10
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-06 17:28:28
+ * @Last Modified time: 2019-06-06 17:48:25
  */
 
 namespace App\Http\Controllers\BackendApi\Admin\Message;
@@ -26,7 +26,7 @@ class NoticeMessagesController extends BackEndApiMainController
      */
     public function adminMessages()
     {
-        $messagesEloq = $this->eloqM::where('admin_id', $this->partnerAdmin->id)->with('noticeMessage')->orderBy('created_at', 'desc')->get();
+        $messagesEloq = $this->eloqM::where('receive_admin_id', $this->partnerAdmin->id)->with('noticeMessage')->orderBy('created_at', 'desc')->get();
         $messages = [];
         foreach ($messagesEloq as $messageEloq) {
             $data = [

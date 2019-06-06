@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-01 14:51:08
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-06 17:29:06
+ * @Last Modified time: 2019-06-06 17:46:44
  */
 
 namespace App\Models\Admin\Message;
@@ -18,7 +18,7 @@ class BackendSystemInternalMessage extends BaseModel
     protected $casts = array('created_at' => 'created_at', 'updated_at' => 'updated_at');
 
     protected $fillable = [
-        'send_id', 'admin_id', 'group_id', 'message_id', 'status', 'created_at', 'updated_at',
+        'operate_admin_id', 'receive_admin_id', 'receive_group_id', 'message_id', 'status', 'created_at', 'updated_at',
     ];
 
     public function noticeMessage()

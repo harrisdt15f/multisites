@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-01 16:09:24
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-06 17:28:59
+ * @Last Modified time: 2019-06-06 17:51:50
  */
 namespace App\Lib\Common;
 
@@ -35,16 +35,16 @@ class InternalNoticeMessage
      * 生成interna_notice表
      * @param $adminEloq   接收信息的管理员Eloq
      * @param $message_id  backend_system_notice_lists表id
-     * @param $send_id  发送人id  系统null
+     * @param $operate_admin_id  发送人id  系统null
      * @return void
      */
-    public function createInternalNotice($adminsArr, $message_id, $send_id = null)
+    public function createInternalNotice($adminsArr, $message_id, $operate_admin_id = null)
     {
         foreach ($adminsArr as $admin) {
             $data = [
-                'send_id' => $send_id,
-                'admin_id' => $admin['id'],
-                'group_id' => $admin['group_id'],
+                'operate_admin_id' => $operate_admin_id,
+                'receive_admin_id' => $admin['id'],
+                'receive_group_id' => $admin['group_id'],
                 'message_id' => $message_id,
                 'status' => 0,
             ];
