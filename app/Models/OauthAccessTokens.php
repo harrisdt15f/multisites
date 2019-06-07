@@ -7,8 +7,6 @@ use Illuminate\Support\Carbon;
 
 class OauthAccessTokens extends Model
 {
-    protected $table = 'oauth_access_tokens';
-
     public static function clearOldToken($id)
     {
         $accessTokenEloq = self::where('user_id', $id)->get();

@@ -13,8 +13,6 @@ class BackendAdminUser extends Authenticatable implements JWTSubject
 {
     use Notifiable;
 
-    protected $table = 'backend_admin_users';
-
     /**
      * The attributes that are mass assignable.
      *

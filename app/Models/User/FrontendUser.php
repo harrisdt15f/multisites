@@ -17,8 +17,6 @@ class FrontendUser extends Authenticatable implements JWTSubject
     const TYPE_AGENT = 2;
     const TYPE_USER = 3;
 
-    protected $table = 'frontend_users';
-
     /**
      * The attributes that are mass assignable.
      *

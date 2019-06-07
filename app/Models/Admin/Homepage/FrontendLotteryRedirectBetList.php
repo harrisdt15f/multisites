@@ -7,8 +7,6 @@ use App\Models\Game\Lottery\LotteryList;
 
 class FrontendLotteryRedirectBetList extends BaseModel
 {
-    protected $table = 'frontend_lottery_redirect_bet_lists';
-
     protected $fillable = [
         'lotteries_id', 'pic_path', 'sort', 'created_at', 'updated_at',
     ];

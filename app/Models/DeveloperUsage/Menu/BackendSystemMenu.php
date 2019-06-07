@@ -9,8 +9,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class BackendSystemMenu extends BaseModel
 {
     use MenuLogics;
-    protected $table = 'backend_system_menus';
-
     protected $redisFirstTag = 'ms_menu';
 
     public function childs(): HasMany

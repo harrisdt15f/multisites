@@ -6,8 +6,6 @@ use App\Models\Admin\BackendAdminUser;
 
 class SystemPlatform extends BaseModel
 {
-
-    protected $table = 'system_platforms';
     public $timestamps = true;
 
     public function partnerAdminUsers()

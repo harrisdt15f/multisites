@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class LotteryIssueRule extends BaseModel
 {
-    protected $table = 'lottery_issue_rules';
-
     /**
      * The attributes that are mass assignable.
      *

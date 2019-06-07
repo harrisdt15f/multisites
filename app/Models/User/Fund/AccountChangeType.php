@@ -9,8 +9,6 @@ class AccountChangeType extends BaseModel
 {
     use AccountChangeTypeLogics;
 
-    protected $table = 'account_change_type';
-
     protected $fillable = [
         'name',
         'sign',

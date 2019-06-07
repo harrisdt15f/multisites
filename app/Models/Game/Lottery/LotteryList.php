@@ -11,7 +11,6 @@ use App\Models\Game\Lottery\LotteryMethod;
 class LotteryList extends BaseModel
 {
     use LotteryIssueGenerate, LotteryLogics;
-    protected $table = 'lottery_lists';
 
     /**
      * The attributes that are mass assignable.

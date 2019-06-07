@@ -7,5 +7,4 @@ use App\Models\Logics\ProjectTraits;
 class Project extends BaseModel
 {
     use ProjectTraits;
-    protected $table = 'projects';
 }
