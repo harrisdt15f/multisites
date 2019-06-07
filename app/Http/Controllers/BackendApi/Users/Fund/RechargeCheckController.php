@@ -52,8 +52,7 @@ class RechargeCheckController extends BackEndApiMainController
             return $this->msgOut(false, [], '100904');
         }
         $auditFlow = BackendAdminAuditFlowList::where('id', $rechargeLog->audit_flow_id)->first();
-        // var_dump($rechargeLog);exit;
-        if (is_null($rechargeLog)) {
+        if (is_null($auditFlow)) {
             return $this->msgOut(false, [], '100905');
         }
         if ($rechargeLog->status !== 0) {

@@ -25,7 +25,6 @@ class AccountChangeTypeController extends BackEndApiMainController
             'name' => 'required|string',
             'sign' => 'required|string',
             'in_out' => 'required|numeric|in:0,1',
-            'type' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return $this->msgout(false, [], '400', $validator->errors()->first());

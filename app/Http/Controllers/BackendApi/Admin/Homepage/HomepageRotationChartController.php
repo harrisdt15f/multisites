@@ -143,7 +143,7 @@ class HomepageRotationChartController extends BackEndApiMainController
         //如果要修改图片  删除原图  上传新图
         if (array_key_exists('pic', $this->inputs)) {
             $imageClass = new ImageArrange();
-            $picData = $this->replaceImage($pastData['pic_path'], $pastData['thumbnail_path'], $this->inputs['pic'], $ImageClass);
+            $picData = $this->replaceImage($pastData['pic_path'], $pastData['thumbnail_path'], $this->inputs['pic'], $imageClass);
             if ($picData['success'] === false) {
                 return $this->msgOut(false, [], $picData['code']);
             }
