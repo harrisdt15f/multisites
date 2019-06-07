@@ -15,6 +15,7 @@ use App\Models\User\UserRechargeHistory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Models\User\UsersRechargeHistorie;
 
 class UserHandleController extends BackEndApiMainController
 {
@@ -39,7 +40,7 @@ class UserHandleController extends BackEndApiMainController
         $min = $this->currentPlatformEloq->prize_group_min;
         $max = $this->currentPlatformEloq->prize_group_max;
         $validator = Validator::make($this->inputs, [
-            'username' => 'required|unique:users',
+            'username' => 'required|unique:frontend_users',
             'password' => 'required',
             'fund_password' => 'required',
             'is_tester' => 'required|numeric',
@@ -254,7 +255,7 @@ class UserHandleController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors());
         }
-        $eloqM = $this->modelWithNameSpace('BackendAdminAuditPasswordsList');
+        $eloqM = $this->modelWithNameSpace($this->withNameSpace);
         $applyUserEloq = $eloqM::where([
             ['id', '=', $this->inputs['id']],
             ['type', '=', $this->inputs['type']],
@@ -365,8 +366,7 @@ class UserHandleController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $datas = AccountChangeReport::select('username', 'type_name', 'type_sign', 'amount', 'before_balance', 'balance', 'created_at')
-            ->with(['changeType' => function ($query) {
+        $datas = AccountChangeReport::select('username', 'type_name', 'type_sign', 'amount', 'before_balance', 'balance', 'created_at')->with(['changeType' => function ($query) {
                 $query->select('sign', 'in_out');
             }])
             ->where(function ($query) {
