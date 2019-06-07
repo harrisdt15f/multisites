@@ -6,6 +6,7 @@ use App\Events\IssueGenerateEvent;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Models\Game\Lottery\LotteryList;
 use App\Models\Game\Lottery\LotteryMethod;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
@@ -15,21 +16,26 @@ class LotteriesController extends BackEndApiMainController
 {
     protected $eloqM = 'Game\Lottery\LotteryList';
 
-    public function seriesLists()
+    /**
+     * 获取系列接口
+     * @return JsonResponse
+     */
+    public function seriesLists(): JsonResponse
     {
         $seriesData = Config::get('game.main.series');
         return $this->msgOut(true, $seriesData);
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * 获取彩种接口
+     * @return JsonResponse
      */
-    public function lotteriesLists()
+    public function lotteriesLists(): JsonResponse
     {
         $series = array_keys(Config::get('game.main.series'));
         $seriesStringImploded = implode(',', $series);
         $rule = [
-            'series_id' => 'required|in:' . $seriesStringImploded,
+            'series_id' => 'required|in:'.$seriesStringImploded,
         ];
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
@@ -48,9 +54,10 @@ class LotteriesController extends BackEndApiMainController
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * 获取玩法结果。
+     * @return JsonResponse
      */
-    public function lotteriesMethodLists()
+    public function lotteriesMethodLists(): JsonResponse
     {
         $method = [];
         $redisKey = 'play_method_list';
@@ -124,7 +131,7 @@ class LotteriesController extends BackEndApiMainController
                                     ->where('method_group', $curentMethodGroup)
                                     ->where('method_row', $method_row);
                             })
-                            // ->with('methodDetails')
+                                // ->with('methodDetails')
                                 ->get()->toArray();
                         }
                     }
@@ -140,7 +147,11 @@ class LotteriesController extends BackEndApiMainController
         return $this->msgOut(true, $method);
     }
 
-    public function lotteryIssueLists()
+    /**
+     * 获取奖期列表接口。
+     * @return JsonResponse
+     */
+    public function lotteryIssueLists(): JsonResponse
     {
         $modelName = 'Game\Lottery\LotteryIssue';
         $eloqM = $this->modelWithNameSpace($modelName);
@@ -148,7 +159,9 @@ class LotteriesController extends BackEndApiMainController
 //        {"method":"whereIn","key":"id","value":["cqssc","xjssc","hljssc","zx1fc","txffc"]}
         //        $extraWhereConditions = Arr::wrap(json_decode($this->inputs['extra_where'], true));
         if (!empty($seriesId)) {
-            $lotteryEnNames = LotteryList::where('series_id', $seriesId)->get(['en_name']);
+            $lotteryEnNames = LotteryList::where([
+                ['series_id', '=', $seriesId]
+            ])->get(['en_name']);
             foreach ($lotteryEnNames as $lotteryIthems) {
                 $tempLotteryId[] = $lotteryIthems->en_name;
             }
@@ -157,12 +170,15 @@ class LotteriesController extends BackEndApiMainController
             $this->inputs['extra_where']['value'] = $tempLotteryId;
         }
         $searchAbleFields = ['lottery_id', 'issue'];
-        $data = $this->generateSearchQuery($eloqM, $searchAbleFields);
+        $orderFields = 'begin_time';
+        $orderFlow = 'asc';
+        $this->inputs['time_condtions'] = $this->inputs['time_condtions'] ?? '[["begin_time",">=",'.Carbon::now()->timestamp.']]';// 从现在开始。如果。没有时间字段的话，就用当前时间以上的显示
+        $data = $this->generateSearchQuery($eloqM, $searchAbleFields, 0, null, null, $orderFields, $orderFlow);
         return $this->msgOut(true, $data);
     }
 
     // 生成奖期
-    public function generateIssue()
+    public function generateIssue(): JsonResponse
     {
         $rule = [
             'lottery_id' => 'required',
@@ -179,7 +195,7 @@ class LotteriesController extends BackEndApiMainController
     }
 
     //彩种开关
-    public function lotteriesSwitch()
+    public function lotteriesSwitch(): ?JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -206,7 +222,7 @@ class LotteriesController extends BackEndApiMainController
     }
 
     //玩法组开关
-    public function methodGroupSwitch()
+    public function methodGroupSwitch(): ?JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'lottery_id' => 'required|string',
@@ -238,7 +254,7 @@ class LotteriesController extends BackEndApiMainController
     }
 
     //玩法行开关
-    public function methodRowSwitch()
+    public function methodRowSwitch(): ?JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'lottery_id' => 'required|string',
@@ -272,7 +288,7 @@ class LotteriesController extends BackEndApiMainController
     }
 
     //玩法开关
-    public function methodSwitch()
+    public function methodSwitch(): ?JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
@@ -299,7 +315,7 @@ class LotteriesController extends BackEndApiMainController
     }
 
     //清理玩法缓存
-    public function clearMethodCache()
+    public function clearMethodCache(): void
     {
         $redisKey = 'play_method_list';
         if (Cache::has($redisKey)) {
@@ -308,7 +324,7 @@ class LotteriesController extends BackEndApiMainController
     }
 
     //编辑玩法
-    public function editMethod()
+    public function editMethod(): ?JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
