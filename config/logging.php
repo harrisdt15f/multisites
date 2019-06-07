@@ -125,6 +125,12 @@ return [
             'driver' => 'custom',
             'via' => BackendLogMonolog::class,
         ],
+        'account' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/account/accounts.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
 
     ],
 
