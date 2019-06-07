@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ConfiguresController extends BackEndApiMainController
 {
-    protected $eloqM = 'Admin\PartnerSysConfigures';
+    protected $eloqM = 'Admin\SystemConfiguration';
 
     //获取全部配置
     public function getConfiguresList(): JsonResponse

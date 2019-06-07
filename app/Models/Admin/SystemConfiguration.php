@@ -6,10 +6,10 @@ use App\Models\Admin\Logics\SysConfiguresTraits;
 use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class PartnerSysConfigures extends BaseModel
+class SystemConfiguration extends BaseModel
 {
     use SysConfiguresTraits;
-    
+
     protected $fillable = [
         'parent_id',
         'pid',

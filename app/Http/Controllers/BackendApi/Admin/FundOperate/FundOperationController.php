@@ -7,7 +7,7 @@ use App\Lib\Common\FundOperationRecharge;
 use App\Models\Admin\BackendAdminUser;
 use App\Models\Admin\Fund\BackendAdminRechargePermitGroup;
 use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
-use App\Models\Admin\PartnerSysConfigures;
+use App\Models\Admin\SystemConfiguration;
 use App\Models\User\Fund\BackendAdminRechargehumanLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -36,7 +36,7 @@ class FundOperationController extends BackEndApiMainController
         $orderFields = 'id';
         $orderFlow = 'asc';
         $data = $this->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields, $orderFields, $orderFlow);
-        $SysConfiguresEloq = PartnerSysConfigures::where('sign', 'admin_recharge_daily_limit')->first();
+        $SysConfiguresEloq = SystemConfiguration::where('sign', 'admin_recharge_daily_limit')->first();
         $finalData['admin_user'] = $data;
         $finalData['dailyFundLimit'] = $SysConfiguresEloq['value'];
         return $this->msgOut(true, $finalData);
@@ -99,7 +99,7 @@ class FundOperationController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $SysConfiguresEloq = PartnerSysConfigures::where('sign', 'admin_recharge_daily_limit')->first();
+        $SysConfiguresEloq = SystemConfiguration::where('sign', 'admin_recharge_daily_limit')->first();
         if (is_null($SysConfiguresEloq)) {
             return $this->msgOut(false, [], '101302');
         }

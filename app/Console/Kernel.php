@@ -2,7 +2,7 @@
 
 namespace App\Console;
 
-use App\Models\Admin\PartnerSysConfigures;
+use App\Models\Admin\SystemConfiguration;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\Cache;
@@ -34,8 +34,8 @@ class Kernel extends ConsoleKernel
         if (Cache::has('generateIssueTime')) {
             $generateIssueTime = Cache::get('generateIssueTime');
         } else {
-            $PartnerSysConfigures = new PartnerSysConfigures();
-            $generateIssueTime = $PartnerSysConfigures->getConfigValue('generate_issue_time');
+            $systemConfiguration = new SystemConfiguration();
+            $generateIssueTime = $systemConfiguration->getConfigValue('generate_issue_time');
             Cache::forever('generateIssueTime', $generateIssueTime);
         }
         $schedule->command('GenerateIssue')->daily()->at($generateIssueTime);
