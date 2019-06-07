@@ -9,8 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class PartnerSysConfigures extends BaseModel
 {
     use SysConfiguresTraits;
-    protected $table = 'partner_sys_configures';
-
+    
     protected $fillable = [
         'parent_id',
         'pid',

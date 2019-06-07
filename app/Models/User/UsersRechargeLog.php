@@ -6,7 +6,6 @@ use App\Models\BaseModel;
 
 class UsersRechargeLog extends BaseModel
 {
-    protected $table = 'users_recharge_logs';
 
     const ARTIFICIAL = 1; //人工充值
     const AUTOMATIC = 0; //自动充值

@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 use App\Models\DeveloperUsage\Backend\BackendAdminRoute;
 class Logs extends BaseModel
 {
-    protected $table = 'logs';
-
     public const PHONE = 1;
     public const DESKSTOP = 2;
     public const ROBOT = 3;

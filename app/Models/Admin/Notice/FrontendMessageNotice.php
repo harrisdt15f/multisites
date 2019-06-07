@@ -7,8 +7,6 @@ use App\Models\BaseModel;
 
 class FrontendMessageNotice extends BaseModel
 {
-    protected $table = 'frontend_message_notices';
-
     protected $fillable = [
         'type', 'title', 'content', 'start_time', 'end_time', 'sort', 'status', 'admin_id', 'created_at', 'updated_at',
     ];

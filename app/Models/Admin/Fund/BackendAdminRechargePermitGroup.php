@@ -8,8 +8,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class BackendAdminRechargePermitGroup extends BaseModel
 {
-    protected $table = 'backend_admin_recharge_permit_groups';
-
     protected $fillable = [
         'group_id', 'group_name',
     ];

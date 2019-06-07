@@ -8,7 +8,6 @@ use App\Models\Game\Lottery\Logics\MethodsLogics;
 class LotteryMethod extends BaseModel
 {
     use MethodsLogics;
-    protected $table = 'lottery_methods';
 
     /**
      * The attributes that are mass assignable.

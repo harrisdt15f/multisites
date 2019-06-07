@@ -10,8 +10,6 @@ class FrontendUsersAccount extends Ardent
 {
     use UserAccountLogics;
 
-    protected $table = 'frontend_users_accounts';
-
     /**
      * The attributes that are mass assignable.
      *

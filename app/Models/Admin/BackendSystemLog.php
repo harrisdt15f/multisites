@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class BackendSystemLog extends BaseModel
 {
-    protected $table = 'backend_system_logs';
-
     public const PHONE = 1;
     public const DESKSTOP = 2;
     public const ROBOT = 3;

@@ -7,7 +7,6 @@ use App\Models\BaseModel;
 
 class BackendAdminAccessGroup extends BaseModel
 {
-    protected $table = 'backend_admin_access_groups';
     protected $fillable = [
         'group_name', 'role', 'status',
     ];

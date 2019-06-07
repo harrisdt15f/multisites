@@ -7,8 +7,6 @@ use App\Models\Admin\BackendAdminUser;
 
 class BackendAdminAuditFlowList extends BaseModel
 {
-    protected $table = 'backend_admin_audit_flow_lists';
-
     protected $fillable = [
         'admin_id', 'auditor_id', 'apply_note', 'auditor_note', 'admin_name', 'auditor_name', 'username',
     ];

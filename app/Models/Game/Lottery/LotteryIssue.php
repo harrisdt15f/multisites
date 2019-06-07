@@ -8,8 +8,6 @@ use App\Models\Game\Lottery\Logics\IssueLogics;
 class LotteryIssue extends BaseModel
 {
     use IssueLogics;
-    protected $table = 'lottery_issues';
-
     /**
      * The attributes that are mass assignable.
      *
