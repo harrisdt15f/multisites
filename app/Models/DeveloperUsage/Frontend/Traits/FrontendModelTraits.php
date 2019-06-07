@@ -6,7 +6,7 @@ namespace App\Models\DeveloperUsage\Frontend\Traits;
  * @Author: LingPh
  * @Date:   2019-05-29 17:38:37
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-05-30 11:00:00
+ * @Last Modified time: 2019-06-07 15:28:01
  */
 trait FrontendModelTraits
 {
@@ -34,5 +34,15 @@ trait FrontendModelTraits
     public function ParentModel($typeArr)
     {
         return self::where('level', 1)->whereIn('type', $typeArr)->get();
+    }
+
+    /**
+     * 获取一个模块信息
+     * @param  string $en_name 模块英文名
+     * @return
+     */
+    public function getModel($en_name)
+    {
+        return self::where('en_name', $en_name)->first();
     }
 }
