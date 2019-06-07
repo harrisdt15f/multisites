@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Admin\BackendAdminUser;
 use App\Models\Admin\Fund\BackendAdminRechargePermitGroup;
 use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
-use App\Models\Admin\PartnerSysConfigures;
+use App\Models\Admin\SystemConfiguration;
 use App\Models\User\Fund\BackendAdminRechargehumanLog;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -35,13 +35,10 @@ class AllocationRechargeFundControl extends Command
     public function handle()
     {
         Log::info('开始定时发放人工充值额度');
-        $FundOperation = new BackendAdminRechargePocessAmount();
-        $rechargeLog = new BackendAdminRechargehumanLog();
-        $AdminUsersEloq = new BackendAdminUser();
-        $PartnerSysConfigures = new PartnerSysConfigures();
-        $fundOperationGroup = new BackendAdminRechargePermitGroup();
-        $fundData = $PartnerSysConfigures->select('value')->where('sign', 'admin_recharge_daily_limit')->first();
+        $sysConfigures = new SystemConfiguration();
+        $fundData = $sysConfigures->select('value')->where('sign', 'admin_recharge_daily_limit')->first();
         $everyDayfund = $fundData['value'];
+        $fundOperationGroup = new BackendAdminRechargePermitGroup();
         $groupArr = $fundOperationGroup->get()->toArray();
         $groups = array_column($groupArr, 'group_id');
         //拥有权限的管理员
@@ -51,11 +48,11 @@ class AllocationRechargeFundControl extends Command
             ->whereIn('group_id', $groups)
             ->get()->toArray();
         $time = date('Y-m-d H:i:s', time());
-        foreach ($admins as $k => $v) {
-            if ($v['fund'] < $everyDayfund) {
+        foreach ($admins as $admin) {
+            if ($admin['fund'] < $everyDayfund) {
                 $fund = $everyDayfund;
-                $addFund = $fund - $v['fund'];
-                $adminFund = $v['fund'] + $addFund;
+                $addFund = $fund - $admin['fund'];
+                $adminFund = $admin['fund'] + $addFund;
                 $type = BackendAdminRechargehumanLog::SYSTEM;
                 $in_out = BackendAdminRechargehumanLog::INCREMENT;
                 $comment = '[每日充值额度发放]=>>+' . $addFund . '|[目前额度]=>>' . $adminFund;
@@ -64,8 +61,8 @@ class AllocationRechargeFundControl extends Command
                     'updated_at' => $time,
                 ];
                 $flowsData = [
-                    'admin_id' => $v['id'],
-                    'admin_name' => $v['name'],
+                    'admin_id' => $admin['id'],
+                    'admin_name' => $admin['name'],
                     'comment' => $comment,
                     'type' => $type,
                     'in_out' => $in_out,
@@ -74,7 +71,9 @@ class AllocationRechargeFundControl extends Command
                 ];
                 DB::beginTransaction();
                 try {
-                    $FundOperation->where('admin_id', $v['id'])->update($editFundData);
+                    $fundOperation = new BackendAdminRechargePocessAmount();
+                    $fundOperation->where('admin_id', $admin['id'])->update($editFundData);
+                    $rechargeLog = new BackendAdminRechargehumanLog();
                     $rechargeLog->insert($flowsData);
                     DB::commit();
                 } catch (Exception $e) {

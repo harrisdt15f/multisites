@@ -131,7 +131,12 @@ return [
             'level' => 'debug',
             'days' => 14,
         ],
-
+        'platform' => [
+            'driver' => 'daily',
+            'path' => storage_path('platform/issues.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
     ],
 
 ];

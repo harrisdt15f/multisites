@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-05-31 13:46:32
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-06 11:52:02
+ * @Last Modified time: 2019-06-07 16:09:22
  */
 
 namespace App\Console\Commands;
@@ -38,7 +38,7 @@ class GenerateIssueControl extends Command
     public function handle()
     {
         Log::info('开始定时生成彩票奖期');
-        $lotteries = LotteryList::where('status', 1)->pluck('en_name');
+        $lotteries = LotteryList::where('status', 1)->where('en_name', '!=', 'hklhc')->pluck('en_name');
         $data = [
             'start_time' => date('Y-m-d'),
             'end_time' => date('Y-m-d'),

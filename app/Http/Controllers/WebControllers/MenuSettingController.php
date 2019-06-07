@@ -91,21 +91,8 @@ class MenuSettingController extends AdminMainController
         $itemProcess = [];
         $atLeastOne = false;
         if (!empty($parseDatas)) {
-            foreach ($parseDatas as $key => $value) {
-                $menuEloq = BackendSystemMenu::find($value['currentId']);
-                $menuEloq->pid = $value['currentParent'] === '#' ? 0 : (int) $value['currentParent'];
-                if ($menuEloq->save()) {
-                    $pass['pass'] = $value['currentText'];
-                    $itemProcess[] = $pass;
-                    $atLeastOne = true;
-                } else {
-                    $fail['fail'] = $value['currentText'];
-                    $itemProcess[] = $fail;
-                }
-            }
-            if ($atLeastOne === true) {
-                $menuEloq->refreshStar();
-            }
+            $menuELoq = new $this->eloqM;
+            $itemProcess = $menuELoq->changeParent($parseDatas);
             return response()->json(['success' => true, $itemProcess]);
         }
 

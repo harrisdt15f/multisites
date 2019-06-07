@@ -1,7 +1,7 @@
 <?php
 namespace App\Lib\Logic;
 
-use App\Lib\Clog;
+use Illuminate\Support\Facades\Log;
 use App\Models\User\Fund\AccountChangeReport;
 use App\Models\User\Fund\AccountChangeType;
 use App\Models\User\FrontendUser;
@@ -57,7 +57,7 @@ class AccountChange
             $this->accounts[$account->user_id] = $account;
             return $this->doChange($account, $type, $params);
         }catch (\Exception $e){
-            Clog::account('error-'. $e->getMessage() .'|'. $e->getLine() .'|'. $e->getFile());
+            Log::channel('account')->error('error-'. $e->getMessage() .'|'. $e->getLine() .'|'. $e->getFile());
             return $e->getMessage();
         }
     }
@@ -76,7 +76,7 @@ class AccountChange
 
         //　1. 获取帐变配置
         if (empty($typeConfig)) {
-            Clog::account("error-{$user->id}-{$typeSign}不存在!");
+            Log::channel('account')->error("error-{$user->id}-{$typeSign}不存在!");
             return "对不起, {$typeSign}不存在!";
         }
         // 2. 参数检测
@@ -300,7 +300,7 @@ class AccountChange
     public function unFrozenToPlayer($account, $money)
     {
         if ($money > $account->frozen) {
-            Clog::account("error-{$account->user_id}-{$money}-{$account->frozen}-冻结金额不足!");
+            Log::channel('account')->error("error-{$account->user_id}-{$money}-{$account->frozen}-冻结金额不足!");
             return '对不起, 用户冻结金额不足!';
         }
 

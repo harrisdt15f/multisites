@@ -4,9 +4,9 @@
  * @Author: LingPh
  * @Date:   2019-05-30 14:28:04
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-06 12:03:05
+ * @Last Modified time: 2019-06-07 14:39:05
  */
-namespace App\Http\Controllers\BackendApi\DeveloperUsage\LotteryMethodsWaysLevel;
+namespace App\Http\Controllers\BackendApi\DeveloperUsage\MethodLevel;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Models\Game\Lottery\LotteryMethod;

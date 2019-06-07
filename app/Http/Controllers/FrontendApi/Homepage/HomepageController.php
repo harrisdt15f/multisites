@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 
 class HomepageController extends FrontendApiMainController
 {
-    protected $eloqM = 'Admin\Homepage\HomepageModel';
+    protected $eloqM = 'DeveloperUsage\Frontend\FrontendAllocatedModel';
     protected $offMsg = '当前模块为关闭状态';
 
     //需要展示的前台模块
@@ -22,10 +22,10 @@ class HomepageController extends FrontendApiMainController
         if (Cache::has('showModel')) {
             $data = Cache::get('showModel');
         } else {
-            $homepageModel = $this->eloqM::select('key', 'status')->where('pid', '!=', 0)->orWhere('key', '=', 'banner')->get();
+            $homepageModel = $this->eloqM::select('en_name', 'status')->where('is_homepage_display', 1)->get();
             $data = [];
             foreach ($homepageModel as $value) {
-                $data[$value->key] = $value->status;
+                $data[$value->en_name] = $value->status;
             }
             Cache::forever('showModel', $data);
         }
@@ -38,7 +38,7 @@ class HomepageController extends FrontendApiMainController
         if (Cache::has('homepageBanner')) {
             $datas = Cache::get('homepageBanner');
         } else {
-            $status = $this->eloqM::select('status')->where('key', 'banner')->first();
+            $status = $this->eloqM::select('status')->where('en_name', 'banner')->first();
             if ($status->status !== 1) {
                 return $this->msgOut(false, [], '400', $this->offMsg);
             }
@@ -65,7 +65,7 @@ class HomepageController extends FrontendApiMainController
         if (Cache::has('popularLotteries')) {
             $datas = Cache::get('popularLotteries');
         } else {
-            $lotteriesEloq = $this->eloqM::select('show_num', 'status')->where('key', 'popularLotteries.one')->first();
+            $lotteriesEloq = $this->eloqM::select('show_num', 'status')->where('en_name', 'popularLotteries.one')->first();
             if ($lotteriesEloq->status !== 1) {
                 return $this->msgOut(false, [], '400', $this->offMsg);
             }
@@ -89,7 +89,7 @@ class HomepageController extends FrontendApiMainController
         if (Cache::has('popularMethods')) {
             $datas = Cache::get('popularMethods');
         } else {
-            $lotteriesEloq = $this->eloqM::select('show_num', 'status')->where('key', 'popularLotteries.two')->first();
+            $lotteriesEloq = $this->eloqM::select('show_num', 'status')->where('en_name', 'popularLotteries.two')->first();
             if ($lotteriesEloq->status !== 1) {
                 return $this->msgOut(false, [], '400', $this->offMsg);
             }
@@ -114,7 +114,7 @@ class HomepageController extends FrontendApiMainController
         if (Cache::has('homepageQrCode')) {
             $data = Cache::get('homepageQrCode');
         } else {
-            $data = $this->eloqM::select('value', 'status')->where('key', 'qr.code')->first()->toArray();
+            $data = $this->eloqM::select('value', 'status')->where('en_name', 'qr.code')->first()->toArray();
             if ($data['status'] !== 1) {
                 return $this->msgOut(false, [], '400', $this->offMsg);
             }
@@ -130,7 +130,7 @@ class HomepageController extends FrontendApiMainController
         if (Cache::has('homepageActivity')) {
             $data = Cache::get('homepageActivity');
         } else {
-            $activityEloq = $this->eloqM::select('show_num', 'status')->where('key', 'activity')->first();
+            $activityEloq = $this->eloqM::select('show_num', 'status')->where('en_name', 'activity')->first();
             if ($activityEloq->status !== 1) {
                 return $this->msgOut(false, [], '400', $this->offMsg);
             }
@@ -146,7 +146,7 @@ class HomepageController extends FrontendApiMainController
         if (Cache::has('homepageLogo')) {
             $data = Cache::get('homepageLogo');
         } else {
-            $data = $this->eloqM::select('value', 'status')->where('key', 'logo')->first()->toArray();
+            $data = $this->eloqM::select('value', 'status')->where('en_name', 'logo')->first()->toArray();
             if ($data['status'] !== 1) {
                 return $this->msgOut(false, [], '400', $this->offMsg);
             }
@@ -162,7 +162,7 @@ class HomepageController extends FrontendApiMainController
         if (Cache::has('homepageNotice')) {
             $datas = Cache::get('homepageNotice');
         } else {
-            $noticeEloq = $this->eloqM::select('show_num', 'status')->where('key', 'notice')->first();
+            $noticeEloq = $this->eloqM::select('show_num', 'status')->where('en_name', 'notice')->first();
             if ($noticeEloq->status !== 1) {
                 return $this->msgOut(false, [], '400', $this->offMsg);
             }
@@ -178,7 +178,7 @@ class HomepageController extends FrontendApiMainController
         if (Cache::has('homepageIco')) {
             $data = Cache::get('homepageIco');
         } else {
-            $icoEloq = $this->eloqM::select('value', 'status')->where('key', 'frontend.ico')->first();
+            $icoEloq = $this->eloqM::select('value', 'status')->where('en_name', 'frontend.ico')->first();
             if ($icoEloq->status !== 1) {
                 return $this->msgOut(false, [], '400', $this->offMsg);
             };

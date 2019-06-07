@@ -4,7 +4,7 @@ namespace App\Http\Controllers\FrontendApi;
 
 use App\Models\Admin\BackendAdminAccessGroup;
 use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
-use App\Models\Admin\PartnerSysConfigures;
+use App\Models\Admin\SystemConfiguration;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -111,8 +111,8 @@ class FrontendAuthController extends FrontendApiMainController
             'balance' => sprintf('%1.4f', substr($balance, 0, strrpos($balance, '.', 0) + 1 + 4)),
             'frozen_balance' => sprintf('%1.4f', substr($frozen, 0, strrpos($frozen, '.', 0) + 1 + 4)),
             'has_funds_password' => $user->fund_password ? true : false,
-            'download_url' => PartnerSysConfigures::getConfigValue('app_download_url') . '/' . $user->invite_code,
-            'version' => PartnerSysConfigures::getConfigValue('app_version'),
+            'download_url' => SystemConfiguration::getConfigValue('app_download_url') . '/' . $user->invite_code,
+            'version' => SystemConfiguration::getConfigValue('app_version'),
         ];
         return $this->msgOut(true, $data);
     }

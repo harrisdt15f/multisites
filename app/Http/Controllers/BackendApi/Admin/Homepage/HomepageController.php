@@ -10,19 +10,23 @@ use Illuminate\Support\Facades\Validator;
 
 class HomepageController extends BackEndApiMainController
 {
-    protected $eloqM = 'Admin\Homepage\HomepageModel';
+    protected $eloqM = 'DeveloperUsage\Frontend\FrontendAllocatedModel';
 
     //导航一列表
     public function navOne(): JsonResponse
     {
-        $datas = $this->eloqM::select('id', 'model_name', 'key', 'value', 'status')->where('pid', 1)->get()->toArray();
+        $frontendModelEloq = new $this->eloqM;
+        $navEloq = $frontendModelEloq->getModel('nav.one');
+        $datas = $this->eloqM::select('id', 'label', 'en_name', 'value', 'show_num', 'status')->where('pid', $navEloq->id)->get()->toArray();
         return $this->msgOut(true, $datas);
     }
 
     //主题板块列表
     public function pageModel(): JsonResponse
     {
-        $datas = $this->eloqM::select('id', 'model_name', 'key', 'value', 'show_num', 'status')->where('pid', 4)->orWhere('key', 'banner')->get()->toArray();
+        $frontendModelEloq = new $this->eloqM;
+        $pageEloq = $frontendModelEloq->getModel('page.model');
+        $datas = $this->eloqM::select('id', 'label', 'en_name', 'value', 'show_num', 'status')->where('pid', $pageEloq->id)->orWhere('en_name', 'banner')->get()->toArray();
         return $this->msgOut(true, $datas);
     }
 
@@ -46,18 +50,10 @@ class HomepageController extends BackEndApiMainController
             $pastData->status = $this->inputs['status'];
         }
         if (array_key_exists('value', $this->inputs)) {
-            if ($pastData->is_edit_value === 1) {
-                $pastData->value = $this->inputs['value'];
-            } else {
-                return $this->msgOut(false, [], '101901');
-            }
+            $pastData->value = $this->inputs['value'];
         }
         if (array_key_exists('show_num', $this->inputs)) {
-            if ($pastData->is_edit_show_num === 1) {
-                $pastData->show_num = $this->inputs['show_num'];
-            } else {
-                return $this->msgOut(false, [], '101902');
-            }
+            $pastData->show_num = $this->inputs['show_num'];
         }
         try {
             $pastData->save();
@@ -81,19 +77,19 @@ class HomepageController extends BackEndApiMainController
     public function uploadPic(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'key' => 'required|string',
+            'en_name' => 'required|string',
             'pic' => 'required|image',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $pastData = $this->eloqM::where('key', $this->inputs['key'])->first();
+        $pastData = $this->eloqM::where('en_name', $this->inputs['en_name'])->first();
         if (is_null($pastData)) {
             return $this->msgOut(false, [], '101903');
         }
         //上传图片
         $imgClass = new ImageArrange();
-        $depositPath = $imgClass->depositPath($this->inputs['key'], $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
+        $depositPath = $imgClass->depositPath($this->inputs['en_name'], $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
         $pic = $imgClass->uploadImg($this->inputs['pic'], $depositPath);
         if ($pic['success'] === false) {
             return $this->msgOut(false, [], '400', $pic['msg']);
@@ -107,7 +103,7 @@ class HomepageController extends BackEndApiMainController
                 $imgClass->deletePic(substr($pastLogoPath, 1));
             }
             //删除前台首页缓存
-            $this->deleteCache($pastData->key);
+            $this->deleteCache($pastData->en_name);
             return $this->msgOut(true);
         } catch (Exception $e) {
             $imgClass->deletePic($pic['path']);
@@ -126,7 +122,7 @@ class HomepageController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $pastData = $this->eloqM::where('key', 'frontend.ico')->first();
+        $pastData = $this->eloqM::where('en_name', 'frontend.ico')->first();
         if (is_null($pastData)) {
             return $this->msgOut(false, [], '101905');
         }
@@ -140,7 +136,7 @@ class HomepageController extends BackEndApiMainController
             $pastData->value = '/' . $ico['path'];
             $pastData->save();
             //删除前台首页缓存
-            $this->deleteCache($pastData->key);
+            $this->deleteCache($pastData->en_name);
             //删除原图
             if (!is_null($pastIco)) {
                 $imageClass->deletePic(substr($pastIco, 1));

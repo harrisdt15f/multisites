@@ -117,4 +117,30 @@ trait MenuLogics
                 ->orderBy('sort')->get();
         }
     }
+
+    /**
+     * [changeParent description]
+     * @param  [array] $parseDatas  [description]
+     * @return [array] $itemProcess [description]
+     */
+    public function changeParent($parseDatas)
+    {
+        foreach ($parseDatas as $key => $value) {
+            $menuEloq = self::find($value['currentId']);
+            $menuEloq->pid = $value['currentParent'] === '#' ? 0 : (int) $value['currentParent'];
+            $menuEloq->sort = $value['currentSort'];
+            if ($menuEloq->save()) {
+                $pass['pass'] = $value['currentText'];
+                $itemProcess[] = $pass;
+                $atLeastOne = true;
+            } else {
+                $fail['fail'] = $value['currentText'];
+                $itemProcess[] = $fail;
+            }
+        }
+        if ($atLeastOne === true) {
+            $menuEloq->refreshStar();
+        }
+        return $itemProcess;
+    }
 }
