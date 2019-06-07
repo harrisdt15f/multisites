@@ -2,7 +2,7 @@
 namespace App\Lib\Logic;
 
 
-use App\Lib\Clog;
+use Illuminate\Support\Facades\Log;
 use App\Models\Partner\PartnerAdminGroup;
 use App\Models\Partner\PartnerAdminMenu;
 use App\Models\Partner\PartnerPlatform;
@@ -58,7 +58,7 @@ class PlatformLogic {
             db()->commit();
         } catch (\Exception $e) {
             db()->rollback();
-            Clog::partnerLog("add-platform:exception:" . $e->getMessage() . "|" . $e->getLine() . "|" . $e->getFile());
+            Log::channel('platform')->error("add-platform:exception:" . $e->getMessage() . "|" . $e->getLine() . "|" . $e->getFile());
             return $e->getMessage();
         }
 
@@ -97,7 +97,7 @@ class PlatformLogic {
             db()->commit();
         } catch (\Exception $e) {
             db()->rollback();
-            Clog::partnerLog("add-platform-top-user:exception:" . $e->getMessage() . "|" . $e->getLine() . "|" . $e->getFile());
+            Log::channel('platform')->error("add-platform-top-user:exception:" . $e->getMessage() . "|" . $e->getLine() . "|" . $e->getFile());
             return $e->getMessage();
         }
 

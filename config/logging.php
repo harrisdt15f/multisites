@@ -18,7 +18,7 @@ return [
     | messages to the logs. The name specified in this option should match
     | one of the channels defined in the "channels" configuration array.
     |
-    */
+     */
 
     'default' => env('LOG_CHANNEL', 'stack'),
 
@@ -35,7 +35,7 @@ return [
     |                    "errorlog", "monolog",
     |                    "custom", "stack"
     |
-    */
+     */
 
     'channels' => [
         'stack' => [
@@ -107,13 +107,13 @@ return [
             'driver' => 'monolog',
             'handler' => Monolog\Handler\GelfHandler::class,
             'handler_with' => [
-                'publisher' =>  app(GraylogSetup::class)->getGelfPublisher(),
+                'publisher' => app(GraylogSetup::class)->getGelfPublisher(),
             ],
-            'formatter' => GelfMessageFormatter::class
+            'formatter' => GelfMessageFormatter::class,
         ],
         /*'byqueue' => [
-            'driver' => 'custom',
-            'via' => LogMonolog::class,
+        'driver' => 'custom',
+        'via' => LogMonolog::class,
 
         ],*/
         'frontend-by-queue' => [
@@ -125,7 +125,18 @@ return [
             'driver' => 'custom',
             'via' => BackendLogMonolog::class,
         ],
-
+        'account' => [
+            'driver' => 'daily',
+            'path' => storage_path('account/issues.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
+        'platform' => [
+            'driver' => 'daily',
+            'path' => storage_path('platform/issues.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
     ],
 
 ];
