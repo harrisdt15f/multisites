@@ -6,6 +6,8 @@ use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Request;
+use Jenssegers\Agent\Agent;
 use RicardoFontanelli\LaravelTelegram\Telegram;
 
 class Handler extends ExceptionHandler
@@ -32,7 +34,7 @@ class Handler extends ExceptionHandler
     /**
      * Report or log an exception.
      *
-     * @param \Exception $exception
+     * @param  \Exception  $exception
      * @return void
      */
     public function report(Exception $exception)
@@ -40,19 +42,51 @@ class Handler extends ExceptionHandler
         if ($this->shouldntReport($exception)) {
             return;
         }
-
         //###### sending errors to tg //Harris ############
-        $error= [
-            'file'=>$exception->getFile(),
-            'line'=>$exception->getLine(),
-            'code' => $exception->getCode(),
-            'message' =>$exception->getMessage(),
-            'previous'=>$exception->getPrevious(),
-            'TraceAsString'=>$exception->getTraceAsString(),
-            'trace'=> $exception->getTrace(),
-        ];
-        $telegram = new Telegram(config('telegram.token'),config('telegram.botusername'));
-        $telegram->sendMessage(config('telegram.chats.default'), e(json_encode($error)));
+        $appEnvironment = app()->environment();
+        if ($appEnvironment == 'develop' || $appEnvironment == 'test-develop') {
+            $agent = new Agent();
+            $os = $agent->platform();
+            $osVersion = $agent->version($os);
+            $browser = $agent->browser();
+            $bsVersion = $agent->version($browser);
+            $robot = $agent->robot();
+            if ($agent->isRobot()) {
+                $type = 'robot';
+            } elseif ($agent->isDesktop()) {
+                $type = 'desktop';
+            } elseif ($agent->isTablet()) {
+                $type = 'tablet';
+            } elseif ($agent->isMobile()) {
+                $type = 'mobile';
+            } elseif ($agent->isPhone()) {
+                $type = 'phone';
+            } else {
+                $type = 'other';
+            }
+            $error = [
+                'origin' => request()->headers->get('origin'),
+                'ips' => json_encode(request()->ips()),
+                'user_agent' => request()->server('HTTP_USER_AGENT'),
+                'lang' => json_encode($agent->languages()),
+                'device' => $agent->device(),
+                'os' => $os,
+                'browser' => $browser,
+                'bs_version' => $bsVersion,
+                'os_version' => $osVersion,
+                'device_type' => $type,
+                'robot' => $robot,
+                'inputs' => Request::all(),
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'code' => $exception->getCode(),
+                'message' => $exception->getMessage(),
+                'previous' => $exception->getPrevious(),
+                'TraceAsString' => $exception->getTraceAsString(),
+            ];
+            $telegram = new Telegram(config('telegram.token'), config('telegram.botusername'));
+            $telegram->sendMessage(config('telegram.chats.'.$appEnvironment), e(json_encode($error, JSON_PRETTY_PRINT)));
+        }
         Log::channel('daily')->error(
             $exception->getMessage(),
             array_merge($this->context(), ['exception' => $exception])
@@ -63,8 +97,8 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \Exception $exception
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Exception  $exception
      * @return \Illuminate\Http\Response
      */
     public function render($request, Exception $exception)
