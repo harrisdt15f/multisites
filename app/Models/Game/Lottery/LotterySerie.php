@@ -8,10 +8,6 @@
 
 namespace App\Models\Game\Lottery;
 
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 use App\Models\BaseModel;
 
 class LotterySerie extends BaseModel
@@ -20,14 +16,6 @@ class LotterySerie extends BaseModel
 
     public function lotteries()
     {
-<<<<<<< HEAD
-        return $this->hasMany(LotteryList::class, 'series_id', 'series_name');
-    }
-
-}
-=======
         return $this->hasMany(LotteryList::Class, 'series_id', 'series_name');
     }
-
 }
->>>>>>> master

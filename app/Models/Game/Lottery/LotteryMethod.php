@@ -9,8 +9,8 @@ class LotteryMethod extends BaseModel
 {
     use MethodsLogics;
 
-    public const OPEN=1;
-    public const CLOSE=0;
+    public const OPEN = 1;
+    public const CLOSE = 0;
     /**
      * The attributes that are mass assignable.
      *
@@ -31,11 +31,11 @@ class LotteryMethod extends BaseModel
 
     public function methodRows()
     {
-<<<<<<< HEAD
-        return $this->hasMany(__CLASS__, 'method_group', 'method_group')->select(['method_row','status'])->groupBy('method_row');
-=======
-        return $this->hasMany(__CLASS__, 'method_group', 'method_group')->select(['method_row','status','lottery_id'])->groupBy('method_row');
->>>>>>> master
+        return $this->hasMany(__CLASS__, 'method_group', 'method_group')->select([
+            'method_row',
+            'status',
+            'lottery_id'
+        ])->groupBy('method_row');
     }
 
     public function methodDetails()
