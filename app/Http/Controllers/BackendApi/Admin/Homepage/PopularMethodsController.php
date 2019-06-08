@@ -4,12 +4,13 @@
  * @Author: LingPh
  * @Date:   2019-06-04 14:38:55
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-06 12:36:32
+ * @Last Modified time: 2019-06-08 14:39:40
  */
 namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Models\Admin\Homepage\FrontendLotteryFnfBetableMethod;
+use App\Models\Game\Lottery\LotteryMethod;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +20,7 @@ class PopularMethodsController extends BackEndApiMainController
 {
     protected $eloqM = 'Admin\Homepage\FrontendLotteryFnfBetableList';
 
-    //热门玩法列表
+    //热门彩票二 玩法列表
     public function detail(): JsonResponse
     {
         $methodEloqs = $this->eloqM::with(['method' => function ($query) {
@@ -39,23 +40,20 @@ class PopularMethodsController extends BackEndApiMainController
         return $this->msgOut(true, $datas);
     }
 
-    //添加玩法彩种
+    //热门彩票二 添加热门彩种
     public function add(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
+            'lotteries_id' => 'required|string',
             'method_id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $checkData = $this->eloqM::where('method_id', $this->inputs['method_id'])->first();
-        if (!is_null($checkData)) {
-            return $this->msgOut(false, [], '102012');
-        }
-        //检查玩法是否存在
-        $checkMethod = FrontendLotteryFnfBetableMethod::find($this->inputs['method_id']);
-        if (is_null($checkMethod)) {
-            return $this->msgOut(false, [], '102013');
+        //检查数据是否合法
+        $checkBool = $this->checkData($this->inputs['lotteries_id'], $this->inputs['method_id']);
+        if ($checkBool['success'] === false) {
+            return $this->msgOut(false, [], $checkBool['code']);
         }
         //sort
         $maxSort = $this->eloqM::orderBy('sort', 'desc')->first();
@@ -65,6 +63,7 @@ class PopularMethodsController extends BackEndApiMainController
             $sort = $maxSort->sort + 1;
         }
         $addData = [
+            'lotteries_id' => $this->inputs['lotteries_id'],
             'method_id' => $this->inputs['method_id'],
             'sort' => $sort,
         ];
@@ -83,33 +82,29 @@ class PopularMethodsController extends BackEndApiMainController
         }
     }
 
-    //编辑热门玩法
+    //热门彩票二 编辑热门玩法
     public function edit(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric',
+            'lotteries_id' => 'required|string',
             'method_id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $pastData = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastData)) {
+        //检查数据是否合法
+        $checkBool = $this->checkData($this->inputs['lotteries_id'], $this->inputs['method_id'], $this->inputs['id']);
+        if ($checkBool['success'] === false) {
+            return $this->msgOut(false, [], $checkBool['code']);
+        }
+        $pastDataEloq = $this->eloqM::find($this->inputs['id']);
+        if (is_null($pastDataEloq)) {
             return $this->msgOut(false, [], '102014');
         }
-        //检查玩法是否存在
-        $checkMethod = FrontendLotteryFnfBetableMethod::find($this->inputs['method_id']);
-        if (is_null($checkMethod)) {
-            return $this->msgOut(false, [], '102013');
-        }
-        //检查是否存在重复彩种
-        $checkData = $this->eloqM::where('method_id', $this->inputs['method_id'])->where('id', '!=', $this->inputs['id'])->first();
-        if (!is_null($checkData)) {
-            return $this->msgOut(false, [], '102012');
-        }
         try {
-            $pastData->method_id = $this->inputs['method_id'];
-            $pastData->save();
+            $this->editAssignment($pastDataEloq, $this->inputs);
+            $pastDataEloq->save();
             //清除首页热门玩法缓存
             $this->deleteCache();
             return $this->msgOut(true);
@@ -175,18 +170,12 @@ class PopularMethodsController extends BackEndApiMainController
             if ($this->inputs['sort_type'] == 1) {
                 $stationaryData = $this->eloqM::find($this->inputs['front_id']);
                 $stationaryData->sort = $this->inputs['front_sort'];
-                $this->eloqM::where(function ($query) {
-                    $query->where('sort', '>=', $this->inputs['front_sort'])
-                        ->where('sort', '<', $this->inputs['rearways_sort']);
-                })->increment('sort');
+                $this->eloqM::where('sort', '>=', $this->inputs['front_sort'])->where('sort', '<', $this->inputs['rearways_sort'])->increment('sort');
             } elseif ($this->inputs['sort_type'] == 2) {
                 //下拉排序
                 $stationaryData = $this->eloqM::find($this->inputs['rearways_id']);
                 $stationaryData->sort = $this->inputs['rearways_sort'];
-                $this->eloqM::where(function ($query) {
-                    $query->where('sort', '>', $this->inputs['front_sort'])
-                        ->where('sort', '<=', $this->inputs['rearways_sort']);
-                })->decrement('sort');
+                $this->eloqM::where('sort', '>', $this->inputs['front_sort'])->where('sort', '<=', $this->inputs['rearways_sort'])->decrement('sort');
             }
             $stationaryData->save();
             DB::commit();
@@ -207,7 +196,9 @@ class PopularMethodsController extends BackEndApiMainController
         $lotterys = FrontendLotteryFnfBetableMethod::groupBy('lottery_name')->orderBy('id', 'asc')->pluck('lottery_name')->toArray();
         $data = [];
         foreach ($lotterys as $key => $lottery) {
-            $data[$lottery] = FrontendLotteryFnfBetableMethod::select('id as method_id', 'method_name')->where('lottery_name', $lottery)->get()->toArray();
+            $methodIds = FrontendLotteryFnfBetableMethod::where('lottery_name', $lottery)->pluck('id');
+            $methods = LotteryMethod::select('lottery_id', 'lottery_name', 'id as method_id', 'method_name')->whereIn('id', $methodIds)->get()->toArray();
+            $data[] = $methods;
         }
         return $this->msgOut(true, $data);
     }
@@ -218,5 +209,25 @@ class PopularMethodsController extends BackEndApiMainController
         if (Cache::has('popularMethods')) {
             Cache::forget('popularMethods');
         }
+    }
+
+    public function checkData($lotteriesId, $methodId, $id = null)
+    {
+        //彩种是否已存在
+        $checkData = $this->eloqM::where('lotteries_id', $lotteriesId)->where('id', '!=', $id)->exists();
+        if ($checkData === true) {
+            return ['success' => false, 'code' => '102012'];
+        }
+        //检查彩种是否合法
+        $checkLottery = FrontendLotteryFnfBetableMethod::where('lottery_id', $lotteriesId)->exists();
+        if ($checkLottery === false) {
+            return ['success' => false, 'code' => '102015'];
+        }
+        //检查玩法是否合法
+        $checkMethod = FrontendLotteryFnfBetableMethod::find($methodId)->exists();
+        if ($checkMethod === false) {
+            return ['success' => false, 'code' => '102013'];
+        }
+        return ['success' => true];
     }
 }
