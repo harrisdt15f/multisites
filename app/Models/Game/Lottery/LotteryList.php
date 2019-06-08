@@ -5,8 +5,6 @@ namespace App\Models\Game\Lottery;
 use App\Models\BaseModel;
 use App\Models\Game\Lottery\Logics\LotteryIssueGenerate;
 use App\Models\Game\Lottery\Logics\LotteryLogics;
-use App\Models\Game\Lottery\LotteryIssueRule;
-use App\Models\Game\Lottery\LotteryMethod;
 
 class LotteryList extends BaseModel
 {
@@ -53,6 +51,11 @@ class LotteryList extends BaseModel
 
     public function gameMethods()
     {
-        return $this->hasOne(LotteryMethod::class, 'lottery_id', 'en_name')->where('status', 1);
+        return $this->hasMany(LotteryMethod::class, 'lottery_id', 'en_name');
+    }
+
+    public function methodGroups()
+    {
+        return $this->hasMany(LotteryMethod::class, 'lottery_id', 'en_name')->select(['method_group','status'])->groupBy('method_group');
     }
 }

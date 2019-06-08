@@ -29,19 +29,9 @@ class LotteryMethod extends BaseModel
         'status',
     ];
 
-    public function lotteriesIds()
-    {
-        return $this->hasMany(__CLASS__, 'series_id', 'series_id')->select(['lottery_id'])->groupBy('lottery_id');
-    }
-
-    public function methodGroups()
-    {
-        return $this->hasMany(__CLASS__, 'lottery_id', 'lottery_id')->select(['method_group'])->groupBy('method_group');
-    }
-
     public function methodRows()
     {
-        return $this->hasMany(__CLASS__, 'method_group', 'method_group')->select(['method_row'])->groupBy('method_row');
+        return $this->hasMany(__CLASS__, 'method_group', 'method_group')->select(['method_row','status'])->groupBy('method_row');
     }
 
     public function methodDetails()
