@@ -70,7 +70,8 @@ class LotteriesController extends BackEndApiMainController
                 $lottery = $seriesIthem->lotteries;//->where('status',1)
                 $seriesId = $seriesIthem->series_name;
                 foreach ($lottery as $litems) {
-                    $lotteyArr = $litems->first(['id', 'cn_name', 'status'])->toArray();
+                    $lotteyArr = collect($litems->toArray())
+                        ->only(['id', 'cn_name', 'status']);
 //                    $methodEloq = $litems->gameMethods;
                     $currentLotteryId = $litems->en_name;
                     $temp[$seriesId][$currentLotteryId]['data'] = $lotteyArr;
@@ -97,7 +98,7 @@ class LotteriesController extends BackEndApiMainController
                         $temp[$seriesId][$currentLotteryId]['child'][$curentMethodGroup]['data'] = $methodGroup;
                         $temp[$seriesId][$currentLotteryId]['child'][$curentMethodGroup]['child'] = [];
                         //#########################################################
-                        $methodRows = $mgItems->methodRows;
+                        $methodRows = $mgItems->methodRows->where('lottery_id',$currentLotteryId);
                         try {
                             $methodRowstatus = $methodRows->where('status', 1)->first()->status;
                             if (is_null($methodRowstatus)) {
@@ -107,18 +108,24 @@ class LotteriesController extends BackEndApiMainController
                             $methodRowstatus = LotteryMethod::CLOSE;
                         }
                         foreach ($methodRows as $mrItems) {
-                            $method_row = $mrItems->method_row;
+                            $currentMethodRow = $mrItems->method_row;
                             //玩法行 data
                             $methodRow = [
                                 'lottery_id' => $currentLotteryId,
                                 'method_group' => $curentMethodGroup,
-                                'method_row' => $method_row,
+                                'method_row' => $currentMethodRow,
                                 'status' => $methodRowstatus//玩法行下是否存在开启状态的玩法
                             ];
                             //$temp 插入玩法行data
                             $temp[$seriesId][$currentLotteryId]['child'][$curentMethodGroup]['child'][$mrItems->method_row]['data'] = $methodRow;
+                            $methodDetailWhereData = [
+                                ['method_group', '=', $curentMethodGroup],
+                                ['method_row', '=', $currentMethodRow],
+                            ];
                             //玩法data
-                            $methodData = $mrItems->get(['id', 'method_name', 'status', 'total'])->toArray();
+                            $methodData = $mrItems->methodDetails
+                                ->where('method_group',$curentMethodGroup)
+                                ->where('method_row',$currentMethodRow);
                             //$temp 插入玩法data
                             $temp[$seriesId][$currentLotteryId]['child'][$curentMethodGroup]['child'][$mrItems->method_row]['child'] = $methodData;
                         }

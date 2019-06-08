@@ -31,15 +31,17 @@ class LotteryMethod extends BaseModel
 
     public function methodRows()
     {
-        return $this->hasMany(__CLASS__, 'method_group', 'method_group')->select(['method_row','status'])->groupBy('method_row');
+        return $this->hasMany(__CLASS__, 'method_group', 'method_group')->select(['method_row','status','lottery_id'])->groupBy('method_row');
     }
 
     public function methodDetails()
     {
-        return $this->hasMany(__CLASS__, 'method_row', 'method_row')->select([
+        return $this->hasMany(__CLASS__, 'lottery_id', 'lottery_id')->select([
             'id',
             'lottery_name',
+            'method_group',
             'method_id',
+            'method_row',
             'method_name',
             'status',
             'created_at',
