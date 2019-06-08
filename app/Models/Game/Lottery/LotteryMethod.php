@@ -9,6 +9,8 @@ class LotteryMethod extends BaseModel
 {
     use MethodsLogics;
 
+    public const OPEN=1;
+    public const CLOSE=0;
     /**
      * The attributes that are mass assignable.
      *

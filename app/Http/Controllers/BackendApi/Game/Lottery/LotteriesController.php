@@ -71,61 +71,44 @@ class LotteriesController extends BackEndApiMainController
                     $methodGrops = $litems->methodGroups;
                     foreach ($methodGrops as $mgitems) {
                         $curentMethodGroup = $mgitems->method_group;
-                        $checkOpenGroup = LotteryMethod::where(function ($query) use (
-                            $currentLotteryId,
-                            $curentMethodGroup
-                        ) {
-                            $query->where('lottery_id', $currentLotteryId)
-                                ->where('method_group', $curentMethodGroup)
-                                ->where('status', 1);
-                        })->first();
                         //玩法组 data
                         $methodGroup = ['lottery_id' => $currentLotteryId, 'method_group' => $curentMethodGroup];
-                        if (is_null($checkOpenGroup)) {
-                            $methodGroup['status'] = 0;
-                        } else {
-                            $methodGroup['status'] = 1;
-                        }
+                        //玩法组下是否存在开启状态的玩法
+                        $checkOpenGroup = LotteryMethod::where('lottery_id', $currentLotteryId)
+                                ->where('method_group', $curentMethodGroup)
+                                ->where('status', 1)
+                                ->first();
+                        $methodGroup['status'] = is_null($checkOpenGroup) ? LotteryMethod::CLOSE : LotteryMethod::OPEN;
+                        //$temp 插入玩法组data
                         $temp[$seriesIthem][$currentLotteryId]['child'][$curentMethodGroup]['data'] = $methodGroup;
                         $temp[$seriesIthem][$currentLotteryId]['child'][$curentMethodGroup]['child'] = [];
                         $methodRows = $mgitems->methodRows;
                         foreach ($methodRows as $rowitems) {
                             $method_row = $rowitems->method_row;
                             //玩法行 data
-                            $checkOpenRow = LotteryMethod::where(function ($query) use (
-                                $currentLotteryId,
-                                $curentMethodGroup,
-                                $method_row
-                            ) {
-                                $query->where('lottery_id', $currentLotteryId)
-                                    ->where('method_group', $curentMethodGroup)
-                                    ->where('method_row', $method_row)
-                                    ->where('status', 1);
-                            })->first();
                             $methodRow = [
                                 'lottery_id' => $currentLotteryId,
                                 'method_group' => $curentMethodGroup,
                                 'method_row' => $method_row,
                             ];
-                            if (is_null($checkOpenGroup)) {
-                                $methodRow['status'] = 0;
-                            } else {
-                                $methodRow['status'] = 1;
-                            }
-                            $temp[$seriesIthem][$currentLotteryId]['child'][$curentMethodGroup]['child'][$rowitems->method_row]['data'] = $methodRow;
-                            //玩法信息
-                            $temp[$seriesIthem][$currentLotteryId]['child'][$curentMethodGroup]['child'][$rowitems->method_row]['child'] = $rowitems->select('id',
-                                'method_name', 'status', 'total')->where(function ($query) use (
-                                $currentLotteryId,
-                                $curentMethodGroup,
-                                $method_row
-                            ) {
-                                $query->where('lottery_id', $currentLotteryId)
+                            //玩法行下是否存在开启状态的玩法
+                            $checkOpenRow = LotteryMethod::where('lottery_id', $currentLotteryId)
                                     ->where('method_group', $curentMethodGroup)
-                                    ->where('method_row', $method_row);
-                            })
+                                    ->where('method_row', $method_row)
+                                    ->where('status', 1)
+                                    ->first();
+                            $methodRow['status'] = is_null($checkOpenRow) ? LotteryMethod::CLOSE : LotteryMethod::OPEN;
+                            //$temp 插入玩法行data
+                            $temp[$seriesIthem][$currentLotteryId]['child'][$curentMethodGroup]['child'][$rowitems->method_row]['data'] = $methodRow;
+                            //玩法data
+                            $methodData = $rowitems->select('id',
+                                'method_name', 'status', 'total')->where('lottery_id', $currentLotteryId)
+                                    ->where('method_group', $curentMethodGroup)
+                                    ->where('method_row', $method_row)
                             // ->with('methodDetails')
                                 ->get()->toArray();
+                            //$temp 插入玩法data
+                            $temp[$seriesIthem][$currentLotteryId]['child'][$curentMethodGroup]['child'][$rowitems->method_row]['child'] = $methodData;
                         }
                     }
 
