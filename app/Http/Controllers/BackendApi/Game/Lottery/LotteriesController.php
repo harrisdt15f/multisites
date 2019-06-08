@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Validator;
 class LotteriesController extends BackEndApiMainController
 {
     protected $eloqM = 'Game\Lottery\LotteryList';
+    protected $methodCacheName = 'play_method_list';
+    protected $lotteryIssue = 'Game\Lottery\LotteryIssue';
 
     public function seriesLists()
     {
@@ -75,9 +77,9 @@ class LotteriesController extends BackEndApiMainController
                         $methodGroup = ['lottery_id' => $currentLotteryId, 'method_group' => $curentMethodGroup];
                         //玩法组下是否存在开启状态的玩法
                         $checkOpenGroup = LotteryMethod::where('lottery_id', $currentLotteryId)
-                                ->where('method_group', $curentMethodGroup)
-                                ->where('status', 1)
-                                ->first();
+                            ->where('method_group', $curentMethodGroup)
+                            ->where('status', 1)
+                            ->first();
                         $methodGroup['status'] = is_null($checkOpenGroup) ? LotteryMethod::CLOSE : LotteryMethod::OPEN;
                         //$temp 插入玩法组data
                         $temp[$seriesIthem][$currentLotteryId]['child'][$curentMethodGroup]['data'] = $methodGroup;
@@ -93,18 +95,18 @@ class LotteriesController extends BackEndApiMainController
                             ];
                             //玩法行下是否存在开启状态的玩法
                             $checkOpenRow = LotteryMethod::where('lottery_id', $currentLotteryId)
-                                    ->where('method_group', $curentMethodGroup)
-                                    ->where('method_row', $method_row)
-                                    ->where('status', 1)
-                                    ->first();
+                                ->where('method_group', $curentMethodGroup)
+                                ->where('method_row', $method_row)
+                                ->where('status', 1)
+                                ->first();
                             $methodRow['status'] = is_null($checkOpenRow) ? LotteryMethod::CLOSE : LotteryMethod::OPEN;
                             //$temp 插入玩法行data
                             $temp[$seriesIthem][$currentLotteryId]['child'][$curentMethodGroup]['child'][$rowitems->method_row]['data'] = $methodRow;
                             //玩法data
                             $methodData = $rowitems->select('id',
                                 'method_name', 'status', 'total')->where('lottery_id', $currentLotteryId)
-                                    ->where('method_group', $curentMethodGroup)
-                                    ->where('method_row', $method_row)
+                                ->where('method_group', $curentMethodGroup)
+                                ->where('method_row', $method_row)
                             // ->with('methodDetails')
                                 ->get()->toArray();
                             //$temp 插入玩法data
@@ -125,8 +127,7 @@ class LotteriesController extends BackEndApiMainController
 
     public function lotteryIssueLists()
     {
-        $modelName = 'Game\Lottery\LotteryIssue';
-        $eloqM = $this->modelWithNameSpace($modelName);
+        $eloqM = $this->modelWithNameSpace($this->lotteryIssue);
         $seriesId = $this->inputs['series_id'] ?? '';
 //        {"method":"whereIn","key":"id","value":["cqssc","xjssc","hljssc","zx1fc","txffc"]}
         //        $extraWhereConditions = Arr::wrap(json_decode($this->inputs['extra_where'], true));
@@ -199,17 +200,13 @@ class LotteriesController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $methodGroupEloq = LotteryMethod::select('id')->where(function ($query) {
-            $query->where('lottery_id', $this->inputs['lottery_id'])
-                ->where('method_group', $this->inputs['method_group']);
-        })->get()->toArray();
-        if (empty($methodGroupEloq)) {
+        $methodGroupIds = LotteryMethod::where('lottery_id', $this->inputs['lottery_id'])->where('method_group', $this->inputs['method_group'])->pluck('id');
+        if (empty($methodGroupIds)) {
             return $this->msgOut(false, [], '101701');
         }
         try {
-            $methodGroupIds = array_column($methodGroupEloq, 'id');
-            $updateDate = ['status', $this->inputs['status']];
-            LotteryMethod::whereIn('id', $methodGroupIds)->update(['status' => $this->inputs['status']]);
+            $updateDate = ['status' => $this->inputs['status']];
+            LotteryMethod::whereIn('id', $methodGroupIds)->update($updateDate);
             //清理彩种玩法缓存
             $this->clearMethodCache();
             return $this->msgOut(true);
@@ -232,18 +229,13 @@ class LotteriesController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $methodGroupEloq = LotteryMethod::select('id')->where(function ($query) {
-            $query->where('lottery_id', $this->inputs['lottery_id'])
-                ->where('method_group', $this->inputs['method_group'])
-                ->where('method_row', $this->inputs['method_row']);
-        })->get()->toArray();
-        if (empty($methodGroupEloq)) {
+        $methodGroupIds = LotteryMethod::where('lottery_id', $this->inputs['lottery_id'])->where('method_group', $this->inputs['method_group'])->where('method_row', $this->inputs['method_row'])->pluck('id');
+        if (empty($methodGroupIds)) {
             return $this->msgOut(false, [], '101702');
         }
         try {
-            $methodGroupIds = array_column($methodGroupEloq, 'id');
-            $updateDate = ['status', $this->inputs['status']];
-            LotteryMethod::whereIn('id', $methodGroupIds)->update(['status' => $this->inputs['status']]);
+            $updateDate = ['status' => $this->inputs['status']];
+            LotteryMethod::whereIn('id', $methodGroupIds)->update($updateDate);
             //清理彩种玩法缓存
             $this->clearMethodCache();
             return $this->msgOut(true);
@@ -284,7 +276,7 @@ class LotteriesController extends BackEndApiMainController
     //清理玩法缓存
     public function clearMethodCache()
     {
-        $redisKey = 'play_method_list';
+        $redisKey = $this->methodCacheName;
         if (Cache::has($redisKey)) {
             Cache::forget($redisKey);
         }
