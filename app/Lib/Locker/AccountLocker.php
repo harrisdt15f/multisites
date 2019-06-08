@@ -1,6 +1,6 @@
 <?php namespace App\Lib\Locker;
 
-use App\Lib\Clog;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -46,7 +46,7 @@ class AccountLocker
             }
             usleep($this->sleep);
         }
-        Clog::lockError('账户锁-获取锁失败-'.$this->memKey, $this->context);
+        Log::channel('log')->error('账户锁-获取锁失败-'.$this->memKey, $this->context);
         // 释放
         $this->release();
         return false;
@@ -58,7 +58,7 @@ class AccountLocker
         try {
             $ret = Cache::tags(self::$tag)->forget($this->memKey);
         } catch (\Exception $e) {
-            Clog::lockError('账户锁-释放锁失败-'.$e->getMessage(), $this->context);
+            Log::channel('log')->error('账户锁-释放锁失败-'.$e->getMessage(), $this->context);
             $ret = false;
         }
         return $ret;

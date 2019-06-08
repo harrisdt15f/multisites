@@ -125,7 +125,7 @@ return [
             'driver' => 'custom',
             'via' => BackendLogMonolog::class,
         ],
-        'account' => [
+        'account' => [// Clog::account
             'driver' => 'daily',
             'path' => storage_path('logs/account/accounts.log'),
             'level' => 'debug',
@@ -137,37 +137,37 @@ return [
             'level' => 'debug',
             'days' => 14,
         ],
-        'game' => [
+        'game' => [ // Clog::gameError
             'driver' => 'daily',
             'path' => storage_path('logs/game/game.log'),
             'level' => 'debug',
             'days' => 14,
         ],
-        'bet' => [
+        'bet' => [ // Clog::userBet
             'driver' => 'daily',
             'path' => storage_path('logs/bet/bet.log'),
             'level' => 'debug',
             'days' => 14,
         ],
-        'recharge' => [
+        'recharge' => [ // Clog::recharge    Clog::rechargeLog
             'driver' => 'daily',
             'path' => storage_path('logs/recharge/recharge.log'),
             'level' => 'debug',
             'days' => 14,
         ],
-        'withdraw' => [
+        'withdraw' => [ // Clog::withdraw    Clog::withdrawLog
             'driver' => 'daily',
             'path' => storage_path('logs/withdraw/withdraw.log'),
             'level' => 'debug',
             'days' => 14,
         ],
-        'log' => [
+        'log' => [ // Clog::lockError
             'driver' => 'daily',
             'path' => storage_path('logs/account/log.log'),
             'level' => 'debug',
             'days' => 14,
         ],
-        'addchild' => [
+        'addchild' => [ // Clog::userAddChild
             'driver' => 'daily',
             'path' => storage_path('logs/user/addchild.log'),
             'level' => 'debug',
