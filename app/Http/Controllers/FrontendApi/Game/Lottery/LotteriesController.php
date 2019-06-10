@@ -145,7 +145,7 @@ class LotteriesController extends FrontendApiMainController
     public function issueHistory(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'lottery_sign' => 'required|string|min:4|max:10|exists:lotteries,en_name',
+            'lottery_sign' => 'required|string|min:4|max:10|exists:lottery_lists,en_name',
             'count' => 'integer',
         ]);
         if ($validator->fails()) {
@@ -175,7 +175,7 @@ class LotteriesController extends FrontendApiMainController
     public function availableIssues(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'lottery_sign' => 'required|string|min:4|max:10|exists:lotteries,en_name',
+            'lottery_sign' => 'required|string|min:4|max:10|exists:lottery_lists,en_name', //lottery_lists
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
@@ -222,7 +222,7 @@ class LotteriesController extends FrontendApiMainController
     {
         $validator = Validator::make($this->inputs, [
             'count' => 'required|integer|min:10|max:100',
-            'lottery_sign' => 'required|string|min:4|max:10|exists:lotteries,en_name',
+            'lottery_sign' => 'required|string|min:4|max:10|exists:lottery_lists,en_name',
             'start' => 'required|integer',
         ]);
         if ($validator->fails()) {
