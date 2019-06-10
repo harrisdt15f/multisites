@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -54,8 +55,9 @@ class DeleteCachePicControl extends Command
                     }
                 }
             }
-            $cacheTime = 2 * 24 * 60;
-            Cache::put('CachePic', $CachePic, $cacheTime);
+            $hourToStore = 24 * 2;
+            $expiresAt = Carbon::now()->addHours($hourToStore);
+            Cache::put('CachePic', $CachePic, $expiresAt);
         }
     }
 }

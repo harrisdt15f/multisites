@@ -129,7 +129,7 @@ class LotteriesController extends FrontendApiMainController
                     'defaultMethod' => $defaultMethod,
                 ];
                 $hourToStore = 24;
-                $expiresAt = Carbon::now()->addHours($hourToStore)->diffInMinutes();
+                $expiresAt = Carbon::now()->addHours($hourToStore);
                 Cache::put($redisKey, $cacheData, $expiresAt);
             }
         }

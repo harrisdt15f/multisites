@@ -9,6 +9,7 @@ use App\Models\Admin\BackendAdminUser;
 use App\Models\Admin\Message\BackendSystemNoticeList;
 use App\Models\BackendAdminAuditFlowList;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -261,15 +262,15 @@ class ArticlesController extends BackEndApiMainController
         if ($pic['success'] === false) {
             return $this->msgOut(false, [], '400', $pic['msg']);
         }
-        $cacheTime = 2 * 24 * 60;
-        $pic['expire_time'] = (time() + 60 * 30) . '';
+        $hourToStore = 24 * 2;
+        $expiresAt = Carbon::now()->addHours($hourToStore);
         if (Cache::has('CachePic')) {
             $CachePic = Cache::get('CachePic');
             $CachePic[$pic['name']] = $pic;
         } else {
             $CachePic[$pic['name']] = $pic;
         }
-        Cache::put('CachePic', $CachePic, $cacheTime);
+        Cache::put('CachePic', $CachePic, $expiresAt);
         return $this->msgOut(true, $pic);
     }
 
@@ -287,8 +288,9 @@ class ArticlesController extends BackEndApiMainController
                     unset($CachePic[$picName]);
                 }
             }
-            $cacheTime = 2 * 24 * 60;
-            Cache::put('CachePic', $CachePic, $cacheTime);
+            $hourToStore = 24 * 2;
+            $expiresAt = Carbon::now()->addHours($hourToStore);
+            Cache::put('CachePic', $CachePic, $expiresAt);
         }
     }
 
