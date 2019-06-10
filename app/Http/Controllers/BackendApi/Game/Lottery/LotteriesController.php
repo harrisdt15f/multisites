@@ -17,7 +17,7 @@ class LotteriesController extends BackEndApiMainController
 {
     protected $eloqM = 'Game\Lottery\LotteryList';
     protected $methodCacheName = 'play_method_list';
-    protected $lotteryIssue = 'Game\Lottery\LotteryIssue';
+    protected $lotteryIssueEloq = 'Game\Lottery\LotteryIssue';
 
     /**
      * 获取系列接口
@@ -123,7 +123,7 @@ class LotteriesController extends BackEndApiMainController
      */
     public function lotteryIssueLists(): JsonResponse
     {
-        $eloqM = $this->modelWithNameSpace($this->lotteryIssue);
+        $eloqM = $this->modelWithNameSpace($this->lotteryIssueEloq);
         $seriesId = $this->inputs['series_id'] ?? '';
 //        {"method":"whereIn","key":"id","value":["cqssc","xjssc","hljssc","zx1fc","txffc"]}
         //        $extraWhereConditions = Arr::wrap(json_decode($this->inputs['extra_where'], true));
