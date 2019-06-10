@@ -30,7 +30,7 @@ class LotteriesBetRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'lottery_sign' => 'required|string|min:4|max:10|exists:lotteries,en_name',
+            'lottery_sign' => 'required|string|min:4|max:10|exists:lottery_lists,en_name',
             'trace_issues' => 'required',
 //            'trace_issues' => ['required', 'regex:/^\{(\d{9,15}\:(true|false)\,?)+\}$/'],
             //{20180405001:true,20180405001:false,20180405001:true}
