@@ -111,9 +111,8 @@ class LotteriesController extends BackEndApiMainController
                 $method = array_merge($method, $temp);
             }
             $hourToStore = 24;
-            $expiresAt = Carbon::now()->addHours($hourToStore)->diffInMinutes();
+            $expiresAt = Carbon::now()->addHours($hourToStore);
             Cache::put($redisKey, $method, $expiresAt);
-            Cache::forever($redisKey, $method);
         }
         return $this->msgOut(true, $method);
     }

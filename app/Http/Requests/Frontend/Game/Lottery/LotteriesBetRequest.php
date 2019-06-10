@@ -30,12 +30,12 @@ class LotteriesBetRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'lottery_sign' => 'required|string|min:4|max:10|exists:lotteries,en_name',
+            'lottery_sign' => 'required|string|min:4|max:10|exists:lottery_lists,en_name',
             'trace_issues' => 'required',
 //            'trace_issues' => ['required', 'regex:/^\{(\d{9,15}\:(true|false)\,?)+\}$/'],
             //{20180405001:true,20180405001:false,20180405001:true}
 
-            'balls.*.method_id' => 'required|exists:methods,method_id',
+            'balls.*.method_id' => 'required|exists:lottery_methods,method_id',
             'balls.*.method_name' => 'required',//中文
             'balls.*.codes' => ['required', 'regex:/^(?!\|)(?!.*\|$)((?!\&)(?!.*\&$)(?!.*?\&\&)[0-9&]{1,19}\|?){1,5}$/'],
             //0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9
