@@ -64,57 +64,57 @@ class LotteriesController extends BackEndApiMainController
     {
         $method = [];
         $redisKey = 'play_method_list';
-        // if (Cache::has($redisKey)) {
-        //     $method = Cache::get($redisKey);
-        // } else {
-        $seriesEloq = LotterySerie::get();
-        foreach ($seriesEloq as $seriesIthem) {
-            $lottery = $seriesIthem->lotteries; //->where('status',1)
-            $seriesId = $seriesIthem->series_name;
-            foreach ($lottery as $litems) {
-                $lotteyArr = collect($litems->toArray())
-                    ->only(['id', 'cn_name', 'status']);
+        if (Cache::has($redisKey)) {
+            $method = Cache::get($redisKey);
+        } else {
+            $seriesEloq = LotterySerie::get();
+            foreach ($seriesEloq as $seriesIthem) {
+                $lottery = $seriesIthem->lotteries; //->where('status',1)
+                $seriesId = $seriesIthem->series_name;
+                foreach ($lottery as $litems) {
+                    $lotteyArr = collect($litems->toArray())
+                        ->only(['id', 'cn_name', 'status']);
 //                    $methodEloq = $litems->gameMethods;
-                $currentLotteryId = $litems->en_name;
-                $temp[$seriesId][$currentLotteryId]['data'] = $lotteyArr;
-                $temp[$seriesId][$currentLotteryId]['child'] = [];
-                //#########################################################
-                $methodGrops = $litems->methodGroups;
-                foreach ($methodGrops as $mgItems) {
-                    $curentMethodGroup = $mgItems->method_group;
-                    $methodGroupBool = $mgItems->where('lottery_id', $currentLotteryId)->where('method_group', $curentMethodGroup)->where('status', 1)->exists();
-                    $methodGroupstatus = $methodGroupBool ? LotteryMethod::OPEN : LotteryMethod::CLOSE;
-                    //玩法组 data
-                    $methodGroup = $this->methodData($currentLotteryId, $curentMethodGroup, $methodGroupstatus);
-                    //$temp 插入玩法组data
-                    $temp[$seriesId][$currentLotteryId]['child'][$curentMethodGroup]['data'] = $methodGroup;
-                    $temp[$seriesId][$currentLotteryId]['child'][$curentMethodGroup]['child'] = [];
+                    $currentLotteryId = $litems->en_name;
+                    $temp[$seriesId][$currentLotteryId]['data'] = $lotteyArr;
+                    $temp[$seriesId][$currentLotteryId]['child'] = [];
                     //#########################################################
-                    $methodRows = $mgItems->methodRows->where('lottery_id', $currentLotteryId);
-                    foreach ($methodRows as $mrItems) {
-                        $currentMethodRow = $mrItems->method_row;
-                        $methodRowBool = $mrItems->where('lottery_id', $currentLotteryId)->where('method_group', $curentMethodGroup)->where('method_row', $currentMethodRow)->where('status', 1)->exists();
-                        $methodRowstatus = $methodRowBool ? LotteryMethod::OPEN : LotteryMethod::CLOSE;
-                        //玩法行 data
-                        $methodRow = $this->methodData($currentLotteryId, $curentMethodGroup, $methodRowstatus, $currentMethodRow);
-                        //$temp 插入玩法行data
-                        $temp[$seriesId][$currentLotteryId]['child'][$curentMethodGroup]['child'][$mrItems->method_row]['data'] = $methodRow;
-                        //玩法data
-                        $methodData = $mrItems->methodDetails
-                            ->where('method_group', $curentMethodGroup)
-                            ->where('method_row', $currentMethodRow);
-                        //$temp 插入玩法data
-                        $temp[$seriesId][$currentLotteryId]['child'][$curentMethodGroup]['child'][$mrItems->method_row]['child'] = $methodData;
+                    $methodGrops = $litems->methodGroups;
+                    foreach ($methodGrops as $mgItems) {
+                        $curentMethodGroup = $mgItems->method_group;
+                        $methodGroupBool = $mgItems->where('lottery_id', $currentLotteryId)->where('method_group', $curentMethodGroup)->where('status', 1)->exists();
+                        $methodGroupstatus = $methodGroupBool ? LotteryMethod::OPEN : LotteryMethod::CLOSE;
+                        //玩法组 data
+                        $methodGroup = $this->methodData($currentLotteryId, $curentMethodGroup, $methodGroupstatus);
+                        //$temp 插入玩法组data
+                        $temp[$seriesId][$currentLotteryId]['child'][$curentMethodGroup]['data'] = $methodGroup;
+                        $temp[$seriesId][$currentLotteryId]['child'][$curentMethodGroup]['child'] = [];
+                        //#########################################################
+                        $methodRows = $mgItems->methodRows->where('lottery_id', $currentLotteryId);
+                        foreach ($methodRows as $mrItems) {
+                            $currentMethodRow = $mrItems->method_row;
+                            $methodRowBool = $mrItems->where('lottery_id', $currentLotteryId)->where('method_group', $curentMethodGroup)->where('method_row', $currentMethodRow)->where('status', 1)->exists();
+                            $methodRowstatus = $methodRowBool ? LotteryMethod::OPEN : LotteryMethod::CLOSE;
+                            //玩法行 data
+                            $methodRow = $this->methodData($currentLotteryId, $curentMethodGroup, $methodRowstatus, $currentMethodRow);
+                            //$temp 插入玩法行data
+                            $temp[$seriesId][$currentLotteryId]['child'][$curentMethodGroup]['child'][$mrItems->method_row]['data'] = $methodRow;
+                            //玩法data
+                            $methodData = $mrItems->methodDetails
+                                ->where('method_group', $curentMethodGroup)
+                                ->where('method_row', $currentMethodRow);
+                            //$temp 插入玩法data
+                            $temp[$seriesId][$currentLotteryId]['child'][$curentMethodGroup]['child'][$mrItems->method_row]['child'] = $methodData;
+                        }
                     }
                 }
+                $method = array_merge($method, $temp);
             }
-            $method = array_merge($method, $temp);
+            $hourToStore = 24;
+            $expiresAt = Carbon::now()->addHours($hourToStore)->diffInMinutes();
+            Cache::put($redisKey, $method, $expiresAt);
+            Cache::forever($redisKey, $method);
         }
-        $hourToStore = 24;
-        $expiresAt = Carbon::now()->addHours($hourToStore)->diffInMinutes();
-        Cache::put($redisKey, $method, $expiresAt);
-        Cache::forever($redisKey, $method);
-        // }
         return $this->msgOut(true, $method);
     }
 
