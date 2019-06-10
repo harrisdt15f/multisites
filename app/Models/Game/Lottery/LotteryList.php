@@ -56,6 +56,6 @@ class LotteryList extends BaseModel
 
     public function methodGroups()
     {
-        return $this->hasMany(LotteryMethod::class, 'lottery_id', 'en_name')->select(['method_group','status'])->groupBy('method_group');
+        return $this->hasMany(LotteryMethod::class, 'lottery_id', 'en_name')->select(['method_group', 'status', 'lottery_id'])->groupBy('method_group');
     }
 }

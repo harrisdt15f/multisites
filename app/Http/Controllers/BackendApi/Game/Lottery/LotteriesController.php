@@ -90,7 +90,7 @@ class LotteriesController extends BackEndApiMainController
                         $temp[$seriesId][$currentLotteryId]['child'][$curentMethodGroup]['data'] = $methodGroup;
                         $temp[$seriesId][$currentLotteryId]['child'][$curentMethodGroup]['child'] = [];
                         //#########################################################
-                        $methodRows = $mgItems->methodRows->where('lottery_id', $currentLotteryId);
+                        $methodRows = $mgItems->methodRows;
                         foreach ($methodRows as $mrItems) {
                             $currentMethodRow = $mrItems->method_row;
                             $methodRowBool = $mrItems->where('lottery_id', $currentLotteryId)->where('method_group', $curentMethodGroup)->where('method_row', $currentMethodRow)->where('status', 1)->exists();
@@ -100,7 +100,7 @@ class LotteriesController extends BackEndApiMainController
                             //$temp 插入玩法行data
                             $temp[$seriesId][$currentLotteryId]['child'][$curentMethodGroup]['child'][$mrItems->method_row]['data'] = $methodRow;
                             //玩法data
-                            $methodData = $mrItems->methodDetails->where('lottery_id', $currentLotteryId)->where('method_group', $curentMethodGroup)->where('method_row', $currentMethodRow);
+                            $methodData = $mgItems->methodDetails->where('method_group', $curentMethodGroup)->where('method_row', $currentMethodRow);
                             //$temp 插入玩法data
                             $temp[$seriesId][$currentLotteryId]['child'][$curentMethodGroup]['child'][$mrItems->method_row]['child'] = $methodData;
                         }

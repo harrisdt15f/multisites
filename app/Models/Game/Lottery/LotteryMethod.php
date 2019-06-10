@@ -43,6 +43,7 @@ class LotteryMethod extends BaseModel
         return $this->hasMany(__CLASS__, 'lottery_id', 'lottery_id')->select([
             'id',
             'lottery_name',
+            'lottery_id',
             'method_group',
             'method_id',
             'method_row',
