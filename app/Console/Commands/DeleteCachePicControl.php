@@ -54,8 +54,8 @@ class DeleteCachePicControl extends Command
                     }
                 }
             }
-            $minutes = 2 * 24 * 60;
-            Cache::put('CachePic', $CachePic, $minutes);
+            $cacheTime = 2 * 24 * 60;
+            Cache::put('CachePic', $CachePic, $cacheTime);
         }
     }
 }

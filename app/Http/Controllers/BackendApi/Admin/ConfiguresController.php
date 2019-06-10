@@ -169,7 +169,7 @@ class ConfiguresController extends BackEndApiMainController
                 $pastDataEloq->value = $this->inputs['value'];
                 $pastDataEloq->save();
                 if (Cache::has('generateIssueTime')) {
-                    $generateIssueTime = Cache::forget('generateIssueTime');
+                    Cache::forget('generateIssueTime');
                 }
             } else {
                 $bool = $this->createIssueConfigure($this->inputs['value']);

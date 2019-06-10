@@ -261,7 +261,7 @@ class ArticlesController extends BackEndApiMainController
         if ($pic['success'] === false) {
             return $this->msgOut(false, [], '400', $pic['msg']);
         }
-        $minutes = 2 * 24 * 60;
+        $cacheTime = 2 * 24 * 60;
         $pic['expire_time'] = (time() + 60 * 30) . '';
         if (Cache::has('CachePic')) {
             $CachePic = Cache::get('CachePic');
@@ -269,7 +269,7 @@ class ArticlesController extends BackEndApiMainController
         } else {
             $CachePic[$pic['name']] = $pic;
         }
-        Cache::put('CachePic', $CachePic, $minutes);
+        Cache::put('CachePic', $CachePic, $cacheTime);
         return $this->msgOut(true, $pic);
     }
 
@@ -287,8 +287,8 @@ class ArticlesController extends BackEndApiMainController
                     unset($CachePic[$picName]);
                 }
             }
-            $minutes = 2 * 24 * 60;
-            Cache::put('CachePic', $CachePic, $minutes);
+            $cacheTime = 2 * 24 * 60;
+            Cache::put('CachePic', $CachePic, $cacheTime);
         }
     }
 
