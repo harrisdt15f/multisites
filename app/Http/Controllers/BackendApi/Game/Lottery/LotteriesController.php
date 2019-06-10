@@ -100,9 +100,7 @@ class LotteriesController extends BackEndApiMainController
                             //$temp 插入玩法行data
                             $temp[$seriesId][$currentLotteryId]['child'][$curentMethodGroup]['child'][$mrItems->method_row]['data'] = $methodRow;
                             //玩法data
-                            $methodData = $mrItems->methodDetails
-                                ->where('method_group', $curentMethodGroup)
-                                ->where('method_row', $currentMethodRow);
+                            $methodData = $mrItems->methodDetails->where('lottery_id', $currentLotteryId)->where('method_group', $curentMethodGroup)->where('method_row', $currentMethodRow);
                             //$temp 插入玩法data
                             $temp[$seriesId][$currentLotteryId]['child'][$curentMethodGroup]['child'][$mrItems->method_row]['child'] = $methodData;
                         }
