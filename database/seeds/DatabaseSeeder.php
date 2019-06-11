@@ -28,7 +28,6 @@ class DatabaseSeeder extends Seeder
         $this->call(BackendSystemLogsTableSeeder::class);
         $this->call(BackendSystemMenusTableSeeder::class);
         $this->call(BackendSystemNoticeListsTableSeeder::class);
-        $this->call(FailedJobsTableSeeder::class);
         $this->call(FrontendActivityContentsTableSeeder::class);
         $this->call(FrontendAllocatedModelsTableSeeder::class);
         $this->call(FrontendAppRoutesTableSeeder::class);
@@ -60,7 +59,6 @@ class DatabaseSeeder extends Seeder
         $this->call(LotterySeriesTableSeeder::class);
         $this->call(LotteryTraceListsTableSeeder::class);
         $this->call(LotteryTracesTableSeeder::class);
-        $this->call(MigrationsTableSeeder::class);
         $this->call(ProjectsTableSeeder::class);
         $this->call(SystemConfigurationsTableSeeder::class);
         $this->call(SystemPlatformsTableSeeder::class);
