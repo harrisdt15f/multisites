@@ -14,4 +14,6 @@ Route::group(['prefix' => 'log', 'namespace' => 'Admin\Log'], function () {
     Route::match(['post', 'options'], 'list', ['as' => $namePrefix . 'list', 'uses' => $controller . 'details']);
     //前台日志列表
     Route::match(['post', 'options'], 'frontend-list', ['as' => $namePrefix . 'frontend-list', 'uses' => $controller . 'frontendLogs']);
+    //IP转换地址接口
+    Route::match(['get', 'options'], 'get-address', ['as' => $namePrefix . 'get-address', 'uses' => $controller . 'getAddress']);
 });
