@@ -2,13 +2,13 @@
 
 namespace App\Models\Logics;
 
-use App\Models\Trace;
+use App\Models\LotteryTrace;
 
 /**
  * @Author: LingPh
  * @Date:   2019-05-29 17:49:50
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-05-29 17:50:27
+ * @Last Modified time: 2019-06-12 17:37:14
  */
 trait TraceTraits
 {

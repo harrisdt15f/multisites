@@ -222,13 +222,13 @@ class LotteriesController extends FrontendApiMainController
     {
         $validator = Validator::make($this->inputs, [
             'count' => 'required|integer|min:10|max:100',
-            'lottery_sign' => 'required|string|min:4|max:10|exists:lottery_lists,en_name',
+            'lottery_sign' => 'string|min:4|max:10|exists:lottery_lists,en_name',
             'start' => 'required|integer',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $lotterySign = $this->inputs['lottery_sign'];
+        $lotterySign = $this->inputs['lottery_sign'] ?? '*';
         $start = $this->inputs['start']; //0
         $count = $this->inputs['count']; //10
         $data = Project::getGamePageList($lotterySign, $start, $count);

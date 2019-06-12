@@ -2,7 +2,7 @@
 
 namespace App\Models\Logics;
 
-use App\Models\Trace;
+use App\Models\LotteryTrace;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Request;
  * @Author: LingPh
  * @Date:   2019-05-29 17:44:08
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-06 17:39:01
+ * @Last Modified time: 2019-06-12 19:18:15
  */
 trait ProjectTraits
 {
@@ -49,7 +49,12 @@ trait ProjectTraits
             $count = 100;
         }
         $projectData = [];
-        $projectList = self::orderBy('id', 'desc')->where('lottery_sign', '=', $lotterySign)->skip($start)->take($count)->get();
+        $where = $lotterySign === '*' ? ['lottery_sign' => ['!=', null]] : [];
+        $projectList = self::orderBy('id', 'desc')->where(function ($query) use ($lotterySign) {
+            if ($lotterySign !== '*') {
+                $query->where('lottery_sign', '=', $lotterySign);
+            };
+        })->skip($start)->take($count)->get();
         foreach ($projectList as $item) {
             $projectData[] = [
                 'id' => $item->id,
@@ -65,7 +70,7 @@ trait ProjectTraits
             ];
         }
         $traceData = [];
-        $traceList = Trace::orderBy('id', 'desc')->where('lottery_sign', '=', $lotterySign)->skip($start)->take($count)->get();
+        $traceList = LotteryTrace::orderBy('id', 'desc')->where('lottery_sign', '=', $lotterySign)->skip($start)->take($count)->get();
         foreach ($traceList as $item) {
             $traceData[] = [
                 'id' => $item->id,
