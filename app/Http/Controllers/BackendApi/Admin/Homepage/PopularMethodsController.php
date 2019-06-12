@@ -4,12 +4,13 @@
  * @Author: LingPh
  * @Date:   2019-06-04 14:38:55
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-12 12:03:20
+ * @Last Modified time: 2019-06-12 14:01:28
  */
 namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Models\Admin\Homepage\FrontendLotteryFnfBetableMethod;
+use App\Models\Game\Lottery\LotteryList;
 use App\Models\Game\Lottery\LotteryMethod;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -192,11 +193,13 @@ class PopularMethodsController extends BackEndApiMainController
     //添加热门玩法时选择的玩法列表
     public function methodsList(): JsonResponse
     {
-        $lotterys = FrontendLotteryFnfBetableMethod::groupBy('lottery_name')->orderBy('id', 'asc')->pluck('lottery_name')->toArray();
+        $lotteryIds = FrontendLotteryFnfBetableMethod::groupBy('lottery_id')->pluck('lottery_id')->toArray();
+        //取出开启状态的彩票
+        $lotterys = LotteryList::whereIn('en_name', $lotteryIds)->where('status', 1)->orderBy('id', 'asc')->pluck('cn_name')->toArray();
         $data = [];
-        foreach ($lotterys as $key => $lottery) {
+        foreach ($lotterys as $lottery) {
             $methodIds = FrontendLotteryFnfBetableMethod::where('lottery_name', $lottery)->pluck('id');
-            $methods = LotteryMethod::select('lottery_id', 'lottery_name', 'id as method_id', 'method_name')->whereIn('id', $methodIds)->get()->toArray();
+            $methods = LotteryMethod::select('lottery_id', 'lottery_name', 'id as method_id', 'method_name', 'status')->whereIn('id', $methodIds)->get()->toArray();
             $data[$lottery] = $methods;
         }
         return $this->msgOut(true, $data);
