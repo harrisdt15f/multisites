@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-04 14:38:55
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-08 14:39:40
+ * @Last Modified time: 2019-06-12 12:03:20
  */
 namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
@@ -75,7 +75,6 @@ class PopularMethodsController extends BackEndApiMainController
             $this->deleteCache();
             return $this->msgOut(true);
         } catch (Exception $e) {
-            $imgClass->deletePic($pic['path']);
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);
@@ -93,14 +92,14 @@ class PopularMethodsController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
+        $pastDataEloq = $this->eloqM::find($this->inputs['id']);
+        if (is_null($pastDataEloq)) {
+            return $this->msgOut(false, [], '102014');
+        }
         //检查数据是否合法
         $checkBool = $this->checkData($this->inputs['lotteries_id'], $this->inputs['method_id'], $this->inputs['id']);
         if ($checkBool['success'] === false) {
             return $this->msgOut(false, [], $checkBool['code']);
-        }
-        $pastDataEloq = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastDataEloq)) {
-            return $this->msgOut(false, [], '102014');
         }
         try {
             $this->editAssignment($pastDataEloq, $this->inputs);
@@ -198,7 +197,7 @@ class PopularMethodsController extends BackEndApiMainController
         foreach ($lotterys as $key => $lottery) {
             $methodIds = FrontendLotteryFnfBetableMethod::where('lottery_name', $lottery)->pluck('id');
             $methods = LotteryMethod::select('lottery_id', 'lottery_name', 'id as method_id', 'method_name')->whereIn('id', $methodIds)->get()->toArray();
-            $data[] = $methods;
+            $data[$lottery] = $methods;
         }
         return $this->msgOut(true, $data);
     }
@@ -211,22 +210,33 @@ class PopularMethodsController extends BackEndApiMainController
         }
     }
 
+    /**
+     * 检查数据是否合法
+     * @param  [int] $lotteriesId [彩票id]
+     * @param  [int] $methodId    [玩法id]
+     * @param  [int] $id          [热门彩票2 id]
+     * @return [array]
+     */
     public function checkData($lotteriesId, $methodId, $id = null)
     {
         //彩种是否已存在
-        $checkData = $this->eloqM::where('lotteries_id', $lotteriesId)->where('id', '!=', $id)->exists();
-        if ($checkData === true) {
+        $isExistLottery = $this->eloqM::where('lotteries_id', $lotteriesId)->where('id', '!=', $id)->exists();
+        if ($isExistLottery === true) {
             return ['success' => false, 'code' => '102012'];
         }
         //检查彩种是否合法
-        $checkLottery = FrontendLotteryFnfBetableMethod::where('lottery_id', $lotteriesId)->exists();
-        if ($checkLottery === false) {
+        $isValidLottery = FrontendLotteryFnfBetableMethod::where('lottery_id', $lotteriesId)->exists();
+        if ($isValidLottery === false) {
             return ['success' => false, 'code' => '102015'];
         }
         //检查玩法是否合法
-        $checkMethod = FrontendLotteryFnfBetableMethod::find($methodId)->exists();
-        if ($checkMethod === false) {
+        $isValidMethod = FrontendLotteryFnfBetableMethod::find($methodId);
+        if (is_null($isValidMethod)) {
             return ['success' => false, 'code' => '102013'];
+        }
+        //检查玩法与彩种是否匹配
+        if ($isValidMethod->lottery_id !== $lotteriesId) {
+            return ['success' => false, 'code' => '102015'];
         }
         return ['success' => true];
     }
