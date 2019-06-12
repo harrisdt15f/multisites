@@ -3,12 +3,16 @@
 namespace App\Http\Controllers\BackendApi\DeveloperUsage\Frontend;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Models\DeveloperUsage\Frontend\FrontendAppRoute;
+use App\Models\DeveloperUsage\Frontend\FrontendWebRoute;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class FrontendAllocatedModelController extends BackEndApiMainController
 {
     protected $eloqM = 'DeveloperUsage\Frontend\FrontendAllocatedModel';
 
+    //前端模块列表
     public function detail()
     {
         $validator = Validator::make($this->inputs, [
@@ -22,6 +26,7 @@ class FrontendAllocatedModelController extends BackEndApiMainController
         return $this->msgOut(true, $allFrontendModel);
     }
 
+    //添加前端模块
     public function add()
     {
         $validator = Validator::make($this->inputs, [
@@ -60,6 +65,7 @@ class FrontendAllocatedModelController extends BackEndApiMainController
         }
     }
 
+    //编辑前端模块
     public function edit()
     {
         $validator = Validator::make($this->inputs, [
@@ -100,6 +106,7 @@ class FrontendAllocatedModelController extends BackEndApiMainController
         }
     }
 
+    //删除前端模块
     public function delete()
     {
         $validator = Validator::make($this->inputs, [
@@ -108,26 +115,36 @@ class FrontendAllocatedModelController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $checkidIdEloq = $this->eloqM::find($this->inputs['id']);
-        if (is_null($checkidIdEloq)) {
+        $modelEloq = $this->eloqM::find($this->inputs['id']);
+        if (is_null($modelEloq)) {
             return $this->msgOut(false, [], '101602');
         }
         //检查是否存在下级
         $deleteIds[] = $this->inputs['id'];
-        $childs = $this->eloqM::where('pid', $this->inputs['id'])->get()->toArray();
+        $childs = $modelEloq->childs->pluck('id')->toArray();
         if (!is_null($childs)) {
-            $childsId = array_column($childs, 'id');
-            $deleteIds = array_merge($deleteIds, $childsId);
-            $grandson = $this->eloqM::whereIn('pid', $childsId)->get()->toArray();
+            $deleteIds = array_merge($deleteIds, $childs);
+            $grandson = $this->eloqM::whereIn('pid', $childs)->pluck('id')->toArray();
             if (!is_null($grandson)) {
-                $grandsonId = array_column($grandson, 'id');
-                $deleteIds = array_merge($deleteIds, $grandsonId);
+                $deleteIds = array_merge($deleteIds, $grandson);
             }
         }
+        DB::beginTransaction();
         try {
             $this->eloqM::whereIn('id', $deleteIds)->delete();
+            //删除绑定该模块的路由
+            $issetWebRoute = FrontendWebRoute::whereIn('frontend_model_id', $deleteIds)->exists();
+            if ($issetWebRoute === true) {
+                FrontendWebRoute::whereIn('frontend_model_id', $deleteIds)->delete();
+            }
+            $issetAppRoute = FrontendAppRoute::whereIn('frontend_model_id', $deleteIds)->get();
+            if ($issetAppRoute === true) {
+                FrontendAppRoute::whereIn('frontend_model_id', $deleteIds)->delete();
+            }
+            DB::commit();
             return $this->msgOut(true);
         } catch (Exception $e) {
+            DB::rollback();
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);
