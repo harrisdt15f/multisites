@@ -27,37 +27,18 @@ class HomepageRotationChartController extends BackEndApiMainController
     public function add(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'title' => 'required|string',
+            'title' => 'required|string|unique:frontend_page_banners,title',
             'content' => 'required|string',
             'pic' => 'required|image',
             'type' => 'required|numeric|in:1,2',
-            'redirect_url' => 'string',
-            'activity_id' => 'numeric',
+            'redirect_url' => 'string|required_if:type,1',
+            'activity_id' => 'numeric|required_if:type,2|exists:frontend_activity_contents,id',
             'status' => 'required|numeric|in:0,1',
             'start_time' => 'required|date',
             'end_time' => 'required|date',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $checkTitle = $this->eloqM::where('title', $this->inputs['title'])->first();
-        if (!is_null($checkTitle)) {
-            return $this->msgOut(false, [], '101800');
-        }
-        //跳转内部
-        if ($this->inputs['type'] == 1) {
-            if (!array_key_exists('redirect_url', $this->inputs)) {
-                return $this->msgOut(false, [], '101801');
-            }
-        } elseif ($this->inputs['type'] == 2) {
-            //跳转活动
-            if (!array_key_exists('activity_id', $this->inputs)) {
-                return $this->msgOut(false, [], '101802');
-            }
-            $checkActivity = FrontendActivityContent::where('id', $this->inputs['activity_id'])->first();
-            if (is_null($checkActivity)) {
-                return $this->msgOut(false, [], '101808');
-            }
         }
         //上传图片
         $imageClass = new ImageArrange();
@@ -98,12 +79,12 @@ class HomepageRotationChartController extends BackEndApiMainController
     public function edit(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:frontend_page_banners,id',
             'title' => 'required|string',
             'content' => 'required|string',
             'pic' => 'image',
-            'redirect_url' => 'string',
-            'activity_id' => 'numeric',
+            'redirect_url' => 'string|required_if:type,1',
+            'activity_id' => 'numeric|required_if:type,2|exists:frontend_activity_contents,id',
             'status' => 'required|numeric|in:0,1',
             'start_time' => 'required|date',
             'end_time' => 'required|date',
@@ -112,30 +93,12 @@ class HomepageRotationChartController extends BackEndApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastData)) {
-            return $this->msgOut(false, [], '101804');
-        }
         $checkTitle = $this->eloqM::where(function ($query) {
             $query->where('title', $this->inputs['title'])
                 ->where('id', '!=', $this->inputs['id']);
         })->first();
         if (!is_null($checkTitle)) {
             return $this->msgOut(false, [], '101800');
-        }
-        //跳转内部
-        if ($pastData['type'] == 1) {
-            if (!array_key_exists('redirect_url', $this->inputs)) {
-                return $this->msgOut(false, [], '101801');
-            }
-        } elseif ($pastData['type'] == 2) {
-            //跳转活动
-            if (!array_key_exists('activity_id', $this->inputs)) {
-                return $this->msgOut(false, [], '101802');
-            }
-            $checkActivity = FrontendActivityContent::where('id', $this->inputs['activity_id'])->first();
-            if (is_null($checkActivity)) {
-                return $this->msgOut(false, [], '101808');
-            }
         }
         $editData = $this->inputs;
         unset($editData['id']);
@@ -169,15 +132,12 @@ class HomepageRotationChartController extends BackEndApiMainController
     public function delete(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:frontend_page_banners,id',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastDataEloq = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastDataEloq)) {
-            return $this->msgOut(false, [], '101806');
-        }
         $pastData = $pastDataEloq;
         DB::beginTransaction();
         try {

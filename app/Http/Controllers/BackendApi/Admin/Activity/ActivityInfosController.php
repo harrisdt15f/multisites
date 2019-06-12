@@ -26,7 +26,7 @@ class ActivityInfosController extends BackEndApiMainController
     public function add(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'title' => 'required',
+            'title' => 'required|unique:frontend_activity_contents,title',
             'content' => 'required',
             'pic' => 'required|image|mimes:jpeg,png,jpg',
             'start_time' => 'date_format:Y-m-d H:i:s',
@@ -37,10 +37,6 @@ class ActivityInfosController extends BackEndApiMainController
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastData = $this->eloqM::where('title', $this->inputs['title'])->first();
-        if (!is_null($pastData)) {
-            return $this->msgOut(false, [], '100300');
         }
         //活动是否永久 与 开始结束时间 的处理
         if ($this->inputs['is_time_interval'] == 1) {
@@ -99,7 +95,7 @@ class ActivityInfosController extends BackEndApiMainController
     public function edit(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:frontend_activity_contents,id',
             'title' => 'required',
             'content' => 'required',
             'pic' => 'image|mimes:jpeg,png,jpg',
@@ -126,9 +122,6 @@ class ActivityInfosController extends BackEndApiMainController
             return $this->msgOut(false, [], '100300');
         }
         $editDataEloq = $this->eloqM::find($this->inputs['id']);
-        if (is_null($editDataEloq)) {
-            return $this->msgOut(false, [], '100301');
-        }
         $editData = $this->inputs;
         //如果修改了图片 上传新图片
         if (isset($this->inputs['pic'])) {
@@ -170,43 +163,40 @@ class ActivityInfosController extends BackEndApiMainController
     public function delete()
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:frontend_activity_contents,id',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
-        if (!is_null($pastData)) {
-            DB::beginTransaction();
-            try {
-                $this->eloqM::where('id', $this->inputs['id'])->delete();
-                //排序
-                $this->eloqM::where('sort', '>', $pastData['sort'])->decrement('sort');
-                DB::commit();
-                //删除图片
-                $ImageClass = new ImageArrange();
-                $ImageClass->deletePic(substr($pastData['pic_path'], 1));
-                $ImageClass->deletePic(substr($pastData['thumbnail_path'], 1));
-                //删除前台首页缓存
-                $this->deleteCache();
-                return $this->msgOut(true);
-            } catch (\Exception $e) {
-                DB::rollback();
-                $errorObj = $e->getPrevious()->getPrevious();
-                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-                return $this->msgOut(false, [], $sqlState, $msg);
-            }
-        } else {
-            return $this->msgOut(false, [], 100301);
+        DB::beginTransaction();
+        try {
+            $this->eloqM::where('id', $this->inputs['id'])->delete();
+            //排序
+            $this->eloqM::where('sort', '>', $pastData['sort'])->decrement('sort');
+            DB::commit();
+            //删除图片
+            $ImageClass = new ImageArrange();
+            $ImageClass->deletePic(substr($pastData['pic_path'], 1));
+            $ImageClass->deletePic(substr($pastData['thumbnail_path'], 1));
+            //删除前台首页缓存
+            $this->deleteCache();
+            return $this->msgOut(true);
+        } catch (\Exception $e) {
+            DB::rollback();
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
+
     }
 
     //活动排序
     public function sort(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'front_id' => 'required|numeric|gt:0',
-            'rearways_id' => 'required|numeric|gt:0',
+            'front_id' => 'required|exists:frontend_activity_contents,id',
+            'rearways_id' => 'required|exists:frontend_activity_contents,id',
             'front_sort' => 'required|numeric|gt:0',
             'rearways_sort' => 'required|numeric|gt:0',
             'sort_type' => 'required|numeric|in:1,2',
@@ -214,21 +204,16 @@ class ActivityInfosController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $pastFrontData = $this->eloqM::find($this->inputs['front_id']);
-        $pastRearwaysData = $this->eloqM::find($this->inputs['rearways_id']);
-        if (is_null($pastFrontData) || is_null($pastRearwaysData)) {
-            return $this->msgOut(false, [], '100304');
-        }
         DB::beginTransaction();
         try {
             //上拉排序
             if ($this->inputs['sort_type'] == 1) {
-                $stationaryData = $pastFrontData;
+                $stationaryData = $this->eloqM::find($this->inputs['front_id']);
                 $stationaryData->sort = $this->inputs['front_sort'];
                 $this->eloqM::where('sort', '>=', $this->inputs['front_sort'])->where('sort', '<', $this->inputs['rearways_sort'])->increment('sort');
                 //下拉排序
             } elseif ($this->inputs['sort_type'] == 2) {
-                $stationaryData = $pastRearwaysData;
+                $stationaryData = $this->eloqM::find($this->inputs['rearways_id']);
                 $stationaryData->sort = $this->inputs['rearways_sort'];
                 $this->eloqM::where('sort', '>', $this->inputs['front_sort'])->where('sort', '<=', $this->inputs['rearways_sort'])->decrement('sort');
             }

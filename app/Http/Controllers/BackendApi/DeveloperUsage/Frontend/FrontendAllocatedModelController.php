@@ -30,22 +30,14 @@ class FrontendAllocatedModelController extends BackEndApiMainController
     public function add()
     {
         $validator = Validator::make($this->inputs, [
-            'label' => 'required|string',
-            'en_name' => 'required|string',
+            'label' => 'required|string|unique:frontend_allocated_models,label',
+            'en_name' => 'required|string|unique:frontend_allocated_models,en_name',
             'pid' => 'required|numeric',
             'type' => 'required|numeric',
             'level' => 'required|numeric|in:1,2,3',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $checkLabelEloq = $this->eloqM::where('label', $this->inputs['label'])->first();
-        if (!is_null($checkLabelEloq)) {
-            return $this->msgOut(false, [], '101600');
-        }
-        $checkEnNamelEloq = $this->eloqM::where('en_name', $this->inputs['en_name'])->first();
-        if (!is_null($checkEnNamelEloq)) {
-            return $this->msgOut(false, [], '101601');
         }
         if ($this->inputs['pid'] != 0) {
             $checkParentLevel = $this->eloqM::where('id', $this->inputs['pid'])->first();
@@ -69,7 +61,7 @@ class FrontendAllocatedModelController extends BackEndApiMainController
     public function edit()
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:frontend_allocated_models,id',
             'label' => 'required|string',
             'en_name' => 'required|string',
         ]);
@@ -77,9 +69,6 @@ class FrontendAllocatedModelController extends BackEndApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastData)) {
-            return $this->msgOut(false, [], '101602');
-        }
         $checkLabelEloq = $this->eloqM::where(function ($query) {
             $query->where('label', $this->inputs['label'])
                 ->where('id', '!=', $this->inputs['id']);
@@ -110,15 +99,12 @@ class FrontendAllocatedModelController extends BackEndApiMainController
     public function delete()
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:frontend_allocated_models,id',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $modelEloq = $this->eloqM::find($this->inputs['id']);
-        if (is_null($modelEloq)) {
-            return $this->msgOut(false, [], '101602');
-        }
         //检查是否存在下级
         $deleteIds[] = $this->inputs['id'];
         $childs = $modelEloq->childs->pluck('id')->toArray();

@@ -20,10 +20,10 @@ class FrontendWebRouteController extends BackEndApiMainController
     public function add()
     {
         $validator = Validator::make($this->inputs, [
-            'route_name' => 'required|string',
+            'route_name' => 'required|string|unique:frontend_web_routes,route_name',
             'controller' => 'required|string',
             'method' => 'required|string',
-            'frontend_model_id' => 'required|numeric',
+            'frontend_model_id' => 'required|numeric|exists:frontend_allocated_models,id',
             'title' => 'required|string',
         ]);
         if ($validator->fails()) {
@@ -49,7 +49,7 @@ class FrontendWebRouteController extends BackEndApiMainController
     public function delete()
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|unique:frontend_web_routes,id',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
@@ -72,7 +72,7 @@ class FrontendWebRouteController extends BackEndApiMainController
     public function isOpen()
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|unique:frontend_web_routes,id',
             'is_open' => 'required|numeric|in:0,1',
         ]);
         if ($validator->fails()) {

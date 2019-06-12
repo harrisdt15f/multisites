@@ -64,26 +64,25 @@ class RegionController extends BackEndApiMainController
         }
         $addDatas = $this->inputs;
         $pastData = $this->eloqM::where(['region_parent_id' => $this->inputs['region_parent_id'], 'region_name' => $this->inputs['region_name']])->orwhere('region_id', $this->inputs['region_id'])->first();
-        if (is_null($pastData)) {
-            try {
-                $configure = new $this->eloqM();
-                $configure->fill($addDatas);
-                $configure->save();
-                return $this->msgOut(true);
-            } catch (\Exception $e) {
-                $errorObj = $e->getPrevious()->getPrevious();
-                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-                return $this->msgOut(false, [], $sqlState, $msg);
-            }
-        } else {
+        if (!is_null($pastData)) {
             return $this->msgOut(false, [], '101001');
+        }
+        try {
+            $configure = new $this->eloqM();
+            $configure->fill($addDatas);
+            $configure->save();
+            return $this->msgOut(true);
+        } catch (\Exception $e) {
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
     //编辑行政区
     public function edit()
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:users_regions,id',
             'region_id' => 'required|numeric',
             'region_name' => 'required',
             'region_level' => 'required|in:1,2,3,4',

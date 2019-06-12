@@ -20,18 +20,14 @@ class FrontendAppRouteController extends BackEndApiMainController
     public function add()
     {
         $validator = Validator::make($this->inputs, [
-            'route_name' => 'required|string',
+            'route_name' => 'required|string|unique:frontend_app_routes,route_name',
             'controller' => 'required|string',
             'method' => 'required|string',
-            'frontend_model_id' => 'required|numeric',
+            'frontend_model_id' => 'required|numeric|exists:frontend_allocated_models,id',
             'title' => 'required|string',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $checkData = $this->eloqM::where('route_name', $this->inputs['route_name'])->first();
-        if (!is_null($checkData)) {
-            return $this->msgOut(false, [], '101500');
         }
         try {
             $routeEloq = new $this->eloqM;
@@ -49,14 +45,10 @@ class FrontendAppRouteController extends BackEndApiMainController
     public function delete()
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|unique:frontend_app_routes,id',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $checkData = $this->eloqM::find($this->inputs['id']);
-        if (is_null($checkData)) {
-            return $this->msgOut(false, [], '101501');
         }
         try {
             $this->eloqM::where('id', $this->inputs['id'])->delete();
@@ -72,16 +64,13 @@ class FrontendAppRouteController extends BackEndApiMainController
     public function isOpen()
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|unique:frontend_app_routes,id',
             'is_open' => 'required|numeric|in:0,1',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastData)) {
-            return $this->msgOut(false, [], '101501');
-        }
         try {
             $pastData->is_open = $this->inputs['is_open'];
             $pastData->save();

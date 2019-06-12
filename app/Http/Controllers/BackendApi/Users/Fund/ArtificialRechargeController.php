@@ -42,7 +42,7 @@ class ArtificialRechargeController extends BackEndApiMainController
     public function recharge(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:frontend_users,id',
             'amount' => 'required|numeric|gt:0',
             'apply_note' => 'required|string',
         ]);
@@ -50,9 +50,6 @@ class ArtificialRechargeController extends BackEndApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         };
         $userEloq = FrontendUser::find($this->inputs['id']);
-        if (is_null($userEloq)) {
-            return $this->msgOut(false, [], '101100');
-        }
         $partnerAdmin = $this->partnerAdmin;
         DB::beginTransaction();
         try {

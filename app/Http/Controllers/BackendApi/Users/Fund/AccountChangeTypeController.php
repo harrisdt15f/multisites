@@ -23,18 +23,14 @@ class AccountChangeTypeController extends BackEndApiMainController
     {
         $validator = Validator::make($this->inputs, [
             'name' => 'required|string',
-            'sign' => 'required|string',
+            'sign' => 'required|string|unique:account_change_types,sign',
             'in_out' => 'required|numeric|in:0,1',
         ]);
         if ($validator->fails()) {
             return $this->msgout(false, [], '400', $validator->errors()->first());
         }
-        $checkData = $this->eloqM::where('sign', $this->inputs['sign'])->first();
-        if (!is_null($checkData)) {
-            return $this->msgout(false, [], '101201');
-        }
-        $eloqM = new $this->eloqM;
         try {
+            $eloqM = new $this->eloqM;
             $eloqM->fill($this->inputs);
             $eloqM->save();
             return $this->msgout(true);
@@ -49,7 +45,7 @@ class AccountChangeTypeController extends BackEndApiMainController
     public function edit(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:account_change_types,id',
             'name' => 'required|string',
             'sign' => 'required|string',
             'in_out' => 'required|numeric|in:0,1',
@@ -85,7 +81,7 @@ class AccountChangeTypeController extends BackEndApiMainController
     public function delete(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:account_change_types,id',
         ]);
         if ($validator->fails()) {
             return $this->msgout(false, [], '400', $validator->errors()->first());

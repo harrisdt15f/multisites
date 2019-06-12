@@ -22,7 +22,7 @@ class BankController extends BackEndApiMainController
     public function addBank(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'title' => 'required|string',
+            'title' => 'required|string|unique:frontend_system_banks,title',
             'code' => 'required|alpha',
             'pay_type' => 'required|numeric',
             'status' => 'required|in:0,1',
@@ -53,7 +53,7 @@ class BankController extends BackEndApiMainController
     public function editBank(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:frontend_system_banks,id',
             'title' => 'required|string',
             'code' => 'required|alpha',
             'status' => 'required|in:0,1',
@@ -67,13 +67,10 @@ class BankController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $editDataEloq = $this->eloqM::find($this->inputs['id']);
-        if (empty($editDataEloq)) {
-            return $this->msgOut(false, [], '100600');
-        }
-        $this->editAssignment($editDataEloq, $this->inputs);
+        $pastEloq = $this->eloqM::find($this->inputs['id']);
+        $this->editAssignment($pastEloq, $this->inputs);
         try {
-            $editDataEloq->save();
+            $pastEloq->save();
             return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
@@ -86,7 +83,7 @@ class BankController extends BackEndApiMainController
     public function deleteBank(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:frontend_system_banks,id',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());

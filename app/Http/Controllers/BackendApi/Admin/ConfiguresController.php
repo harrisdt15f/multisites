@@ -32,21 +32,13 @@ class ConfiguresController extends BackEndApiMainController
     {
         $rule = [
             'parent_id' => 'required|numeric',
-            'sign' => 'required',
+            'sign' => 'required|unique:system_configurations,sign',
             'name' => 'required',
             'description' => 'required',
-            'value' => 'required', //父级的时候是不需要传送 value 值
         ];
-        if (isset($this->inputs['parent_id']) && $this->inputs['parent_id'] === 0) {
-            unset($rule['value']);
-        }
         $validator = Validator::make($this->inputs, $rule);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastData = $this->eloqM::where('sign', $this->inputs['sign'])->exists();
-        if ($pastData === true) {
-            return $this->msgOut(false, [], '100700');
         }
         $addDatas = $this->inputs;
         $addDatas['pid'] = $this->currentPlatformEloq->platform_id;
@@ -70,7 +62,7 @@ class ConfiguresController extends BackEndApiMainController
     public function edit(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:system_configurations,id',
             'parent_id' => 'required|numeric',
             'sign' => 'required',
             'name' => 'required',
@@ -85,9 +77,6 @@ class ConfiguresController extends BackEndApiMainController
             return $this->msgOut(false, [], '100700');
         }
         $pastDataEloq = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastDataEloq)) {
-            return $this->msgOut(false, [], '100701');
-        }
         $editDatas = $this->inputs;
         $this->editAssignment($pastDataEloq, $editDatas);
         try {
@@ -104,15 +93,12 @@ class ConfiguresController extends BackEndApiMainController
     public function delete(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:system_configurations,id',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastData)) {
-            return $this->msgOut(false, [], '100701');
-        }
         try {
             $pastData->delete();
             return $this->msgOut(true);
@@ -128,7 +114,7 @@ class ConfiguresController extends BackEndApiMainController
     public function configSwitch(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:system_configurations,id',
             'parent_id' => 'required|numeric',
             'status' => 'required|in:0,1',
         ]);
@@ -139,9 +125,6 @@ class ConfiguresController extends BackEndApiMainController
             return $this->msgOut(false, [], '100702');
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastData)) {
-            return $this->msgOut(false, [], '100701');
-        }
         try {
             $pastData->status = $this->inputs['status'];
             $pastData->save();

@@ -34,7 +34,7 @@ class HomepageController extends BackEndApiMainController
     public function edit(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:frontend_allocated_models,id',
             'status' => 'numeric|in:0,1',
             'value' => 'string',
             'show_num' => 'numeric',
@@ -43,9 +43,6 @@ class HomepageController extends BackEndApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastData)) {
-            return $this->msgOut(false, [], '101900');
-        }
         if (array_key_exists('status', $this->inputs)) {
             $pastData->status = $this->inputs['status'];
         }
@@ -77,16 +74,13 @@ class HomepageController extends BackEndApiMainController
     public function uploadPic(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'en_name' => 'required|string',
+            'en_name' => 'required|string|exists:frontend_allocated_models,en_name',
             'pic' => 'required|image',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastData = $this->eloqM::where('en_name', $this->inputs['en_name'])->first();
-        if (is_null($pastData)) {
-            return $this->msgOut(false, [], '101903');
-        }
         //上传图片
         $imgClass = new ImageArrange();
         $depositPath = $imgClass->depositPath($this->inputs['en_name'], $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);

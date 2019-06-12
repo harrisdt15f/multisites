@@ -33,7 +33,7 @@ class ArticlesController extends BackEndApiMainController
     {
         $validator = Validator::make($this->inputs, [
             'category_id' => 'required|numeric',
-            'title' => 'required|string',
+            'title' => 'required|string|unique:backend_admin_message_articles,title',
             'summary' => 'required|string',
             'content' => 'required|string',
             'search_text' => 'required|string',
@@ -44,10 +44,6 @@ class ArticlesController extends BackEndApiMainController
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastData = $this->eloqM::where('title', $this->inputs['title'])->first();
-        if (!is_null($pastData)) {
-            return $this->msgOut(false, [], '100500');
         }
         try {
             //插入 backend_admin_audit_flow_lists 审核表
@@ -90,7 +86,7 @@ class ArticlesController extends BackEndApiMainController
     public function editArticles(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:backend_admin_message_articles,id',
             'category_id' => 'required|numeric',
             'title' => 'required|string',
             'summary' => 'required|string',
@@ -104,24 +100,24 @@ class ArticlesController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $pastData = $this->eloqM::where('title', $this->inputs['title'])->where('id', '!=', $this->inputs['id'])->first();
-        if (!is_null($pastData)) {
+        $issetTitle = $this->eloqM::where('title', $this->inputs['title'])->where('id', '!=', $this->inputs['id'])->exists();
+        if ($issetTitle === true) {
             return $this->msgOut(false, [], '100500');
         }
         try {
+            $pastEloq = $this->eloqM::find($this->inputs['id']);
             //插入 backend_admin_audit_flow_lists 审核表
             $auditFlowId = $this->insertAuditFlow($this->inputs['apply_note']);
-            $editDataEloq->audit_flow_id = $auditFlowId;
+            $pastEloq->audit_flow_id = $auditFlowId;
             //
-            $editDataEloq = $this->eloqM::find($this->inputs['id']);
-            $pastPicPath = $editDataEloq->pic_path;
+            $pastPicPath = $pastEloq->pic_path;
             $editDatas = $this->inputs;
             unset($editDatas['pic_name']);
             unset($editDatas['pic_name']);
             unset($editDatas['apply_note']);
-            $this->editAssignment($editDataEloq, $editDatas);
-            $editDataEloq->status = 0;
-            $editDataEloq->last_update_admin_id = $this->partnerAdmin['id'];
+            $this->editAssignment($pastEloq, $editDatas);
+            $pastEloq->status = 0;
+            $pastEloq->last_update_admin_id = $this->partnerAdmin['id'];
             //查看是否修改图片
             $new_pic_path = $this->inputs['pic_path'];
             if ($new_pic_path != $pastPicPath) {
@@ -131,9 +127,9 @@ class ArticlesController extends BackEndApiMainController
                 $pastPicPathArr = explode('|', $pastPicPath);
                 $this->deleteImg($pastPicPathArr);
                 //
-                $editDataEloq->pic_path = implode('|', $new_pic_path);
+                $pastEloq->pic_path = implode('|', $new_pic_path);
             }
-            $editDataEloq->save();
+            $pastEloq->save();
             //发送站内消息给管理员审核
             $this->sendMessage();
             return $this->msgOut(true);
@@ -148,31 +144,27 @@ class ArticlesController extends BackEndApiMainController
     public function deleteArticles(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:backend_admin_message_articles,id',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
         $picPathArr = explode('|', $pastData['pic_path']);
-        if (!is_null($pastData)) {
-            DB::beginTransaction();
-            try {
-                $this->eloqM::where('id', $this->inputs['id'])->delete();
-                //排序
-                $this->eloqM::where('sort', '>', $pastData['sort'])->decrement('sort');
-                //删除图片
-                $this->deleteImg($picPathArr);
-                DB::commit();
-                return $this->msgOut(true);
-            } catch (\Exception $e) {
-                DB::rollback();
-                $errorObj = $e->getPrevious()->getPrevious();
-                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-                return $this->msgOut(false, [], $sqlState, $msg);
-            }
-        } else {
-            return $this->msgOut(false, [], '100501');
+        DB::beginTransaction();
+        try {
+            $pastData->delete();
+            //排序
+            $this->eloqM::where('sort', '>', $pastData['sort'])->decrement('sort');
+            //删除图片
+            $this->deleteImg($picPathArr);
+            DB::commit();
+            return $this->msgOut(true);
+        } catch (\Exception $e) {
+            DB::rollback();
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
 
@@ -222,15 +214,12 @@ class ArticlesController extends BackEndApiMainController
     public function topArticles(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:backend_admin_message_articles,id',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $topData = $this->eloqM::find($this->inputs['id']);
-        if (is_null($topData)) {
-            return $this->msgOut(false, [], '100501');
-        }
         try {
             $this->eloqM::where('sort', '<', $topData['sort'])->increment('sort');
             $topData->sort = 1;

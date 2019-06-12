@@ -19,22 +19,14 @@ class RouteController extends BackEndApiMainController
     public function add()
     {
         $validator = Validator::make($this->inputs, [
-            'route_name' => 'required|string',
+            'route_name' => 'required|string|unique:backend_admin_routes,route_name',
             'controller' => 'required|string',
             'method' => 'required|string',
-            'menu_group_id' => 'required|numeric',
-            'title' => 'required|string',
+            'menu_group_id' => 'required|numeric|exists:backend_system_menus,id',
+            'title' => 'required|string|unique:backend_admin_routes,title',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $checkTitle = $this->eloqM::where('title', $this->inputs['title'])->first();
-        if (!is_null($checkTitle)) {
-            return $this->msgOut(false, [], '101400');
-        }
-        $checkData = $this->eloqM::where('route_name', $this->inputs['route_name'])->first();
-        if (!is_null($checkData)) {
-            return $this->msgOut(false, [], '101403');
         }
         try {
             $routeEloq = new $this->eloqM;
@@ -51,37 +43,22 @@ class RouteController extends BackEndApiMainController
     public function edit()
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:backend_admin_routes,id',
             'controller' => 'required|string',
             'method' => 'required|string',
-            'menu_group_id' => 'required|numeric',
+            'menu_group_id' => 'required|numeric|exists:backend_system_menus,id',
             'title' => 'required|string',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastEloq = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastEloq)) {
-            return $this->msgOut(false, [], '101401');
-        }
-        $checkMeun = BackendSystemMenu::where('id', $this->inputs['menu_group_id'])->first();
-        if (is_null($checkMeun)) {
-            return $this->msgOut(false, [], '101402');
-        }
-        $checkTitle = $this->eloqM::where(function ($query) {
-            $query->where('title', $this->inputs['title'])
-                ->where('id', '!=', $this->inputs['id']);
-        })->first();
+        $checkTitle = $this->eloqM::where('title', $this->inputs['title'])->where('id', '!=', $this->inputs['id'])->first();
         if (!is_null($checkTitle)) {
             return $this->msgOut(false, [], '101400');
         }
-        $editData = $this->inputs;
-        unset($editData['id']);
-        if (array_key_exists('route_name', $editData)) {
-            unset($editData['route_name']);
-        }
         try {
-            $this->editAssignment($pastEloq, $editData);
+            $this->editAssignment($pastEloq, $this->inputs);
             $pastEloq->save();
             return $this->msgOut(true);
         } catch (Exception $e) {
@@ -94,7 +71,7 @@ class RouteController extends BackEndApiMainController
     public function delete()
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:backend_admin_routes,id',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());

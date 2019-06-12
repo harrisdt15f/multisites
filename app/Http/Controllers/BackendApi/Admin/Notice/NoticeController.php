@@ -29,7 +29,7 @@ class NoticeController extends BackEndApiMainController
     {
         $validator = Validator::make($this->inputs, [
             'type' => 'required|numeric',
-            'title' => 'required|string',
+            'title' => 'required|string|unique:frontend_message_notices,title',
             'content' => 'required|string',
             'start_time' => 'required|date',
             'end_time' => 'required|date',
@@ -37,10 +37,6 @@ class NoticeController extends BackEndApiMainController
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $checkTitle = $this->eloqM::where('title', $this->inputs['title'])->first();
-        if (!is_null($checkTitle)) {
-            return $this->msgOut(false, [], '102100');
         }
         $addData = $this->inputs;
         //admin_id
@@ -70,7 +66,7 @@ class NoticeController extends BackEndApiMainController
     public function edit(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:frontend_message_notices,id',
             'type' => 'required|numeric',
             'title' => 'required|string',
             'content' => 'required|string',
@@ -82,9 +78,6 @@ class NoticeController extends BackEndApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastEloq = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastEloq)) {
-            return $this->msgOut(false, [], '102101');
-        }
         $checkTitle = $this->eloqM::where('title', $this->inputs['title'])->where('id', '!=', $this->inputs['id'])->first();
         if (!is_null($checkTitle)) {
             return $this->msgOut(false, [], '102100');
@@ -106,15 +99,12 @@ class NoticeController extends BackEndApiMainController
     public function delete(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:frontend_message_notices,id',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastEloq = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastEloq)) {
-            return $this->msgOut(false, [], '102101');
-        }
         //sort
         $sort = $pastEloq->sort;
         DB::beginTransaction();
@@ -137,8 +127,8 @@ class NoticeController extends BackEndApiMainController
     public function sort(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'front_id' => 'required|numeric|gt:0',
-            'rearways_id' => 'required|numeric|gt:0',
+            'front_id' => 'required|exists:frontend_message_notices,id',
+            'rearways_id' => 'required|exists:frontend_message_notices,id',
             'front_sort' => 'required|numeric|gt:0',
             'rearways_sort' => 'required|numeric|gt:0',
             'sort_type' => 'required|numeric|in:1,2',
@@ -146,21 +136,16 @@ class NoticeController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $pastFrontData = $this->eloqM::find($this->inputs['front_id']);
-        $pastRearwaysData = $this->eloqM::find($this->inputs['rearways_id']);
-        if (is_null($pastFrontData) || is_null($pastRearwaysData)) {
-            return $this->msgOut(false, [], '102102');
-        }
         DB::beginTransaction();
         try {
             //上拉排序
             if ($this->inputs['sort_type'] == 1) {
-                $stationaryData = $pastFrontData;
+                $stationaryData = $this->eloqM::find($this->inputs['front_id']);
                 $stationaryData->sort = $this->inputs['front_sort'];
                 $this->eloqM::where('sort', '>=', $this->inputs['front_sort'])->where('sort', '<', $this->inputs['rearways_sort'])->increment('sort');
                 //下拉排序
             } elseif ($this->inputs['sort_type'] == 2) {
-                $stationaryData = $pastRearwaysData;
+                $stationaryData = $this->eloqM::find($this->inputs['rearways_id']);
                 $stationaryData->sort = $this->inputs['rearways_sort'];
                 $this->eloqM::where('sort', '>', $this->inputs['front_sort'])->where('sort', '<=', $this->inputs['rearways_sort'])->decrement('sort');
             }
@@ -181,7 +166,7 @@ class NoticeController extends BackEndApiMainController
     public function top()
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:frontend_message_notices,id',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());

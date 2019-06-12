@@ -37,22 +37,19 @@ class PopularLotteriesController extends BackEndApiMainController
     public function add(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'lotteries_id' => 'required|numeric',
+            'lotteries_id' => 'required|numeric|unique:frontend_lottery_redirect_bet_lists,lotteries_id|exists:lottery_lists,id',
             'pic' => 'required|image',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $checkLotterie = $this->eloqM::where('lotteries_id', $this->inputs['lotteries_id'])->first();
-        if (!is_null($checkLotterie)) {
-            return $this->msgOut(false, [], '102000');
-        }
         //sort
-        $maxSort = $this->eloqM::orderBy('sort', 'desc')->first();
+        $maxSort = $this->eloqM::orderBy('sort', 'desc')->value('sort');
         if (is_null($maxSort)) {
             $sort = 1;
         } else {
-            $sort = $maxSort->sort + 1;
+            $sort = $maxSort + 1;
         }
         //上传图片
         $imgClass = new ImageArrange();
@@ -85,22 +82,14 @@ class PopularLotteriesController extends BackEndApiMainController
     public function edit(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:frontend_lottery_redirect_bet_lists,id',
             'pic' => 'image',
-            'lotteries_id' => 'required|numeric',
+            'lotteries_id' => 'required|numeric|exists:lottery_lists,id',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastData)) {
-            return $this->msgOut(false, [], '102003');
-        }
-        //检查彩种是否存在
-        $checkLotteries = LotteryList::find($this->inputs['lotteries_id']);
-        if (is_null($checkLotteries)) {
-            return $this->msgOut(false, [], '102011');
-        }
         //检查该热门类型是否存在重复彩票
         $checkData = $this->eloqM::where('lotteries_id', $this->inputs['lotteries_id'])->where('id', '!=', $this->inputs['id'])->first();
         if (!is_null($checkData)) {
@@ -140,15 +129,12 @@ class PopularLotteriesController extends BackEndApiMainController
     public function delete(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:frontend_lottery_redirect_bet_lists,id',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastDataEloq = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastDataEloq)) {
-            return $this->msgOut(false, [], '102005');
-        }
         $pastData = $pastDataEloq;
         DB::beginTransaction();
         try {

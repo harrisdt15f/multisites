@@ -46,7 +46,7 @@ class FundOperationController extends BackEndApiMainController
     public function addFund(): JsonResponse
     {
         $rule = [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:backend_admin_users,id',
             'fund' => 'required|numeric|gt:0',
         ];
         $validator = Validator::make($this->inputs, $rule);
@@ -54,9 +54,6 @@ class FundOperationController extends BackEndApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $admin_user = BackendAdminUser::find($this->inputs['id']);
-        if (is_null($admin_user)) {
-            return $this->msgOut(false, [], '101300');
-        }
         $FundOperationAdmin = BackendAdminRechargePocessAmount::where('admin_id', $this->inputs['id'])->first();
         if (is_null($FundOperationAdmin)) {
             return $this->msgOut(false, [], '101301');
@@ -119,7 +116,7 @@ class FundOperationController extends BackEndApiMainController
     public function fundChangeLog(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'admin_id' => 'required|numeric',
+            'admin_id' => 'required|numeric|exists:backend_admin_users,id',
             'start_time' => 'required|date',
             'end_time' => 'required|date',
         ]);

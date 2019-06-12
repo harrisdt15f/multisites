@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-04 14:38:55
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-12 14:01:28
+ * @Last Modified time: 2019-06-12 20:38:04
  */
 namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
@@ -45,16 +45,11 @@ class PopularMethodsController extends BackEndApiMainController
     public function add(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'lotteries_id' => 'required|string',
-            'method_id' => 'required|numeric',
+            'lotteries_id' => 'required|exists:lottery_lists,en_name|unique:frontend_lottery_fnf_betable_lists,lotteries_id',
+            'method_id' => 'required|exists:frontend_lottery_fnf_betable_methods,id',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        //检查数据是否合法
-        $checkBool = $this->checkData($this->inputs['lotteries_id'], $this->inputs['method_id']);
-        if ($checkBool['success'] === false) {
-            return $this->msgOut(false, [], $checkBool['code']);
         }
         //sort
         $maxSort = $this->eloqM::orderBy('sort', 'desc')->first();
@@ -86,21 +81,18 @@ class PopularMethodsController extends BackEndApiMainController
     public function edit(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
-            'lotteries_id' => 'required|string',
-            'method_id' => 'required|numeric',
+            'id' => 'required|exists:frontend_lottery_fnf_betable_lists,id',
+            'lotteries_id' => 'required|exists:lottery_lists,en_name',
+            'method_id' => 'required|exists:frontend_lottery_fnf_betable_methods,id',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastDataEloq = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastDataEloq)) {
-            return $this->msgOut(false, [], '102014');
-        }
-        //检查数据是否合法
-        $checkBool = $this->checkData($this->inputs['lotteries_id'], $this->inputs['method_id'], $this->inputs['id']);
-        if ($checkBool['success'] === false) {
-            return $this->msgOut(false, [], $checkBool['code']);
+        //彩种是否已存在
+        $isExistLottery = $this->eloqM::where('lotteries_id', $this->inputs['lotteries_id'])->where('id', '!=', $this->inputs['id'])->exists();
+        if ($isExistLottery === true) {
+            return $this->msgOut(false, [], '102012');
         }
         try {
             $this->editAssignment($pastDataEloq, $this->inputs);
@@ -119,15 +111,12 @@ class PopularMethodsController extends BackEndApiMainController
     public function delete(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|exists:frontend_lottery_fnf_betable_lists,id',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastDataEloq = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastDataEloq)) {
-            return $this->msgOut(false, [], '102014');
-        }
         $sort = $pastDataEloq->sort;
         DB::beginTransaction();
         try {
@@ -150,19 +139,14 @@ class PopularMethodsController extends BackEndApiMainController
     public function sort(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'front_id' => 'required|numeric|gt:0',
-            'rearways_id' => 'required|numeric|gt:0',
+            'front_id' => 'required|exists:frontend_lottery_fnf_betable_lists,id',
+            'rearways_id' => 'required|exists:frontend_lottery_fnf_betable_lists,id',
             'front_sort' => 'required|numeric|gt:0',
             'rearways_sort' => 'required|numeric|gt:0',
             'sort_type' => 'required|numeric|in:1,2',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastFrontData = $this->eloqM::find($this->inputs['front_id']);
-        $pastRearwaysData = $this->eloqM::find($this->inputs['rearways_id']);
-        if (is_null($pastFrontData) || is_null($pastRearwaysData)) {
-            return $this->msgOut(false, [], '102014');
         }
         DB::beginTransaction();
         try {
@@ -222,21 +206,6 @@ class PopularMethodsController extends BackEndApiMainController
      */
     public function checkData($lotteriesId, $methodId, $id = null)
     {
-        //彩种是否已存在
-        $isExistLottery = $this->eloqM::where('lotteries_id', $lotteriesId)->where('id', '!=', $id)->exists();
-        if ($isExistLottery === true) {
-            return ['success' => false, 'code' => '102012'];
-        }
-        //检查彩种是否合法
-        $isValidLottery = FrontendLotteryFnfBetableMethod::where('lottery_id', $lotteriesId)->exists();
-        if ($isValidLottery === false) {
-            return ['success' => false, 'code' => '102015'];
-        }
-        //检查玩法是否合法
-        $isValidMethod = FrontendLotteryFnfBetableMethod::find($methodId);
-        if (is_null($isValidMethod)) {
-            return ['success' => false, 'code' => '102013'];
-        }
         //检查玩法与彩种是否匹配
         if ($isValidMethod->lottery_id !== $lotteriesId) {
             return ['success' => false, 'code' => '102015'];

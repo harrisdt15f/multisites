@@ -23,7 +23,7 @@ class AdvertisementTypeController extends BackEndApiMainController
     public function edit(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:frontend_info_categories,id',
             'status' => 'in:0,1',
             'l_size' => 'gt:0',
             'w_size' => 'gt:0',
@@ -33,10 +33,6 @@ class AdvertisementTypeController extends BackEndApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $editData = $this->eloqM::find($this->inputs['id']);
-        if (is_null($editData)) {
-            return $this->msgOut(false, [], '100400');
-        }
-        unset($this->inputs['id']);
         $this->editAssignment($editData, $this->inputs);
         try {
             $editData->save();
