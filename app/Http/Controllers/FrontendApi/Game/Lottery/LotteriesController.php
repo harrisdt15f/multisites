@@ -8,7 +8,7 @@ use App\Lib\Locker\AccountLocker;
 use App\Lib\Logic\AccountChange;
 use App\Models\Game\Lottery\LotteryIssue;
 use App\Models\Game\Lottery\LotteryList;
-use App\Models\LotteryMethod;
+use App\Models\Game\Lottery\LotteryMethod;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
