@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-05-30 14:28:04
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-07 14:39:05
+ * @Last Modified time: 2019-06-13 11:38:16
  */
 namespace App\Http\Controllers\BackendApi\DeveloperUsage\MethodLevel;
 
@@ -34,7 +34,7 @@ class MethodLevelController extends BackEndApiMainController
     public function add()
     {
         $validator = Validator::make($this->inputs, [
-            'method_id' => 'required|string',
+            'method_id' => 'required|string|exists:lottery_methods,id',
             'level' => 'required|numeric|gt:0|lt:11',
             'position' => 'required|string',
             'count' => 'required|numeric',
@@ -42,11 +42,6 @@ class MethodLevelController extends BackEndApiMainController
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        //检查玩法
-        $checkMethods = LotteryMethod::where('method_id', $this->inputs['method_id'])->first();
-        if (is_null($checkMethods)) {
-            return $this->msgOut(false, [], '102200');
         }
         //检查玩法等级
         $checkMethodLevel = $this->eloqM::where('method_id', $this->inputs['method_id'])->where('level', $this->inputs['level'])->first();
@@ -71,7 +66,7 @@ class MethodLevelController extends BackEndApiMainController
     public function edit()
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:lottery_methods_ways_levels,id',
             'level' => 'required|numeric|gt:0|lt:11',
             'position' => 'required|string',
             'count' => 'required|numeric',
@@ -81,9 +76,6 @@ class MethodLevelController extends BackEndApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastDataEloq = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastDataEloq)) {
-            return $this->msgOut(false, [], '102201');
-        }
         //检查玩法等级
         $checkMethodLevel = $this->eloqM::where('method_id', $pastDataEloq->method_id)->where('level', $this->inputs['level'])->where('id', '!=', $this->inputs['id'])->first();
         if (!is_null($checkMethodLevel)) {
@@ -106,15 +98,12 @@ class MethodLevelController extends BackEndApiMainController
     public function delete()
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:lottery_methods_ways_levels,id',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastDataEloq = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastDataEloq)) {
-            return $this->msgOut(false, [], '102201');
-        }
         try {
             $pastDataEloq->delete();
             //删除玩法等级列表缓存

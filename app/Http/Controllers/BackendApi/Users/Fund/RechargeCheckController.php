@@ -40,7 +40,7 @@ class RechargeCheckController extends BackEndApiMainController
     public function auditSuccess()
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:backend_admin_rechargehuman_logs,id',
             'auditor_note' => 'required|string',
         ]);
         if ($validator->fails()) {
@@ -48,9 +48,6 @@ class RechargeCheckController extends BackEndApiMainController
         }
         // 审核表
         $rechargeLog = $this->eloqM::find($this->inputs['id']);
-        if (is_null($rechargeLog)) {
-            return $this->msgOut(false, [], '100904');
-        }
         $auditFlow = BackendAdminAuditFlowList::where('id', $rechargeLog->audit_flow_id)->first();
         if (is_null($auditFlow)) {
             return $this->msgOut(false, [], '100905');
@@ -108,7 +105,7 @@ class RechargeCheckController extends BackEndApiMainController
     public function auditFailure()
     {
         $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
+            'id' => 'required|numeric|exists:backend_admin_rechargehuman_logs,id',
             'auditor_note' => 'required|string',
         ]);
         if ($validator->fails()) {
