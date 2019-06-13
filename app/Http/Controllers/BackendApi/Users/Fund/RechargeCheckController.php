@@ -50,7 +50,7 @@ class RechargeCheckController extends BackEndApiMainController
         $rechargeLog = $this->eloqM::find($this->inputs['id']);
         $auditFlow = BackendAdminAuditFlowList::where('id', $rechargeLog->audit_flow_id)->first();
         if (is_null($auditFlow)) {
-            return $this->msgOut(false, [], '100905');
+            return $this->msgOut(false, [], '100904');
         }
         if ($rechargeLog->status !== 0) {
             return $this->msgOut(false, [], '100900');

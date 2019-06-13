@@ -89,7 +89,7 @@ class PopularLotteriesController extends BackEndApiMainController
         //检查该热门类型是否存在重复彩票
         $checkData = $this->eloqM::where('lotteries_id', $this->inputs['lotteries_id'])->where('id', '!=', $this->inputs['id'])->first();
         if (!is_null($checkData)) {
-            return $this->msgOut(false, [], '102010');
+            return $this->msgOut(false, [], '102000');
         }
         //修改了图片的操作
         if (isset($this->inputs['pic'])) {

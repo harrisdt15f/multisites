@@ -58,12 +58,12 @@ class ArtificialRechargeController extends BackEndApiMainController
                 //扣除管理员额度
                 $adminFundData = BackendAdminRechargePocessAmount::where('admin_id', $partnerAdmin->id)->first();
                 if (is_null($adminFundData)) {
-                    return $this->msgOut(false, [], '101101');
+                    return $this->msgOut(false, [], '101100');
                 }
                 $adminOperationFund = $adminFundData->fund;
                 //可操作额度小于充值额度
                 if ($adminOperationFund < $this->inputs['amount']) {
-                    return $this->msgOut(false, [], '101102');
+                    return $this->msgOut(false, [], '101101');
                 }
                 $newFund = $adminOperationFund - $this->inputs['amount'];
                 $adminFundEdit = ['fund' => $newFund];
@@ -92,7 +92,7 @@ class ArtificialRechargeController extends BackEndApiMainController
                 //充值失败回滚
                 if ($editStatus === 0) {
                     DB::rollBack();
-                    return $this->msgOut(false, [], '101103');
+                    return $this->msgOut(false, [], '101102');
                 }
                 //用户帐变表
                 $accountChangeReportEloq = new AccountChangeReport();

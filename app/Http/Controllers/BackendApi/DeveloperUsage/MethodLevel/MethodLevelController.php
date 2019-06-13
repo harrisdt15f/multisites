@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-05-30 14:28:04
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-13 11:38:16
+ * @Last Modified time: 2019-06-13 16:40:54
  */
 namespace App\Http\Controllers\BackendApi\DeveloperUsage\MethodLevel;
 
@@ -79,7 +79,7 @@ class MethodLevelController extends BackEndApiMainController
         //检查玩法等级
         $checkMethodLevel = $this->eloqM::where('method_id', $pastDataEloq->method_id)->where('level', $this->inputs['level'])->where('id', '!=', $this->inputs['id'])->first();
         if (!is_null($checkMethodLevel)) {
-            return $this->msgOut(false, [], '102202');
+            return $this->msgOut(false, [], '102200');
         }
         try {
             $this->editAssignment($pastDataEloq, $this->inputs);

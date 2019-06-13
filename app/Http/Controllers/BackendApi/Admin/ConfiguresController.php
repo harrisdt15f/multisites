@@ -122,7 +122,7 @@ class ConfiguresController extends BackEndApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         if ($this->inputs['parent_id'] == 0) {
-            return $this->msgOut(false, [], '100702');
+            return $this->msgOut(false, [], '100701');
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
         try {
@@ -157,7 +157,7 @@ class ConfiguresController extends BackEndApiMainController
             } else {
                 $bool = $this->createIssueConfigure($this->inputs['value']);
                 if ($bool === false) {
-                    return $this->msgOut(false, [], '100703');
+                    return $this->msgOut(false, [], '100702');
                 }
             }
             return $this->msgOut(true);

@@ -77,9 +77,6 @@ class RouteController extends BackEndApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastEloq = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastEloq)) {
-            return $this->msgOut(false, [], '101401');
-        }
         try {
             $pastEloq->delete();
             return $this->msgOut(true);

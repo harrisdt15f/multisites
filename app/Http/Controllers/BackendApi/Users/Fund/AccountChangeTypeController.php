@@ -55,14 +55,11 @@ class AccountChangeTypeController extends BackEndApiMainController
             return $this->msgout(false, [], '400', $validator->errors()->first());
         }
         $pastEloq = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastEloq)) {
-            return $this->msgout(false, [], '101200');
-        }
         $checkData = $this->eloqM::where(function ($query) {
             $query->where('sign', $this->inputs['sign'])->where('id', '!=', $this->inputs['id']);
         })->first();
         if (!is_null($checkData)) {
-            return $this->msgout(false, [], '101201');
+            return $this->msgout(false, [], '101200');
         }
         $editData = $this->inputs;
         unset($editData['id']);
