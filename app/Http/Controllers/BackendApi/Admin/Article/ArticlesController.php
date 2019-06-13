@@ -32,7 +32,7 @@ class ArticlesController extends BackEndApiMainController
     public function addArticles(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'category_id' => 'required|numeric',
+            'category_id' => 'required|numeric|exists:frontend_info_categories,id',
             'title' => 'required|string|unique:backend_admin_message_articles,title',
             'summary' => 'required|string',
             'content' => 'required|string',
@@ -50,26 +50,22 @@ class ArticlesController extends BackEndApiMainController
             $auditFlowId = $this->insertAuditFlow($this->inputs['apply_note']);
             //插入 BackendAdminMessageArticle 文章表
             $addDatas = $this->inputs;
+            $addDatas['audit_flow_id'] = $auditFlowId;
             unset($addDatas['pic_name']);
-            $sortdata = $this->eloqM::orderBy('sort', 'desc')->first();
-            if (is_null($sortdata)) {
-                $sort = 1;
-            } else {
-                $sort = $sortdata['sort'] + 1;
-            }
+            $maxSort = $this->eloqM::max('sort');
+            $sort = is_null($maxSort) ? 1 : $maxSort++;
             $addDatas['sort'] = $sort;
             $addDatas['status'] = 0;
             $addDatas['add_admin_id'] = $this->partnerAdmin['id'];
             $addDatas['last_update_admin_id'] = $this->partnerAdmin['id'];
-            if (array_key_exists('pic_path', $this->inputs) && !empty($this->inputs['pic_path'])) {
+            if (isset($this->inputs['pic_path']) && !empty($this->inputs['pic_path'])) {
                 $addDatas['pic_path'] = implode('|', $this->inputs['pic_path']);
             }
             $articlesEloq = new $this->eloqM();
-            $addDatas['audit_flow_id'] = $auditFlowId;
             $articlesEloq->fill($addDatas);
             $articlesEloq->save();
             //文章发布成功  销毁缓存
-            if (array_key_exists('pic_path', $this->inputs)) {
+            if (isset($this->inputs['pic_path'])) {
                 $this->deleteCachePic($this->inputs['pic_name']);
             }
             //发送站内消息给管理员审核
@@ -87,7 +83,7 @@ class ArticlesController extends BackEndApiMainController
     {
         $validator = Validator::make($this->inputs, [
             'id' => 'required|numeric|exists:backend_admin_message_articles,id',
-            'category_id' => 'required|numeric',
+            'category_id' => 'required|numeric|exists:frontend_info_categories,id',
             'title' => 'required|string',
             'summary' => 'required|string',
             'content' => 'required|string',
@@ -112,7 +108,6 @@ class ArticlesController extends BackEndApiMainController
             //
             $pastPicPath = $pastEloq->pic_path;
             $editDatas = $this->inputs;
-            unset($editDatas['pic_name']);
             unset($editDatas['pic_name']);
             unset($editDatas['apply_note']);
             $this->editAssignment($pastEloq, $editDatas);
@@ -172,8 +167,8 @@ class ArticlesController extends BackEndApiMainController
     public function sortArticles(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'front_id' => 'required|numeric|gt:0',
-            'rearways_id' => 'required|numeric|gt:0',
+            'front_id' => 'required|numeric|exists:backend_admin_message_articles,id',
+            'rearways_id' => 'required|numeric|exists:backend_admin_message_articles,id',
             'front_sort' => 'required|numeric|gt:0',
             'rearways_sort' => 'required|numeric|gt:0',
             'sort_type' => 'required|numeric|in:1,2',
@@ -181,21 +176,16 @@ class ArticlesController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $pastFrontData = $this->eloqM::find($this->inputs['front_id']);
-        $pastRearwaysData = $this->eloqM::find($this->inputs['rearways_id']);
-        if (is_null($pastFrontData) || is_null($pastRearwaysData)) {
-            return $this->msgOut(false, [], '100501');
-        }
         DB::beginTransaction();
         try {
             //上拉排序
             if ($this->inputs['sort_type'] == 1) {
-                $stationaryData = $pastFrontData;
+                $stationaryData = $this->eloqM::find($this->inputs['front_id']);
                 $stationaryData->sort = $this->inputs['front_sort'];
                 $this->eloqM::where('sort', '>=', $this->inputs['front_sort'])->where('sort', '<', $this->inputs['rearways_sort'])->increment('sort');
                 //下拉排序
             } elseif ($this->inputs['sort_type'] == 2) {
-                $stationaryData = $pastRearwaysData;
+                $stationaryData = $this->eloqM::find($this->inputs['rearways_id']);
                 $stationaryData->sort = $this->inputs['rearways_sort'];
                 $this->eloqM::where('sort', '>', $this->inputs['front_sort'])->where('sort', '<=', $this->inputs['rearways_sort'])->decrement('sort');
             }

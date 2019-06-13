@@ -54,9 +54,9 @@ class FundOperationController extends BackEndApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $admin_user = BackendAdminUser::find($this->inputs['id']);
-        $FundOperationAdmin = BackendAdminRechargePocessAmount::where('admin_id', $this->inputs['id'])->first();
-        if (is_null($FundOperationAdmin)) {
-            return $this->msgOut(false, [], '101301');
+        $fundOperationAdmin = BackendAdminRechargePocessAmount::where('admin_id', $this->inputs['id'])->first();
+        if (is_null($fundOperationAdmin)) {
+            return $this->msgOut(false, [], '101300');
         }
         //查看该管理员今日 手动添加的充值额度
         $checkFund = $this->rechargeFundToday($this->inputs['id'], $this->inputs['fund']);
@@ -65,10 +65,10 @@ class FundOperationController extends BackEndApiMainController
         }
         DB::beginTransaction();
         try {
-            $newFund = $FundOperationAdmin->fund + $this->inputs['fund'];
-            $AdminEditData = ['fund' => $newFund];
-            $FundOperationAdmin->fill($AdminEditData);
-            $FundOperationAdmin->save();
+            $newFund = $fundOperationAdmin->fund + $this->inputs['fund'];
+            $adminEditData = ['fund' => $newFund];
+            $fundOperationAdmin->fill($adminEditData);
+            $fundOperationAdmin->save();
             $comment = '[人工充值额度操作]==>+' . $this->inputs['fund'] . '|[目前额度]==>' . $newFund;
             $partnerAdmin = $this->partnerAdmin;
             $type = BackendAdminRechargehumanLog::SUPERADMIN;
@@ -96,14 +96,14 @@ class FundOperationController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $SysConfiguresEloq = SystemConfiguration::where('sign', 'admin_recharge_daily_limit')->first();
-        if (is_null($SysConfiguresEloq)) {
-            return $this->msgOut(false, [], '101302');
+        $sysConfiguresEloq = SystemConfiguration::where('sign', 'admin_recharge_daily_limit')->first();
+        if (is_null($sysConfiguresEloq)) {
+            return $this->msgOut(false, [], '101301');
         }
         try {
             $editData = ['value' => $this->inputs['fund']];
-            $SysConfiguresEloq->fill($editData);
-            $SysConfiguresEloq->save();
+            $sysConfiguresEloq->fill($editData);
+            $sysConfiguresEloq->save();
             return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();

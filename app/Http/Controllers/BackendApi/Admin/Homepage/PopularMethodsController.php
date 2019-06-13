@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-04 14:38:55
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-12 20:38:04
+ * @Last Modified time: 2019-06-13 15:33:30
  */
 namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
@@ -52,12 +52,8 @@ class PopularMethodsController extends BackEndApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         //sort
-        $maxSort = $this->eloqM::orderBy('sort', 'desc')->first();
-        if (is_null($maxSort)) {
-            $sort = 1;
-        } else {
-            $sort = $maxSort->sort + 1;
-        }
+        $maxSort = $this->eloqM::max('sort');
+        $sort = is_null($maxSort) ? 1 : $maxSort++;
         $addData = [
             'lotteries_id' => $this->inputs['lotteries_id'],
             'method_id' => $this->inputs['method_id'],
@@ -92,7 +88,7 @@ class PopularMethodsController extends BackEndApiMainController
         //彩种是否已存在
         $isExistLottery = $this->eloqM::where('lotteries_id', $this->inputs['lotteries_id'])->where('id', '!=', $this->inputs['id'])->exists();
         if ($isExistLottery === true) {
-            return $this->msgOut(false, [], '102012');
+            return $this->msgOut(false, [], '100600');
         }
         try {
             $this->editAssignment($pastDataEloq, $this->inputs);

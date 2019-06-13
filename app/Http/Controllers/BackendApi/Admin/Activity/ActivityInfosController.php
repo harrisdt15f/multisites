@@ -29,27 +29,14 @@ class ActivityInfosController extends BackEndApiMainController
             'title' => 'required|unique:frontend_activity_contents,title',
             'content' => 'required',
             'pic' => 'required|image|mimes:jpeg,png,jpg',
-            'start_time' => 'date_format:Y-m-d H:i:s',
-            'end_time' => 'date_format:Y-m-d H:i:s',
+            'start_time' => 'date_format:Y-m-d H:i:s|required_if:is_time_interval,1',
+            'end_time' => 'date_format:Y-m-d H:i:s|required_if:is_time_interval,1',
             'status' => 'required',
             'redirect_url' => 'required',
             'is_time_interval' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        //活动是否永久 与 开始结束时间 的处理
-        if ($this->inputs['is_time_interval'] == 1) {
-            if (!array_key_exists('start_time', $this->inputs) || !array_key_exists('end_time', $this->inputs)) {
-                return $this->msgOut(false, [], '100303');
-            }
-        } elseif ($this->inputs['is_time_interval'] == 0) {
-            if (array_key_exists('start_time', $this->inputs)) {
-                unset($this->inputs['start_time']);
-            }
-            if (array_key_exists('end_time', $this->inputs)) {
-                unset($this->inputs['end_time']);
-            }
         }
         //接收文件信息
         $ImageClass = new ImageArrange();
@@ -62,12 +49,8 @@ class ActivityInfosController extends BackEndApiMainController
         //生成缩略图
         $thumbnail_path = $ImageClass->creatThumbnail($pic['path'], 100, 200, 'sm_');
         //sort
-        $sortdata = $this->eloqM::orderBy('sort', 'desc')->first();
-        if (is_null($sortdata)) {
-            $sort = 1;
-        } else {
-            $sort = $sortdata->sort + 1;
-        }
+        $maxSort = $this->eloqM::max('sort');
+        $sort = is_null($maxSort) ? 1 : $maxSort++;
         $addDatas = $this->inputs;
         unset($addDatas['pic']);
         $addDatas['sort'] = $sort;
@@ -99,23 +82,14 @@ class ActivityInfosController extends BackEndApiMainController
             'title' => 'required',
             'content' => 'required',
             'pic' => 'image|mimes:jpeg,png,jpg',
-            'start_time' => 'date_format:Y-m-d H:i:s',
-            'end_time' => 'date_format:Y-m-d H:i:s',
+            'start_time' => 'date_format:Y-m-d H:i:s|required_if:is_time_interval,1',
+            'end_time' => 'date_format:Y-m-d H:i:s|required_if:is_time_interval,1',
             'status' => 'required',
             'redirect_url' => 'required',
             'is_time_interval' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        //活动是否永久 与 开始结束时间 的处理
-        if ($this->inputs['is_time_interval'] == 1) {
-            if (!array_key_exists('start_time', $this->inputs) || !array_key_exists('end_time', $this->inputs)) {
-                return $this->msgOut(false, [], '100303');
-            }
-        } elseif ($this->inputs['is_time_interval'] == 0) {
-            $this->inputs['start_time'] = null;
-            $this->inputs['end_time'] = null;
         }
         $pastData = $this->eloqM::where('title', $this->inputs['title'])->where('id', '!=', $this->inputs['id'])->first();
         if (!is_null($pastData)) {
@@ -125,7 +99,6 @@ class ActivityInfosController extends BackEndApiMainController
         $editData = $this->inputs;
         //如果修改了图片 上传新图片
         if (isset($this->inputs['pic'])) {
-            //
             unset($editData['pic']);
             $pastPic = $editDataEloq->pic_path;
             $pastThumbnail = $editDataEloq->thumbnail_path;

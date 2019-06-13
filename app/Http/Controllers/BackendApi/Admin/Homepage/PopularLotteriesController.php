@@ -45,12 +45,8 @@ class PopularLotteriesController extends BackEndApiMainController
         }
         $checkLotterie = $this->eloqM::where('lotteries_id', $this->inputs['lotteries_id'])->first();
         //sort
-        $maxSort = $this->eloqM::orderBy('sort', 'desc')->value('sort');
-        if (is_null($maxSort)) {
-            $sort = 1;
-        } else {
-            $sort = $maxSort + 1;
-        }
+        $maxSort = $this->eloqM::max('sort');
+        $sort = is_null($maxSort) ? 1 : $maxSort++;
         //上传图片
         $imgClass = new ImageArrange();
         $depositPath = $imgClass->depositPath('popular_lotteries', $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);

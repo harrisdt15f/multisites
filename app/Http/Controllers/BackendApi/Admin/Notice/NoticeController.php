@@ -42,12 +42,8 @@ class NoticeController extends BackEndApiMainController
         //admin_id
         $addData['admin_id'] = $this->partnerAdmin->id;
         //sort
-        $sortdata = $this->eloqM::orderBy('sort', 'desc')->first();
-        if (is_null($sortdata)) {
-            $addData['sort'] = 1;
-        } else {
-            $addData['sort'] = $sortdata['sort'] + 1;
-        }
+        $maxSort = $this->eloqM::max('sort');
+        $addData['sort'] = is_null($maxSort) ? 1 : $maxSort++;
         try {
             $noticeEloq = new $this->eloqM;
             $noticeEloq->fill($addData);

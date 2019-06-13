@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Validator;
 class HomepageRotationChartController extends BackEndApiMainController
 {
     protected $eloqM = 'Admin\Homepage\FrontendPageBanner';
-
+    protected $folderName = 'Homepagec_Rotation_chart';
     //首页轮播图列表
     public function detail(): JsonResponse
     {
@@ -42,7 +42,7 @@ class HomepageRotationChartController extends BackEndApiMainController
         }
         //上传图片
         $imageClass = new ImageArrange();
-        $folderName = 'Homepagec_Rotation_chart';
+        $folderName = $this->folderName;
         $depositPath = $imageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
         $pic = $imageClass->uploadImg($this->inputs['pic'], $depositPath);
         if ($pic['success'] === false) {
@@ -55,12 +55,8 @@ class HomepageRotationChartController extends BackEndApiMainController
         $addData['pic_path'] = '/' . $pic['path'];
         $addData['thumbnail_path'] = '/' . $thumbnail;
         //sort
-        $maxSort = $this->eloqM::orderBy('sort', 'desc')->first();
-        if (is_null($maxSort)) {
-            $addData['sort'] = 1;
-        } else {
-            $addData['sort'] = $maxSort->sort + 1;
-        }
+        $maxSort = $this->eloqM::max('sort');
+        $addData['sort'] = is_null($maxSort) ? 1 : $maxSort++;
         try {
             $rotationChartEloq = new $this->eloqM;
             $rotationChartEloq->fill($addData);
@@ -104,7 +100,7 @@ class HomepageRotationChartController extends BackEndApiMainController
         unset($editData['id']);
         unset($editData['pic']);
         //如果要修改图片  删除原图  上传新图
-        if (array_key_exists('pic', $this->inputs)) {
+        if (isset($this->inputs['pic'])) {
             $imageClass = new ImageArrange();
             $picData = $this->replaceImage($pastData['pic_path'], $pastData['thumbnail_path'], $this->inputs['pic'], $imageClass);
             if ($picData['success'] === false) {
@@ -162,8 +158,8 @@ class HomepageRotationChartController extends BackEndApiMainController
     public function sort(): JsonResponse
     {
         $validator = Validator::make($this->inputs, [
-            'front_id' => 'required|numeric|gt:0',
-            'rearways_id' => 'required|numeric|gt:0',
+            'front_id' => 'required|numeric|exists:frontend_page_banners,id',
+            'rearways_id' => 'required|numeric|exists:frontend_page_banners,id',
             'front_sort' => 'required|numeric|gt:0',
             'rearways_sort' => 'required|numeric|gt:0',
             'sort_type' => 'required|numeric|in:1,2',
@@ -171,21 +167,16 @@ class HomepageRotationChartController extends BackEndApiMainController
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $pastFrontData = $this->eloqM::find($this->inputs['front_id']);
-        $pastRearwaysData = $this->eloqM::find($this->inputs['rearways_id']);
-        if (is_null($pastFrontData) || is_null($pastRearwaysData)) {
-            return $this->msgOut(false, [], '101807');
-        }
         DB::beginTransaction();
         try {
             //上拉排序
             if ($this->inputs['sort_type'] == 1) {
-                $stationaryData = $pastFrontData;
+                $stationaryData = $this->eloqM::find($this->inputs['front_id']);
                 $stationaryData->sort = $this->inputs['front_sort'];
                 $this->eloqM::where('sort', '>=', $this->inputs['front_sort'])->where('sort', '<', $this->inputs['rearways_sort'])->increment('sort');
                 //下拉排序
             } elseif ($this->inputs['sort_type'] == 2) {
-                $stationaryData = $pastRearwaysData;
+                $stationaryData = $this->eloqM::find($this->inputs['rearways_id']);
                 $stationaryData->sort = $this->inputs['rearways_sort'];
                 $this->eloqM::where('sort', '>', $this->inputs['front_sort'])->where('sort', '<=', $this->inputs['rearways_sort'])->decrement('sort');
             }
@@ -220,13 +211,13 @@ class HomepageRotationChartController extends BackEndApiMainController
     {
         $imageClass->deletePic(substr($pastImg, 1));
         $imageClass->deletePic(substr($thumbnail, 1));
-        $folderName = 'Homepagec_Rotation_chart';
+        $folderName = $this->folderName;
         $depositPath = $imageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
         $picData = $imageClass->uploadImg($newImg, $depositPath);
         if ($picData['success'] === true) {
             return $picData;
         } else {
-            return ['success' => false, 'code' => '101803'];
+            return ['success' => false, 'code' => '101801'];
         }
     }
 

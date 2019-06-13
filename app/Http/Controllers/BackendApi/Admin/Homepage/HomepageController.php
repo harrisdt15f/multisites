@@ -43,13 +43,13 @@ class HomepageController extends BackEndApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $pastData = $this->eloqM::find($this->inputs['id']);
-        if (array_key_exists('status', $this->inputs)) {
+        if (isset($this->inputs['status'])) {
             $pastData->status = $this->inputs['status'];
         }
-        if (array_key_exists('value', $this->inputs)) {
+        if (isset($this->inputs['value'])) {
             $pastData->value = $this->inputs['value'];
         }
-        if (array_key_exists('show_num', $this->inputs)) {
+        if (isset($this->inputs['show_num'])) {
             $pastData->show_num = $this->inputs['show_num'];
         }
         try {
@@ -118,7 +118,7 @@ class HomepageController extends BackEndApiMainController
         }
         $pastData = $this->eloqM::where('en_name', 'frontend.ico')->first();
         if (is_null($pastData)) {
-            return $this->msgOut(false, [], '101905');
+            return $this->msgOut(false, [], '101900');
         }
         //上传ico
         $imageClass = new ImageArrange();
