@@ -4,13 +4,13 @@
  * @Author: LingPh
  * @Date:   2019-06-13 20:09:49
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-13 20:12:01
+ * @Last Modified time: 2019-06-14 19:13:12
  */
 namespace App\Http\Requests\Backend\Admin\Activity;
 
 use App\Http\Requests\BaseFormRequest;
 
-class ActivityDeleteRequest extends BaseFormRequest
+class ActivityInfosDeleteRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

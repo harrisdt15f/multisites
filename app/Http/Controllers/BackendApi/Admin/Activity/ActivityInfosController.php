@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\BackendApi\Admin\Activity;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Http\Requests\Backend\Admin\Activity\ActivityAddRequest;
-use App\Http\Requests\Backend\Admin\Activity\ActivityDeleteRequest;
-use App\Http\Requests\Backend\Admin\Activity\ActivityEditRequest;
-use App\Http\Requests\Backend\Admin\Activity\ActivitySortRequest;
+use App\Http\Requests\Backend\Admin\Activity\ActivityInfosAddRequest;
+use App\Http\Requests\Backend\Admin\Activity\ActivityInfosDeleteRequest;
+use App\Http\Requests\Backend\Admin\Activity\ActivityInfosEditRequest;
+use App\Http\Requests\Backend\Admin\Activity\ActivityInfosSortRequest;
 use App\Lib\Common\ImageArrange;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -26,7 +26,7 @@ class ActivityInfosController extends BackEndApiMainController
     }
 
     //添加活动
-    public function add(ActivityAddRequest $request): JsonResponse
+    public function add(ActivityInfosAddRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         //接收文件信息
@@ -66,7 +66,7 @@ class ActivityInfosController extends BackEndApiMainController
     }
 
     //编辑活动
-    public function edit(ActivityEditRequest $request): JsonResponse
+    public function edit(ActivityInfosEditRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         $pastData = $this->eloqM::where('title', $inputDatas['title'])->where('id', '!=', $inputDatas['id'])->first();
@@ -111,7 +111,7 @@ class ActivityInfosController extends BackEndApiMainController
     }
 
     //删除活动
-    public function delete(ActivityDeleteRequest $request)
+    public function delete(ActivityInfosDeleteRequest $request)
     {
         $inputDatas = $request->validated();
         $pastData = $this->eloqM::find($inputDatas['id']);
@@ -138,7 +138,7 @@ class ActivityInfosController extends BackEndApiMainController
     }
 
     //活动排序
-    public function sort(ActivitySortRequest $request): JsonResponse
+    public function sort(ActivityInfosSortRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         DB::beginTransaction();

@@ -118,13 +118,13 @@ class ConfiguresController extends BackEndApiMainController
         $pastDataEloq = $this->eloqM::where('sign', 'generate_issue_time')->first();
         try {
             if (!is_null($pastDataEloq)) {
-                $pastDataEloq->value = $$inputDatas['value'];
+                $pastDataEloq->value = $inputDatas['value'];
                 $pastDataEloq->save();
                 if (Cache::has('generateIssueTime')) {
                     Cache::forget('generateIssueTime');
                 }
             } else {
-                $bool = $this->createIssueConfigure($$inputDatas['value']);
+                $bool = $this->createIssueConfigure($inputDatas['value']);
                 if ($bool === false) {
                     return $this->msgOut(false, [], '100702');
                 }

@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-04 14:38:55
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 17:52:23
+ * @Last Modified time: 2019-06-14 19:26:17
  */
 namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
@@ -165,21 +165,5 @@ class PopularMethodsController extends BackEndApiMainController
         if (Cache::has('popularMethods')) {
             Cache::forget('popularMethods');
         }
-    }
-
-    /**
-     * 检查数据是否合法
-     * @param  [int] $lotteriesId [彩票id]
-     * @param  [int] $methodId    [玩法id]
-     * @param  [int] $id          [热门彩票2 id]
-     * @return [array]
-     */
-    public function checkData($lotteriesId, $methodId, $id = null)
-    {
-        //检查玩法与彩种是否匹配
-        if ($isValidMethod->lottery_id !== $lotteriesId) {
-            return ['success' => false, 'code' => '102015'];
-        }
-        return ['success' => true];
     }
 }

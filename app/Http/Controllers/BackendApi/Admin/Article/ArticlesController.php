@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\BackendApi\Admin\Article;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Http\Requests\Backend\Admin\Article\ArticlesAddArticlesRequest;
-use App\Http\Requests\Backend\Admin\Article\ArticlesDeleteArticlesRequest;
-use App\Http\Requests\Backend\Admin\Article\ArticlesEditArticlesRequest;
-use App\Http\Requests\Backend\Admin\Article\ArticlesSortArticlesRequest;
-use App\Http\Requests\Backend\Admin\Article\ArticlesTopArticlesRequest;
+use App\Http\Requests\Backend\Admin\Article\ArticlesAddRequest;
+use App\Http\Requests\Backend\Admin\Article\ArticlesDeleteRequest;
+use App\Http\Requests\Backend\Admin\Article\ArticlesEditRequest;
+use App\Http\Requests\Backend\Admin\Article\ArticlesSortRequest;
+use App\Http\Requests\Backend\Admin\Article\ArticlesTopRequest;
 use App\Http\Requests\Backend\Admin\Article\ArticlesUploadPicRequest;
 use App\Lib\Common\ImageArrange;
 use App\Lib\Common\InternalNoticeMessage;
@@ -35,7 +35,7 @@ class ArticlesController extends BackEndApiMainController
         return $this->msgOut(true, $datas);
     }
     //发布文章
-    public function addArticles(ArticlesAddArticlesRequest $request): JsonResponse
+    public function add(ArticlesAddRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         try {
@@ -72,7 +72,7 @@ class ArticlesController extends BackEndApiMainController
     }
 
     //编辑文章
-    public function editArticles(ArticlesEditArticlesRequest $request): JsonResponse
+    public function edit(ArticlesEditRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         $issetTitle = $this->eloqM::where('title', $inputDatas['title'])->where('id', '!=', $inputDatas['id'])->exists();
@@ -115,7 +115,7 @@ class ArticlesController extends BackEndApiMainController
     }
 
     //删除文章
-    public function deleteArticles(ArticlesDeleteArticlesRequest $request): JsonResponse
+    public function delete(ArticlesDeleteRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         $pastData = $this->eloqM::find($inputDatas['id']);
@@ -138,7 +138,7 @@ class ArticlesController extends BackEndApiMainController
     }
 
     //文章排序
-    public function sortArticles(ArticlesSortArticlesRequest $request): JsonResponse
+    public function sort(ArticlesSortRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         DB::beginTransaction();
@@ -166,7 +166,7 @@ class ArticlesController extends BackEndApiMainController
     }
 
     //文章置顶
-    public function topArticles(ArticlesTopArticlesRequest $request): JsonResponse
+    public function top(ArticlesTopRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         $validator = Validator::make($inputDatas, [

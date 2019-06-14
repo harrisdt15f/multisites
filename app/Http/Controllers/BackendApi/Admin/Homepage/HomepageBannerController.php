@@ -21,7 +21,6 @@ class HomepageBannerController extends BackEndApiMainController
     //首页轮播图列表
     public function detail(): JsonResponse
     {
-        $searchAbleFields = ['title', 'type'];
         $data = $this->eloqM::orderBy('sort', 'asc')->get()->toArray();
         return $this->msgOut(true, $data);
     }
@@ -71,7 +70,6 @@ class HomepageBannerController extends BackEndApiMainController
             return $this->msgOut(false, [], '101800');
         }
         $editData = $inputDatas;
-        unset($editData['id']);
         unset($editData['pic']);
         //如果要修改图片  删除原图  上传新图
         if (isset($inputDatas['pic'])) {

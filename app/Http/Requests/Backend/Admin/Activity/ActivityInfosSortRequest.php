@@ -4,13 +4,13 @@
  * @Author: LingPh
  * @Date:   2019-06-13 20:13:40
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-13 20:14:07
+ * @Last Modified time: 2019-06-14 19:15:38
  */
 namespace App\Http\Requests\Backend\Admin\Activity;
 
 use App\Http\Requests\BaseFormRequest;
 
-class ActivitySortRequest extends BaseFormRequest
+class ActivityInfosSortRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
