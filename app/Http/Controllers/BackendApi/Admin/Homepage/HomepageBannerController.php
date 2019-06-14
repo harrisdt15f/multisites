@@ -3,15 +3,18 @@
 namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Http\Requests\Backend\Admin\Homepage\HomepageBannerAddRequest;
+use App\Http\Requests\Backend\Admin\Homepage\HomepageBannerDeleteRequest;
+use App\Http\Requests\Backend\Admin\Homepage\HomepageBannerEditRequest;
+use App\Http\Requests\Backend\Admin\Homepage\HomepageBannerSortRequest;
 use App\Lib\Common\ImageArrange;
 use App\Models\Admin\Activity\FrontendActivityContent;
 use App\Models\Advertisement\FrontendSystemAdsType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
-class HomepageRotationChartController extends BackEndApiMainController
+class HomepageBannerController extends BackEndApiMainController
 {
     protected $eloqM = 'Admin\Homepage\FrontendPageBanner';
     protected $folderName = 'Homepagec_Rotation_chart';
@@ -24,33 +27,20 @@ class HomepageRotationChartController extends BackEndApiMainController
     }
 
     //添加首页轮播图
-    public function add(): JsonResponse
+    public function add(HomepageBannerAddRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'title' => 'required|string|unique:frontend_page_banners,title',
-            'content' => 'required|string',
-            'pic' => 'required|image',
-            'type' => 'required|numeric|in:1,2',
-            'redirect_url' => 'string|required_if:type,1',
-            'activity_id' => 'numeric|required_if:type,2|exists:frontend_activity_contents,id',
-            'status' => 'required|numeric|in:0,1',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         //上传图片
         $imageClass = new ImageArrange();
         $folderName = $this->folderName;
         $depositPath = $imageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
-        $pic = $imageClass->uploadImg($this->inputs['pic'], $depositPath);
+        $pic = $imageClass->uploadImg($inputDatas['pic'], $depositPath);
         if ($pic['success'] === false) {
             return $this->msgOut(false, [], '400', $pic['msg']);
         }
         //生成缩略图
         $thumbnail = $imageClass->creatThumbnail($pic['path'], 100, 200, 'sm_');
-        $addData = $this->inputs;
+        $addData = $inputDatas;
         unset($addData['pic']);
         $addData['pic_path'] = '/' . $pic['path'];
         $addData['thumbnail_path'] = '/' . $thumbnail;
@@ -72,37 +62,21 @@ class HomepageRotationChartController extends BackEndApiMainController
     }
 
     //编辑首页轮播图
-    public function edit(): JsonResponse
+    public function edit(HomepageBannerEditRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:frontend_page_banners,id',
-            'title' => 'required|string',
-            'content' => 'required|string',
-            'pic' => 'image',
-            'redirect_url' => 'string|required_if:type,1',
-            'activity_id' => 'numeric|required_if:type,2|exists:frontend_activity_contents,id',
-            'status' => 'required|numeric|in:0,1',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastData = $this->eloqM::find($this->inputs['id']);
-        $checkTitle = $this->eloqM::where(function ($query) {
-            $query->where('title', $this->inputs['title'])
-                ->where('id', '!=', $this->inputs['id']);
-        })->first();
+        $inputDatas = $request->validated();
+        $pastData = $this->eloqM::find($inputDatas['id']);
+        $checkTitle = $this->eloqM::where('title', $inputDatas['title'])->where('id', '!=', $inputDatas['id'])->first();
         if (!is_null($checkTitle)) {
             return $this->msgOut(false, [], '101800');
         }
-        $editData = $this->inputs;
+        $editData = $inputDatas;
         unset($editData['id']);
         unset($editData['pic']);
         //如果要修改图片  删除原图  上传新图
-        if (isset($this->inputs['pic'])) {
+        if (isset($inputDatas['pic'])) {
             $imageClass = new ImageArrange();
-            $picData = $this->replaceImage($pastData['pic_path'], $pastData['thumbnail_path'], $this->inputs['pic'], $imageClass);
+            $picData = $this->replaceImage($pastData['pic_path'], $pastData['thumbnail_path'], $inputDatas['pic'], $imageClass);
             if ($picData['success'] === false) {
                 return $this->msgOut(false, [], $picData['code']);
             }
@@ -125,15 +99,10 @@ class HomepageRotationChartController extends BackEndApiMainController
     }
 
     //删除首页轮播图
-    public function delete(): JsonResponse
+    public function delete(HomepageBannerDeleteRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:frontend_page_banners,id',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastDataEloq = $this->eloqM::find($this->inputs['id']);
+        $inputDatas = $request->validated();
+        $pastDataEloq = $this->eloqM::find($inputDatas['id']);
         $pastData = $pastDataEloq;
         DB::beginTransaction();
         try {
@@ -155,30 +124,21 @@ class HomepageRotationChartController extends BackEndApiMainController
     }
 
     //首页轮播图排序
-    public function sort(): JsonResponse
+    public function sort(HomepageBannerSortRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'front_id' => 'required|numeric|exists:frontend_page_banners,id',
-            'rearways_id' => 'required|numeric|exists:frontend_page_banners,id',
-            'front_sort' => 'required|numeric|gt:0',
-            'rearways_sort' => 'required|numeric|gt:0',
-            'sort_type' => 'required|numeric|in:1,2',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         DB::beginTransaction();
         try {
             //上拉排序
-            if ($this->inputs['sort_type'] == 1) {
-                $stationaryData = $this->eloqM::find($this->inputs['front_id']);
-                $stationaryData->sort = $this->inputs['front_sort'];
-                $this->eloqM::where('sort', '>=', $this->inputs['front_sort'])->where('sort', '<', $this->inputs['rearways_sort'])->increment('sort');
+            if ($inputDatas['sort_type'] == 1) {
+                $stationaryData = $this->eloqM::find($inputDatas['front_id']);
+                $stationaryData->sort = $inputDatas['front_sort'];
+                $this->eloqM::where('sort', '>=', $inputDatas['front_sort'])->where('sort', '<', $inputDatas['rearways_sort'])->increment('sort');
                 //下拉排序
-            } elseif ($this->inputs['sort_type'] == 2) {
-                $stationaryData = $this->eloqM::find($this->inputs['rearways_id']);
-                $stationaryData->sort = $this->inputs['rearways_sort'];
-                $this->eloqM::where('sort', '>', $this->inputs['front_sort'])->where('sort', '<=', $this->inputs['rearways_sort'])->decrement('sort');
+            } elseif ($inputDatas['sort_type'] == 2) {
+                $stationaryData = $this->eloqM::find($inputDatas['rearways_id']);
+                $stationaryData->sort = $inputDatas['rearways_sort'];
+                $this->eloqM::where('sort', '>', $inputDatas['front_sort'])->where('sort', '<=', $inputDatas['rearways_sort'])->decrement('sort');
             }
             $stationaryData->save();
             DB::commit();

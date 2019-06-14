@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-04 14:41:55
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-08 14:35:03
+ * @Last Modified time: 2019-06-14 11:31:47
  */
 
 namespace App\Models\Admin\Homepage;
@@ -19,6 +19,6 @@ class FrontendLotteryFnfBetableList extends BaseModel
 
     public function method()
     {
-        return $this->hasOne(FrontendLotteryFnfBetableMethod::class, 'id', 'method_id');
+        return $this->hasOne(FrontendLotteryFnfBetableMethod::class, 'id', 'method_id')->select('id', 'lottery_name', 'method_name');
     }
 }

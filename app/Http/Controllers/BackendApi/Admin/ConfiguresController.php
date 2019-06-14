@@ -3,11 +3,16 @@
 namespace App\Http\Controllers\BackendApi\Admin;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Http\Requests\Backend\Admin\ConfiguresAddRequest;
+use App\Http\Requests\Backend\Admin\ConfiguresConfigSwitchRequest;
+use App\Http\Requests\Backend\Admin\ConfiguresDeleteRequest;
+use App\Http\Requests\Backend\Admin\ConfiguresEditRequest;
+use App\Http\Requests\Backend\Admin\ConfiguresGenerateIssueTimeRequest;
+use App\Http\Requests\Backend\Admin\ConfiguresGetSysConfigureValueRequest;
 use App\Lib\Common\ImageArrange;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class ConfiguresController extends BackEndApiMainController
 {
@@ -28,19 +33,10 @@ class ConfiguresController extends BackEndApiMainController
     }
 
     //添加配置
-    public function add(): JsonResponse
+    public function add(ConfiguresAddRequest $request): JsonResponse
     {
-        $rule = [
-            'parent_id' => 'required|numeric',
-            'sign' => 'required|unique:system_configurations,sign',
-            'name' => 'required',
-            'description' => 'required',
-        ];
-        $validator = Validator::make($this->inputs, $rule);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $addDatas = $this->inputs;
+        $inputDatas = $request->validated();
+        $addDatas = $inputDatas;
         $addDatas['pid'] = $this->currentPlatformEloq->platform_id;
         $adminId = $this->partnerAdmin->id;
         $addDatas['add_admin_id'] = $adminId;
@@ -59,25 +55,15 @@ class ConfiguresController extends BackEndApiMainController
     }
 
     //修改配置
-    public function edit(): JsonResponse
+    public function edit(ConfiguresEditRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:system_configurations,id',
-            'parent_id' => 'required|numeric',
-            'sign' => 'required',
-            'name' => 'required',
-            'description' => 'required',
-            'value' => 'string',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $checkSign = $this->eloqM::where('sign', $this->inputs['sign'])->where('id', '!=', $this->inputs['id'])->exists();
+        $inputDatas = $request->validated();
+        $checkSign = $this->eloqM::where('sign', $inputDatas['sign'])->where('id', '!=', $inputDatas['id'])->exists();
         if ($checkSign === true) {
             return $this->msgOut(false, [], '100700');
         }
-        $pastDataEloq = $this->eloqM::find($this->inputs['id']);
-        $editDatas = $this->inputs;
+        $pastDataEloq = $this->eloqM::find($inputDatas['id']);
+        $editDatas = $inputDatas;
         $this->editAssignment($pastDataEloq, $editDatas);
         try {
             $pastDataEloq->save();
@@ -90,15 +76,10 @@ class ConfiguresController extends BackEndApiMainController
     }
 
     //删除配置
-    public function delete(): JsonResponse
+    public function delete(ConfiguresDeleteRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:system_configurations,id',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastData = $this->eloqM::find($this->inputs['id']);
+        $inputDatas = $request->validated();
+        $pastData = $this->eloqM::find($inputDatas['id']);
         try {
             $pastData->delete();
             return $this->msgOut(true);
@@ -111,22 +92,15 @@ class ConfiguresController extends BackEndApiMainController
     }
 
     //配置状态开关 0关  1开
-    public function configSwitch(): JsonResponse
+    public function configSwitch(ConfiguresConfigSwitchRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:system_configurations,id',
-            'parent_id' => 'required|numeric',
-            'status' => 'required|in:0,1',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        if ($this->inputs['parent_id'] == 0) {
+        $inputDatas = $request->validated();
+        if ($inputDatas['parent_id'] == 0) {
             return $this->msgOut(false, [], '100701');
         }
-        $pastData = $this->eloqM::find($this->inputs['id']);
+        $pastData = $this->eloqM::find($inputDatas['id']);
         try {
-            $pastData->status = $this->inputs['status'];
+            $pastData->status = $inputDatas['status'];
             $pastData->save();
             return $this->msgOut(true);
         } catch (\Exception $e) {
@@ -138,24 +112,19 @@ class ConfiguresController extends BackEndApiMainController
     }
 
     //配置获取奖期时间
-    public function generateIssueTime()
+    public function generateIssueTime(ConfiguresGenerateIssueTimeRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'value' => 'required|date_format:H:i',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         $pastDataEloq = $this->eloqM::where('sign', 'generate_issue_time')->first();
         try {
             if (!is_null($pastDataEloq)) {
-                $pastDataEloq->value = $this->inputs['value'];
+                $pastDataEloq->value = $$inputDatas['value'];
                 $pastDataEloq->save();
                 if (Cache::has('generateIssueTime')) {
                     Cache::forget('generateIssueTime');
                 }
             } else {
-                $bool = $this->createIssueConfigure($this->inputs['value']);
+                $bool = $this->createIssueConfigure($$inputDatas['value']);
                 if ($bool === false) {
                     return $this->msgOut(false, [], '100702');
                 }
@@ -219,16 +188,11 @@ class ConfiguresController extends BackEndApiMainController
     }
 
     //获取某个配置的值
-    public function getSysConfigureValue()
+    public function getSysConfigureValue(ConfiguresGetSysConfigureValueRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'key' => 'required|string',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         $sysConfiguresEloq = new $this->eloqM;
-        $time = $sysConfiguresEloq->getConfigValue($this->inputs['key']);
+        $time = $sysConfiguresEloq->getConfigValue($inputDatas['key']);
         return $this->msgOut(true, $time);
     }
 }

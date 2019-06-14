@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\BackendApi\Admin\Advertisement;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Http\Requests\Backend\Admin\Advertisement\AdvertisementTypeEditRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Validator;
 
 class AdvertisementTypeController extends BackEndApiMainController
 {
@@ -20,20 +20,11 @@ class AdvertisementTypeController extends BackEndApiMainController
     /**
      * 编辑广告类型
      */
-    public function edit(): JsonResponse
+    public function edit(AdvertisementTypeEditRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:frontend_info_categories,id',
-            'status' => 'in:0,1',
-            'l_size' => 'gt:0',
-            'w_size' => 'gt:0',
-            'size' => 'numeric|gt:0',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $editData = $this->eloqM::find($this->inputs['id']);
-        $this->editAssignment($editData, $this->inputs);
+        $inputDatas = $request->validated();
+        $editData = $this->eloqM::find($inputDatas['id']);
+        $this->editAssignment($editData, $inputDatas);
         try {
             $editData->save();
             return $this->msgOut(true);

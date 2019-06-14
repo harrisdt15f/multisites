@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\BackendApi\DeveloperUsage\Frontend;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\Backend\DeveloperUsage\Frontend\FrontendWebRouteAddRequest;
+use App\Http\Requests\Backend\DeveloperUsage\Frontend\FrontendWebRouteDeleteRequest;
+use App\Http\Requests\Backend\DeveloperUsage\Frontend\FrontendWebRouteIsOpenRequest;
 
 class FrontendWebRouteController extends BackEndApiMainController
 {
@@ -17,25 +19,12 @@ class FrontendWebRouteController extends BackEndApiMainController
     }
 
     //添加web路由
-    public function add()
+    public function add(FrontendWebRouteAddRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'route_name' => 'required|string|unique:frontend_web_routes,route_name',
-            'controller' => 'required|string',
-            'method' => 'required|string',
-            'frontend_model_id' => 'required|numeric|exists:frontend_allocated_models,id',
-            'title' => 'required|string',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $checkData = $this->eloqM::where('route_name', $this->inputs['route_name'])->first();
-        if (!is_null($checkData)) {
-            return $this->msgOut(false, [], '101500');
-        }
+        $inputDatas = $request->validated();
         try {
             $routeEloq = new $this->eloqM;
-            $routeEloq->fill($this->inputs);
+            $routeEloq->fill($inputDatas);
             $routeEloq->save();
             return $this->msgOut(true);
         } catch (Exception $e) {
@@ -46,20 +35,11 @@ class FrontendWebRouteController extends BackEndApiMainController
     }
 
     //删除web路由
-    public function delete()
+    public function delete(FrontendWebRouteDeleteRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|unique:frontend_web_routes,id',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $checkData = $this->eloqM::find($this->inputs['id']);
-        if (is_null($checkData)) {
-            return $this->msgOut(false, [], '101501');
-        }
+        $inputDatas = $request->validated();
         try {
-            $this->eloqM::where('id', $this->inputs['id'])->delete();
+            $this->eloqM::where('id', $inputDatas['id'])->delete();
             return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
@@ -69,22 +49,13 @@ class FrontendWebRouteController extends BackEndApiMainController
     }
 
     //设置web路由是否开放
-    public function isOpen()
+    public function isOpen(FrontendWebRouteIsOpenRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|unique:frontend_web_routes,id',
-            'is_open' => 'required|numeric|in:0,1',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastData = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastData)) {
-            return $this->msgOut(false, [], '101501');
-        }
+        $inputDatas = $request->validated();
+        $pastDataEloq = $this->eloqM::find($inputDatas['id']);
         try {
-            $pastData->is_open = $this->inputs['is_open'];
-            $pastData->save();
+            $pastDataEloq->is_open = $inputDatas['is_open'];
+            $pastDataEloq->save();
             return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();

@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\BackendApi\Admin\Notice;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Http\Requests\Backend\Admin\Notice\NoticeAddRequest;
+use App\Http\Requests\Backend\Admin\Notice\NoticeDeleteRequest;
+use App\Http\Requests\Backend\Admin\Notice\NoticeEditRequest;
+use App\Http\Requests\Backend\Admin\Notice\NoticeSortRequest;
+use App\Http\Requests\Backend\Admin\Notice\NoticeTopRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class NoticeController extends BackEndApiMainController
 {
@@ -25,20 +29,10 @@ class NoticeController extends BackEndApiMainController
     }
 
     //添加公告
-    public function add(): JsonResponse
+    public function add(NoticeAddRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'type' => 'required|numeric',
-            'title' => 'required|string|unique:frontend_message_notices,title',
-            'content' => 'required|string',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date',
-            'status' => 'required|numeric|in:0,1',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $addData = $this->inputs;
+        $inputDatas = $request->validated();
+        $addData = $inputDatas;
         //admin_id
         $addData['admin_id'] = $this->partnerAdmin->id;
         //sort
@@ -59,27 +53,16 @@ class NoticeController extends BackEndApiMainController
     }
 
     //编辑公告
-    public function edit(): JsonResponse
+    public function edit(NoticeEditRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:frontend_message_notices,id',
-            'type' => 'required|numeric',
-            'title' => 'required|string',
-            'content' => 'required|string',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date',
-            'status' => 'required|numeric|in:0,1',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastEloq = $this->eloqM::find($this->inputs['id']);
-        $checkTitle = $this->eloqM::where('title', $this->inputs['title'])->where('id', '!=', $this->inputs['id'])->first();
+        $inputDatas = $request->validated();
+        $pastEloq = $this->eloqM::find($inputDatas['id']);
+        $checkTitle = $this->eloqM::where('title', $inputDatas['title'])->where('id', '!=', $inputDatas['id'])->first();
         if (!is_null($checkTitle)) {
             return $this->msgOut(false, [], '102100');
         }
         try {
-            $this->editAssignment($pastEloq, $this->inputs);
+            $this->editAssignment($pastEloq, $inputDatas);
             $pastEloq->save();
             //删除前台首页缓存
             $this->deleteCache();
@@ -92,15 +75,10 @@ class NoticeController extends BackEndApiMainController
     }
 
     //删除公告
-    public function delete(): JsonResponse
+    public function delete(NoticeDeleteRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:frontend_message_notices,id',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastEloq = $this->eloqM::find($this->inputs['id']);
+        $inputDatas = $request->validated();
+        $pastEloq = $this->eloqM::find($inputDatas['id']);
         //sort
         $sort = $pastEloq->sort;
         DB::beginTransaction();
@@ -120,30 +98,21 @@ class NoticeController extends BackEndApiMainController
     }
 
     //公告排序
-    public function sort(): JsonResponse
+    public function sort(NoticeSortRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'front_id' => 'required|exists:frontend_message_notices,id',
-            'rearways_id' => 'required|exists:frontend_message_notices,id',
-            'front_sort' => 'required|numeric|gt:0',
-            'rearways_sort' => 'required|numeric|gt:0',
-            'sort_type' => 'required|numeric|in:1,2',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         DB::beginTransaction();
         try {
             //上拉排序
-            if ($this->inputs['sort_type'] == 1) {
-                $stationaryData = $this->eloqM::find($this->inputs['front_id']);
-                $stationaryData->sort = $this->inputs['front_sort'];
-                $this->eloqM::where('sort', '>=', $this->inputs['front_sort'])->where('sort', '<', $this->inputs['rearways_sort'])->increment('sort');
+            if ($inputDatas['sort_type'] == 1) {
+                $stationaryData = $this->eloqM::find($inputDatas['front_id']);
+                $stationaryData->sort = $inputDatas['front_sort'];
+                $this->eloqM::where('sort', '>=', $inputDatas['front_sort'])->where('sort', '<', $inputDatas['rearways_sort'])->increment('sort');
                 //下拉排序
-            } elseif ($this->inputs['sort_type'] == 2) {
-                $stationaryData = $this->eloqM::find($this->inputs['rearways_id']);
-                $stationaryData->sort = $this->inputs['rearways_sort'];
-                $this->eloqM::where('sort', '>', $this->inputs['front_sort'])->where('sort', '<=', $this->inputs['rearways_sort'])->decrement('sort');
+            } elseif ($inputDatas['sort_type'] == 2) {
+                $stationaryData = $this->eloqM::find($inputDatas['rearways_id']);
+                $stationaryData->sort = $inputDatas['rearways_sort'];
+                $this->eloqM::where('sort', '>', $inputDatas['front_sort'])->where('sort', '<=', $inputDatas['rearways_sort'])->decrement('sort');
             }
             $stationaryData->save();
             DB::commit();
@@ -159,15 +128,10 @@ class NoticeController extends BackEndApiMainController
     }
 
     //公告置顶
-    public function top()
+    public function top(NoticeTopRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:frontend_message_notices,id',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastEloq = $this->eloqM::find($this->inputs['id']);
+        $inputDatas = $request->validated();
+        $pastEloq = $this->eloqM::find($inputDatas['id']);
         if (is_null($pastEloq)) {
             return $this->msgOut(false, [], '102101');
         }
@@ -176,8 +140,7 @@ class NoticeController extends BackEndApiMainController
         try {
             $pastEloq->sort = 1;
             $pastEloq->save();
-            //比这条数据sort小的   +1
-            $this->eloqM::where('sort', '<', $pastSort)->where('id', '!=', $this->inputs['id'])->increment('sort');
+            $this->eloqM::where('sort', '<', $pastSort)->where('id', '!=', $inputDatas['id'])->increment('sort');
             DB::commit();
             //删除前台首页缓存
             $this->deleteCache();

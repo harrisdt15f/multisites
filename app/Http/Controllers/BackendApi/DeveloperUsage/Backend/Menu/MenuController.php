@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\BackendApi\DeveloperUsage\Backend\Menu;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Http\Requests\Backend\DeveloperUsage\Backend\Menu\MenuAddRequest;
+use App\Http\Requests\Backend\DeveloperUsage\Backend\Menu\MenuAllRequireInfosRequest;
+use App\Http\Requests\Backend\DeveloperUsage\Backend\Menu\MenuDeleteRequest;
+use App\Http\Requests\Backend\DeveloperUsage\Backend\Menu\MenuEditRequest;
 use App\Models\DeveloperUsage\Backend\BackendAdminRoute;
 use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
 use function GuzzleHttp\json_decode;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Validator;
 
 class MenuController extends BackEndApiMainController
 {
@@ -27,17 +30,11 @@ class MenuController extends BackEndApiMainController
     /**
      * @return JsonResponse
      */
-    public function allRequireInfos(): JsonResponse
+    public function allRequireInfos(MenuAllRequireInfosRequest $request): JsonResponse
     {
-        $rule = [
-            'type' => 'required|integer|in:1,2,3,0',
-        ];
-        $validator = Validator::make($this->inputs, $rule);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         $routeCollection = Route::getRoutes()->get();
-        if ($this->inputs['type'] == 0) {
+        if ($inputDatas['type'] == 0) {
             foreach ($routeCollection as $key => $r) {
                 if (isset($r->action['as']) && $r->action['prefix'] !== '_debugbar') {
                     $routeShortData[$key]['url'] = $r->uri;
@@ -52,7 +49,7 @@ class MenuController extends BackEndApiMainController
                 2 => 'web-api',
                 3 => 'mobile-api',
             ];
-            $routeEndKey = $type[$this->inputs['type']] ?? $type[1];
+            $routeEndKey = $type[$inputDatas['type']] ?? $type[1];
 //        $firstlevelmenus = BackendSystemMenu::getFirstLevelList();
 
 //        $editMenu = BackendSystemMenu::all();
@@ -77,42 +74,27 @@ class MenuController extends BackEndApiMainController
         return $this->msgOut(true, $data);
     }
 
-    public function add()
+    public function add(MenuAddRequest $request)
     {
+        $inputDatas = $request->validated();
         $parent = false;
-        $rule = [
-            'label' => 'required|regex:/[\x{4e00}-\x{9fa5}]+/u', //操作日志
-            'en_name' => 'required|regex:/^(?!\.)(?!.*\.$)(?!.*?\.\.)[a-z.-]+$/', //operation.log
-            'display' => 'required|numeric|in:0,1',
-            'route' => 'required|regex:/^(?!.*\/$)(?!.*?\/\/)[a-z\/-]+$/', // /operasyon/operation-log
-            'icon' => 'regex:/^(?!\-)(?!.*\-$)(?!.*?\-\-)(?!\ )(?!.*\ $)(?!.*?\ \ )[a-z0-9 -]+$/',
-            'sort' => 'required|integer',
-            //anticon anticon-appstore  icon-6-icon
-        ];
-        if (isset($this->inputs['isParent']) && $this->inputs['isParent'] === '1') {
+        if (isset($inputDatas['isParent']) && $inputDatas['isParent'] === '1') {
             $parent = true;
-        } else {
-            $rule['parentId'] = 'required|numeric';
-            $rule['level'] = 'required|numeric|in:1,2,3';
         }
-        $validator = Validator::make($this->inputs, $rule);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $MenuEloq = $this->eloqM::where('label', $this->inputs['label'])->first();
+        $MenuEloq = $this->eloqM::where('label', $inputDatas['label'])->first();
         if (!is_null($MenuEloq)) {
             return $this->msgOut(false, [], '100800');
         }
         $menuEloq = new BackendSystemMenu();
-        $menuEloq->label = $this->inputs['label'];
-        $menuEloq->en_name = $this->inputs['en_name'];
-        $menuEloq->route = $this->inputs['route'];
-        $menuEloq->display = $this->inputs['display'];
-        $menuEloq->icon = $this->inputs['icon'] ?? null;
-        $menuEloq->sort = $this->inputs['sort'];
+        $menuEloq->label = $inputDatas['label'];
+        $menuEloq->en_name = $inputDatas['en_name'];
+        $menuEloq->route = $inputDatas['route'];
+        $menuEloq->display = $inputDatas['display'];
+        $menuEloq->icon = $inputDatas['icon'] ?? null;
+        $menuEloq->sort = $inputDatas['sort'];
         if ($parent === false) {
-            $menuEloq->pid = $this->inputs['parentId'];
-            $menuEloq->level = $this->inputs['level'];
+            $menuEloq->pid = $inputDatas['parentId'];
+            $menuEloq->level = $inputDatas['level'];
         }
         try {
             $menuEloq->save();
@@ -125,18 +107,11 @@ class MenuController extends BackEndApiMainController
         }
     }
 
-    public function delete()
+    public function delete(MenuDeleteRequest $request)
     {
-        $rule = [
-            'toDelete' => 'required|array',
-            'toDelete.*' => 'int',
-        ];
-        $validator = Validator::make($this->inputs, $rule);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         $menuEloq = new BackendSystemMenu();
-        $toDelete = $this->inputs['toDelete'];
+        $toDelete = $inputDatas['toDelete'];
         if (!empty($toDelete)) {
             try {
                 $datas = $menuEloq->find($toDelete)->each(function ($product, $key) {
@@ -159,39 +134,24 @@ class MenuController extends BackEndApiMainController
      * (?!.*\.$) - don't allow . at end
      * @return JsonResponse
      */
-    public function edit():  ? JsonResponse
+    public function edit(MenuEditRequest $request):  ? JsonResponse
     {
+        $inputDatas = $request->validated();
         $parent = false;
-        $rule = [
-            'label' => 'required|regex:/[\x{4e00}-\x{9fa5}]+/u', //操作日志
-            'en_name' => 'required|regex:/^(?!\.)(?!.*\.$)(?!.*?\.\.)[a-z.-]+$/', //operation.log
-            'display' => 'required|numeric|in:0,1',
-            'menuId' => 'required|numeric',
-            'route' => 'required|regex:/^(?!.*\/$)(?!.*?\/\/)[a-z\/-]+$/', // /operasyon/operation-log
-            'icon' => 'regex:/^(?!\-)(?!.*\-$)(?!.*?\-\-)(?!\ )(?!.*\ $)(?!.*?\ \ )[a-z0-9 -]+$/',
-            //anticon anticon-appstore  icon-6-icon
-        ];
-        if (isset($this->inputs['isParent']) && $this->inputs['isParent'] === '1') {
-            $rule['isParent'] = 'required|numeric|in:0,1';
+        if (isset($inputDatas['isParent']) && $inputDatas['isParent'] === '1') {
             $parent = true;
-        } else {
-            $rule['parentId'] = 'required|numeric';
         }
-        $validator = Validator::make($this->inputs, $rule);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $menuEloq = BackendSystemMenu::find($this->inputs['menuId']);
-        $menuEloq->label = $this->inputs['label'];
-        $menuEloq->en_name = $this->inputs['en_name'];
-        $menuEloq->display = $this->inputs['display'];
-        $menuEloq->icon = $this->inputs['icon'] ?? null;
+        $menuEloq = BackendSystemMenu::find($inputDatas['menuId']);
+        $menuEloq->label = $inputDatas['label'];
+        $menuEloq->en_name = $inputDatas['en_name'];
+        $menuEloq->display = $inputDatas['display'];
+        $menuEloq->icon = $inputDatas['icon'] ?? null;
         if ($parent === true) {
             $menuEloq->route = '#';
             $menuEloq->pid = 0;
         } else {
-            $menuEloq->route = $this->inputs['route'];
-            $menuEloq->pid = $this->inputs['parentId'];
+            $menuEloq->route = $inputDatas['route'];
+            $menuEloq->pid = $inputDatas['parentId'];
         }
         $data = $menuEloq->toArray();
         if ($menuEloq->save()) {

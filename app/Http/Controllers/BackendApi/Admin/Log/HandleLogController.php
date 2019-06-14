@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BackendApi\Admin\Log;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Http\Requests\Backend\Admin\Log\HandleLogGetAddressRequest;
 use App\Lib\Common\IpAddress;
 use App\Models\Admin\FrontendSystemLog;
 use App\Models\Admin\SystemAddressIp;
@@ -29,18 +30,13 @@ class HandleLogController extends BackEndApiMainController
     }
 
     //IP获取地址
-    public function getAddress()
+    public function getAddress(HandleLogGetAddressRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'ip' => 'required|ip',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $addressIpELoq = SystemAddressIp::where('ip', $this->inputs['ip'])->first();
+        $inputDatas = $request->validated();
+        $addressIpELoq = SystemAddressIp::where('ip', $inputDatas['ip'])->first();
         if (is_null($addressIpELoq)) {
             $ipAddressCla = new IpAddress();
-            $addressIpELoq = $ipAddressCla->getAddress($this->inputs['ip']);
+            $addressIpELoq = $ipAddressCla->getAddress($inputDatas['ip']);
         }
         $data = [
             'ip' => $addressIpELoq->ip,

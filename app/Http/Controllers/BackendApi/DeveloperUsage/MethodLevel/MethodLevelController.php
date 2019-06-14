@@ -4,14 +4,16 @@
  * @Author: LingPh
  * @Date:   2019-05-30 14:28:04
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-13 16:40:54
+ * @Last Modified time: 2019-06-14 17:56:27
  */
 namespace App\Http\Controllers\BackendApi\DeveloperUsage\MethodLevel;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Http\Requests\Backend\DeveloperUsage\MethodLevel\MethodLevelAddRequest;
+use App\Http\Requests\Backend\DeveloperUsage\MethodLevel\MethodLevelDeleteRequest;
+use App\Http\Requests\Backend\DeveloperUsage\MethodLevel\MethodLevelEditRequest;
 use App\Models\Game\Lottery\LotteryMethod;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Validator;
 
 class MethodLevelController extends BackEndApiMainController
 {
@@ -31,26 +33,17 @@ class MethodLevelController extends BackEndApiMainController
     }
 
     //添加玩法等级
-    public function add()
+    public function add(MethodLevelAddRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'method_id' => 'required|string|exists:lottery_methods,id',
-            'level' => 'required|numeric|gt:0|lt:11',
-            'position' => 'required|string',
-            'count' => 'required|numeric',
-            'prize' => 'required|numeric',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         //检查玩法等级
-        $checkMethodLevel = $this->eloqM::where('method_id', $this->inputs['method_id'])->where('level', $this->inputs['level'])->first();
+        $checkMethodLevel = $this->eloqM::where('method_id', $inputDatas['method_id'])->where('level', $inputDatas['level'])->first();
         if (!is_null($checkMethodLevel)) {
             return $this->msgOut(false, [], '102201');
         }
         try {
             $methodLevelEloq = new $this->eloqM;
-            $methodLevelEloq->fill($this->inputs);
+            $methodLevelEloq->fill($inputDatas);
             $methodLevelEloq->save();
             //删除玩法等级列表缓存
             $this->deleteCache();
@@ -63,26 +56,17 @@ class MethodLevelController extends BackEndApiMainController
     }
 
     //编辑玩法等级
-    public function edit()
+    public function edit(MethodLevelEditRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:lottery_methods_ways_levels,id',
-            'level' => 'required|numeric|gt:0|lt:11',
-            'position' => 'required|string',
-            'count' => 'required|numeric',
-            'prize' => 'required|numeric',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastDataEloq = $this->eloqM::find($this->inputs['id']);
+        $inputDatas = $request->validated();
+        $pastDataEloq = $this->eloqM::find($inputDatas['id']);
         //检查玩法等级
-        $checkMethodLevel = $this->eloqM::where('method_id', $pastDataEloq->method_id)->where('level', $this->inputs['level'])->where('id', '!=', $this->inputs['id'])->first();
+        $checkMethodLevel = $this->eloqM::where('method_id', $pastDataEloq->method_id)->where('level', $inputDatas['level'])->where('id', '!=', $inputDatas['id'])->first();
         if (!is_null($checkMethodLevel)) {
             return $this->msgOut(false, [], '102200');
         }
         try {
-            $this->editAssignment($pastDataEloq, $this->inputs);
+            $this->editAssignment($pastDataEloq, $inputDatas);
             $pastDataEloq->save();
             //删除玩法等级列表缓存
             $this->deleteCache();
@@ -95,17 +79,11 @@ class MethodLevelController extends BackEndApiMainController
     }
 
     //删除玩法等级
-    public function delete()
+    public function delete(MethodLevelDeleteRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:lottery_methods_ways_levels,id',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastDataEloq = $this->eloqM::find($this->inputs['id']);
+        $inputDatas = $request->validated();
         try {
-            $pastDataEloq->delete();
+            $this->eloqM::where('id', $inputDatas['id'])->delete();
             //删除玩法等级列表缓存
             $this->deleteCache();
             return $this->msgOut(true);

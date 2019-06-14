@@ -69,8 +69,7 @@ return [
     '101700' => '彩种不存在',
     '101701' => '该玩法组下不存在玩法',
     '101702' => '该玩法行下不存在玩法',
-    '101703' => '该玩法不存在',
-    //HomepageRotationChartController
+    //HomepageBannerController
     '101800' => '轮播图标题已存在',
     '101801' => '图片上传失败',
     //HomepageController

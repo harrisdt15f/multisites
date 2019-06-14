@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\BackendApi\Users\Fund;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Http\Requests\Backend\Users\Fund\AccountChangeTypeAddRequest;
+use App\Http\Requests\Backend\Users\Fund\AccountChangeTypeDeleteRequest;
+use App\Http\Requests\Backend\Users\Fund\AccountChangeTypeEditRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Validator;
 
 class AccountChangeTypeController extends BackEndApiMainController
 {
@@ -19,19 +21,12 @@ class AccountChangeTypeController extends BackEndApiMainController
     }
 
     //添加帐变类型
-    public function add(): JsonResponse
+    public function add(AccountChangeTypeAddRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'name' => 'required|string',
-            'sign' => 'required|string|unique:account_change_types,sign',
-            'in_out' => 'required|numeric|in:0,1',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgout(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         try {
             $eloqM = new $this->eloqM;
-            $eloqM->fill($this->inputs);
+            $eloqM->fill($inputDatas);
             $eloqM->save();
             return $this->msgout(true);
         } catch (Exception $e) {
@@ -42,29 +37,18 @@ class AccountChangeTypeController extends BackEndApiMainController
     }
 
     //编辑帐变类型
-    public function edit(): JsonResponse
+    public function edit(AccountChangeTypeEditRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:account_change_types,id',
-            'name' => 'required|string',
-            'sign' => 'required|string',
-            'in_out' => 'required|numeric|in:0,1',
-            'type' => 'required|numeric',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgout(false, [], '400', $validator->errors()->first());
-        }
-        $pastEloq = $this->eloqM::find($this->inputs['id']);
+        $inputDatas = $request->validated();
+        $pastEloq = $this->eloqM::find($inputDatas['id']);
         $checkData = $this->eloqM::where(function ($query) {
-            $query->where('sign', $this->inputs['sign'])->where('id', '!=', $this->inputs['id']);
+            $query->where('sign', $inputDatas['sign'])->where('id', '!=', $inputDatas['id']);
         })->first();
         if (!is_null($checkData)) {
             return $this->msgout(false, [], '101200');
         }
-        $editData = $this->inputs;
-        unset($editData['id']);
         try {
-            $this->editAssignment($pastEloq, $editData);
+            $this->editAssignment($pastEloq, $inputDatas);
             $pastEloq->save();
             return $this->msgout(true);
         } catch (Exception $e) {
@@ -75,18 +59,10 @@ class AccountChangeTypeController extends BackEndApiMainController
     }
 
     //删除帐变类型
-    public function delete(): JsonResponse
+    public function delete(AccountChangeTypeDeleteRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:account_change_types,id',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgout(false, [], '400', $validator->errors()->first());
-        }
-        $pastEloq = $this->eloqM::find($this->inputs['id']);
-        if (is_null($pastEloq)) {
-            return $this->msgout(false, [], '101200');
-        }
+        $inputDatas = $request->validated();
+        $pastEloq = $this->eloqM::find($inputDatas['id']);
         try {
             $pastEloq->delete();
             return $this->msgout(true);

@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\BackendApi\Admin\Activity;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Http\Requests\Backend\Admin\Activity\ActivityAddRequest;
+use App\Http\Requests\Backend\Admin\Activity\ActivityDeleteRequest;
+use App\Http\Requests\Backend\Admin\Activity\ActivityEditRequest;
+use App\Http\Requests\Backend\Admin\Activity\ActivitySortRequest;
 use App\Lib\Common\ImageArrange;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class ActivityInfosController extends BackEndApiMainController
 {
@@ -23,26 +26,14 @@ class ActivityInfosController extends BackEndApiMainController
     }
 
     //添加活动
-    public function add(): JsonResponse
+    public function add(ActivityAddRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'title' => 'required|unique:frontend_activity_contents,title',
-            'content' => 'required',
-            'pic' => 'required|image|mimes:jpeg,png,jpg',
-            'start_time' => 'date_format:Y-m-d H:i:s|required_if:is_time_interval,1',
-            'end_time' => 'date_format:Y-m-d H:i:s|required_if:is_time_interval,1',
-            'status' => 'required',
-            'redirect_url' => 'required',
-            'is_time_interval' => 'required|numeric',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         //接收文件信息
         $ImageClass = new ImageArrange();
         $depositPath = $ImageClass->depositPath($this->folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
         //进行上传
-        $pic = $ImageClass->uploadImg($this->inputs['pic'], $depositPath);
+        $pic = $ImageClass->uploadImg($inputDatas['pic'], $depositPath);
         if ($pic['success'] === false) {
             return $this->msgOut(false, [], '400', $pic['msg']);
         }
@@ -51,7 +42,7 @@ class ActivityInfosController extends BackEndApiMainController
         //sort
         $maxSort = $this->eloqM::max('sort');
         $sort = is_null($maxSort) ? 1 : $maxSort++;
-        $addDatas = $this->inputs;
+        $addDatas = $inputDatas;
         unset($addDatas['pic']);
         $addDatas['sort'] = $sort;
         $addDatas['pic_path'] = '/' . $pic['path'];
@@ -75,30 +66,17 @@ class ActivityInfosController extends BackEndApiMainController
     }
 
     //编辑活动
-    public function edit(): JsonResponse
+    public function edit(ActivityEditRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:frontend_activity_contents,id',
-            'title' => 'required',
-            'content' => 'required',
-            'pic' => 'image|mimes:jpeg,png,jpg',
-            'start_time' => 'date_format:Y-m-d H:i:s|required_if:is_time_interval,1',
-            'end_time' => 'date_format:Y-m-d H:i:s|required_if:is_time_interval,1',
-            'status' => 'required',
-            'redirect_url' => 'required',
-            'is_time_interval' => 'required|numeric',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastData = $this->eloqM::where('title', $this->inputs['title'])->where('id', '!=', $this->inputs['id'])->first();
+        $inputDatas = $request->validated();
+        $pastData = $this->eloqM::where('title', $inputDatas['title'])->where('id', '!=', $inputDatas['id'])->first();
         if (!is_null($pastData)) {
             return $this->msgOut(false, [], '100300');
         }
-        $editDataEloq = $this->eloqM::find($this->inputs['id']);
-        $editData = $this->inputs;
+        $editDataEloq = $this->eloqM::find($inputDatas['id']);
+        $editData = $inputDatas;
         //如果修改了图片 上传新图片
-        if (isset($this->inputs['pic'])) {
+        if (isset($inputDatas['pic'])) {
             unset($editData['pic']);
             $pastPic = $editDataEloq->pic_path;
             $pastThumbnail = $editDataEloq->thumbnail_path;
@@ -106,7 +84,7 @@ class ActivityInfosController extends BackEndApiMainController
             $ImageClass = new ImageArrange();
             $depositPath = $ImageClass->depositPath($this->folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
             //进行上传
-            $picdata = $ImageClass->uploadImg($this->inputs['pic'], $depositPath);
+            $picdata = $ImageClass->uploadImg($inputDatas['pic'], $depositPath);
             if ($picdata['success'] === false) {
                 return $this->msgOut(false, [], '400', $picdata['msg']);
             }
@@ -117,7 +95,7 @@ class ActivityInfosController extends BackEndApiMainController
         $this->editAssignment($editDataEloq, $editData);
         try {
             $editDataEloq->save();
-            if (isset($this->inputs['pic'])) {
+            if (isset($inputDatas['pic'])) {
                 //删除原图片
                 $ImageClass->deletePic(substr($pastPic, 1));
                 $ImageClass->deletePic(substr($pastThumbnail, 1));
@@ -133,18 +111,13 @@ class ActivityInfosController extends BackEndApiMainController
     }
 
     //删除活动
-    public function delete()
+    public function delete(ActivityDeleteRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:frontend_activity_contents,id',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastData = $this->eloqM::find($this->inputs['id']);
+        $inputDatas = $request->validated();
+        $pastData = $this->eloqM::find($inputDatas['id']);
         DB::beginTransaction();
         try {
-            $this->eloqM::where('id', $this->inputs['id'])->delete();
+            $this->eloqM::where('id', $inputDatas['id'])->delete();
             //排序
             $this->eloqM::where('sort', '>', $pastData['sort'])->decrement('sort');
             DB::commit();
@@ -165,30 +138,21 @@ class ActivityInfosController extends BackEndApiMainController
     }
 
     //活动排序
-    public function sort(): JsonResponse
+    public function sort(ActivitySortRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'front_id' => 'required|exists:frontend_activity_contents,id',
-            'rearways_id' => 'required|exists:frontend_activity_contents,id',
-            'front_sort' => 'required|numeric|gt:0',
-            'rearways_sort' => 'required|numeric|gt:0',
-            'sort_type' => 'required|numeric|in:1,2',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         DB::beginTransaction();
         try {
             //上拉排序
-            if ($this->inputs['sort_type'] == 1) {
-                $stationaryData = $this->eloqM::find($this->inputs['front_id']);
-                $stationaryData->sort = $this->inputs['front_sort'];
-                $this->eloqM::where('sort', '>=', $this->inputs['front_sort'])->where('sort', '<', $this->inputs['rearways_sort'])->increment('sort');
+            if ($inputDatas['sort_type'] == 1) {
+                $stationaryData = $this->eloqM::find($inputDatas['front_id']);
+                $stationaryData->sort = $inputDatas['front_sort'];
+                $this->eloqM::where('sort', '>=', $inputDatas['front_sort'])->where('sort', '<', $inputDatas['rearways_sort'])->increment('sort');
                 //下拉排序
-            } elseif ($this->inputs['sort_type'] == 2) {
-                $stationaryData = $this->eloqM::find($this->inputs['rearways_id']);
-                $stationaryData->sort = $this->inputs['rearways_sort'];
-                $this->eloqM::where('sort', '>', $this->inputs['front_sort'])->where('sort', '<=', $this->inputs['rearways_sort'])->decrement('sort');
+            } elseif ($inputDatas['sort_type'] == 2) {
+                $stationaryData = $this->eloqM::find($inputDatas['rearways_id']);
+                $stationaryData->sort = $inputDatas['rearways_sort'];
+                $this->eloqM::where('sort', '>', $inputDatas['front_sort'])->where('sort', '<=', $inputDatas['rearways_sort'])->decrement('sort');
             }
             $stationaryData->save();
             DB::commit();

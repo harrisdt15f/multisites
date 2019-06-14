@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\BackendApi\DeveloperUsage\Backend\Routes;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Http\Requests\Backend\DeveloperUsage\Backend\Routes\RoutesAddRequest;
+use App\Http\Requests\Backend\DeveloperUsage\Backend\Routes\RoutesDeleteRequest;
+use App\Http\Requests\Backend\DeveloperUsage\Backend\Routes\RoutesEditRequest;
 use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
-use Illuminate\Support\Facades\Validator;
 
 class RouteController extends BackEndApiMainController
 {
@@ -16,21 +18,13 @@ class RouteController extends BackEndApiMainController
         return $this->msgOut(true, $datas);
     }
 
-    public function add()
+    //添加路由
+    public function add(RoutesAddRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'route_name' => 'required|string|unique:backend_admin_routes,route_name',
-            'controller' => 'required|string',
-            'method' => 'required|string',
-            'menu_group_id' => 'required|numeric|exists:backend_system_menus,id',
-            'title' => 'required|string|unique:backend_admin_routes,title',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         try {
             $routeEloq = new $this->eloqM;
-            $routeEloq->fill($this->inputs);
+            $routeEloq->fill($inputDatas);
             $routeEloq->save();
             return $this->msgOut(true);
         } catch (Exception $e) {
@@ -40,25 +34,17 @@ class RouteController extends BackEndApiMainController
         }
     }
 
-    public function edit()
+    //编辑路由
+    public function edit(RoutesEditRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:backend_admin_routes,id',
-            'controller' => 'required|string',
-            'method' => 'required|string',
-            'menu_group_id' => 'required|numeric|exists:backend_system_menus,id',
-            'title' => 'required|string',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastEloq = $this->eloqM::find($this->inputs['id']);
-        $checkTitle = $this->eloqM::where('title', $this->inputs['title'])->where('id', '!=', $this->inputs['id'])->first();
+        $inputDatas = $request->validated();
+        $pastEloq = $this->eloqM::find($inputDatas['id']);
+        $checkTitle = $this->eloqM::where('title', $inputDatas['title'])->where('id', '!=', $inputDatas['id'])->first();
         if (!is_null($checkTitle)) {
             return $this->msgOut(false, [], '101400');
         }
         try {
-            $this->editAssignment($pastEloq, $this->inputs);
+            $this->editAssignment($pastEloq, $inputDatas);
             $pastEloq->save();
             return $this->msgOut(true);
         } catch (Exception $e) {
@@ -68,15 +54,11 @@ class RouteController extends BackEndApiMainController
         }
     }
 
-    public function delete()
+    //删除路由
+    public function delete(RoutesDeleteRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:backend_admin_routes,id',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastEloq = $this->eloqM::find($this->inputs['id']);
+        $inputDatas = $request->validated();
+        $pastEloq = $this->eloqM::find($inputDatas['id']);
         try {
             $pastEloq->delete();
             return $this->msgOut(true);

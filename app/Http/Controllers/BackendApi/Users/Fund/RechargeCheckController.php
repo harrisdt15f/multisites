@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\BackendApi\Users\Fund;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Http\Requests\Backend\Users\Fund\RechargeCheckAuditFailureRequest;
+use App\Http\Requests\Backend\Users\Fund\RechargeCheckAuditSuccessRequest;
 use App\Lib\Common\AccountChange;
 use App\Lib\Common\FundOperationRecharge;
 use App\Lib\Common\InternalNoticeMessage;
@@ -16,7 +18,6 @@ use App\Models\User\Fund\AccountChangeType;
 use App\Models\User\Fund\FrontendUsersAccount;
 use App\Models\User\UsersRechargeHistorie;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class RechargeCheckController extends BackEndApiMainController
 {
@@ -37,17 +38,12 @@ class RechargeCheckController extends BackEndApiMainController
         return $this->msgOut(true, $data);
     }
 
-    public function auditSuccess()
+    //审核通过
+    public function auditSuccess(RechargeCheckAuditSuccessRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:backend_admin_rechargehuman_logs,id',
-            'auditor_note' => 'required|string',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors());
-        }
+        $inputDatas = $request->validated();
         // 审核表
-        $rechargeLog = $this->eloqM::find($this->inputs['id']);
+        $rechargeLog = $this->eloqM::find($inputDatas['id']);
         $auditFlow = BackendAdminAuditFlowList::where('id', $rechargeLog->audit_flow_id)->first();
         if (is_null($auditFlow)) {
             return $this->msgOut(false, [], '100904');
@@ -74,7 +70,7 @@ class RechargeCheckController extends BackEndApiMainController
             //修改backend_admin_audit_flow_lists审核表
             $userData = FrontendUser::where('id', $rechargeLog->user_id)->with('account')->first();
             $balance = $userData->account->balance + $rechargeLog->amount;
-            $this->auditFlowEdit($auditFlow, $this->partnerAdmin, $this->inputs['auditor_note']);
+            $this->auditFlowEdit($auditFlow, $this->partnerAdmin, $inputDatas['auditor_note']);
             //修改用户金额
             $UserAccounts = FrontendUsersAccount::where('user_id', $rechargeLog->user_id)->first();
             $UserAccountsEdit = ['balance' => $balance];
@@ -102,16 +98,10 @@ class RechargeCheckController extends BackEndApiMainController
         }
     }
 
-    public function auditFailure()
+    public function auditFailure(RechargeCheckAuditFailureRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:backend_admin_rechargehuman_logs,id',
-            'auditor_note' => 'required|string',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors());
-        }
-        $rechargeLog = $this->eloqM::find($this->inputs['id']);
+        $inputDatas = $request->validated();
+        $rechargeLog = $this->eloqM::find($inputDatas['id']);
         if ($rechargeLog->status !== 0) {
             return $this->msgOut(false, [], '100900');
         }
@@ -134,7 +124,7 @@ class RechargeCheckController extends BackEndApiMainController
             //退还管理员人工充值额度
             $auditFlow = BackendAdminAuditFlowList::where('id', $rechargeLog->audit_flow_id)->first();
             $adminFundDataEdit = ['fund' => $newFund];
-            $this->auditFlowEdit($auditFlow, $this->partnerAdmin, $this->inputs['auditor_note']);
+            $this->auditFlowEdit($auditFlow, $this->partnerAdmin, $inputDatas['auditor_note']);
             $adminFundData->fill($adminFundDataEdit);
             $adminFundData->save();
             //返还额度后  backend_admin_rechargehuman_logs 记录表

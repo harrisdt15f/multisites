@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Http\Requests\Backend\Admin\Homepage\PopularLotteriesAddRequest;
+use App\Http\Requests\Backend\Admin\Homepage\PopularLotteriesDeleteRequest;
+use App\Http\Requests\Backend\Admin\Homepage\PopularLotteriesEditRequest;
+use App\Http\Requests\Backend\Admin\Homepage\PopularLotteriesSortRequest;
 use App\Lib\Common\ImageArrange;
 use App\Models\Game\Lottery\LotteryList;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class PopularLotteriesController extends BackEndApiMainController
 {
@@ -34,28 +37,22 @@ class PopularLotteriesController extends BackEndApiMainController
     }
 
     //添加热门彩票
-    public function add(): JsonResponse
+    public function add(PopularLotteriesAddRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'lotteries_id' => 'required|numeric|unique:frontend_lottery_redirect_bet_lists,lotteries_id|exists:lottery_lists,id',
-            'pic' => 'required|image',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $checkLotterie = $this->eloqM::where('lotteries_id', $this->inputs['lotteries_id'])->first();
+        $inputDatas = $request->validated();
+        $checkLotterie = $this->eloqM::where('lotteries_id', $inputDatas['lotteries_id'])->first();
         //sort
         $maxSort = $this->eloqM::max('sort');
         $sort = is_null($maxSort) ? 1 : $maxSort++;
         //上传图片
         $imgClass = new ImageArrange();
         $depositPath = $imgClass->depositPath('popular_lotteries', $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
-        $pic = $imgClass->uploadImg($this->inputs['pic'], $depositPath);
+        $pic = $imgClass->uploadImg($inputDatas['pic'], $depositPath);
         if ($pic['success'] === false) {
             return $this->msgOut(false, [], '400', $pic['msg']);
         }
         $addData = [
-            'lotteries_id' => $this->inputs['lotteries_id'],
+            'lotteries_id' => $inputDatas['lotteries_id'],
             'sort' => $sort,
             'pic_path' => '/' . $pic['path'],
         ];
@@ -75,35 +72,28 @@ class PopularLotteriesController extends BackEndApiMainController
     }
 
     //编辑热门彩票
-    public function edit(): JsonResponse
+    public function edit(PopularLotteriesEditRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:frontend_lottery_redirect_bet_lists,id',
-            'pic' => 'image',
-            'lotteries_id' => 'required|numeric|exists:lottery_lists,id',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastData = $this->eloqM::find($this->inputs['id']);
+        $inputDatas = $request->validated();
+        $pastData = $this->eloqM::find($inputDatas['id']);
         //检查该热门类型是否存在重复彩票
-        $checkData = $this->eloqM::where('lotteries_id', $this->inputs['lotteries_id'])->where('id', '!=', $this->inputs['id'])->first();
+        $checkData = $this->eloqM::where('lotteries_id', $inputDatas['lotteries_id'])->where('id', '!=', $inputDatas['id'])->first();
         if (!is_null($checkData)) {
             return $this->msgOut(false, [], '102000');
         }
         //修改了图片的操作
-        if (isset($this->inputs['pic'])) {
+        if (isset($inputDatas['pic'])) {
             $pastPic = $pastData->pic_path;
             $imgClass = new ImageArrange();
             $depositPath = $imgClass->depositPath('popular_lotteries', $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
-            $pic = $imgClass->uploadImg($this->inputs['pic'], $depositPath);
+            $pic = $imgClass->uploadImg($inputDatas['pic'], $depositPath);
             if ($pic['success'] === false) {
                 return $this->msgOut(false, [], '400', $pic['msg']);
             }
             $pastData->pic_path = '/' . $pic['path'];
         }
         try {
-            $pastData->lotteries_id = $this->inputs['lotteries_id'];
+            $pastData->lotteries_id = $inputDatas['lotteries_id'];
             $pastData->save();
             if (isset($pastPic)) {
                 $imgClass->deletePic(substr($pastPic, 1));
@@ -122,15 +112,10 @@ class PopularLotteriesController extends BackEndApiMainController
     }
 
     //删除热门彩票
-    public function delete(): JsonResponse
+    public function delete(PopularLotteriesDeleteRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:frontend_lottery_redirect_bet_lists,id',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastDataEloq = $this->eloqM::find($this->inputs['id']);
+        $inputDatas = $request->validated();
+        $pastDataEloq = $this->eloqM::find($inputDatas['id']);
         $pastData = $pastDataEloq;
         DB::beginTransaction();
         try {
@@ -153,41 +138,21 @@ class PopularLotteriesController extends BackEndApiMainController
     }
 
     //热门彩票拉动排序
-    public function sort(): JsonResponse
+    public function sort(PopularLotteriesSortRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'front_id' => 'required|numeric|gt:0',
-            'rearways_id' => 'required|numeric|gt:0',
-            'front_sort' => 'required|numeric|gt:0',
-            'rearways_sort' => 'required|numeric|gt:0',
-            'sort_type' => 'required|numeric|in:1,2',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastFrontData = $this->eloqM::find($this->inputs['front_id']);
-        $pastRearwaysData = $this->eloqM::find($this->inputs['rearways_id']);
-        if (is_null($pastFrontData) || is_null($pastRearwaysData)) {
-            return $this->msgOut(false, [], '102008');
-        }
+        $inputDatas = $request->validated();
         DB::beginTransaction();
         try {
             //上拉排序
-            if ($this->inputs['sort_type'] == 1) {
-                $stationaryData = $this->eloqM::find($this->inputs['front_id']);
-                $stationaryData->sort = $this->inputs['front_sort'];
-                $this->eloqM::where(function ($query) {
-                    $query->where('sort', '>=', $this->inputs['front_sort'])
-                        ->where('sort', '<', $this->inputs['rearways_sort']);
-                })->increment('sort');
-            } elseif ($this->inputs['sort_type'] == 2) {
+            if ($inputDatas['sort_type'] == 1) {
+                $stationaryData = $this->eloqM::find($inputDatas['front_id']);
+                $stationaryData->sort = $inputDatas['front_sort'];
+                $this->eloqM::where('sort', '>=', $inputDatas['front_sort'])->where('sort', '<', $inputDatas['rearways_sort'])->increment('sort');
+            } elseif ($inputDatas['sort_type'] == 2) {
                 //下拉排序
-                $stationaryData = $this->eloqM::find($this->inputs['rearways_id']);
-                $stationaryData->sort = $this->inputs['rearways_sort'];
-                $this->eloqM::where(function ($query) {
-                    $query->where('sort', '>', $this->inputs['front_sort'])
-                        ->where('sort', '<=', $this->inputs['rearways_sort']);
-                })->decrement('sort');
+                $stationaryData = $this->eloqM::find($inputDatas['rearways_id']);
+                $stationaryData->sort = $inputDatas['rearways_sort'];
+                $this->eloqM::where('sort', '>', $inputDatas['front_sort'])->where('sort', '<=', $inputDatas['rearways_sort'])->decrement('sort');
             }
             $stationaryData->save();
             DB::commit();

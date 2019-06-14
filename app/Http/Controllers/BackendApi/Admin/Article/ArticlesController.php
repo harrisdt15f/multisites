@@ -3,6 +3,12 @@
 namespace App\Http\Controllers\BackendApi\Admin\Article;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Http\Requests\Backend\Admin\Article\ArticlesAddArticlesRequest;
+use App\Http\Requests\Backend\Admin\Article\ArticlesDeleteArticlesRequest;
+use App\Http\Requests\Backend\Admin\Article\ArticlesEditArticlesRequest;
+use App\Http\Requests\Backend\Admin\Article\ArticlesSortArticlesRequest;
+use App\Http\Requests\Backend\Admin\Article\ArticlesTopArticlesRequest;
+use App\Http\Requests\Backend\Admin\Article\ArticlesUploadPicRequest;
 use App\Lib\Common\ImageArrange;
 use App\Lib\Common\InternalNoticeMessage;
 use App\Models\Admin\BackendAdminUser;
@@ -12,12 +18,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class ArticlesController extends BackEndApiMainController
 {
     protected $eloqM = 'Admin\Activity\BackendAdminMessageArticle';
     protected $message = '有新的文章需要审核';
+    protected $folderName = 'articles';
 
     //文章列表
     public function detail(): JsonResponse
@@ -29,27 +35,14 @@ class ArticlesController extends BackEndApiMainController
         return $this->msgOut(true, $datas);
     }
     //发布文章
-    public function addArticles(): JsonResponse
+    public function addArticles(ArticlesAddArticlesRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'category_id' => 'required|numeric|exists:frontend_info_categories,id',
-            'title' => 'required|string|unique:backend_admin_message_articles,title',
-            'summary' => 'required|string',
-            'content' => 'required|string',
-            'search_text' => 'required|string',
-            'is_for_agent' => 'required|in:0,1',
-            'apply_note' => 'required|string',
-            'pic_name' => 'array',
-            'pic_path' => 'array',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         try {
             //插入 backend_admin_audit_flow_lists 审核表
-            $auditFlowId = $this->insertAuditFlow($this->inputs['apply_note']);
+            $auditFlowId = $this->insertAuditFlow($inputDatas['apply_note']);
             //插入 BackendAdminMessageArticle 文章表
-            $addDatas = $this->inputs;
+            $addDatas = $inputDatas;
             $addDatas['audit_flow_id'] = $auditFlowId;
             unset($addDatas['pic_name']);
             $maxSort = $this->eloqM::max('sort');
@@ -58,15 +51,15 @@ class ArticlesController extends BackEndApiMainController
             $addDatas['status'] = 0;
             $addDatas['add_admin_id'] = $this->partnerAdmin['id'];
             $addDatas['last_update_admin_id'] = $this->partnerAdmin['id'];
-            if (isset($this->inputs['pic_path']) && !empty($this->inputs['pic_path'])) {
-                $addDatas['pic_path'] = implode('|', $this->inputs['pic_path']);
+            if (isset($inputDatas['pic_path']) && !empty($inputDatas['pic_path'])) {
+                $addDatas['pic_path'] = implode('|', $inputDatas['pic_path']);
             }
             $articlesEloq = new $this->eloqM();
             $articlesEloq->fill($addDatas);
             $articlesEloq->save();
             //文章发布成功  销毁缓存
-            if (isset($this->inputs['pic_path'])) {
-                $this->deleteCachePic($this->inputs['pic_name']);
+            if (isset($inputDatas['pic_path'])) {
+                $this->deleteCachePic($inputDatas['pic_name']);
             }
             //发送站内消息给管理员审核
             $this->sendMessage();
@@ -79,45 +72,31 @@ class ArticlesController extends BackEndApiMainController
     }
 
     //编辑文章
-    public function editArticles(): JsonResponse
+    public function editArticles(ArticlesEditArticlesRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:backend_admin_message_articles,id',
-            'category_id' => 'required|numeric|exists:frontend_info_categories,id',
-            'title' => 'required|string',
-            'summary' => 'required|string',
-            'content' => 'required|string',
-            'search_text' => 'required|string',
-            'is_for_agent' => 'required|in:0,1',
-            'apply_note' => 'required|string',
-            'pic_name' => 'required|array',
-            'pic_path' => 'required|array',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $issetTitle = $this->eloqM::where('title', $this->inputs['title'])->where('id', '!=', $this->inputs['id'])->exists();
+        $inputDatas = $request->validated();
+        $issetTitle = $this->eloqM::where('title', $inputDatas['title'])->where('id', '!=', $inputDatas['id'])->exists();
         if ($issetTitle === true) {
             return $this->msgOut(false, [], '100500');
         }
         try {
-            $pastEloq = $this->eloqM::find($this->inputs['id']);
+            $pastEloq = $this->eloqM::find($inputDatas['id']);
             //插入 backend_admin_audit_flow_lists 审核表
-            $auditFlowId = $this->insertAuditFlow($this->inputs['apply_note']);
+            $auditFlowId = $this->insertAuditFlow($inputDatas['apply_note']);
             $pastEloq->audit_flow_id = $auditFlowId;
             //
             $pastPicPath = $pastEloq->pic_path;
-            $editDatas = $this->inputs;
+            $editDatas = $inputDatas;
             unset($editDatas['pic_name']);
             unset($editDatas['apply_note']);
             $this->editAssignment($pastEloq, $editDatas);
             $pastEloq->status = 0;
             $pastEloq->last_update_admin_id = $this->partnerAdmin['id'];
             //查看是否修改图片
-            $new_pic_path = $this->inputs['pic_path'];
+            $new_pic_path = $inputDatas['pic_path'];
             if ($new_pic_path != $pastPicPath) {
                 //销毁缓存
-                $this->deleteCachePic($this->inputs['pic_name']);
+                $this->deleteCachePic($inputDatas['pic_name']);
                 //删除原图
                 $pastPicPathArr = explode('|', $pastPicPath);
                 $this->deleteImg($pastPicPathArr);
@@ -136,15 +115,10 @@ class ArticlesController extends BackEndApiMainController
     }
 
     //删除文章
-    public function deleteArticles(): JsonResponse
+    public function deleteArticles(ArticlesDeleteArticlesRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:backend_admin_message_articles,id',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastData = $this->eloqM::find($this->inputs['id']);
+        $inputDatas = $request->validated();
+        $pastData = $this->eloqM::find($inputDatas['id']);
         $picPathArr = explode('|', $pastData['pic_path']);
         DB::beginTransaction();
         try {
@@ -164,30 +138,21 @@ class ArticlesController extends BackEndApiMainController
     }
 
     //文章排序
-    public function sortArticles(): JsonResponse
+    public function sortArticles(ArticlesSortArticlesRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'front_id' => 'required|numeric|exists:backend_admin_message_articles,id',
-            'rearways_id' => 'required|numeric|exists:backend_admin_message_articles,id',
-            'front_sort' => 'required|numeric|gt:0',
-            'rearways_sort' => 'required|numeric|gt:0',
-            'sort_type' => 'required|numeric|in:1,2',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         DB::beginTransaction();
         try {
             //上拉排序
-            if ($this->inputs['sort_type'] == 1) {
-                $stationaryData = $this->eloqM::find($this->inputs['front_id']);
-                $stationaryData->sort = $this->inputs['front_sort'];
-                $this->eloqM::where('sort', '>=', $this->inputs['front_sort'])->where('sort', '<', $this->inputs['rearways_sort'])->increment('sort');
+            if ($inputDatas['sort_type'] == 1) {
+                $stationaryData = $this->eloqM::find($inputDatas['front_id']);
+                $stationaryData->sort = $inputDatas['front_sort'];
+                $this->eloqM::where('sort', '>=', $inputDatas['front_sort'])->where('sort', '<', $inputDatas['rearways_sort'])->increment('sort');
                 //下拉排序
-            } elseif ($this->inputs['sort_type'] == 2) {
-                $stationaryData = $this->eloqM::find($this->inputs['rearways_id']);
-                $stationaryData->sort = $this->inputs['rearways_sort'];
-                $this->eloqM::where('sort', '>', $this->inputs['front_sort'])->where('sort', '<=', $this->inputs['rearways_sort'])->decrement('sort');
+            } elseif ($inputDatas['sort_type'] == 2) {
+                $stationaryData = $this->eloqM::find($inputDatas['rearways_id']);
+                $stationaryData->sort = $inputDatas['rearways_sort'];
+                $this->eloqM::where('sort', '>', $inputDatas['front_sort'])->where('sort', '<=', $inputDatas['rearways_sort'])->decrement('sort');
             }
             $stationaryData->save();
             DB::commit();
@@ -201,15 +166,16 @@ class ArticlesController extends BackEndApiMainController
     }
 
     //文章置顶
-    public function topArticles(): JsonResponse
+    public function topArticles(ArticlesTopArticlesRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
+        $inputDatas = $request->validated();
+        $validator = Validator::make($inputDatas, [
             'id' => 'required|numeric|exists:backend_admin_message_articles,id',
         ]);
         if ($validator->fails()) {
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
-        $topData = $this->eloqM::find($this->inputs['id']);
+        $topData = $this->eloqM::find($inputDatas['id']);
         try {
             $this->eloqM::where('sort', '<', $topData['sort'])->increment('sort');
             $topData->sort = 1;
@@ -223,19 +189,13 @@ class ArticlesController extends BackEndApiMainController
     }
 
     //图片上传
-    public function uploadPic(): JsonResponse
+    public function uploadPic(ArticlesUploadPicRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'pic' => 'required|file',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         //接收文件信息
         $ImageClass = new ImageArrange();
-        $file = $this->inputs['pic'];
-        $folderName = 'articles';
-        $depositPath = $ImageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
+        $file = $inputDatas['pic'];
+        $depositPath = $ImageClass->depositPath($this->folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
         //进行上传
         $pic = $ImageClass->uploadImg($file, $depositPath);
         if ($pic['success'] === false) {

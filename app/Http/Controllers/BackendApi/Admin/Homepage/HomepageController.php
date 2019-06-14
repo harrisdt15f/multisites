@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Http\Requests\Backend\Admin\Homepage\HomepageEditRequest;
+use App\Http\Requests\Backend\Admin\Homepage\HomepageUploadIcoRequest;
+use App\Http\Requests\Backend\Admin\Homepage\HomepageUploadPicRequest;
 use App\Lib\Common\ImageArrange;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Validator;
 
 class HomepageController extends BackEndApiMainController
 {
@@ -31,31 +33,23 @@ class HomepageController extends BackEndApiMainController
     }
 
     //编辑首页模块
-    public function edit(): JsonResponse
+    public function edit(HomepageEditRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:frontend_allocated_models,id',
-            'status' => 'numeric|in:0,1',
-            'value' => 'string',
-            'show_num' => 'numeric',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
+        $inputDatas = $request->validated();
+        $pastData = $this->eloqM::find($inputDatas['id']);
+        if (isset($inputDatas['status'])) {
+            $pastData->status = $inputDatas['status'];
         }
-        $pastData = $this->eloqM::find($this->inputs['id']);
-        if (isset($this->inputs['status'])) {
-            $pastData->status = $this->inputs['status'];
+        if (isset($inputDatas['value'])) {
+            $pastData->value = $inputDatas['value'];
         }
-        if (isset($this->inputs['value'])) {
-            $pastData->value = $this->inputs['value'];
-        }
-        if (isset($this->inputs['show_num'])) {
-            $pastData->show_num = $this->inputs['show_num'];
+        if (isset($inputDatas['show_num'])) {
+            $pastData->show_num = $inputDatas['show_num'];
         }
         try {
             $pastData->save();
             //如果修改了展示状态  清楚首页展示model的缓存
-            if (isset($this->inputs['status'])) {
+            if (isset($inputDatas['status'])) {
                 if (Cache::has('showModel')) {
                     Cache::forget('showModel');
                 }
@@ -71,20 +65,14 @@ class HomepageController extends BackEndApiMainController
     }
 
     //修改首页模块下的图片
-    public function uploadPic(): JsonResponse
+    public function uploadPic(HomepageUploadPicRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'en_name' => 'required|string|exists:frontend_allocated_models,en_name',
-            'pic' => 'required|image',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastData = $this->eloqM::where('en_name', $this->inputs['en_name'])->first();
+        $inputDatas = $request->validated();
+        $pastData = $this->eloqM::where('en_name', $inputDatas['en_name'])->first();
         //上传图片
         $imgClass = new ImageArrange();
-        $depositPath = $imgClass->depositPath($this->inputs['en_name'], $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
-        $pic = $imgClass->uploadImg($this->inputs['pic'], $depositPath);
+        $depositPath = $imgClass->depositPath($inputDatas['en_name'], $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
+        $pic = $imgClass->uploadImg($inputDatas['pic'], $depositPath);
         if ($pic['success'] === false) {
             return $this->msgOut(false, [], '400', $pic['msg']);
         }
@@ -108,14 +96,9 @@ class HomepageController extends BackEndApiMainController
     }
 
     //上传前台网站头ico
-    public function uploadIco(): JsonResponse
+    public function uploadIco(HomepageUploadIcoRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'ico' => 'required|file|dimensions:width=16,height=16',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         $pastData = $this->eloqM::where('en_name', 'frontend.ico')->first();
         if (is_null($pastData)) {
             return $this->msgOut(false, [], '101900');
@@ -124,7 +107,7 @@ class HomepageController extends BackEndApiMainController
         $imageClass = new ImageArrange();
         $folderName = 'frontend';
         $depositPath = $imageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name) . '/ico';
-        $ico = $imageClass->uploadImg($this->inputs['ico'], $depositPath);
+        $ico = $imageClass->uploadImg($inputDatas['ico'], $depositPath);
         $pastIco = $pastData->value;
         try {
             $pastData->value = '/' . $ico['path'];
@@ -150,8 +133,7 @@ class HomepageController extends BackEndApiMainController
     {
         $homepageCache = [
             'qr.code' => 'homepageQrCode',
-            'customer.service' => 11,
-            'notice' => 11,
+            'notice' => 'homepageNotice',
             'activity' => 'homepageActivity',
             'logo' => 'homepageLogo',
             'frontend.ico' => 'homepageIco',

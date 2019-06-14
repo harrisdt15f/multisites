@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * @Author: LingPh
+ * @Date:   2019-06-14 16:25:52
+ * @Last Modified by:   LingPh
+ * @Last Modified time: 2019-06-14 17:20:26
+ */
+namespace App\Http\Requests\Backend\Users\District;
+
+use App\Http\Requests\BaseFormRequest;
+
+class RegionEditRequest extends BaseFormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules(): array
+    {
+        return [
+            'id' => 'required|numeric|exists:users_regions,id',
+            'region_id' => 'required|numeric',
+            'region_name' => 'required',
+            'region_level' => 'required|in:1,2,3,4',
+        ];
+    }
+
+    /*public function messages()
+{
+return [
+'lottery_sign.required' => 'lottery_sign is required!',
+'trace_issues.required' => 'trace_issues is required!',
+'balls.required' => 'balls is required!'
+];
+}*/
+}

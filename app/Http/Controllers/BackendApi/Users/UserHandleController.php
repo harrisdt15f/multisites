@@ -3,6 +3,15 @@
 namespace App\Http\Controllers\BackendApi\Users;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+// use App\Http\Requests\Backend\Users\UserHandleCreateUserRequest;
+use App\Http\Requests\Backend\Users\UserHandleApplyResetUserFundPasswordRequest;
+use App\Http\Requests\Backend\Users\UserHandleApplyResetUserPasswordRequest;
+use App\Http\Requests\Backend\Users\UserHandleCommonAuditPasswordRequest;
+use App\Http\Requests\Backend\Users\UserHandleDeactivateDetailRequest;
+use App\Http\Requests\Backend\Users\UserHandleDeactivateRequest;
+use App\Http\Requests\Backend\Users\UserHandleDeductionBalanceRequest;
+use App\Http\Requests\Backend\Users\UserHandleUserAccountChangeRequest;
+use App\Http\Requests\Backend\Users\UserHandleUserRechargeHistoryRequest;
 use App\Lib\Common\AccountChange;
 use App\Models\Admin\BackendAdminAuditPasswordsList;
 use App\Models\Admin\FrontendUsersPrivacyFlow;
@@ -12,10 +21,10 @@ use App\Models\User\Fund\AccountChangeReport;
 use App\Models\User\Fund\AccountChangeType;
 use App\Models\User\Fund\FrontendUsersAccount;
 use App\Models\User\UserRechargeHistory;
+use App\Models\User\UsersRechargeHistorie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use App\Models\User\UsersRechargeHistorie;
 
 class UserHandleController extends BackEndApiMainController
 {
@@ -37,6 +46,9 @@ class UserHandleController extends BackEndApiMainController
      */
     public function createUser()
     {
+        // ############################################
+        // $inputDatas = $request->validated();
+        // validated $min $max 私有属性无法访问   需要处理
         $min = $this->currentPlatformEloq->prize_group_min;
         $max = $this->currentPlatformEloq->prize_group_max;
         $validator = Validator::make($this->inputs, [
@@ -112,43 +124,31 @@ class UserHandleController extends BackEndApiMainController
      * 18.申请用户密码功能
      * @return \Illuminate\Http\JsonResponse
      */
-    public function applyResetUserPassword()
+    public function applyResetUserPassword(UserHandleApplyResetUserPasswordRequest $request)
     {
-        $rule = [
-            'id' => 'required|numeric',
-            'password' => 'required',
-            'apply_note' => 'required',
-        ];
-        return $this->commonHandleUserPassword($rule, 1);
+        $inputDatas = $request->validated();
+        return $this->commonHandleUserPassword($inputDatas, 1);
     }
 
     /**
      * 20.申请资金密码
      * @return \Illuminate\Http\JsonResponse
      */
-    public function applyResetUserFundPassword()
+    public function applyResetUserFundPassword(UserHandleApplyResetUserFundPasswordRequest $request)
     {
-        $rule = [
-            'id' => 'required|numeric',
-            'password' => 'required',
-            'apply_note' => 'required',
-        ];
-        return $this->commonHandleUserPassword($rule, 2);
+        $inputDatas = $request->validated();
+        return $this->commonHandleUserPassword($inputDatas, 2);
     }
 
     /**
      * 申请资金密码跟密码共用功能
-     * @param $rule
+     * @param $inputDatas
      * @param $type todo if type new added then should notice on error message
      * @return \Illuminate\Http\JsonResponse
      */
-    public function commonHandleUserPassword($rule, $type)
+    public function commonHandleUserPassword($inputDatas, $type)
     {
-        $validator = Validator::make($this->inputs, $rule);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors());
-        }
-        $applyUserEloq = $this->eloqM::find($this->inputs['id']);
+        $applyUserEloq = $this->eloqM::find($inputDatas['id']);
         if (!is_null($applyUserEloq)) {
             $auditFlowEloq = new BackendAdminAuditFlowList();
             $adminApplyEloq = new BackendAdminAuditPasswordsList();
@@ -173,7 +173,7 @@ class UserHandleController extends BackEndApiMainController
                 'admin_id' => $this->partnerAdmin->id,
                 'admin_name' => $this->partnerAdmin->name,
                 'username' => $applyUserEloq->username,
-                'apply_note' => $this->inputs['apply_note'] ?? '',
+                'apply_note' => $inputDatas['apply_note'] ?? '',
             ];
             DB::beginTransaction();
             try {
@@ -182,7 +182,7 @@ class UserHandleController extends BackEndApiMainController
                 $auditData = [
                     'type' => $type,
                     'user_id' => $applyUserEloq->id,
-                    'audit_data' => Hash::make($this->inputs['password']),
+                    'audit_data' => Hash::make($inputDatas['password']),
                     'audit_flow_id' => $auditResult->id,
                     'status' => 0,
                 ];
@@ -243,22 +243,13 @@ class UserHandleController extends BackEndApiMainController
         return $this->commonAuditPassword();
     }
 
-    public function commonAuditPassword()
+    public function commonAuditPassword(UserHandleCommonAuditPasswordRequest $request)
     {
-        $rule = [
-            'id' => 'required|numeric',
-            'type' => 'required|numeric', //1登录密码 2 资金密码
-            'status' => 'required|numeric', //1 通过 2 拒绝
-            'auditor_note' => 'required', //密码审核备注
-        ];
-        $validator = Validator::make($this->inputs, $rule);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors());
-        }
+        $inputDatas = $request->validated();
         $eloqM = $this->modelWithNameSpace($this->withNameSpace);
         $applyUserEloq = $eloqM::where([
-            ['id', '=', $this->inputs['id']],
-            ['type', '=', $this->inputs['type']],
+            ['id', '=', $inputDatas['id']],
+            ['type', '=', $inputDatas['type']],
             ['status', '=', 0],
         ])->first();
         if (!is_null($applyUserEloq)) {
@@ -272,14 +263,14 @@ class UserHandleController extends BackEndApiMainController
             }
             DB::beginTransaction();
             try {
-                if ($this->inputs['status'] == 1) {
+                if ($inputDatas['status'] == 1) {
                     $user->save();
                 }
                 $auditFlowEloq->auditor_id = $this->partnerAdmin->id;
-                $auditFlowEloq->auditor_note = $this->inputs['auditor_note'];
+                $auditFlowEloq->auditor_note = $tinputDatas['auditor_note'];
                 $auditFlowEloq->auditor_name = $this->partnerAdmin->name;
                 $auditFlowEloq->save();
-                $applyUserEloq->status = $this->inputs['status'];
+                $applyUserEloq->status = $inputDatas['status'];
                 $applyUserEloq->save();
                 DB::commit();
                 return $this->msgOut(true);
@@ -298,22 +289,14 @@ class UserHandleController extends BackEndApiMainController
      * 用户冻结账号功能
      * @return \Illuminate\Http\JsonResponse
      */
-    public function deactivate()
+    public function deactivate(UserHandleDeactivateRequest $request)
     {
-        $rule = [
-            'user_id' => 'required|numeric',
-            'frozen_type' => 'required|numeric', //冻结类型
-            'comment' => 'required', //备注
-        ];
-        $validator = Validator::make($this->inputs, $rule);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors());
-        }
-        $userEloq = $this->eloqM::find($this->inputs['user_id']);
+        $inputDatas = $request->validated();
+        $userEloq = $this->eloqM::find($inputDatas['user_id']);
         if (!is_null($userEloq)) {
             DB::beginTransaction();
             try {
-                $userEloq->frozen_type = $this->inputs['frozen_type'];
+                $userEloq->frozen_type = $inputDatas['frozen_type'];
                 $userEloq->save();
                 $userAdmitFlowLog = new FrontendUsersPrivacyFlow();
                 $data = [
@@ -321,7 +304,7 @@ class UserHandleController extends BackEndApiMainController
                     'admin_name' => $this->partnerAdmin->name,
                     'user_id' => $userEloq->id,
                     'username' => $userEloq->username,
-                    'comment' => $this->inputs['comment'],
+                    'comment' => $inputDatas['comment'],
                 ];
                 $userAdmitFlowLog->fill($data);
                 $userAdmitFlowLog->save();
@@ -336,44 +319,22 @@ class UserHandleController extends BackEndApiMainController
         }
     }
 
-    public function deactivateDetail()
+    public function deactivateDetail(UserHandleDeactivateDetailRequest $request)
     {
-        $rule = [
-            'user_id' => 'required|numeric',
-            'start_time' => 'required|date_format:Y-m-d H:i:s',
-            'end_time' => 'required|date_format:Y-m-d H:i:s',
-        ];
-        $validator = Validator::make($this->inputs, $rule);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors());
-        }
-        $userEloq = $this->eloqM::find($this->inputs['user_id']);
+        $inputDatas = $request->validated();
+        $userEloq = $this->eloqM::find($inputDatas['user_id']);
         if (!is_null($userEloq)) {
-            $data = FrontendUsersPrivacyFlow::where('user_id', $this->inputs['user_id'])->where('created_at', '>=', $this->inputs['start_time'])->where('created_at', '<', $this->inputs['end_time'])->orderBy('created_at', 'desc')->get()->toArray();
+            $data = FrontendUsersPrivacyFlow::where('user_id', $inputDatas['user_id'])->where('created_at', '>=', $inputDatas['start_time'])->where('created_at', '<', $inputDatas['end_time'])->orderBy('created_at', 'desc')->get()->toArray();
             return $this->msgOut(true, $data);
         }
 
     }
 
     //用户帐变记录
-    public function userAccountChange()
+    public function userAccountChange(UserHandleUserAccountChangeRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'user_id' => 'required|numeric',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $datas = AccountChangeReport::select('username', 'type_name', 'type_sign', 'amount', 'before_balance', 'balance', 'created_at')->with(['changeType' => function ($query) {
-                $query->select('sign', 'in_out');
-            }])
-            ->where(function ($query) {
-                $query->where('user_id', $this->inputs['user_id'])
-                    ->where('created_at', '>=', $this->inputs['start_time'])
-                    ->where('created_at', '<', $this->inputs['end_time']);
-            })->get()->toArray();
+        $inputDatas = $request->validated();
+        $datas = AccountChangeReport::select('username', 'type_name', 'type_sign', 'amount', 'before_balance', 'balance', 'created_at')->with('changeType')->where('user_id', $inputDatas['user_id'])->where('created_at', '>=', $inputDatas['start_time'])->where('created_at', '<', $inputDatas['end_time'])->get()->toArray();
         foreach ($datas as $key => $report) {
             $datas[$key]['in_out'] = $report['change_type']['in_out'];
             unset($datas[$key]['type_sign']);
@@ -383,60 +344,43 @@ class UserHandleController extends BackEndApiMainController
     }
 
     //用户充值记录
-    public function userRechargeHistory()
+    public function userRechargeHistory(UserHandleUserRechargeHistoryRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'user_id' => 'required|numeric',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $datas = UsersRechargeHistorie::select('user_name', 'amount', 'deposit_mode', 'status', 'created_at')->where(function ($query) {
-            $query->where('user_id', $this->inputs['user_id'])
-                ->where('created_at', '>=', $this->inputs['start_time'])
-                ->where('created_at', '<', $this->inputs['end_time']);
-        })->get()->toArray();
+        $inputDatas = $request->validated();
+        $datas = UsersRechargeHistorie::select('user_name', 'amount', 'deposit_mode', 'status', 'created_at')->where('user_id', $inputDatas['user_id'])->where('created_at', '>=', $inputDatas['start_time'])->where('created_at', '<', $inputDatas['end_time'])->get()->toArray();
         return $this->msgOut(true, $datas);
     }
 
     //人工扣除用户资金
-    public function deductionBalance()
+    public function deductionBalance(UserHandleDeductionBalanceRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'user_id' => 'required|numeric',
-            'amount' => 'required|numeric',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         //检查是否存在 人工充值 的帐变类型表
         $accountChangeTypeEloq = AccountChangeType::select('name', 'sign')->where('sign', 'artificial_deduction')->first();
         if (is_null($accountChangeTypeEloq)) {
             return $this->msgOut(false, [], '100103');
         }
-        $userAccountsEloq = FrontendUsersAccount::where('user_id', $this->inputs['user_id'])->first();
-        if ($userAccountsEloq->balance < $this->inputs['amount']) {
+        $userAccountsEloq = FrontendUsersAccount::where('user_id', $inputDatas['user_id'])->first();
+        if ($userAccountsEloq->balance < $inputDatas['amount']) {
             return $this->msgOut(false, [], '100104');
         }
         DB::beginTransaction();
         try {
             //扣除金额
-            $newBalance = $userAccountsEloq->balance - $this->inputs['amount'];
+            $newBalance = $userAccountsEloq->balance - $inputDatas['amount'];
             $editArr = ['balance' => $newBalance];
             $editStatus = FrontendUsersAccount::where(function ($query) use ($userAccountsEloq) {
-                $query->where('user_id', $this->inputs['user_id'])
+                $query->where('user_id', $inputDatas['user_id'])
                     ->where('updated_at', $userAccountsEloq->updated_at);
             })->update($editArr);
             if ($editStatus === 0) {
                 return $this->msgOut(false, [], '100105');
             }
             //添加帐变记录
-            $userEloq = $this->eloqM::select('id', 'sign', 'top_id', 'parent_id', 'rid', 'username')->where('id', $this->inputs['user_id'])->first();
+            $userEloq = $this->eloqM::select('id', 'sign', 'top_id', 'parent_id', 'rid', 'username')->where('id', $inputDatas['user_id'])->first();
             $accountChangeReportEloq = new AccountChangeReport();
             $accountChangeClass = new AccountChange();
-            $accountChangeClass->addData($accountChangeReportEloq, $userEloq, $this->inputs['amount'], $userAccountsEloq->balance, $newBalance, $accountChangeTypeEloq);
+            $accountChangeClass->addData($accountChangeReportEloq, $userEloq, $inputDatas['amount'], $userAccountsEloq->balance, $newBalance, $accountChangeTypeEloq);
             DB::commit();
             return $this->msgOut(true);
         } catch (Exception $e) {

@@ -15,7 +15,7 @@ class AccountChangeReport extends BaseModel
 
     public function changeType()
     {
-        $data = $this->hasOne(AccountChangeType::class, 'sign', 'type_sign');
+        $data = $this->hasOne(AccountChangeType::class, 'sign', 'type_sign')->select('sign', 'in_out');
         return $data;
     }
 }

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\BackendApi\Admin\Article;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends BackEndApiMainController
 {

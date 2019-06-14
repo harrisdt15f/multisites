@@ -4,17 +4,17 @@
  * @Author: LingPh
  * @Date:   2019-06-01 14:29:10
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-06 17:48:25
+ * @Last Modified time: 2019-06-14 17:55:27
  */
 
 namespace App\Http\Controllers\BackendApi\Admin\Message;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Http\Requests\Backend\Admin\Message\NoticeMessagesSendMessagesRequest;
 use App\Lib\Common\InternalNoticeMessage;
 use App\Models\Admin\BackendAdminUser;
 use App\Models\Admin\Message\BackendSystemNoticeList;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class NoticeMessagesController extends BackEndApiMainController
 {
@@ -45,21 +45,15 @@ class NoticeMessagesController extends BackEndApiMainController
      * 手动发送站内信息
      * @return JsonResponse $messages
      */
-    public function sendMessages()
+    public function sendMessages(NoticeMessagesSendMessagesRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'admins_id' => 'required|array',
-            'message' => 'required|string',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $adminsArr = BackendAdminUser::select('id', 'group_id')->whereIn('id', $this->inputs['admins_id'])->get()->toArray();
+        $inputDatas = $request->validated();
+        $adminsArr = BackendAdminUser::select('id', 'group_id')->whereIn('id', $inputDatas['admins_id'])->get()->toArray();
         DB::beginTransaction();
         try {
             $messageClass = new InternalNoticeMessage();
             $type = BackendSystemNoticeList::ARTIFICIAL;
-            $message = $this->inputs['message'];
+            $message = $inputDatas['message'];
             $messageClass->insertMessage($type, $message, $adminsArr, $this->partnerAdmin->id);
             DB::commit();
             return $this->msgOut(true);

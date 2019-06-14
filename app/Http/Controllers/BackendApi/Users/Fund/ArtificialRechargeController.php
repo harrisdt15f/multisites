@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BackendApi\Users\Fund;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Http\Requests\Backend\Users\Fund\ArtificialRechargeRechargeRequest;
 use App\Lib\Common\AccountChange;
 use App\Lib\Common\FundOperationRecharge;
 use App\Lib\Common\InternalNoticeMessage;
@@ -21,7 +22,6 @@ use App\Models\User\UsersRechargeHistorie;
 use App\Models\User\UsersRechargeLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class ArtificialRechargeController extends BackEndApiMainController
 {
@@ -39,17 +39,10 @@ class ArtificialRechargeController extends BackEndApiMainController
     }
 
     //给用户人工充值
-    public function recharge(): JsonResponse
+    public function recharge(ArtificialRechargeRechargeRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:frontend_users,id',
-            'amount' => 'required|numeric|gt:0',
-            'apply_note' => 'required|string',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        };
-        $userEloq = FrontendUser::find($this->inputs['id']);
+        $inputDatas = $request->validated();
+        $userEloq = FrontendUser::find($inputDatas['id']);
         $partnerAdmin = $this->partnerAdmin;
         DB::beginTransaction();
         try {
@@ -62,15 +55,15 @@ class ArtificialRechargeController extends BackEndApiMainController
                 }
                 $adminOperationFund = $adminFundData->fund;
                 //可操作额度小于充值额度
-                if ($adminOperationFund < $this->inputs['amount']) {
+                if ($adminOperationFund < $inputDatas['amount']) {
                     return $this->msgOut(false, [], '101101');
                 }
-                $newFund = $adminOperationFund - $this->inputs['amount'];
+                $newFund = $adminOperationFund - $inputDatas['amount'];
                 $adminFundEdit = ['fund' => $newFund];
                 $adminFundData->fill($adminFundEdit);
                 $adminFundData->save();
                 //插入审核表
-                $auditFlowID = $this->insertAuditFlow($partnerAdmin->id, $partnerAdmin->name, $this->inputs['apply_note']);
+                $auditFlowID = $this->insertAuditFlow($partnerAdmin->id, $partnerAdmin->name, $inputDatas['apply_note']);
                 //发送站内消息 提醒有权限的管理员审核
                 $this->sendMessage();
             } else {
@@ -82,8 +75,8 @@ class ArtificialRechargeController extends BackEndApiMainController
                     return $this->msgOut(false, [], '100901');
                 }
                 //修改用户金额
-                $UserAccounts = FrontendUsersAccount::where('user_id', $this->inputs['id'])->first();
-                $balance = $UserAccounts->balance + $this->inputs['amount'];
+                $UserAccounts = FrontendUsersAccount::where('user_id', $inputDatas['id'])->first();
+                $balance = $UserAccounts->balance + $inputDatas['amount'];
                 $UserAccountsEdit = ['balance' => $balance];
                 $editStatus = FrontendUsersAccount::where(function ($query) use ($UserAccounts) {
                     $query->where('user_id', $UserAccounts->user_id)
@@ -97,12 +90,12 @@ class ArtificialRechargeController extends BackEndApiMainController
                 //用户帐变表
                 $accountChangeReportEloq = new AccountChangeReport();
                 $accountChangeClass = new AccountChange();
-                $accountChangeClass->addData($accountChangeReportEloq, $userEloq->toArray(), $this->inputs['amount'], $UserAccounts->balance, $balance, $accountChangeTypeEloq);
+                $accountChangeClass->addData($accountChangeReportEloq, $userEloq->toArray(), $inputDatas['amount'], $UserAccounts->balance, $balance, $accountChangeTypeEloq);
             }
             //添加人工充值明细表
             $auditFlowID = isset($auditFlowID) ? $auditFlowID : null;
             $newFund = isset($newFund) ? $newFund : null;
-            $this->insertFundLog($partnerAdmin, $userEloq, $auditFlowID, $newFund);
+            $this->insertFundLog($partnerAdmin, $userEloq, $auditFlowID, $inputDatas['amount'], $newFund);
             //用户 users_recharge_histories 表
             $deposit_mode = UsersRechargeHistorie::ARTIFICIAL;
             $companyOrderNum = $this->insertRechargeHistory($userEloq, $auditFlowID, $deposit_mode);
@@ -243,17 +236,18 @@ class ArtificialRechargeController extends BackEndApiMainController
      * @param  object $partnerAdmin 管理员eloq
      * @param  object $userEloq     用户eloq
      * @param  int $auditFlowID  backend_admin_audit_flow_lists审核表id
+     * @param  int $amount  变动的额度
      * @param  int $newFund  变动后的额度
      * @return void
      */
-    public function insertFundLog($partnerAdmin, $userEloq, $auditFlowID, $newFund)
+    public function insertFundLog($partnerAdmin, $userEloq, $auditFlowID, $amount, $newFund)
     {
         $rechargeLog = new BackendAdminRechargehumanLog();
         $type = $this->currentPartnerAccessGroup->role !== '*' ? BackendAdminRechargehumanLog::ADMIN : 3;
         $in_out = BackendAdminRechargehumanLog::DECREMENT;
-        $comment = '[给用户人工充值]==>-' . $this->inputs['amount'] . '|[目前额度]==>' . $newFund;
+        $comment = '[给用户人工充值]==>-' . $amount . '|[目前额度]==>' . $newFund;
         $fundOperationClass = new FundOperationRecharge();
-        $fundOperationClass->insertOperationDatas($rechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $userEloq->id, $userEloq->nickname, $this->inputs['amount'], $comment, $auditFlowID);
+        $fundOperationClass->insertOperationDatas($rechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $userEloq->id, $userEloq->nickname, $amount, $comment, $auditFlowID);
     }
 
     /**

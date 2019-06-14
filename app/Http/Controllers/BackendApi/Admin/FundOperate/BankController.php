@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\BackendApi\Admin\FundOperate;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Http\Requests\Backend\Admin\FundOperate\BankAddBankRequest;
+use App\Http\Requests\Backend\Admin\FundOperate\BankDeleteBankRequest;
+use App\Http\Requests\Backend\Admin\FundOperate\BankEditBankRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Validator;
 
 class BankController extends BackEndApiMainController
 {
@@ -19,27 +21,12 @@ class BankController extends BackEndApiMainController
     }
 
     //添加银行
-    public function addBank(): JsonResponse
+    public function addBank(BankAddBankRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'title' => 'required|string|unique:frontend_system_banks,title',
-            'code' => 'required|alpha',
-            'pay_type' => 'required|numeric',
-            'status' => 'required|in:0,1',
-            'min_recharge' => 'required|numeric',
-            'max_recharge' => 'required|numeric',
-            'min_withdraw' => 'required|numeric',
-            'max_withdraw' => 'required|numeric',
-            'remarks' => 'required|string',
-            'allow_user_level' => 'required|string',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $addDatas = $this->inputs;
+        $inputDatas = $request->validated();
         try {
             $configure = new $this->eloqM();
-            $configure->fill($addDatas);
+            $configure->fill($inputDatas);
             $configure->save();
             return $this->msgOut(true);
         } catch (Exception $e) {
@@ -50,25 +37,11 @@ class BankController extends BackEndApiMainController
     }
 
     //编辑银行
-    public function editBank(): JsonResponse
+    public function editBank(BankEditBankRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:frontend_system_banks,id',
-            'title' => 'required|string',
-            'code' => 'required|alpha',
-            'status' => 'required|in:0,1',
-            'min_recharge' => 'required|numeric',
-            'max_recharge' => 'required|numeric',
-            'min_withdraw' => 'required|numeric',
-            'max_withdraw' => 'required|numeric',
-            'remarks' => 'required|string',
-            'allow_user_level' => 'required|string',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastEloq = $this->eloqM::find($this->inputs['id']);
-        $this->editAssignment($pastEloq, $this->inputs);
+        $inputDatas = $request->validated();
+        $pastEloq = $this->eloqM::find($inputDatas['id']);
+        $this->editAssignment($pastEloq, $inputDatas);
         try {
             $pastEloq->save();
             return $this->msgOut(true);
@@ -80,16 +53,11 @@ class BankController extends BackEndApiMainController
     }
 
     //删除银行
-    public function deleteBank(): JsonResponse
+    public function deleteBank(BankDeleteBankRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:frontend_system_banks,id',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         try {
-            $this->eloqM::where('id', $this->inputs['id'])->delete();
+            $this->eloqM::where('id', $inputDatas['id'])->delete();
             return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();

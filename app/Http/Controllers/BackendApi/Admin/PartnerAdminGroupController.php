@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\BackendApi\Admin;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Http\Requests\Backend\Admin\PartnerAdminGroupCreateRequest;
+use App\Http\Requests\Backend\Admin\PartnerAdminGroupDestroyRequest;
+use App\Http\Requests\Backend\Admin\PartnerAdminGroupEditRequest;
+use App\Http\Requests\Backend\Admin\PartnerAdminGroupSpecificGroupUsersRequesthe;
 use App\Models\Admin\BackendAdminUser;
 use App\Models\Admin\Fund\BackendAdminRechargePermitGroup;
 use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
@@ -11,7 +15,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class PartnerAdminGroupController extends BackEndApiMainController
 {
@@ -35,20 +38,14 @@ class PartnerAdminGroupController extends BackEndApiMainController
      *
      * @return Response
      */
-    public function create()
+    public function create(PartnerAdminGroupCreateRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'group_name' => 'required|unique:backend_admin_access_groups',
-            'role' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         try {
             $data['platform_id'] = $this->currentPlatformEloq->platform_id;
-            $data['group_name'] = $this->inputs['group_name'];
-            $data['role'] = $this->inputs['role'];
-            $role = $this->inputs['role'] == '*' ? Arr::wrap($this->inputs['role']) : Arr::wrap(json_decode($this->inputs['role'],
+            $data['group_name'] = $inputDatas['group_name'];
+            $data['role'] = $inputDatas['role'];
+            $role = $inputDatas['role'] == '*' ? Arr::wrap($inputDatas['role']) : Arr::wrap(json_decode($inputDatas['role'],
                 true));
             $objPartnerAdminGroup = new $this->eloqM;
             $objPartnerAdminGroup->fill($data);
@@ -90,24 +87,17 @@ class PartnerAdminGroupController extends BackEndApiMainController
      * @param  Request  $request
      * @return Response
      */
-    public function edit()
+    public function edit(PartnerAdminGroupEditRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
-            'group_name' => 'required',
-            'role' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors());
-        }
-        $id = $this->inputs['id'];
+        $inputDatas = $request->validated();
+        $id = $inputDatas['id'];
         $datas = $this->eloqM::find($id);
-        $role = $this->inputs['role'] == '*' ? Arr::wrap($this->inputs['role']) : Arr::wrap(json_decode($this->inputs['role'],
+        $role = $inputDatas['role'] == '*' ? Arr::wrap($inputDatas['role']) : Arr::wrap(json_decode($inputDatas['role'],
             true));
         if (!is_null($datas)) {
             DB::beginTransaction();
-            $datas->group_name = $this->inputs['group_name'];
-            $datas->role = $this->inputs['role'];
+            $datas->group_name = $inputDatas['group_name'];
+            $datas->role = $inputDatas['role'];
             //#####################################################################################
             try {
                 $datas->save();
@@ -172,19 +162,13 @@ class PartnerAdminGroupController extends BackEndApiMainController
      * 删除组管理员角色
      * @return JsonResponse
      */
-    public function destroy():  ? JsonResponse
+    public function destroy(PartnerAdminGroupDestroyRequest $request):  ? JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
-            'group_name' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors());
-        }
-        $id = $this->inputs['id'];
+        $inputDatas = $request->validated();
+        $id = $inputDatas['id'];
         $datas = $this->eloqM::where([
             ['id', '=', $id],
-            ['group_name', '=', $this->inputs['group_name']],
+            ['group_name', '=', $inputDatas['group_name']],
         ])->first();
         if (!is_null($datas)) {
             try {
@@ -219,15 +203,10 @@ class PartnerAdminGroupController extends BackEndApiMainController
         }
     }
 
-    public function specificGroupUsers()
+    public function specificGroupUsers(PartnerAdminGroupSpecificGroupUsersRequesthe $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors());
-        }
-        $accessGroupEloq = $this->eloqM::find($this->inputs['id']);
+        $inputDatas = $request->validated();
+        $accessGroupEloq = $this->eloqM::find($inputDatas['id']);
         if (!is_null($accessGroupEloq)) {
             $data = $accessGroupEloq->adminUsers->toArray();
             return $this->msgOut(true, $data);

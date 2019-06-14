@@ -3,51 +3,40 @@
 namespace App\Http\Controllers\BackendApi\DeveloperUsage\Frontend;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Http\Requests\Backend\DeveloperUsage\Frontend\FrontendAllocatedModelAddRequest;
+use App\Http\Requests\Backend\DeveloperUsage\Frontend\FrontendAllocatedModelDeleteRequest;
+use App\Http\Requests\Backend\DeveloperUsage\Frontend\FrontendAllocatedModelDetailRequest;
+use App\Http\Requests\Backend\DeveloperUsage\Frontend\FrontendAllocatedModelEditRequest;
 use App\Models\DeveloperUsage\Frontend\FrontendAppRoute;
 use App\Models\DeveloperUsage\Frontend\FrontendWebRoute;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class FrontendAllocatedModelController extends BackEndApiMainController
 {
     protected $eloqM = 'DeveloperUsage\Frontend\FrontendAllocatedModel';
 
     //前端模块列表
-    public function detail()
+    public function detail(FrontendAllocatedModelDetailRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'type' => 'required|numeric|in:2,3',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         $eloqM = new $this->eloqM;
-        $allFrontendModel = $eloqM->allFrontendModel($this->inputs['type']);
+        $allFrontendModel = $eloqM->allFrontendModel($inputDatas['type']);
         return $this->msgOut(true, $allFrontendModel);
     }
 
     //添加前端模块
-    public function add()
+    public function add(FrontendAllocatedModelAddRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'label' => 'required|string|unique:frontend_allocated_models,label',
-            'en_name' => 'required|string|unique:frontend_allocated_models,en_name',
-            'pid' => 'required|numeric',
-            'type' => 'required|numeric',
-            'level' => 'required|numeric|in:1,2,3',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        if ($this->inputs['pid'] != 0) {
-            $checkParentLevel = $this->eloqM::where('id', $this->inputs['pid'])->first();
+        $inputDatas = $request->validated();
+        if ($inputDatas['pid'] != 0) {
+            $checkParentLevel = $this->eloqM::where('id', $inputDatas['pid'])->first();
             if ($checkParentLevel->level === 3) {
                 return $this->msgOut(false, [], '101603');
             }
         }
         try {
             $modelEloq = new $this->eloqM;
-            $modelEloq->fill($this->inputs);
+            $modelEloq->fill($inputDatas);
             $modelEloq->save();
             return $this->msgOut(true);
         } catch (Exception $e) {
@@ -58,34 +47,21 @@ class FrontendAllocatedModelController extends BackEndApiMainController
     }
 
     //编辑前端模块
-    public function edit()
+    public function edit(FrontendAllocatedModelEditRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:frontend_allocated_models,id',
-            'label' => 'required|string',
-            'en_name' => 'required|string',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $pastData = $this->eloqM::find($this->inputs['id']);
-        $checkLabelEloq = $this->eloqM::where(function ($query) {
-            $query->where('label', $this->inputs['label'])
-                ->where('id', '!=', $this->inputs['id']);
-        })->first();
+        $inputDatas = $request->validated();
+        $pastData = $this->eloqM::find($inputDatas['id']);
+        $checkLabelEloq = $this->eloqM::where('label', $inputDatas['label'])->where('id', '!=', $inputDatas['id'])->first();
         if (!is_null($checkLabelEloq)) {
             return $this->msgOut(false, [], '101600');
         }
-        $checkEnNamelEloq = $this->eloqM::where(function ($query) {
-            $query->where('en_name', $this->inputs['en_name'])
-                ->where('id', '!=', $this->inputs['id']);
-        })->first();
+        $checkEnNamelEloq = $this->eloqM::where('en_name', $inputDatas['en_name'])->where('id', '!=', $inputDatas['id'])->first();
         if (!is_null($checkEnNamelEloq)) {
             return $this->msgOut(false, [], '101601');
         }
         try {
-            $pastData->label = $this->inputs['label'];
-            $pastData->en_name = $this->inputs['en_name'];
+            $pastData->label = $inputDatas['label'];
+            $pastData->en_name = $inputDatas['en_name'];
             $pastData->save();
             return $this->msgOut(true);
         } catch (Exception $e) {
@@ -96,17 +72,12 @@ class FrontendAllocatedModelController extends BackEndApiMainController
     }
 
     //删除前端模块
-    public function delete()
+    public function delete(FrontendAllocatedModelDeleteRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric|exists:frontend_allocated_models,id',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $modelEloq = $this->eloqM::find($this->inputs['id']);
+        $inputDatas = $request->validated();
+        $modelEloq = $this->eloqM::find($inputDatas['id']);
         //检查是否存在下级
-        $deleteIds[] = $this->inputs['id'];
+        $deleteIds[] = $inputDatas['id'];
         $childs = $modelEloq->childs->pluck('id')->toArray();
         if (!is_null($childs)) {
             $deleteIds = array_merge($deleteIds, $childs);
