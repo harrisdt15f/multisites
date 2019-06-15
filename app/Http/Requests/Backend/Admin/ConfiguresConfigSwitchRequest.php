@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-14 13:41:29
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 13:41:49
+ * @Last Modified time: 2019-06-15 20:11:28
  */
 namespace App\Http\Requests\Backend\Admin;
 
@@ -31,6 +31,7 @@ class ConfiguresConfigSwitchRequest extends BaseFormRequest
     {
         return [
             'id' => 'required|numeric|exists:system_configurations,id',
+            'status' => 'required|numeric|in:0,1',
         ];
     }
 

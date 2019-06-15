@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-01 14:29:10
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 17:55:27
+ * @Last Modified time: 2019-06-15 18:02:51
  */
 
 namespace App\Http\Controllers\BackendApi\Admin\Message;
@@ -14,6 +14,8 @@ use App\Http\Requests\Backend\Admin\Message\NoticeMessagesSendMessagesRequest;
 use App\Lib\Common\InternalNoticeMessage;
 use App\Models\Admin\BackendAdminUser;
 use App\Models\Admin\Message\BackendSystemNoticeList;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
 class NoticeMessagesController extends BackEndApiMainController
@@ -22,9 +24,9 @@ class NoticeMessagesController extends BackEndApiMainController
 
     /**
      * 当前管理员的站内信息
-     * @return JsonResponse $messages
+     * @return JsonResponse
      */
-    public function adminMessages()
+    public function adminMessages(): JsonResponse
     {
         $messagesEloq = $this->eloqM::where('receive_admin_id', $this->partnerAdmin->id)->with('noticeMessage')->orderBy('created_at', 'desc')->get();
         $messages = [];
@@ -43,9 +45,10 @@ class NoticeMessagesController extends BackEndApiMainController
 
     /**
      * 手动发送站内信息
-     * @return JsonResponse $messages
+     * @param  NoticeMessagesSendMessagesRequest $request
+     * @return JsonResponse
      */
-    public function sendMessages(NoticeMessagesSendMessagesRequest $request)
+    public function sendMessages(NoticeMessagesSendMessagesRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         $adminsArr = BackendAdminUser::select('id', 'group_id')->whereIn('id', $inputDatas['admins_id'])->get()->toArray();

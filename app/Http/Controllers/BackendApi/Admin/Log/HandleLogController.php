@@ -7,21 +7,28 @@ use App\Http\Requests\Backend\Admin\Log\HandleLogGetAddressRequest;
 use App\Lib\Common\IpAddress;
 use App\Models\Admin\FrontendSystemLog;
 use App\Models\Admin\SystemAddressIp;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\JsonResponse;
 
 class HandleLogController extends BackEndApiMainController
 {
     protected $eloqM = 'Admin\BackendSystemLog';
-    //后台日志列表
-    public function details()
+
+    /**
+     * 后台日志列表
+     * @return JsonResponse
+     */
+    public function details(): JsonResponse
     {
         $searchAbleFields = ['origin', 'ip', 'device', 'os', 'os_version', 'browser', 'admin_name', 'menu_label', 'device_type'];
         $data = $this->generateSearchQuery($this->eloqM, $searchAbleFields);
         return $this->msgOut(true, $data);
     }
 
-    //前台日志列表
-    public function frontendLogs()
+    /**
+     * 前台日志列表
+     * @return JsonResponse
+     */
+    public function frontendLogs(): JsonResponse
     {
         $logEloq = new FrontendSystemLog();
         $searchAbleFields = ['origin', 'ip', 'device', 'os', 'os_version', 'browser', 'username', 'menu_label', 'device_type'];
@@ -29,8 +36,12 @@ class HandleLogController extends BackEndApiMainController
         return $this->msgOut(true, $data);
     }
 
-    //IP获取地址
-    public function getAddress(HandleLogGetAddressRequest $request)
+    /**
+     * IP获取地址
+     * @param  HandleLogGetAddressRequest $request
+     * @return JsonResponse
+     */
+    public function getAddress(HandleLogGetAddressRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         $addressIpELoq = SystemAddressIp::where('ip', $inputDatas['ip'])->first();

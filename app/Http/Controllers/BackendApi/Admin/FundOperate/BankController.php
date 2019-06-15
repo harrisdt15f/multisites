@@ -6,13 +6,17 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Admin\FundOperate\BankAddBankRequest;
 use App\Http\Requests\Backend\Admin\FundOperate\BankDeleteBankRequest;
 use App\Http\Requests\Backend\Admin\FundOperate\BankEditBankRequest;
+use Exception;
 use Illuminate\Http\JsonResponse;
 
 class BankController extends BackEndApiMainController
 {
     protected $eloqM = 'Admin\Fund\FrontendSystemBank';
 
-    //银行列表
+    /**
+     * 银行列表
+     * @return JsonResponse
+     */
     public function detail(): JsonResponse
     {
         $searchAbleFields = ['title', 'code', 'pay_type', 'status'];
@@ -20,7 +24,11 @@ class BankController extends BackEndApiMainController
         return $this->msgOut(true, $banksDatas);
     }
 
-    //添加银行
+    /**
+     * 添加银行
+     * @param  BankAddBankRequest $request [description]
+     * @return JsonResponse
+     */
     public function addBank(BankAddBankRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
@@ -36,7 +44,11 @@ class BankController extends BackEndApiMainController
         }
     }
 
-    //编辑银行
+    /**
+     * 编辑银行
+     * @param  BankEditBankRequest $request
+     * @return JsonResponse
+     */
     public function editBank(BankEditBankRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
@@ -52,7 +64,11 @@ class BankController extends BackEndApiMainController
         }
     }
 
-    //删除银行
+    /**
+     * 删除银行
+     * @param  BankDeleteBankRequest $request
+     * @return JsonResponse
+     */
     public function deleteBank(BankDeleteBankRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();

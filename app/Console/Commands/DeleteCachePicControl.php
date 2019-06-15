@@ -30,19 +30,19 @@ class DeleteCachePicControl extends Command
      */
     public function handle()
     {
-        Log::info('开始定时删除没上传活动的图片' . date('Y-m-d H:i:s', time()));
+        Log::info('开始定时删除没上传活动的图片');
         if (Cache::has('CachePic')) {
-            $CachePic = Cache::get('CachePic');
-            foreach ($CachePic as $k => $v) {
-                if ($v['expire_time'] < time()) {
-                    $path = 'public/' . $v['path'];
+            $cachePic = Cache::get('CachePic');
+            foreach ($cachePic as $key => $pic) {
+                if ($pic['expire_time'] < time()) {
+                    $path = 'public/' . $pic['path'];
                     if (file_exists($path)) {
                         if (!is_writable(dirname($path))) {
                             Log::info($path . '权限不足');
                         } else {
                             try {
                                 unlink($path);
-                                unset($CachePic[$k]);
+                                unset($cachePic[$key]);
                                 Log::info('清除图片缓存成功');
                             } catch (Exception $e) {
                                 $errorObj = $e->getPrevious()->getPrevious();
@@ -57,7 +57,7 @@ class DeleteCachePicControl extends Command
             }
             $hourToStore = 24 * 2;
             $expiresAt = Carbon::now()->addHours($hourToStore);
-            Cache::put('CachePic', $CachePic, $expiresAt);
+            Cache::put('CachePic', $cachePic, $expiresAt);
         }
     }
 }

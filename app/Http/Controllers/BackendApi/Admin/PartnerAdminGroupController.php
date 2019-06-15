@@ -11,6 +11,7 @@ use App\Models\Admin\BackendAdminUser;
 use App\Models\Admin\Fund\BackendAdminRechargePermitGroup;
 use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
 use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -25,9 +26,9 @@ class PartnerAdminGroupController extends BackEndApiMainController
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @return JsonResponse
      */
-    public function index()
+    public function index(): JsonResponse
     {
         $data = $this->eloqM::all()->toArray();
         return $this->msgOut(true, $data);
@@ -36,9 +37,10 @@ class PartnerAdminGroupController extends BackEndApiMainController
     /**
      * Show the form for creating a new resource.
      *
-     * @return Response
+     * @param  PartnerAdminGroupCreateRequest $request
+     * @return JsonResponse
      */
-    public function create(PartnerAdminGroupCreateRequest $request)
+    public function create(PartnerAdminGroupCreateRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         try {
@@ -63,7 +65,7 @@ class PartnerAdminGroupController extends BackEndApiMainController
                 $fundOperationGroup->fill($fundOperationData);
                 $fundOperationGroup->save();
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);
@@ -84,10 +86,10 @@ class PartnerAdminGroupController extends BackEndApiMainController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  Request  $request
-     * @return Response
+     * @param  PartnerAdminGroupEditRequest $request
+     * @return JsonResponse
      */
-    public function edit(PartnerAdminGroupEditRequest $request)
+    public function edit(PartnerAdminGroupEditRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         $id = $inputDatas['id'];
@@ -160,6 +162,7 @@ class PartnerAdminGroupController extends BackEndApiMainController
 
     /**
      * 删除组管理员角色
+     * @param  PartnerAdminGroupDestroyRequest $request
      * @return JsonResponse
      */
     public function destroy(PartnerAdminGroupDestroyRequest $request):  ? JsonResponse
@@ -170,40 +173,44 @@ class PartnerAdminGroupController extends BackEndApiMainController
             ['id', '=', $id],
             ['group_name', '=', $inputDatas['group_name']],
         ])->first();
-        if (!is_null($datas)) {
-            try {
-                if ($datas->adminUsers()->exists()) {
-                    $datas->adminUsers()->delete();
-                }
-                $datas->delete();
-                //检查是否有人工充值权限
-                $role = $datas->role == '*' ? Arr::wrap($datas->role) : Arr::wrap(json_decode($datas->role, true));
-                $fundOperation = BackendSystemMenu::select('id')->where('route', '/manage/recharge')->first()->toArray();
-                $isManualRecharge = in_array($fundOperation['id'], $role, true);
-                //如果有有人工充值权限   删除  FundOperation  BackendAdminRechargePermitGroup 表
-                if ($isManualRecharge === true) {
-                    $fundOperationGroup = new BackendAdminRechargePermitGroup();
-                    $fundOperationGroup->where('group_id', $id)->delete();
-                    //需要删除的资金表 admin
-                    $fundOperationEloq = new BackendAdminRechargePocessAmount();
-                    $adminsData = BackendAdminUser::select('id')->where('group_id', $id)->get();
-                    $admins = array_column($adminsData->toArray(), 'id');
-                    if (!is_null($adminsData)) {
-                        $fundOperationEloq->whereIn('admin_id', $admins)->delete();
-                    }
-                }
-                return $this->msgOut(true);
-            } catch (\Exception $e) {
-                $errorObj = $e->getPrevious()->getPrevious();
-                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-                return $this->msgOut(false, [], $sqlState, $msg);
-            }
-        } else {
+        if ($datas === null) {
             return $this->msgOut(false, [], '100201');
+        }
+        try {
+            if ($datas->adminUsers()->exists()) {
+                $datas->adminUsers()->delete();
+            }
+            $datas->delete();
+            //检查是否有人工充值权限
+            $role = $datas->role == '*' ? Arr::wrap($datas->role) : Arr::wrap(json_decode($datas->role, true));
+            $fundOperation = BackendSystemMenu::select('id')->where('route', '/manage/recharge')->first()->toArray();
+            $isManualRecharge = in_array($fundOperation['id'], $role, true);
+            //如果有有人工充值权限   删除  FundOperation  BackendAdminRechargePermitGroup 表
+            if ($isManualRecharge === true) {
+                $fundOperationGroup = new BackendAdminRechargePermitGroup();
+                $fundOperationGroup->where('group_id', $id)->delete();
+                //需要删除的资金表 admin
+                $fundOperationEloq = new BackendAdminRechargePocessAmount();
+                $adminsData = BackendAdminUser::select('id')->where('group_id', $id)->get();
+                $admins = array_column($adminsData->toArray(), 'id');
+                if (!is_null($adminsData)) {
+                    $fundOperationEloq->whereIn('admin_id', $admins)->delete();
+                }
+            }
+            return $this->msgOut(true);
+        } catch (Exception $e) {
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
 
-    public function specificGroupUsers(PartnerAdminGroupSpecificGroupUsersRequesthe $request)
+    /**
+     * [specificGroupUsers description]
+     * @param  PartnerAdminGroupSpecificGroupUsersRequesthe $request
+     * @return JsonResponse
+     */
+    public function specificGroupUsers(PartnerAdminGroupSpecificGroupUsersRequesthe $request) : JsonResponse
     {
         $inputDatas = $request->validated();
         $accessGroupEloq = $this->eloqM::find($inputDatas['id']);

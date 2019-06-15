@@ -127,8 +127,8 @@ class BackEndApiMainController extends Controller
         {
         $data['access_token']=$this->currentAuth->user()->remember_token;
         }*/
-        $defaultSuccessCode = 200;
-        $defaultErrorCode = 404;
+        $defaultSuccessCode = '200';
+        $defaultErrorCode = '404';
         if ($success === true) {
             $code = $code == '' ? $defaultSuccessCode : $code;
         } else {

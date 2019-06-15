@@ -2,15 +2,15 @@
 
 /**
  * @Author: LingPh
- * @Date:   2019-06-13 20:47:22
+ * @Date:   2019-06-13 20:44:56
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-13 20:47:46
+ * @Last Modified time: 2019-06-15 15:56:31
  */
 namespace App\Http\Requests\Backend\Admin\Article;
 
 use App\Http\Requests\BaseFormRequest;
 
-class ArticlesTopArticlesRequest extends BaseFormRequest
+class ArticlesSortRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -30,7 +30,11 @@ class ArticlesTopArticlesRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|numeric|exists:backend_admin_message_articles,id',
+            'front_id' => 'required|numeric|exists:backend_admin_message_articles,id',
+            'rearways_id' => 'required|numeric|exists:backend_admin_message_articles,id',
+            'front_sort' => 'required|numeric|gt:0',
+            'rearways_sort' => 'required|numeric|gt:0',
+            'sort_type' => 'required|numeric|in:1,2',
         ];
     }
 

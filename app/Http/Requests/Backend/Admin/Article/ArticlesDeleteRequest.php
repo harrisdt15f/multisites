@@ -2,15 +2,15 @@
 
 /**
  * @Author: LingPh
- * @Date:   2019-06-13 20:28:44
+ * @Date:   2019-06-13 20:40:59
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-13 20:29:28
+ * @Last Modified time: 2019-06-15 15:56:12
  */
 namespace App\Http\Requests\Backend\Admin\Article;
 
 use App\Http\Requests\BaseFormRequest;
 
-class ArticlesAddArticlesRequest extends BaseFormRequest
+class ArticlesDeleteRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -30,15 +30,7 @@ class ArticlesAddArticlesRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'category_id' => 'required|numeric|exists:frontend_info_categories,id',
-            'title' => 'required|string|unique:backend_admin_message_articles,title',
-            'summary' => 'required|string',
-            'content' => 'required|string',
-            'search_text' => 'required|string',
-            'is_for_agent' => 'required|in:0,1',
-            'apply_note' => 'required|string',
-            'pic_name' => 'array',
-            'pic_path' => 'array',
+            'id' => 'required|numeric|exists:backend_admin_message_articles,id',
         ];
     }
 

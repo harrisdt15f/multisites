@@ -7,6 +7,7 @@ use App\Http\Requests\Backend\Admin\Homepage\HomepageEditRequest;
 use App\Http\Requests\Backend\Admin\Homepage\HomepageUploadIcoRequest;
 use App\Http\Requests\Backend\Admin\Homepage\HomepageUploadPicRequest;
 use App\Lib\Common\ImageArrange;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 
@@ -14,7 +15,10 @@ class HomepageController extends BackEndApiMainController
 {
     protected $eloqM = 'DeveloperUsage\Frontend\FrontendAllocatedModel';
 
-    //导航一列表
+    /**
+     * 导航一列表
+     * @return JsonResponse
+     */
     public function navOne(): JsonResponse
     {
         $frontendModelEloq = new $this->eloqM;
@@ -23,7 +27,10 @@ class HomepageController extends BackEndApiMainController
         return $this->msgOut(true, $datas);
     }
 
-    //主题板块列表
+    /**
+     * 主题板块列表
+     * @return JsonResponse
+     */
     public function pageModel(): JsonResponse
     {
         $frontendModelEloq = new $this->eloqM;
@@ -32,7 +39,11 @@ class HomepageController extends BackEndApiMainController
         return $this->msgOut(true, $datas);
     }
 
-    //编辑首页模块
+    /**
+     * 编辑首页模块
+     * @param  HomepageEditRequest $request
+     * @return JsonResponse
+     */
     public function edit(HomepageEditRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
@@ -64,15 +75,19 @@ class HomepageController extends BackEndApiMainController
         }
     }
 
-    //修改首页模块下的图片
+    /**
+     * 修改首页模块下的图片
+     * @param  HomepageUploadPicRequest $request
+     * @return JsonResponse
+     */
     public function uploadPic(HomepageUploadPicRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         $pastData = $this->eloqM::where('en_name', $inputDatas['en_name'])->first();
         //上传图片
-        $imgClass = new ImageArrange();
-        $depositPath = $imgClass->depositPath($inputDatas['en_name'], $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
-        $pic = $imgClass->uploadImg($inputDatas['pic'], $depositPath);
+        $imageObj = new ImageArrange();
+        $depositPath = $imageObj->depositPath($inputDatas['en_name'], $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
+        $pic = $imageObj->uploadImg($inputDatas['pic'], $depositPath);
         if ($pic['success'] === false) {
             return $this->msgOut(false, [], '400', $pic['msg']);
         }
@@ -81,21 +96,25 @@ class HomepageController extends BackEndApiMainController
             $pastData->value = '/' . $pic['path'];
             $pastData->save();
             //删除原图
-            if (!is_null($pastLogoPath)) {
-                $imgClass->deletePic(substr($pastLogoPath, 1));
+            if ($pastLogoPath !== null) {
+                $imageObj->deletePic(substr($pastLogoPath, 1));
             }
             //删除前台首页缓存
             $this->deleteCache($pastData->en_name);
             return $this->msgOut(true);
         } catch (Exception $e) {
-            $imgClass->deletePic($pic['path']);
+            $imageObj->deletePic($pic['path']);
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
 
-    //上传前台网站头ico
+    /**
+     * 上传前台网站头ico
+     * @param  HomepageUploadIcoRequest $request
+     * @return JsonResponse
+     */
     public function uploadIco(HomepageUploadIcoRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
@@ -104,10 +123,10 @@ class HomepageController extends BackEndApiMainController
             return $this->msgOut(false, [], '101900');
         }
         //上传ico
-        $imageClass = new ImageArrange();
+        $imageObj = new ImageArrange();
         $folderName = 'frontend';
-        $depositPath = $imageClass->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name) . '/ico';
-        $ico = $imageClass->uploadImg($inputDatas['ico'], $depositPath);
+        $depositPath = $imageObj->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name) . '/ico';
+        $ico = $imageObj->uploadImg($inputDatas['ico'], $depositPath);
         $pastIco = $pastData->value;
         try {
             $pastData->value = '/' . $ico['path'];
@@ -115,20 +134,24 @@ class HomepageController extends BackEndApiMainController
             //删除前台首页缓存
             $this->deleteCache($pastData->en_name);
             //删除原图
-            if (!is_null($pastIco)) {
-                $imageClass->deletePic(substr($pastIco, 1));
+            if ($pastIco !== null) {
+                $imageObj->deletePic(substr($pastIco, 1));
             }
             return $this->msgOut(true);
         } catch (Exception $e) {
             //删除上传成功的图片
-            $imageClass->deletePic($ico['path']);
+            $imageObj->deletePic($ico['path']);
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
 
-    //删除前台首页缓存
+    /**
+     * 删除前台首页缓存
+     * @param  string $key
+     * @return void
+     */
     public function deleteCache($key): void
     {
         $homepageCache = [

@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-04 14:38:55
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 19:26:17
+ * @Last Modified time: 2019-06-15 17:58:20
  */
 namespace App\Http\Controllers\BackendApi\Admin\Homepage;
 
@@ -24,7 +24,10 @@ class PopularMethodsController extends BackEndApiMainController
 {
     protected $eloqM = 'Admin\Homepage\FrontendLotteryFnfBetableList';
 
-    //热门彩票二 玩法列表
+    /**
+     * 热门彩票二列表
+     * @return JsonResponse
+     */
     public function detail(): JsonResponse
     {
         $methodEloqs = $this->eloqM::with('method')->orderBy('sort', 'asc')->get();
@@ -42,13 +45,16 @@ class PopularMethodsController extends BackEndApiMainController
         return $this->msgOut(true, $datas);
     }
 
-    //热门彩票二 添加热门彩种
+    /**
+     * 热门彩票二 添加热门彩票
+     * @param PopularMethodsAddRequest $request
+     */
     public function add(PopularMethodsAddRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         //sort
-        $maxSort = $this->eloqM::max('sort');
-        $sort = is_null($maxSort) ? 1 : $maxSort++;
+        $maxSort = $this->eloqM::select('sort')->max('sort');
+        $sort = ++$maxSort;
         $addData = [
             'lotteries_id' => $inputDatas['lotteries_id'],
             'method_id' => $inputDatas['method_id'],
@@ -68,7 +74,11 @@ class PopularMethodsController extends BackEndApiMainController
         }
     }
 
-    //热门彩票二 编辑热门玩法
+    /**
+     * 热门彩票二 编辑热门玩法
+     * @param  PopularMethodsEditRequest $request
+     * @return JsonResponse
+     */
     public function edit(PopularMethodsEditRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
@@ -91,7 +101,11 @@ class PopularMethodsController extends BackEndApiMainController
         }
     }
 
-    //删除热门玩法
+    /**
+     * 删除热门玩法
+     * @param  PopularMethodsDeleteRequest $request
+     * @return JsonResponse
+     */
     public function delete(PopularMethodsDeleteRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
@@ -114,7 +128,11 @@ class PopularMethodsController extends BackEndApiMainController
         }
     }
 
-    //热门玩法拉动排序
+    /**
+     * 热门玩法拉动排序
+     * @param  PopularMethodsSortRequest $request
+     * @return JsonResponse
+     */
     public function sort(PopularMethodsSortRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
@@ -136,7 +154,7 @@ class PopularMethodsController extends BackEndApiMainController
             //清除首页热门玩法缓存
             $this->deleteCache();
             return $this->msgOut(true);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollback();
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -144,7 +162,10 @@ class PopularMethodsController extends BackEndApiMainController
         }
     }
 
-    //添加热门玩法时选择的玩法列表
+    /**
+     * 添加热门玩法时选择的玩法列表
+     * @return JsonResponse
+     */
     public function methodsList(): JsonResponse
     {
         $lotteryIds = FrontendLotteryFnfBetableMethod::groupBy('lottery_id')->pluck('lottery_id')->toArray();
@@ -159,8 +180,11 @@ class PopularMethodsController extends BackEndApiMainController
         return $this->msgOut(true, $data);
     }
 
-    //清除首页热门玩法缓存
-    public function deleteCache()
+    /**
+     * 清除首页热门玩法缓存
+     * @return void
+     */
+    public function deleteCache(): void
     {
         if (Cache::has('popularMethods')) {
             Cache::forget('popularMethods');

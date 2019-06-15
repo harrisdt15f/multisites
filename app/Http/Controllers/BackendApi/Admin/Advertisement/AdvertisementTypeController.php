@@ -4,6 +4,7 @@ namespace App\Http\Controllers\BackendApi\Admin\Advertisement;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Admin\Advertisement\AdvertisementTypeEditRequest;
+use Exception;
 use Illuminate\Http\JsonResponse;
 
 class AdvertisementTypeController extends BackEndApiMainController
@@ -19,6 +20,8 @@ class AdvertisementTypeController extends BackEndApiMainController
 
     /**
      * 编辑广告类型
+     * @param  AdvertisementTypeEditRequest $request
+     * @return JsonResponse
      */
     public function edit(AdvertisementTypeEditRequest $request): JsonResponse
     {

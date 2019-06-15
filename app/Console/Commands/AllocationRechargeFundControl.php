@@ -7,6 +7,7 @@ use App\Models\Admin\Fund\BackendAdminRechargePermitGroup;
 use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
 use App\Models\Admin\SystemConfiguration;
 use App\Models\User\Fund\BackendAdminRechargehumanLog;
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -36,28 +37,24 @@ class AllocationRechargeFundControl extends Command
     {
         Log::info('开始定时发放人工充值额度');
         $sysConfigures = new SystemConfiguration();
-        $fundData = $sysConfigures->select('value')->where('sign', 'admin_recharge_daily_limit')->first();
-        $everyDayfund = $fundData['value'];
-        $fundOperationGroup = new BackendAdminRechargePermitGroup();
-        $groupArr = $fundOperationGroup->get()->toArray();
-        $groups = array_column($groupArr, 'group_id');
+        $everyDayfund = $sysConfigures->select('value')->where('sign', 'admin_recharge_daily_limit')->value('value');
+        $groups = BackendAdminRechargePermitGroup::pluck('group_id')->toArray();
         //拥有权限的管理员
         $admins = BackendAdminUser::from('backend_admin_users as admin')
             ->select('admin.*', 'fund.fund')
             ->leftJoin('backend_admin_recharge_pocess_amounts as fund', 'fund.admin_id', '=', 'admin.id')
             ->whereIn('group_id', $groups)
             ->get()->toArray();
-        $time = date('Y-m-d H:i:s', time());
         foreach ($admins as $admin) {
             if ($admin['fund'] < $everyDayfund) {
-                $fund = $everyDayfund;
-                $addFund = $fund - $admin['fund'];
+                $addFund = $everyDayfund - $admin['fund'];
                 $adminFund = $admin['fund'] + $addFund;
                 $type = BackendAdminRechargehumanLog::SYSTEM;
                 $in_out = BackendAdminRechargehumanLog::INCREMENT;
                 $comment = '[每日充值额度发放]=>>+' . $addFund . '|[目前额度]=>>' . $adminFund;
+                $time = date('Y-m-d H:i:s');
                 $editFundData = [
-                    'fund' => $fund,
+                    'fund' => $everyDayfund,
                     'updated_at' => $time,
                 ];
                 $flowsData = [
@@ -71,8 +68,7 @@ class AllocationRechargeFundControl extends Command
                 ];
                 DB::beginTransaction();
                 try {
-                    $fundOperation = new BackendAdminRechargePocessAmount();
-                    $fundOperation->where('admin_id', $admin['id'])->update($editFundData);
+                    BackendAdminRechargePocessAmount::where('admin_id', $admin['id'])->update($editFundData);
                     $rechargeLog = new BackendAdminRechargehumanLog();
                     $rechargeLog->insert($flowsData);
                     DB::commit();
