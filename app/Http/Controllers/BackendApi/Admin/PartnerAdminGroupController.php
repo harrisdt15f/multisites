@@ -6,7 +6,7 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Admin\PartnerAdminGroupCreateRequest;
 use App\Http\Requests\Backend\Admin\PartnerAdminGroupDestroyRequest;
 use App\Http\Requests\Backend\Admin\PartnerAdminGroupEditRequest;
-use App\Http\Requests\Backend\Admin\PartnerAdminGroupSpecificGroupUsersRequesthe;
+use App\Http\Requests\Backend\Admin\PartnerAdminGroupSpecificGroupUsersReques;
 use App\Models\Admin\BackendAdminUser;
 use App\Models\Admin\Fund\BackendAdminRechargePermitGroup;
 use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
@@ -207,10 +207,10 @@ class PartnerAdminGroupController extends BackEndApiMainController
 
     /**
      * [specificGroupUsers description]
-     * @param  PartnerAdminGroupSpecificGroupUsersRequesthe $request
+     * @param  PartnerAdminGroupSpecificGroupUsersReques $request
      * @return JsonResponse
      */
-    public function specificGroupUsers(PartnerAdminGroupSpecificGroupUsersRequesthe $request) : JsonResponse
+    public function specificGroupUsers(PartnerAdminGroupSpecificGroupUsersReques $request) : JsonResponse
     {
         $inputDatas = $request->validated();
         $accessGroupEloq = $this->eloqM::find($inputDatas['id']);
@@ -221,5 +221,4 @@ class PartnerAdminGroupController extends BackEndApiMainController
             return $this->msgOut(false, [], '100202');
         }
     }
-
 }

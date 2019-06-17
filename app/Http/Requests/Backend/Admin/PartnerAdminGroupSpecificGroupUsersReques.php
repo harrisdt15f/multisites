@@ -4,13 +4,13 @@
  * @Author: LingPh
  * @Date:   2019-06-14 14:14:19
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 14:18:01
+ * @Last Modified time: 2019-06-17 19:33:37
  */
 namespace App\Http\Requests\Backend\Admin;
 
 use App\Http\Requests\BaseFormRequest;
 
-class PartnerAdminGroupSpecificGroupUsersRequesthe extends BaseFormRequest
+class PartnerAdminGroupSpecificGroupUsersReques extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
