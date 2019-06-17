@@ -6,20 +6,28 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\DeveloperUsage\Backend\Routes\RoutesAddRequest;
 use App\Http\Requests\Backend\DeveloperUsage\Backend\Routes\RoutesDeleteRequest;
 use App\Http\Requests\Backend\DeveloperUsage\Backend\Routes\RoutesEditRequest;
-use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
+use Exception;
+use Illuminate\Http\JsonResponse;
 
 class RouteController extends BackEndApiMainController
 {
     protected $eloqM = 'DeveloperUsage\Backend\BackendAdminRoute';
 
-    public function detail()
+    /**
+     * @return JsonResponse
+     */
+    public function detail(): JsonResponse
     {
         $datas = $this->eloqM::with('menu')->get();
         return $this->msgOut(true, $datas);
     }
 
-    //添加路由
-    public function add(RoutesAddRequest $request)
+    /**
+     * 添加路由
+     * @param   RoutesAddRequest $request
+     * @return  JsonResponse
+     */
+    public function add(RoutesAddRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         try {
@@ -34,8 +42,12 @@ class RouteController extends BackEndApiMainController
         }
     }
 
-    //编辑路由
-    public function edit(RoutesEditRequest $request)
+    /**
+     * 编辑路由
+     * @param  RoutesEditRequest $request
+     * @return JsonResponse
+     */
+    public function edit(RoutesEditRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         $pastEloq = $this->eloqM::find($inputDatas['id']);
@@ -54,13 +66,16 @@ class RouteController extends BackEndApiMainController
         }
     }
 
-    //删除路由
-    public function delete(RoutesDeleteRequest $request)
+    /**
+     * 删除路由
+     * @param  RoutesDeleteRequest $request
+     * @return JsonResponse
+     */
+    public function delete(RoutesDeleteRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
-        $pastEloq = $this->eloqM::find($inputDatas['id']);
         try {
-            $pastEloq->delete();
+            $this->eloqM::find($inputDatas['id'])->delete();
             return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();

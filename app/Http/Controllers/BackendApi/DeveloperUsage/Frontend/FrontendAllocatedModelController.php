@@ -9,14 +9,20 @@ use App\Http\Requests\Backend\DeveloperUsage\Frontend\FrontendAllocatedModelDeta
 use App\Http\Requests\Backend\DeveloperUsage\Frontend\FrontendAllocatedModelEditRequest;
 use App\Models\DeveloperUsage\Frontend\FrontendAppRoute;
 use App\Models\DeveloperUsage\Frontend\FrontendWebRoute;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
 class FrontendAllocatedModelController extends BackEndApiMainController
 {
     protected $eloqM = 'DeveloperUsage\Frontend\FrontendAllocatedModel';
 
-    //前端模块列表
-    public function detail(FrontendAllocatedModelDetailRequest $request)
+    /**
+     * 前端模块列表
+     * @param  FrontendAllocatedModelDetailRequest $request
+     * @return JsonResponse
+     */
+    public function detail(FrontendAllocatedModelDetailRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         $eloqM = new $this->eloqM;
@@ -24,8 +30,12 @@ class FrontendAllocatedModelController extends BackEndApiMainController
         return $this->msgOut(true, $allFrontendModel);
     }
 
-    //添加前端模块
-    public function add(FrontendAllocatedModelAddRequest $request)
+    /**
+     * 添加前端模块
+     * @param   FrontendAllocatedModelAddRequest $request
+     * @return  JsonResponse
+     */
+    public function add(FrontendAllocatedModelAddRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         if ($inputDatas['pid'] != 0) {
@@ -46,23 +56,27 @@ class FrontendAllocatedModelController extends BackEndApiMainController
         }
     }
 
-    //编辑前端模块
-    public function edit(FrontendAllocatedModelEditRequest $request)
+    /**
+     * 编辑前端模块
+     * @param  FrontendAllocatedModelEditRequest $request
+     * @return JsonResponse
+     */
+    public function edit(FrontendAllocatedModelEditRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
-        $pastData = $this->eloqM::find($inputDatas['id']);
-        $checkLabelEloq = $this->eloqM::where('label', $inputDatas['label'])->where('id', '!=', $inputDatas['id'])->first();
-        if (!is_null($checkLabelEloq)) {
+        $pastDataEloq = $this->eloqM::find($inputDatas['id']);
+        $isExistLabel = $this->eloqM::where('label', $inputDatas['label'])->where('id', '!=', $inputDatas['id'])->exists();
+        if ($isExistLabel === true) {
             return $this->msgOut(false, [], '101600');
         }
-        $checkEnNamelEloq = $this->eloqM::where('en_name', $inputDatas['en_name'])->where('id', '!=', $inputDatas['id'])->first();
-        if (!is_null($checkEnNamelEloq)) {
+        $isExistName = $this->eloqM::where('en_name', $inputDatas['en_name'])->where('id', '!=', $inputDatas['id'])->exists();
+        if ($isExistName === true) {
             return $this->msgOut(false, [], '101601');
         }
         try {
-            $pastData->label = $inputDatas['label'];
-            $pastData->en_name = $inputDatas['en_name'];
-            $pastData->save();
+            $pastDataEloq->label = $inputDatas['label'];
+            $pastDataEloq->en_name = $inputDatas['en_name'];
+            $pastDataEloq->save();
             return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
@@ -71,8 +85,12 @@ class FrontendAllocatedModelController extends BackEndApiMainController
         }
     }
 
-    //删除前端模块
-    public function delete(FrontendAllocatedModelDeleteRequest $request)
+    /**
+     * 删除前端模块
+     * @param  FrontendAllocatedModelDeleteRequest $request
+     * @return JsonResponse
+     */
+    public function delete(FrontendAllocatedModelDeleteRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         $modelEloq = $this->eloqM::find($inputDatas['id']);
@@ -94,7 +112,7 @@ class FrontendAllocatedModelController extends BackEndApiMainController
             if ($issetWebRoute === true) {
                 FrontendWebRoute::whereIn('frontend_model_id', $deleteIds)->delete();
             }
-            $issetAppRoute = FrontendAppRoute::whereIn('frontend_model_id', $deleteIds)->get();
+            $issetAppRoute = FrontendAppRoute::whereIn('frontend_model_id', $deleteIds)->exists();
             if ($issetAppRoute === true) {
                 FrontendAppRoute::whereIn('frontend_model_id', $deleteIds)->delete();
             }

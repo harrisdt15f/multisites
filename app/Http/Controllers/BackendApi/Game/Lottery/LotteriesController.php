@@ -14,6 +14,7 @@ use App\Http\Requests\Backend\Game\Lottery\LotteriesMethodSwitchRequest;
 use App\Models\Game\Lottery\LotteryList;
 use App\Models\Game\Lottery\LotteryMethod;
 use App\Models\Game\Lottery\LotterySerie;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -37,6 +38,7 @@ class LotteriesController extends BackEndApiMainController
 
     /**
      * 获取彩种接口
+     * @param  LotteriesLotteriesListsRequest $request
      * @return JsonResponse
      */
     public function lotteriesLists(LotteriesLotteriesListsRequest $request): JsonResponse
@@ -146,7 +148,11 @@ class LotteriesController extends BackEndApiMainController
         return $this->msgOut(true, $data);
     }
 
-    // 生成奖期
+    /**
+     * 生成奖期
+     * @param  LotteriesGenerateIssueRequest $request
+     * @return JsonResponse
+     */
     public function generateIssue(LotteriesGenerateIssueRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
@@ -154,7 +160,11 @@ class LotteriesController extends BackEndApiMainController
         return $this->msgOut(true);
     }
 
-    //彩种开关
+    /**
+     * 彩种开关
+     * @param  LotteriesLotteriesSwitchRequest $request
+     * @return JsonResponse
+     */
     public function lotteriesSwitch(LotteriesLotteriesSwitchRequest $request):  ? JsonResponse
     {
         $inputDatas = $request->validated();
@@ -172,7 +182,11 @@ class LotteriesController extends BackEndApiMainController
         }
     }
 
-    //玩法组开关
+    /**
+     * 玩法组开关
+     * @param  LotteriesMethodGroupSwitchRequest $request
+     * @return JsonResponse
+     */
     public function methodGroupSwitch(LotteriesMethodGroupSwitchRequest $request) :  ? JsonResponse
     {
         $inputDatas = $request->validated();
@@ -193,7 +207,11 @@ class LotteriesController extends BackEndApiMainController
         }
     }
 
-    //玩法行开关
+    /**
+     * 玩法行开关
+     * @param  LotteriesMethodRowSwitchRequest $request
+     * @return JsonResponse
+     */
     public function methodRowSwitch(LotteriesMethodRowSwitchRequest $request) :  ? JsonResponse
     {
         $inputDatas = $request->validated();
@@ -214,7 +232,11 @@ class LotteriesController extends BackEndApiMainController
         }
     }
 
-    //玩法开关
+    /**
+     * 玩法开关
+     * @param  LotteriesMethodSwitchRequest $request
+     * @return JsonResponse
+     */
     public function methodSwitch(LotteriesMethodSwitchRequest $request) :  ? JsonResponse
     {
         $inputDatas = $request->validated();
@@ -235,7 +257,10 @@ class LotteriesController extends BackEndApiMainController
         }
     }
 
-    //清理玩法缓存
+    /**
+     * 清理玩法缓存
+     * @return void
+     */
     public function clearMethodCache() : void
     {
         $redisKey = $this->methodCacheName;
@@ -244,7 +269,11 @@ class LotteriesController extends BackEndApiMainController
         }
     }
 
-    //编辑玩法
+    /**
+     * 编辑玩法
+     * @param  LotteriesEditMethodRequest $request
+     * @return JsonResponse
+     */
     public function editMethod(LotteriesEditMethodRequest $request):  ? JsonResponse
     {
         $inputDatas = $request->validated();
@@ -261,12 +290,12 @@ class LotteriesController extends BackEndApiMainController
     }
 
     /**
-     * [组装玩法组和玩法行data]
-     * @param  [int] $lotteryId   [彩种]
-     * @param  [int] $methodGroup [玩法组]
-     * @param  [int] $status      [开启状态]
-     * @param  [int] $methodRow   [玩法行]
-     * @return [array]  $dataArr
+     * 组装玩法组和玩法行data
+     * @param  int $lotteryId   [彩种]
+     * @param  int $methodGroup [玩法组]
+     * @param  int $status      [开启状态]
+     * @param  int $methodRow   [玩法行]
+     * @return array  $dataArr
      */
     public function methodData($lotteryId, $methodGroup, $status, $methodRow = null)
     {
@@ -275,7 +304,7 @@ class LotteriesController extends BackEndApiMainController
             'method_group' => $methodGroup,
             'status' => $status, //玩法行下是否存在开启状态的玩法
         ];
-        if (!is_null($methodRow)) {
+        if ($methodRow !== null) {
             $dataArr['method_row'] = $methodRow;
         }
         return $dataArr;

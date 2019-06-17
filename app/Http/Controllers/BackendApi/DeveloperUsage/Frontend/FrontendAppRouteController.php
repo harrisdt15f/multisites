@@ -6,20 +6,29 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\DeveloperUsage\Frontend\FrontendAppRouteAddRequest;
 use App\Http\Requests\Backend\DeveloperUsage\Frontend\FrontendAppRouteDeleteRequest;
 use App\Http\Requests\Backend\DeveloperUsage\Frontend\FrontendAppRouteIsOpenRequest;
+use Exception;
+use Illuminate\Http\JsonResponse;
 
 class FrontendAppRouteController extends BackEndApiMainController
 {
     protected $eloqM = 'DeveloperUsage\Frontend\FrontendAppRoute';
 
-    //APP路由列表
-    public function detail()
+    /**
+     * APP路由列表
+     * @return JsonResponse
+     */
+    public function detail(): JsonResponse
     {
         $datas = $this->eloqM::select('id', 'route_name', 'frontend_model_id', 'title', 'description', 'is_open')->get()->toArray();
         return $this->msgOut(true, $datas);
     }
 
-    //添加APP路由
-    public function add(FrontendAppRouteAddRequest $request)
+    /**
+     * 添加APP路由
+     * @param FrontendAppRouteAddRequest $request
+     * @return JsonResponse
+     */
+    public function add(FrontendAppRouteAddRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         try {
@@ -34,8 +43,12 @@ class FrontendAppRouteController extends BackEndApiMainController
         }
     }
 
-    //删除APP路由
-    public function delete(FrontendAppRouteDeleteRequest $request)
+    /**
+     * 删除APP路由
+     * @param  FrontendAppRouteDeleteRequest $request
+     * @return JsonResponse
+     */
+    public function delete(FrontendAppRouteDeleteRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         try {
@@ -48,8 +61,12 @@ class FrontendAppRouteController extends BackEndApiMainController
         }
     }
 
-    //设置APP路由是否开放
-    public function isOpen(FrontendAppRouteIsOpenRequest $request)
+    /**
+     * 设置APP路由是否开放
+     * @param  FrontendAppRouteIsOpenRequest $request
+     * @return JsonResponse
+     */
+    public function isOpen(FrontendAppRouteIsOpenRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         $pastData = $this->eloqM::find($inputDatas['id']);
