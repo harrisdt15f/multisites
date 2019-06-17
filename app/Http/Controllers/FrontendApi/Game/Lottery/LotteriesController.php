@@ -93,7 +93,7 @@ class LotteriesController extends FrontendApiMainController
                     }
 
                     if (!isset($hasRow[$method->method_group]) || !in_array($method->method_row,
-                        $hasRow[$method->method_group])) {
+                            $hasRow[$method->method_group])) {
                         $groupData[$method->method_group][] = [
                             'name' => $rowName[$method->method_row],
                             'sign' => $method->method_row,
@@ -203,13 +203,13 @@ class LotteriesController extends FrontendApiMainController
         }
         // 上一期
         $_lastIssue = LotteryIssue::getLastIssue($lotterySign);
-        $lastIssue = [
+        $lastIssue = $_lastIssue !== null ? [
             'issue_no' => $_lastIssue->issue,
             'begin_time' => $_lastIssue->begin_time,
             'end_time' => $_lastIssue->end_time,
             'open_time' => $_lastIssue->allow_encode_time,
             'open_code' => '1,2,3,4,5',
-        ];
+        ] : [];
         $data = [
             'issueInfo' => $canBetIssueData,
             'currentIssue' => $currentIssue,
@@ -263,7 +263,7 @@ class LotteriesController extends FrontendApiMainController
             if ($oMethod->supportExpand) {
                 $position = [];
                 if (isset($item['position'])) {
-                    $position = (array) $item['position'];
+                    $position = (array)$item['position'];
                 }
                 if (!$oMethod->checkPos($position)) {
                     return "对不起, 玩法{$method['name']}位置不正确!";
@@ -384,7 +384,7 @@ class LotteriesController extends FrontendApiMainController
                 if ($res !== true) {
                     DB::rollBack();
                     $accountLocker->release();
-                    return $this->msgOut(false, [], '', '对不起, ' . $res);
+                    return $this->msgOut(false, [], '', '对不起, '.$res);
                 }
             }
             $accountChange->triggerSave();
@@ -392,8 +392,8 @@ class LotteriesController extends FrontendApiMainController
         } catch (\Exception $e) {
             DB::rollBack();
             $accountLocker->release();
-            Log::info('投注-异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine()); //Clog::userBet
-            return $this->msgOut(false, [], '', '对不起, ' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine());
+            Log::info('投注-异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine()); //Clog::userBet
+            return $this->msgOut(false, [], '', '对不起, '.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine());
         }
         $accountLocker->release();
         return $this->msgOut(true, $data);
