@@ -17,3 +17,5 @@ yarn-error.log
 \.phpintel/
 
 public/uploaded_files/
+
+composer\.lock
