@@ -9,6 +9,7 @@ use App\Http\Requests\Backend\DeveloperUsage\Backend\Menu\MenuDeleteRequest;
 use App\Http\Requests\Backend\DeveloperUsage\Backend\Menu\MenuEditRequest;
 use App\Models\DeveloperUsage\Backend\BackendAdminRoute;
 use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
+use Exception;
 use function GuzzleHttp\json_decode;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Route;
@@ -28,6 +29,8 @@ class MenuController extends BackEndApiMainController
     }
 
     /**
+     *
+     * @param  MenuAllRequireInfosRequest $request
      * @return JsonResponse
      */
     public function allRequireInfos(MenuAllRequireInfosRequest $request): JsonResponse
@@ -74,7 +77,11 @@ class MenuController extends BackEndApiMainController
         return $this->msgOut(true, $data);
     }
 
-    public function add(MenuAddRequest $request)
+    /**
+     * @param   MenuAddRequest $request
+     * @return  JsonResponse
+     */
+    public function add(MenuAddRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         $parent = false;
@@ -100,14 +107,18 @@ class MenuController extends BackEndApiMainController
             $menuEloq->save();
             $menuEloq->refreshStar();
             return $this->msgOut(true, $menuEloq->toArray());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
 
-    public function delete(MenuDeleteRequest $request)
+    /**
+     * @param  MenuDeleteRequest $request
+     * @return JsonResponse
+     */
+    public function delete(MenuDeleteRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         $menuEloq = new BackendSystemMenu();
@@ -121,7 +132,7 @@ class MenuController extends BackEndApiMainController
                 });
                 $menuEloq->refreshStar();
                 return $this->msgOut(true, $datas);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 return $this->msgOut(false, [], '0002', $e->getMessage());
             }
         }
@@ -132,6 +143,7 @@ class MenuController extends BackEndApiMainController
      * (?!\.) - don't allow . at start
      * (?!.*?\.\.) - don't allow 2 consecutive dots
      * (?!.*\.$) - don't allow . at end
+     * @param  MenuEditRequest $request
      * @return JsonResponse
      */
     public function edit(MenuEditRequest $request):  ? JsonResponse
@@ -162,6 +174,9 @@ class MenuController extends BackEndApiMainController
         }
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function changeParent() :  ? JsonResponse
     {
         $parseDatas = json_decode($this->inputs['dragResult'], true);
