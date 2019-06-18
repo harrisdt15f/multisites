@@ -7,7 +7,7 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesEditMethodRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesGenerateIssueRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesInputNumberRequest;
-use App\Http\Requests\Backend\Game\Lottery\LotteriesLotteriesListsRequest;
+use App\Http\Requests\Backend\Game\Lottery\LotteriesListsRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesLotteriesSwitchRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesMethodGroupSwitchRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesMethodRowSwitchRequest;
@@ -41,10 +41,10 @@ class LotteriesController extends BackEndApiMainController
 
     /**
      * 获取彩种接口
-     * @param  LotteriesLotteriesListsRequest $request
+     * @param  LotteriesListsRequest $request
      * @return JsonResponse
      */
-    public function lotteriesLists(LotteriesLotteriesListsRequest $request): JsonResponse
+    public function lists(LotteriesListsRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         $lotteriesEloq = $this->eloqM::where([
@@ -63,7 +63,7 @@ class LotteriesController extends BackEndApiMainController
      * 获取玩法结果。
      * @return JsonResponse
      */
-    public function lotteriesMethodLists(): JsonResponse
+    public function methodLists(): JsonResponse
     {
         $method = [];
         $redisKey = 'play_method_list';
@@ -126,7 +126,7 @@ class LotteriesController extends BackEndApiMainController
      * 获取奖期列表接口。
      * @return JsonResponse
      */
-    public function lotteryIssueLists(): JsonResponse
+    public function issueLists(): JsonResponse
     {
         $eloqM = $this->modelWithNameSpace($this->lotteryIssueEloq);
         $seriesId = $this->inputs['series_id'] ?? '';

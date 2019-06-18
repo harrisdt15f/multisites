@@ -4,14 +4,14 @@
  * @Author: LingPh
  * @Date:   2019-06-14 17:46:04
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 17:49:03
+ * @Last Modified time: 2019-06-18 19:03:33
  */
 namespace App\Http\Requests\Backend\Game\Lottery;
 
 use App\Http\Requests\BaseFormRequest;
 use Illuminate\Support\Facades\Config;
 
-class LotteriesLotteriesListsRequest extends BaseFormRequest
+class LotteriesListsRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

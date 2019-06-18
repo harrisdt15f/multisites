@@ -13,11 +13,11 @@ Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], function 
     //游戏series获取接口
     Route::match(['get', 'options'], 'series-lists', ['as' => $namePrefix . 'series-lists', 'uses' => $controller . 'seriesLists']);
     //彩种列表获取接口
-    Route::match(['post', 'options'], 'lotteries-lists', ['as' => $namePrefix . 'lotteries-lists', 'uses' => $controller . 'lotteriesLists']);
+    Route::match(['post', 'options'], 'lotteries-lists', ['as' => $namePrefix . 'lotteries-lists', 'uses' => $controller . 'lists']);
     //彩种玩法展示接口
-    Route::match(['get', 'options'], 'lotteries-method-lists', ['as' => $namePrefix . 'lotteries-method-lists', 'uses' => $controller . 'lotteriesMethodLists']);
+    Route::match(['get', 'options'], 'lotteries-method-lists', ['as' => $namePrefix . 'lotteries-method-lists', 'uses' => $controller . 'methodLists']);
     //奖期展示
-    Route::match(['post', 'options'], 'lotteries-issue-lists', ['as' => $namePrefix . 'lotteries-issue-lists', 'uses' => $controller . 'lotteryIssueLists']);
+    Route::match(['post', 'options'], 'lotteries-issue-lists', ['as' => $namePrefix . 'lotteries-issue-lists', 'uses' => $controller . 'issueLists']);
     //奖期生成接口
     Route::match(['post', 'options'], 'lotteries-issue-generate', ['as' => $namePrefix . 'lotteries-issue-generate', 'uses' => $controller . 'generateIssue']);
     //彩种开关
