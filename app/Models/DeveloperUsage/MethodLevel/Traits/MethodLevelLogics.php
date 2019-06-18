@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-05-30 14:43:03
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-05-30 16:06:27
+ * @Last Modified time: 2019-06-18 17:13:00
  */
 
 namespace App\Models\DeveloperUsage\MethodLevel\Traits;
@@ -15,7 +15,7 @@ trait MethodLevelLogics
     /**
      * @return array $data
      */
-    public function methodLevelDetail()
+    public function methodLevelDetail(): array
     {
         $methodtype = $this->groupBy('method_id')->orderBy('id', 'asc')->get();
         $data = [];

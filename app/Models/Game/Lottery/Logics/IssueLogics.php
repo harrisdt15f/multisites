@@ -14,20 +14,20 @@ trait IssueLogics
 
     /**
      * 获取当前的奖期
-     * @param $lotteryId
+     * @param  $lotteryId
      * @return mixed
      */
-    public static function getCurrentIssue($lotteryId)
+    public static function getCurrentIssue($lotteryId): mixed
     {
         return self::where('lottery_id', $lotteryId)->where('end_time', '>', time())->orderBy('id', 'ASC')->first();
     }
 
     /**
      * 获取当前的奖期
-     * @param $lotteryId
+     * @param  $lotteryId
      * @return mixed
      */
-    public static function getNeedOpenIssue($lotteryId)
+    public static function getNeedOpenIssue($lotteryId): mixed
     {
         return self::where('lottery_id', $lotteryId)->where('allow_encode_time', '<', time())->where('status_encode',
             0)->orderBy('id', 'asc')->get();
@@ -35,7 +35,8 @@ trait IssueLogics
 
     /**
      * 获取所有的奖期
-     * @param $issueArr
+     * @param  $issueArr
+     * @return void
      */
     public function getIssues($issueArr): void
     {
@@ -46,11 +47,11 @@ trait IssueLogics
 
     /**
      * 获取所有可投奖期
-     * @param $lotteryId
-     * @param  int  $count
+     * @param  $lotteryId
+     * @param  int         $count
      * @return mixed
      */
-    public static function getCanBetIssue($lotteryId, $count = 50)
+    public static function getCanBetIssue($lotteryId, $count = 50): mixed
     {
         $time = time();
         return self::where('lottery_id', $lotteryId)->where('end_time', '>', $time)->orderBy('id',
@@ -59,11 +60,11 @@ trait IssueLogics
 
     /**
      * 获取所有历史奖期
-     * @param $lotteryId
-     * @param  int  $count
+     * @param  $lotteryId
+     * @param  int         $count
      * @return mixed
      */
-    public static function getHistoryIssue($lotteryId, $count = 50)
+    public static function getHistoryIssue($lotteryId, $count = 50): mixed
     {
         $time = time();
         return self::where('lottery_id', $lotteryId)->where('begin_time', '<=', $time)->orderBy('id',
@@ -75,7 +76,7 @@ trait IssueLogics
      * @param  string  $lotterySign
      * @return mixed
      */
-    public static function getLastIssue($lotterySign)
+    public static function getLastIssue($lotterySign): mixed
     {
         $time = time();
         return self::where('lottery_id', $lotterySign)->where('end_time', '<=', $time)->orderBy('id', 'DESC')->first();

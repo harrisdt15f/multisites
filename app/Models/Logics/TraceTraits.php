@@ -8,12 +8,16 @@ use App\Models\LotteryTrace;
  * @Author: LingPh
  * @Date:   2019-05-29 17:49:50
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-12 17:37:14
+ * @Last Modified time: 2019-06-18 17:23:18
  */
 trait TraceTraits
 {
-    // 获取列表
-    public static function getList($condition)
+    /**
+     * 获取列表
+     * @param  array $condition
+     * @return array
+     */
+    public static function getList($condition): array
     {
         $query = Trace::orderBy('id', 'desc');
         if (isset($condition['en_name'])) {

@@ -6,12 +6,16 @@ namespace App\Models\DeveloperUsage\Frontend\Traits;
  * @Author: LingPh
  * @Date:   2019-05-29 17:38:37
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-07 15:28:01
+ * @Last Modified time: 2019-06-18 17:14:33
  */
 trait FrontendModelTraits
 {
 
-    public function allFrontendModel($type)
+    /**
+     * @param  int    $type
+     * @return array
+     */
+    public function allFrontendModel($type): array
     {
         if ($type == 2) {
             $typeArr = [1, 2];
@@ -31,7 +35,11 @@ trait FrontendModelTraits
         return $frontendModelList;
     }
 
-    public function ParentModel($typeArr)
+    /**
+     * @param  array    $typeArr
+     * @return mixed
+     */
+    public function ParentModel($typeArr): mixed
     {
         return self::where('level', 1)->whereIn('type', $typeArr)->get();
     }
@@ -39,9 +47,9 @@ trait FrontendModelTraits
     /**
      * 获取一个模块信息
      * @param  string $en_name 模块英文名
-     * @return
+     * @return mixed
      */
-    public function getModel($en_name)
+    public function getModel($en_name): mixed
     {
         return self::where('en_name', $en_name)->first();
     }

@@ -18,7 +18,7 @@ trait MenuLogics
      * @return array
      * TODO : 由于快速开发 后续需要弄缓存与异常处理
      */
-    public function menuLists(BackendAdminAccessGroup $accessGroupEloq)
+    public function menuLists(BackendAdminAccessGroup $accessGroupEloq): array
     {
         $parent_menu = [];
         $role = $accessGroupEloq->role;
@@ -30,7 +30,10 @@ trait MenuLogics
         return $parent_menu;
     }
 
-    public function forStar()
+    /**
+     * @return array
+     */
+    public function forStar(): array
     {
         $redisKey = '*';
         if (Cache::tags([$this->redisFirstTag])->has($redisKey)) {
@@ -63,7 +66,7 @@ trait MenuLogics
      * @param  string  $role
      * @return array
      */
-    public function createMenuDatas($redisKey = '*', $role = '*')
+    public function createMenuDatas($redisKey = '*', $role = '*'): array
     {
         $menuForFE = [];
         $menuLists = self::getFirstLevelList($role);
@@ -120,10 +123,10 @@ trait MenuLogics
 
     /**
      * [changeParent description]
-     * @param  [array] $parseDatas  [description]
-     * @return [array] $itemProcess [description]
+     * @param  array $parseDatas
+     * @return array $itemProcess
      */
-    public function changeParent($parseDatas)
+    public function changeParent($parseDatas): array
     {
         foreach ($parseDatas as $key => $value) {
             $menuEloq = self::find($value['currentId']);

@@ -56,7 +56,7 @@ trait LotteryIssueGenerate
      * @param $endDay
      * @return array
      */
-    public function getDaySet($startDay, $endDay)
+    public function getDaySet($startDay, $endDay): array
     {
         $data = [];
         $today = Carbon::today();
@@ -195,7 +195,7 @@ trait LotteryIssueGenerate
      * @param $day
      * @return mixed
      */
-    public function getNextIssueNo($issueNo, $lottery, $rule, $day)
+    public function getNextIssueNo($issueNo, $lottery, $rule, $day): mixed
     {
         $dayTime = Carbon::parse($day);
         $issueFormat = $lottery->issue_format;
@@ -240,7 +240,7 @@ trait LotteryIssueGenerate
      * @param $count
      * @return string
      */
-    public function getNextNumber($issueNo, $count)
+    public function getNextNumber($issueNo, $count): string
     {
         $currentNo = substr($issueNo, -$count);
         $nextNo = intval($currentNo) + 1;

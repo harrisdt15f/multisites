@@ -19,14 +19,22 @@ use Illuminate\Support\Facades\Request;
  */
 trait LotteryLogics
 {
-    // 标识获取彩种
-    public static function findBySign($sign)
+    /**
+     * 标识获取彩种
+     * @param  string $sign
+     * @return mixed
+     */
+    public static function findBySign($sign): mixed
     {
         return self::where('en_name', $sign)->first();
     }
 
-    // 获取列表
-    public static function getList($c)
+    /**
+     * 获取列表
+     * @param  array $c
+     * @return array
+     */
+    public static function getList($c): array
     {
         $query = self::orderBy('id', 'desc');
         if (isset($c['en_name']) && $c['en_name']) {
@@ -45,7 +53,10 @@ trait LotteryLogics
         ];
     }
 
-    // 保存
+    /**
+     * 保存
+     * @return bool
+     */
     public function saveItem(): bool
     {
         $data = Request::all();
@@ -60,7 +71,10 @@ trait LotteryLogics
         return true;
     }
 
-    // 获取选项
+    /**
+     * 获取选项
+     * @return array
+     */
     public static function getOptions(): array
     {
         $items = self::where('status', 1)->get();
@@ -71,6 +85,9 @@ trait LotteryLogics
         return $data;
     }
 
+    /**
+     * @return array
+     */
     public function getFormatMode(): array
     {
         $modeConfig = config('game.main.modes');

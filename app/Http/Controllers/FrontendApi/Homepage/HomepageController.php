@@ -51,8 +51,7 @@ class HomepageController extends FrontendApiMainController
                 if ($data['type'] === 2) {
                     $datas[$key]['redirect_url'] = $data['activity']['redirect_url'];
                 }
-                unset($datas[$key]['activity']);
-                unset($datas[$key]['activity_id']);
+                unset($datas[$key]['activity'], $datas[$key]['activity_id']);
             }
             Cache::forever('homepageBanner', $datas);
         }

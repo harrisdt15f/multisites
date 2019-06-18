@@ -10,17 +10,17 @@ use Illuminate\Support\Facades\Request;
  * @Author: LingPh
  * @Date:   2019-05-29 17:44:08
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-12 19:18:15
+ * @Last Modified time: 2019-06-18 17:23:46
  */
 trait ProjectTraits
 {
 
     /**
      * 前/后 台获取数据标准模板
-     * @param $condition
+     * @param  $condition
      * @return array
      */
-    public static function getList($condition)
+    public static function getList($condition): array
     {
         $query = self::orderBy('id', 'desc');
         if (isset($condition['en_name'])) {
@@ -39,8 +39,8 @@ trait ProjectTraits
     /**
      * 获取投注页需要的注单数据
      * @param $lotterySign
-     * @param int $start
-     * @param int $count
+     * @param int        $start
+     * @param int        $count
      * @return array
      */
     public static function getGamePageList($lotterySign, $start = 0, $count = 10): array
@@ -99,7 +99,7 @@ trait ProjectTraits
      * @param int $from
      * @return array
      */
-    public static function addProject($user, $lottery, $currentIssue, $data, $traceData, $from = 1)
+    public static function addProject($user, $lottery, $currentIssue, $data, $traceData, $from = 1): array
     {
         $returnData = [];
         $traceMainData = [];
