@@ -179,7 +179,7 @@ trait UserAccountLogics
     public function triggerSave()
     {
         if ($this->changes) {
-            $ret = db()->table('account_change_report')->insert($this->changes);
+            $ret = DB::table('account_change_report')->insert($this->changes);
             info($this->changes);
             if (!$ret) {
                 return false;
@@ -193,7 +193,7 @@ trait UserAccountLogics
         if ($this->mode == self::MODE_CHANGE_AFTER) {
             $this->changes[] = $report;
         } else {
-            $ret = db()->table('account_change_report')->insert($report);
+            $ret = DB::table('account_change_report')->insert($report);
             if (!$ret) {
                 return false;
             }
@@ -206,7 +206,7 @@ trait UserAccountLogics
     {
         $updated_at = date('Y-m-d H:i:s');
         $sql = "update `frontend_users_accounts` set `balance`=`balance`+'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}'";
-        $ret = db()->update($sql) > 0;
+        $ret = DB::update($sql) > 0;
         if ($ret) {
             $this->balance += $money;
         }
@@ -217,7 +217,7 @@ trait UserAccountLogics
     public function cost($money)
     {
         $updated_at = date('Y-m-d H:i:s');
-        $ret = db()->update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}' and `balance`>='{$money}'") > 0;
+        $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}' and `balance`>='{$money}'") > 0;
         if ($ret) {
             $this->balance = $this->balance - $money;
         }
@@ -228,7 +228,7 @@ trait UserAccountLogics
     public function frozen($money)
     {
         $updated_at = date('Y-m-d H:i:s');
-        $ret = db()->update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}', `frozen`=`frozen`+ '{$money}'  , `updated_at`='$updated_at' where `user_id` ='{$this->user_id}' and `balance`>='{$money}'") > 0;
+        $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}', `frozen`=`frozen`+ '{$money}'  , `updated_at`='$updated_at' where `user_id` ='{$this->user_id}' and `balance`>='{$money}'") > 0;
         if ($ret) {
             $this->balance -= $money;
             $this->frozen += $money;
@@ -240,7 +240,7 @@ trait UserAccountLogics
     public function unFrozen($money)
     {
         $updated_at = date('Y-m-d H:i:s');
-        $ret = db()->update("update `frontend_users_accounts` set `balance`=`balance`+'{$money}', `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}'") > 0;
+        $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`+'{$money}', `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}'") > 0;
         if ($ret) {
             $this->balance += $money;
             $this->frozen -= $money;
@@ -252,7 +252,7 @@ trait UserAccountLogics
     public function unFrozenToPlayer($money)
     {
         $updated_at = date('Y-m-d H:i:s');
-        $ret = db()->update("update `frontend_users_accounts` set  `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}'") > 0;
+        $ret = DB::update("update `frontend_users_accounts` set  `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}'") > 0;
         if ($ret) {
             $this->frozen -= $money;
         }

@@ -52,9 +52,9 @@ class PopularLotteriesController extends BackEndApiMainController
         $maxSort = $this->eloqM::select('sort')->max('sort');
         $sort = ++$maxSort;
         //上传图片
-        $imgClass = new ImageArrange();
-        $depositPath = $imgClass->depositPath('popular_lotteries', $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
-        $pic = $imgClass->uploadImg($inputDatas['pic'], $depositPath);
+        $imageObj = new ImageArrange();
+        $depositPath = $imageObj->depositPath('popular_lotteries', $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
+        $pic = $imageObj->uploadImg($inputDatas['pic'], $depositPath);
         if ($pic['success'] === false) {
             return $this->msgOut(false, [], '400', $pic['msg']);
         }
@@ -71,7 +71,7 @@ class PopularLotteriesController extends BackEndApiMainController
             $this->deleteCache();
             return $this->msgOut(true);
         } catch (Exception $e) {
-            $imgClass->deletePic($pic['path']);
+            $imageObj->deletePic($pic['path']);
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);
@@ -95,9 +95,9 @@ class PopularLotteriesController extends BackEndApiMainController
         //修改了图片的操作
         if (isset($inputDatas['pic'])) {
             $pastPic = $pastDataEloq->pic_path;
-            $imgClass = new ImageArrange();
-            $depositPath = $imgClass->depositPath('popular_lotteries', $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
-            $pic = $imgClass->uploadImg($inputDatas['pic'], $depositPath);
+            $imageObj = new ImageArrange();
+            $depositPath = $imageObj->depositPath('popular_lotteries', $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
+            $pic = $imageObj->uploadImg($inputDatas['pic'], $depositPath);
             if ($pic['success'] === false) {
                 return $this->msgOut(false, [], '400', $pic['msg']);
             }
@@ -107,14 +107,14 @@ class PopularLotteriesController extends BackEndApiMainController
             $pastDataEloq->lotteries_id = $inputDatas['lotteries_id'];
             $pastDataEloq->save();
             if (isset($pastPic)) {
-                $imgClass->deletePic(substr($pastPic, 1));
+                $imageObj->deletePic(substr($pastPic, 1));
             }
             //清除首页热门彩票缓存
             $this->deleteCache();
             return $this->msgOut(true);
         } catch (Exception $e) {
             if (isset($pic)) {
-                $imgClass->deletePic($pic['path']);
+                $imageObj->deletePic($pic['path']);
             }
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
@@ -139,8 +139,8 @@ class PopularLotteriesController extends BackEndApiMainController
             $datas = $this->eloqM::where('sort', '>', $pastData->sort)->decrement('sort');
             DB::commit();
             //删除图片
-            $imgClass = new ImageArrange();
-            $imgClass->deletePic(substr($pastData->pic_path, 1));
+            $imageObj = new ImageArrange();
+            $imageObj->deletePic(substr($pastData->pic_path, 1));
             //清除首页热门彩票缓存
             $this->deleteCache();
             return $this->msgOut(true);

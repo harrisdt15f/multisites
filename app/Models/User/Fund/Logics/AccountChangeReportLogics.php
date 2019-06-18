@@ -2,6 +2,7 @@
 
 namespace App\Models\User\Fund\Logics;
 
+use Illuminate\Support\Facades\DB;
 /**
  * Created by PhpStorm.
  * author: Harris
@@ -72,10 +73,10 @@ trait AccountChangeReportLogics
 
     public static function getSumBySign($userId, $day = '')
     {
-        $R = db()->table('account_change_report')->select(
+        $R = DB::table('account_change_report')->select(
             'type_sign',
             'user_id',
-            db()->raw('SUM(amount) as amount')
+            DB::raw('SUM(amount) as amount')
         );
         $R->where('user_id', $userId);
         if ($day) {

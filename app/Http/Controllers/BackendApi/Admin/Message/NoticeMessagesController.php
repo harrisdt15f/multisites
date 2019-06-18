@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-01 14:29:10
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-15 18:02:51
+ * @Last Modified time: 2019-06-18 18:39:56
  */
 
 namespace App\Http\Controllers\BackendApi\Admin\Message;
@@ -54,10 +54,10 @@ class NoticeMessagesController extends BackEndApiMainController
         $adminsArr = BackendAdminUser::select('id', 'group_id')->whereIn('id', $inputDatas['admins_id'])->get()->toArray();
         DB::beginTransaction();
         try {
-            $messageClass = new InternalNoticeMessage();
+            $messageObj = new InternalNoticeMessage();
             $type = BackendSystemNoticeList::ARTIFICIAL;
             $message = $inputDatas['message'];
-            $messageClass->insertMessage($type, $message, $adminsArr, $this->partnerAdmin->id);
+            $messageObj->insertMessage($type, $message, $adminsArr, $this->partnerAdmin->id);
             DB::commit();
             return $this->msgOut(true);
         } catch (Exception $e) {

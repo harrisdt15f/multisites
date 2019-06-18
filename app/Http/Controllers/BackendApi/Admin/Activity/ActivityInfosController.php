@@ -38,15 +38,15 @@ class ActivityInfosController extends BackEndApiMainController
     {
         $inputDatas = $request->validated();
         //接收文件信息
-        $imageClass = new ImageArrange();
-        $depositPath = $imageClass->depositPath($this->folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
+        $imageObj = new ImageArrange();
+        $depositPath = $imageObj->depositPath($this->folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
         //进行上传
-        $pic = $imageClass->uploadImg($inputDatas['pic'], $depositPath);
+        $pic = $imageObj->uploadImg($inputDatas['pic'], $depositPath);
         if ($pic['success'] === false) {
             return $this->msgOut(false, [], '400', $pic['msg']);
         }
         //生成缩略图
-        $thumbnail_path = $imageClass->creatThumbnail($pic['path'], 100, 200);
+        $thumbnail_path = $imageObj->creatThumbnail($pic['path'], 100, 200);
         //sort
         $maxSort = $this->eloqM::max('sort');
         $sort = is_null($maxSort) ? 1 : $maxSort++;
@@ -65,8 +65,8 @@ class ActivityInfosController extends BackEndApiMainController
             $this->deleteCache();
             return $this->msgOut(true);
         } catch (Exception $e) {
-            $imageClass->deletePic($pic['path']);
-            $imageClass->deletePic($thumbnail_path);
+            $imageObj->deletePic($pic['path']);
+            $imageObj->deletePic($thumbnail_path);
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
             return $this->msgOut(false, [], $sqlState, $msg);
@@ -93,24 +93,24 @@ class ActivityInfosController extends BackEndApiMainController
             $pastPic = $pastDataEloq->pic_path;
             $pastThumbnail = $pastDataEloq->thumbnail_path;
             //接收文件信息
-            $imageClass = new ImageArrange();
-            $depositPath = $imageClass->depositPath($this->folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
+            $imageObj = new ImageArrange();
+            $depositPath = $imageObj->depositPath($this->folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
             //进行上传
-            $picdata = $imageClass->uploadImg($inputDatas['pic'], $depositPath);
+            $picdata = $imageObj->uploadImg($inputDatas['pic'], $depositPath);
             if ($picdata['success'] === false) {
                 return $this->msgOut(false, [], '400', $picdata['msg']);
             }
             $pastDataEloq->pic_path = '/' . $picdata['path'];
             //生成缩略图
-            $pastDataEloq->thumbnail_path = '/' . $imageClass->creatThumbnail($picdata['path'], 100, 200, 'sm_');
+            $pastDataEloq->thumbnail_path = '/' . $imageObj->creatThumbnail($picdata['path'], 100, 200);
         }
         $this->editAssignment($pastDataEloq, $editData);
         try {
             $pastDataEloq->save();
             if (isset($inputDatas['pic'])) {
                 //删除原图片
-                $imageClass->deletePic(substr($pastPic, 1));
-                $imageClass->deletePic(substr($pastThumbnail, 1));
+                $imageObj->deletePic(substr($pastPic, 1));
+                $imageObj->deletePic(substr($pastThumbnail, 1));
             }
             //删除前台首页缓存
             $this->deleteCache();
@@ -138,9 +138,9 @@ class ActivityInfosController extends BackEndApiMainController
             $this->eloqM::where('sort', '>', $pastDataEloq->sort)->decrement('sort');
             DB::commit();
             //删除图片
-            $imageClass = new ImageArrange();
-            $imageClass->deletePic(substr($pastDataEloq->pic_path, 1));
-            $imageClass->deletePic(substr($pastDataEloq->thumbnail_path, 1));
+            $imageObj = new ImageArrange();
+            $imageObj->deletePic(substr($pastDataEloq->pic_path, 1));
+            $imageObj->deletePic(substr($pastDataEloq->thumbnail_path, 1));
             //删除前台首页缓存
             $this->deleteCache();
             return $this->msgOut(true);

@@ -78,9 +78,9 @@ class ArtificialRechargeController extends BackEndApiMainController
                 }
                 //用户帐变表
                 $accountChangeReportEloq = new AccountChangeReport();
-                $accountChangeClass = new AccountChange();
+                $accountChangeObj = new AccountChange();
                 $userEloq = FrontendUser::find($inputDatas['id']);
-                $accountChangeClass->addData($accountChangeReportEloq, $userEloq->toArray(), $inputDatas['amount'], $UserAccounts->balance, $balance, $accountChangeTypeEloq);
+                $accountChangeObj->addData($accountChangeReportEloq, $userEloq->toArray(), $inputDatas['amount'], $UserAccounts->balance, $balance, $accountChangeTypeEloq);
             }
             //添加人工充值明细表
             $auditFlowID = isset($auditFlowID) ? $auditFlowID : null;
@@ -209,7 +209,7 @@ class ArtificialRechargeController extends BackEndApiMainController
      */
     public function sendMessage(): void
     {
-        $messageClass = new InternalNoticeMessage();
+        $messageObj = new InternalNoticeMessage();
         $type = BackendSystemNoticeList::AUDIT;
         $roleId = BackendSystemMenu::where('en_name', 'recharge.check')->value('id');
         $allGroup = BackendAdminAccessGroup::select('id', 'role')->get();
@@ -228,7 +228,7 @@ class ArtificialRechargeController extends BackEndApiMainController
         //获取有人工充值权限的管理员
         $admins = BackendAdminUser::select('id', 'group_id')->whereIn('group_id', $groupIds)->get();
         if ($admins !== null) {
-            $messageClass->insertMessage($type, $this->message, $admins->toArray());
+            $messageObj->insertMessage($type, $this->message, $admins->toArray());
         }
     }
 
@@ -247,8 +247,8 @@ class ArtificialRechargeController extends BackEndApiMainController
         $type = $this->currentPartnerAccessGroup->role !== '*' ? BackendAdminRechargehumanLog::ADMIN : 3;
         $in_out = BackendAdminRechargehumanLog::DECREMENT;
         $comment = '[给用户人工充值]==>-' . $amount . '|[目前额度]==>' . $newFund;
-        $fundOperationClass = new FundOperationRecharge();
-        $fundOperationClass->insertOperationDatas($rechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $userEloq->id, $userEloq->nickname, $amount, $comment, $auditFlowID);
+        $fundOperationObj = new FundOperationRecharge();
+        $fundOperationObj->insertOperationDatas($rechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $userEloq->id, $userEloq->nickname, $amount, $comment, $auditFlowID);
     }
 
     /**

@@ -91,8 +91,8 @@ class RechargeCheckController extends BackEndApiMainController
             }
             //用户帐变表
             $accountChangeReportEloq = new AccountChangeReport();
-            $accountChangeClass = new AccountChange();
-            $accountChangeClass->addData($accountChangeReportEloq, $userData, $rechargeLog['amount'], $UserAccounts->balance, $balance, $accountChangeTypeEloq);
+            $accountChangeObj = new AccountChange();
+            $accountChangeObj->addData($accountChangeReportEloq, $userData, $rechargeLog['amount'], $UserAccounts->balance, $balance, $accountChangeTypeEloq);
             //发送站内消息提醒管理员
             $this->sendMessage($rechargeLog->admin_id, $this->successMessage);
             DB::commit();
@@ -144,8 +144,8 @@ class RechargeCheckController extends BackEndApiMainController
             $type = $rechargeLogeloqM::SYSTEM;
             $in_out = $rechargeLogeloqM::INCREMENT;
             $comment = '[充值审核失败额度返还]==>+' . $rechargeLog['amount'] . '|[目前额度]==>' . $newFund;
-            $fundOperationClass = new FundOperationRecharge();
-            $fundOperationClass->insertOperationDatas($rechargeLogeloqM, $type, $in_out, null, null, $auditFlow->admin_id, $auditFlow->admin_name, $rechargeLog->amount, $comment, null);
+            $fundOperationObj = new FundOperationRecharge();
+            $fundOperationObj->insertOperationDatas($rechargeLogeloqM, $type, $in_out, null, null, $auditFlow->admin_id, $auditFlow->admin_name, $rechargeLog->amount, $comment, null);
             //发送站内消息提醒管理员
             $this->sendMessage($rechargeLog->admin_id, $this->failureMessage);
             DB::commit();

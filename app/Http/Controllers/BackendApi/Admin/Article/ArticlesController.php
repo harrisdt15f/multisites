@@ -212,11 +212,11 @@ class ArticlesController extends BackEndApiMainController
     {
         $inputDatas = $request->validated();
         //接收文件信息
-        $ImageClass = new ImageArrange();
+        $imageObj = new ImageArrange();
         $file = $inputDatas['pic'];
-        $depositPath = $ImageClass->depositPath($this->folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
+        $depositPath = $imageObj->depositPath($this->folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
         //进行上传
-        $pic = $ImageClass->uploadImg($file, $depositPath);
+        $pic = $imageObj->uploadImg($file, $depositPath);
         if ($pic['success'] === false) {
             return $this->msgOut(false, [], '400', $pic['msg']);
         }
@@ -277,9 +277,9 @@ class ArticlesController extends BackEndApiMainController
      */
     public function deleteImg(array $imgArr)
     {
-        $imageClass = new ImageArrange();
+        $imageObj = new ImageArrange();
         foreach ($imgArr as $imgPath) {
-            $imageClass->deletePic($imgPath);
+            $imageObj->deletePic($imgPath);
         }
     }
 
