@@ -96,7 +96,7 @@ class PartnerAdminGroupController extends BackEndApiMainController
         $datas = $this->eloqM::find($id);
         $role = $inputDatas['role'] == '*' ? Arr::wrap($inputDatas['role']) : Arr::wrap(json_decode($inputDatas['role'],
             true));
-        if (!is_null($datas)) {
+        if ($datas !== null) {
             DB::beginTransaction();
             $datas->group_name = $inputDatas['group_name'];
             $datas->role = $inputDatas['role'];
@@ -137,7 +137,7 @@ class PartnerAdminGroupController extends BackEndApiMainController
                 } else {
                     // 提交的时候是没有资金操作权限 然后
                     //之前有资金操作权限 所以 需要从 fundoperation 表里面删除
-                    if (!is_null($fundOperatinEloq)) {
+                    if ($fundOperatinEloq !== null) {
                         if ($fundOperatinEloq->admins()->exists()) {
                             $partnerAdminsEloq = $fundOperatinEloq->admins;
                             $adminsData = $partnerAdminsEloq->toArray();
@@ -193,7 +193,7 @@ class PartnerAdminGroupController extends BackEndApiMainController
                 $fundOperationEloq = new BackendAdminRechargePocessAmount();
                 $adminsData = BackendAdminUser::select('id')->where('group_id', $id)->get();
                 $admins = array_column($adminsData->toArray(), 'id');
-                if (!is_null($adminsData)) {
+                if ($adminsData !== null) {
                     $fundOperationEloq->whereIn('admin_id', $admins)->delete();
                 }
             }
@@ -214,7 +214,7 @@ class PartnerAdminGroupController extends BackEndApiMainController
     {
         $inputDatas = $request->validated();
         $accessGroupEloq = $this->eloqM::find($inputDatas['id']);
-        if (!is_null($accessGroupEloq)) {
+        if ($accessGroupEloq !== null) {
             $data = $accessGroupEloq->adminUsers->toArray();
             return $this->msgOut(true, $data);
         } else {

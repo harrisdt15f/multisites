@@ -40,7 +40,7 @@ class BackEndApiMainController extends Controller
         $this->middleware(function ($request, $next) {
             $this->currentAuth = auth($this->currentGuard);
             $this->partnerAdmin = $this->currentAuth->user();
-            if (!is_null($this->partnerAdmin)) {
+            if ($this->partnerAdmin !== null) {
                 //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
                 $this->currentPartnerAccessGroup = new BackendAdminAccessGroup();
                 $this->currentPlatformEloq = new SystemPlatform();
@@ -83,7 +83,7 @@ class BackEndApiMainController extends Controller
         $this->currentRouteName = $this->currentOptRoute->action['as']; //当前的route name;
         //$partnerAdREloq = BackendAdminRoute::where('route_name',$this->currentRouteName)->first()->parentRoute->menu;
         $partnerAdREloq = BackendAdminRoute::where('route_name', $this->currentRouteName)->first();
-        if (!is_null($partnerAdREloq)) {
+        if ($partnerAdREloq !== null) {
             $partnerMenuEloq = $partnerAdREloq->menu;
             //set if it is accissable or not
             if (!empty($this->currentPartnerAccessGroup->role)) {
@@ -146,7 +146,7 @@ class BackEndApiMainController extends Controller
 
     protected function modelWithNameSpace($eloqM = null)
     {
-        return !is_null($eloqM) ? 'App\\Models\\' . $eloqM : $eloqM;
+        return $eloqM !== null ? 'App\\Models\\' . $eloqM : $eloqM;
     }
 
     /**
@@ -177,10 +177,10 @@ class BackEndApiMainController extends Controller
         $extraWhereContitions = $this->inputs['extra_where'] ?? [];
         $extraContitions = $this->inputs['extra_column'] ?? [];
         $queryEloq = new $eloqM;
-        $sizeOfInputs = sizeof($searchCriterias);
+        $sizeOfInputs = count($searchCriterias);
         //with Criterias
         $withSearchCriterias = Arr::only($this->inputs, $withSearchAbleFields);
-        $sizeOfWithInputs = sizeof($withSearchCriterias);
+        $sizeOfWithInputs = count($withSearchCriterias);
 
         $pageSize = $this->inputs['page_size'] ?? 20;
         if ($sizeOfInputs == 1) {

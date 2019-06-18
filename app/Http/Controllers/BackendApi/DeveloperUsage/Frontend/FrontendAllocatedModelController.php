@@ -97,10 +97,10 @@ class FrontendAllocatedModelController extends BackEndApiMainController
         //检查是否存在下级
         $deleteIds[] = $inputDatas['id'];
         $childs = $modelEloq->childs->pluck('id')->toArray();
-        if (!is_null($childs)) {
+        if ($childs !== null) {
             $deleteIds = array_merge($deleteIds, $childs);
             $grandson = $this->eloqM::whereIn('pid', $childs)->pluck('id')->toArray();
-            if (!is_null($grandson)) {
+            if ($grandson !== null) {
                 $deleteIds = array_merge($deleteIds, $grandson);
             }
         }

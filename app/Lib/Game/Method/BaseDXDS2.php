@@ -1,4 +1,5 @@
-<?php namespace App\Services\Game\Method;
+<?php
+namespace App\Services\Game\Method;
 
 // 2位大小单双 基类
 trait BaseDXDS2
@@ -18,9 +19,9 @@ trait BaseDXDS2
     {
         $line = array();
         $rand = rand(1, count(self::$dxds));
-        $line[] = implode('&', (array)array_rand(array_flip(self::$dxds), $rand));
+        $line[] = implode('&', (array) array_rand(array_flip(self::$dxds), $rand));
         $rand = rand(1, count(self::$dxds));
-        $line[] = implode('&', (array)array_rand(array_flip(self::$dxds), $rand));
+        $line[] = implode('&', (array) array_rand(array_flip(self::$dxds), $rand));
 
         return implode('|', $line);
     }
@@ -28,10 +29,10 @@ trait BaseDXDS2
     public function fromOld($codes)
     {
         //　0123|0123
-        $codes  = str_replace(array('0', '1', '2', '3'), array('b', 's', 'a', 'd'), $codes);
-        $ex     = explode('|', $codes);
-        $ex[0]  = implode('&', str_split($ex[0]));
-        $ex[1]  = implode('&', str_split($ex[1]));
+        $codes = str_replace(array('0', '1', '2', '3'), array('b', 's', 'a', 'd'), $codes);
+        $ex = explode('|', $codes);
+        $ex[0] = implode('&', str_split($ex[0]));
+        $ex[1] = implode('&', str_split($ex[1]));
         return implode('|', $ex);
     }
 
@@ -51,7 +52,9 @@ trait BaseDXDS2
     {
         $regexp = '/^([bsad]&){0,3}[bsad]\|([bsad]&){0,3}[bsad]$/';
 
-        if (!preg_match($regexp, $sCodes)) return false;
+        if (!preg_match($regexp, $sCodes)) {
+            return false;
+        }
 
         $filterArr = self::$dxds;
 
@@ -59,8 +62,10 @@ trait BaseDXDS2
         foreach ($sCodes as $codes) {
             $temp = explode('&', $codes);
             if (count($temp) != count(array_filter(array_unique($temp), function ($v) use ($filterArr) {
-                    return isset($filterArr[$v]);
-                }))) return false;
+                return isset($filterArr[$v]);
+            }))) {
+                return false;
+            }
 
             if (count($temp) == 0) {
                 return false;
@@ -82,7 +87,7 @@ trait BaseDXDS2
     }
 
     // 冷热遗漏
-    public function bingoCode(Array $numbers)
+    public function bingoCode(array $numbers)
     {
         $b = array_flip([5, 6, 7, 8, 9]);
         $s = array_flip([0, 1, 2, 3, 4]);
@@ -92,7 +97,7 @@ trait BaseDXDS2
         foreach ($numbers as $k => $v) {
             $tmp = [];
             foreach ([$b, $s, $a, $d] as $arr) {
-                $tmp[] = intval(isset($arr[$v]));
+                $tmp[] = int(isset($arr[$v]));
             }
             $result[$k] = $tmp;
         }
@@ -101,7 +106,7 @@ trait BaseDXDS2
     }
 
     // 判定中奖
-    public function assertLevel($levelId, $sCodes, Array $numbers)
+    public function assertLevel($levelId, $sCodes, array $numbers)
     {
         // 多注
         $aCodes = explode("|", $sCodes);
@@ -119,7 +124,10 @@ trait BaseDXDS2
         $temp = [];
         foreach ($aTemp1 as $v1) {
             foreach ($aTemp2 as $v2) {
-                if (isset($temp[$v1 . '-' . $v2])) continue;
+                if (isset($temp[$v1 . '-' . $v2])) {
+                    continue;
+                }
+
                 if (in_array($v1, $arr[0]) && in_array($v2, $arr[1])) {
                     $temp[$v1 . '-' . $v2] = 1;
                     $i++;

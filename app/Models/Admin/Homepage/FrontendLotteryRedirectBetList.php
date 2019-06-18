@@ -12,7 +12,6 @@ class FrontendLotteryRedirectBetList extends BaseModel
     ];
     public function lotteries()
     {
-        $data = $this->hasOne(LotteryList::class, 'id', 'lotteries_id');
-        return $data;
+        return $this->hasOne(LotteryList::class, 'id', 'lotteries_id');
     }
 }

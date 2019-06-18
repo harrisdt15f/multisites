@@ -41,7 +41,7 @@ class BackendLogProcessor
         $adminUser = auth()->user() ? auth()->user()->id : null;
         $record['extra'] = [
             'admin_id' => $adminUser,
-            'admin_name' => !is_null($adminUser) ? auth()->user()->name : null,
+            'admin_name' => $adminUser !== null ? auth()->user()->name : null,
             'origin' => request()->headers->get('origin'),
             'ip' => request()->ip(),
             'ips' => json_encode(request()->ips()),
@@ -66,7 +66,7 @@ class BackendLogProcessor
         if (isset($messageArr['route'])) {
             $record['extra']['route'] = json_encode($messageArr['route']);
             $routeEloq = BackendAdminRoute::where('route_name', $messageArr['route']['action']['as'])->first();
-            if (!is_null($routeEloq)) {
+            if ($routeEloq !== null) {
                 $record['extra']['route_id'] = $routeEloq->id;
                 $record['extra']['menu_id'] = $routeEloq->menu->id ?? null;
                 $record['extra']['menu_label'] = $routeEloq->menu->label ?? null;

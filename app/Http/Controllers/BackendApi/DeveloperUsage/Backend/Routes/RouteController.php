@@ -52,7 +52,7 @@ class RouteController extends BackEndApiMainController
         $inputDatas = $request->validated();
         $pastEloq = $this->eloqM::find($inputDatas['id']);
         $checkTitle = $this->eloqM::where('title', $inputDatas['title'])->where('id', '!=', $inputDatas['id'])->first();
-        if (!is_null($checkTitle)) {
+        if ($checkTitle !== null) {
             return $this->msgOut(false, [], '101400');
         }
         try {

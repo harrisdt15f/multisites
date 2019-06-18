@@ -13,7 +13,6 @@ class FrontendMessageNotice extends BaseModel
 
     public function admin()
     {
-        $data = $this->hasOne(BackendAdminUser::class, 'id', 'admin_id');
-        return $data;
+        return $this->hasOne(BackendAdminUser::class, 'id', 'admin_id');
     }
 }

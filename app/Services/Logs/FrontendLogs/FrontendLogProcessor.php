@@ -40,7 +40,7 @@ class FrontendLogProcessor
         $userId = auth()->user() ? auth()->user()->id : null;
         $record['extra'] = [
             'user_id' => $userId,
-            'username' => !is_null($userId) ? auth()->user()->username : null,
+            'username' => $userId !== null ? auth()->user()->username : null,
             'origin' => request()->headers->get('origin'),
             'ip' => request()->ip(),
             'ips' => json_encode(request()->ips()),
@@ -65,7 +65,7 @@ class FrontendLogProcessor
         /*if (isset($messageArr['route'])) {
         $record['extra']['route'] = json_encode($messageArr['route']);
         $routeEloq = BackendAdminRoute::where('route_name', $messageArr['route']['action']['as'])->first();
-        if (!is_null($routeEloq)) {
+        if ($routeEloq !== null) {
         $record['extra']['route_id'] = $routeEloq->id;
         $record['extra']['menu_id'] = $routeEloq->menu->id ?? null;
         $record['extra']['menu_label'] = $routeEloq->menu->label ?? null;

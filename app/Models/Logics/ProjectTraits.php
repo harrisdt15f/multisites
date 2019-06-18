@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Request;
  * @Author: LingPh
  * @Date:   2019-05-29 17:44:08
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-18 17:23:46
+ * @Last Modified time: 2019-06-18 18:16:41
  */
 trait ProjectTraits
 {
@@ -26,14 +26,14 @@ trait ProjectTraits
         if (isset($condition['en_name'])) {
             $query->where('en_name', '=', $condition['en_name']);
         }
-        $currentPage = isset($condition['page_index']) ? intval($condition['page_index']) : 1;
-        $pageSize = isset($condition['page_size']) ? intval($condition['page_size']) : 15;
+        $currentPage = isset($condition['page_index']) ? int($condition['page_index']) : 1;
+        $pageSize = isset($condition['page_size']) ? int($condition['page_size']) : 15;
         $offset = ($currentPage - 1) * $pageSize;
 
         $total = $query->count();
         $menus = $query->skip($offset)->take($pageSize)->get();
 
-        return ['data' => $menus, 'total' => $total, 'currentPage' => $currentPage, 'totalPage' => intval(ceil($total / $pageSize))];
+        return ['data' => $menus, 'total' => $total, 'currentPage' => $currentPage, 'totalPage' => int(ceil($total / $pageSize))];
     }
 
     /**

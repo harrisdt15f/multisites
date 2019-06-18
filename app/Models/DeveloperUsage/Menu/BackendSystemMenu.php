@@ -13,7 +13,6 @@ class BackendSystemMenu extends BaseModel
 
     public function childs(): HasMany
     {
-        $data = $this->hasMany(__CLASS__, 'pid', 'id');
-        return $data;
+        return $this->hasMany(__CLASS__, 'pid', 'id');
     }
 }

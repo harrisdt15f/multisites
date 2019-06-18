@@ -89,7 +89,7 @@ class MenuController extends BackEndApiMainController
             $parent = true;
         }
         $MenuEloq = $this->eloqM::where('label', $inputDatas['label'])->first();
-        if (!is_null($MenuEloq)) {
+        if ($MenuEloq !== null) {
             return $this->msgOut(false, [], '100800');
         }
         $menuEloq = new BackendSystemMenu();

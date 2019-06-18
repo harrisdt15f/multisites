@@ -13,7 +13,6 @@ class FrontendPageBanner extends BaseModel
 
     public function activity()
     {
-        $data = $this->hasOne(FrontendActivityContent::class, 'id', 'activity_id');
-        return $data;
+        return $this->hasOne(FrontendActivityContent::class, 'id', 'activity_id');
     }
 }

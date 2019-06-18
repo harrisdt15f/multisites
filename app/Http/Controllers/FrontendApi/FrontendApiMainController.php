@@ -27,7 +27,7 @@ class FrontendApiMainController extends Controller
      */
     public function __construct()
     {
-        $open_route = FrontendWebRoute::where('is_open',1)->pluck('method')->toArray();
+        $open_route = FrontendWebRoute::where('is_open', 1)->pluck('method')->toArray();
         $this->middleware('auth:frontend-web', ['except' => $open_route]);
         $this->middleware(function ($request, $next) {
             $this->currentAuth = auth($this->currentGuard);
@@ -81,7 +81,7 @@ class FrontendApiMainController extends Controller
 
     protected function modelWithNameSpace($eloqM = null)
     {
-        return !is_null($eloqM) ? 'App\\Models\\' . $eloqM : $eloqM;
+        return $eloqM !== null ? 'App\\Models\\' . $eloqM : $eloqM;
     }
 
     /**
@@ -112,10 +112,10 @@ class FrontendApiMainController extends Controller
         $extraWhereContitions = $this->inputs['extra_where'] ?? [];
         $extraContitions = $this->inputs['extra_column'] ?? [];
         $queryEloq = new $eloqM;
-        $sizeOfInputs = sizeof($searchCriterias);
+        $sizeOfInputs = count($searchCriterias);
         //with Criterias
         $withSearchCriterias = Arr::only($this->inputs, $withSearchAbleFields);
-        $sizeOfWithInputs = sizeof($withSearchCriterias);
+        $sizeOfWithInputs = count($withSearchCriterias);
 
         $pageSize = $this->inputs['page_size'] ?? 20;
         if ($sizeOfInputs == 1) {

@@ -85,10 +85,7 @@ class RegionController extends BackEndApiMainController
     public function edit(RegionEditRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
-        $pastData = $this->eloqM::where(function ($query) {
-            $query->where('region_id', '=', $inputDatas['region_id'])
-                ->where('id', '!=', $inputDatas['id']);
-        })->first();
+        $pastData = $this->eloqM::where('region_id', '=', $inputDatas['region_id'])->where('id', '!=', $inputDatas['id'])->first();
         if ($pastData !== null) {
             return $this->msgOut(false, [], '101001');
         }

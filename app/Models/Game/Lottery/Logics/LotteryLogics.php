@@ -40,8 +40,8 @@ trait LotteryLogics
         if (isset($c['en_name']) && $c['en_name']) {
             $query->where('en_name', '=', $c['en_name']);
         }
-        $currentPage = isset($c['page_index']) ? intval($c['page_index']) : 1;
-        $pageSize = isset($c['page_size']) ? intval($c['page_size']) : 15;
+        $currentPage = isset($c['page_index']) ? int($c['page_index']) : 1;
+        $pageSize = isset($c['page_size']) ? int($c['page_size']) : 15;
         $offset = ($currentPage - 1) * $pageSize;
         $total = $query->count();
         $data = $query->skip($offset)->take($pageSize)->get();
@@ -49,7 +49,7 @@ trait LotteryLogics
             'data' => $data,
             'total' => $total,
             'currentPage' => $currentPage,
-            'totalPage' => intval(ceil($total / $pageSize)),
+            'totalPage' => int(ceil($total / $pageSize)),
         ];
     }
 
@@ -63,7 +63,7 @@ trait LotteryLogics
         $this->cn_name = $data['cn_name'];
         $this->en_name = $data['en_name'];
         $this->series_id = $data['series_id'];
-        $this->max_trace_number = intval($data['max_trace_number']);
+        $this->max_trace_number = int($data['max_trace_number']);
         $this->issue_format = $data['issue_format'];
         $this->is_fast = isset($data['is_fast']) ? 1 : 0;
         $this->auto_open = isset($data['auto_open']) ? 1 : 0;

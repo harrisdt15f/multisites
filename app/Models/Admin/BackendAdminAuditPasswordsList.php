@@ -13,8 +13,7 @@ class BackendAdminAuditPasswordsList extends BaseModel
 
     public function auditFlow()
     {
-        $data = $this->hasOne(BackendAdminAuditFlowList::class, 'id', 'audit_flow_id');
-        return $data;
+        return $this->hasOne(BackendAdminAuditFlowList::class, 'id', 'audit_flow_id');
     }
 
 }

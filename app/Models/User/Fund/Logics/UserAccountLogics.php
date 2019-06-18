@@ -31,8 +31,8 @@ trait UserAccountLogics
         if (isset($c['parent_name']) && $c['parent_name']) {
             $query->where('frontend_users_accounts.parent_name', $c['parent_name']);
         }
-        $currentPage = isset($c['page_index']) ? intval($c['page_index']) : 1;
-        $pageSize = isset($c['page_size']) ? intval($c['page_size']) : 15;
+        $currentPage = isset($c['page_index']) ? int($c['page_index']) : 1;
+        $pageSize = isset($c['page_size']) ? int($c['page_size']) : 15;
         $offset = ($currentPage - 1) * $pageSize;
         $total = $query->count();
         $data = $query->skip($offset)->take($pageSize)->get();
@@ -40,7 +40,7 @@ trait UserAccountLogics
             'data' => $data,
             'total' => $total,
             'currentPage' => $currentPage,
-            'totalPage' => intval(ceil($total / $pageSize))
+            'totalPage' => int(ceil($total / $pageSize)),
         ];
     }
 
@@ -56,7 +56,7 @@ trait UserAccountLogics
         try {
             return $this->doChange($type, $params);
         } catch (\Exception $e) {
-            Clog::account('error-'.$e->getMessage().'|'.$e->getLine().'|'.$e->getFile());
+            Clog::account('error-' . $e->getMessage() . '|' . $e->getLine() . '|' . $e->getFile());
             return $e->getMessage();
         }
     }

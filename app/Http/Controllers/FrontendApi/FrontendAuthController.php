@@ -69,7 +69,7 @@ class FrontendAuthController extends FrontendApiMainController
         $expireInMinute = $this->currentAuth->factory()->getTTL();
         $expireAt = Carbon::now()->addMinutes($expireInMinute)->format('Y-m-d H:i:s');
         $user = $this->currentAuth->user();
-        if (!is_null($user->remember_token)) {
+        if ($user->remember_token !== null) {
             try {
                 JWTAuth::setToken($user->remember_token);
                 JWTAuth::invalidate();
@@ -236,7 +236,7 @@ class FrontendAuthController extends FrontendApiMainController
             return $this->msgOut(false, [], '400', $validator->errors()->first());
         }
         $targetUserEloq = $this->eloqM::find($this->inputs['id']);
-        if (!is_null($targetUserEloq)) {
+        if ($targetUserEloq !== null) {
             $targetUserEloq->group_id = $this->inputs['group_id'];
             if ($targetUserEloq->save()) {
                 $result = $targetUserEloq->toArray();
@@ -285,7 +285,7 @@ class FrontendAuthController extends FrontendApiMainController
             ['id', '=', $this->inputs['id']],
             ['name', '=', $this->inputs['name']],
         ])->first();
-        if (!is_null($targetUserEloq)) {
+        if ($targetUserEloq !== null) {
             $token = $targetUserEloq->token();
             if ($token) {
                 $token->revoke(); //取消目前登录中的状态
@@ -313,7 +313,7 @@ class FrontendAuthController extends FrontendApiMainController
             ['id', '=', $this->inputs['id']],
             ['name', '=', $this->inputs['name']],
         ])->first();
-        if (!is_null($targetUserEloq)) {
+        if ($targetUserEloq !== null) {
             $targetUserEloq->password = Hash::make($this->inputs['password']);
             if ($targetUserEloq->save()) {
 //用户更新密码
