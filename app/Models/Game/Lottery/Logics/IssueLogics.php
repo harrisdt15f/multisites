@@ -17,7 +17,7 @@ trait IssueLogics
      * @param  $lotteryId
      * @return mixed
      */
-    public static function getCurrentIssue($lotteryId): mixed
+    public static function getCurrentIssue($lotteryId)
     {
         return self::where('lottery_id', $lotteryId)->where('end_time', '>', time())->orderBy('id', 'ASC')->first();
     }
@@ -27,7 +27,7 @@ trait IssueLogics
      * @param  $lotteryId
      * @return mixed
      */
-    public static function getNeedOpenIssue($lotteryId): mixed
+    public static function getNeedOpenIssue($lotteryId)
     {
         return self::where('lottery_id', $lotteryId)->where('allow_encode_time', '<', time())->where('status_encode',
             0)->orderBy('id', 'asc')->get();
@@ -51,7 +51,7 @@ trait IssueLogics
      * @param  int         $count
      * @return mixed
      */
-    public static function getCanBetIssue($lotteryId, $count = 50): mixed
+    public static function getCanBetIssue($lotteryId, $count = 50)
     {
         $time = time();
         return self::where('lottery_id', $lotteryId)->where('end_time', '>', $time)->orderBy('id',
@@ -64,7 +64,7 @@ trait IssueLogics
      * @param  int         $count
      * @return mixed
      */
-    public static function getHistoryIssue($lotteryId, $count = 50): mixed
+    public static function getHistoryIssue($lotteryId, $count = 50)
     {
         $time = time();
         return self::where('lottery_id', $lotteryId)->where('begin_time', '<=', $time)->orderBy('id',
@@ -76,7 +76,7 @@ trait IssueLogics
      * @param  string  $lotterySign
      * @return mixed
      */
-    public static function getLastIssue($lotterySign): mixed
+    public static function getLastIssue($lotterySign)
     {
         $time = time();
         return self::where('lottery_id', $lotterySign)->where('end_time', '<=', $time)->orderBy('id', 'DESC')->first();

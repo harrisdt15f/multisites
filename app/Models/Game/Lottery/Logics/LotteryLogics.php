@@ -24,7 +24,7 @@ trait LotteryLogics
      * @param  string $sign
      * @return mixed
      */
-    public static function findBySign($sign): mixed
+    public static function findBySign($sign)
     {
         return self::where('en_name', $sign)->first();
     }

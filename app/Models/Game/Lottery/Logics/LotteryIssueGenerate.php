@@ -195,7 +195,7 @@ trait LotteryIssueGenerate
      * @param $day
      * @return mixed
      */
-    public function getNextIssueNo($issueNo, $lottery, $rule, $day): mixed
+    public function getNextIssueNo($issueNo, $lottery, $rule, $day)
     {
         $dayTime = Carbon::parse($day);
         $issueFormat = $lottery->issue_format;
