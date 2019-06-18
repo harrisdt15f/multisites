@@ -30,4 +30,6 @@ Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], function 
     Route::match(['post', 'options'], 'method-switch', ['as' => $namePrefix . 'method-switch', 'uses' => $controller . 'methodSwitch']);
     //编辑玩法
     Route::match(['post', 'options'], 'edit-method', ['as' => $namePrefix . 'edit-method', 'uses' => $controller . 'editMethod']);
+    //录号
+    Route::match(['post', 'options'], 'input-code', ['as' => $namePrefix . 'input-code', 'uses' => $controller . 'inputCode']);
 });

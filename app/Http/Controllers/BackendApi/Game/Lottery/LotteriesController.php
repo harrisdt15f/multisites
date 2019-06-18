@@ -6,16 +6,19 @@ use App\Events\IssueGenerateEvent;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesEditMethodRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesGenerateIssueRequest;
+use App\Http\Requests\Backend\Game\Lottery\LotteriesInputNumberRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesLotteriesListsRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesLotteriesSwitchRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesMethodGroupSwitchRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesMethodRowSwitchRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesMethodSwitchRequest;
+use App\Models\Game\Lottery\LotteryIssue;
 use App\Models\Game\Lottery\LotteryList;
 use App\Models\Game\Lottery\LotteryMethod;
 use App\Models\Game\Lottery\LotterySerie;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
@@ -297,7 +300,7 @@ class LotteriesController extends BackEndApiMainController
      * @param  int $methodRow   [玩法行]
      * @return array  $dataArr
      */
-    public function methodData($lotteryId, $methodGroup, $status, $methodRow = null)
+    public function methodData($lotteryId, $methodGroup, $status, $methodRow = null) : array
     {
         $dataArr = [
             'lottery_id' => $lotteryId,
@@ -308,5 +311,35 @@ class LotteriesController extends BackEndApiMainController
             $dataArr['method_row'] = $methodRow;
         }
         return $dataArr;
+    }
+
+    /**
+     * 奖期录号
+     * @param  LotteriesInputNumberRequest $request
+     * @return JsonResponse
+     */
+    public function inputCode(LotteriesInputNumberRequest $request): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        $issueEloq = LotteryIssue::where('lottery_id', $inputDatas['lottery_id'])->where('issue', $inputDatas['issue'])->first();
+        if ($issueEloq === null) {
+            return $this->msgOut(false, [], '101703');
+        }
+        if ($issueEloq->official_code !== null) {
+            return $this->msgOut(false, [], '101704');
+        }
+        $isArr = arr::accessible($inputDatas['code']);
+        if ($isArr === true) {
+            $codeStr = implode('|', $inputDatas['code']);
+            try {
+                $issueEloq->official_code = $codeStr;
+                $issueEloq->save();
+                return $this->msgOut(true);
+            } catch (Exception $e) {
+                $errorObj = $e->getPrevious()->getPrevious();
+                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+                return $this->msgOut(false, [], $sqlState, $msg);
+            }
+        }
     }
 }
