@@ -167,10 +167,10 @@ abstract class Base
 
         $chartData = [];
         $m = $n = 0;
-        $last = int($arr[0]);
+        $last = (int) $arr[0];
         $start = $last;
         for ($i = 1; $i < count($arr); $i++) {
-            $current = int($arr[$i]);
+            $current = (int) $arr[$i];
             if ($current == $last + 1) {
                 $m++;
             } else {

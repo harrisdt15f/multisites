@@ -4,11 +4,12 @@
  * @Author: LingPh
  * @Date:   2019-06-17 18:02:56
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-18 15:37:12
+ * @Last Modified time: 2019-06-18 22:12:16
  */
 namespace App\Http\Requests\Backend\Game\Lottery;
 
 use App\Http\Requests\BaseFormRequest;
+use App\Models\Game\Lottery\LotteryList;
 use Illuminate\Support\Facades\Config;
 
 class LotteriesInputNumberRequest extends BaseFormRequest
@@ -30,13 +31,14 @@ class LotteriesInputNumberRequest extends BaseFormRequest
      */
     public function rules(): array
     {
-        return [
-            'code' => 'required|array|size:5',
-            'code.*' => 'required|numeric',
-            'series_id' => 'required|string|exists:lottery_series,series_name',
+        $lottery_id = $this->get('lottery_id');
+        $lenght = LotteryList::where('en_name', $lottery_id)->value('code_length');
+        $rules = [
             'lottery_id' => 'required|string|exists:lottery_lists,en_name',
+            'code' => 'required|string|size:' . $lenght,
             'issue' => 'required|integer',
         ];
+        return $rules;
     }
 
     /*public function messages()

@@ -103,7 +103,7 @@ trait LotteryIssueGenerate
                 $configTime = Carbon::parse($_config['day']);
                 $_day = $dayTime->diff($configTime)->days;
                 if (isset($_config['zero_start'])) {
-                    $firstIssueNo = int($_config['start_issue']) + $_day * $this->day_issue;
+                    $firstIssueNo = (int) $_config['start_issue'] + $_day * $this->day_issue;
                     $firstIssueNo = $_config['zero_start'] . $firstIssueNo;
                 } else {
                     $firstIssueNo = $_config['start_issue'] + $_day * $this->day_issue;
@@ -202,7 +202,7 @@ trait LotteryIssueGenerate
         $formats = explode('|', $issueFormat);
         // C 开头
         if (count($formats) == 1 and strpos($formats[0], 'C') !== false) {
-            $currentIssueNo = int($issueNo);
+            $currentIssueNo = (int) $issueNo;
             $nextIssue = $currentIssueNo + 1;
             if (strlen($currentIssueNo) == strlen($issueNo)) {
                 return $nextIssue;
@@ -243,7 +243,7 @@ trait LotteryIssueGenerate
     public function getNextNumber($issueNo, $count): string
     {
         $currentNo = substr($issueNo, -$count);
-        $nextNo = int($currentNo) + 1;
+        $nextNo = (int) $currentNo + 1;
         return str_pad($nextNo, $count, '0', STR_PAD_LEFT);
     }
 }

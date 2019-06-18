@@ -16,7 +16,7 @@ trait BaseDWD
         foreach ($numbers as $pos => $code) {
             $tmp = [];
             foreach ($arr as $_code) {
-                $tmp[] = int($code == $_code);
+                $tmp[] = (int) ($code == $_code);
             }
             $result[] = $tmp;
         }

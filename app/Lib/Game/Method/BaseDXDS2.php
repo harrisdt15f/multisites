@@ -97,7 +97,7 @@ trait BaseDXDS2
         foreach ($numbers as $k => $v) {
             $tmp = [];
             foreach ([$b, $s, $a, $d] as $arr) {
-                $tmp[] = int(isset($arr[$v]));
+                $tmp[] = (int) isset($arr[$v]);
             }
             $result[$k] = $tmp;
         }

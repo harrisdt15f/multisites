@@ -18,7 +18,6 @@ use App\Models\Game\Lottery\LotteryMethod;
 use App\Models\Game\Lottery\LotterySerie;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
@@ -328,18 +327,14 @@ class LotteriesController extends BackEndApiMainController
         if ($issueEloq->official_code !== null) {
             return $this->msgOut(false, [], '101704');
         }
-        $isArr = arr::accessible($inputDatas['code']);
-        if ($isArr === true) {
-            $codeStr = implode('|', $inputDatas['code']);
-            try {
-                $issueEloq->official_code = $codeStr;
-                $issueEloq->save();
-                return $this->msgOut(true);
-            } catch (Exception $e) {
-                $errorObj = $e->getPrevious()->getPrevious();
-                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-                return $this->msgOut(false, [], $sqlState, $msg);
-            }
+        try {
+            $issueEloq->official_code = $inputDatas['code'];
+            $issueEloq->save();
+            return $this->msgOut(true);
+        } catch (Exception $e) {
+            $errorObj = $e->getPrevious()->getPrevious();
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
+            return $this->msgOut(false, [], $sqlState, $msg);
         }
     }
 }

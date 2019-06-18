@@ -17,14 +17,14 @@ trait AccountChangeTypeLogics
     {
         $query = self::orderBy('id', 'desc');
 
-        $currentPage = isset($c['page_index']) ? int($c['page_index']) : 1;
-        $pageSize = isset($c['page_size']) ? int($c['page_size']) : 15;
+        $currentPage = isset($c['page_index']) ? (int) $c['page_index'] : 1;
+        $pageSize = isset($c['page_size']) ? (int) $c['page_size'] : 15;
         $offset = ($currentPage - 1) * $pageSize;
 
         $total = $query->count();
         $data = $query->skip($offset)->take($pageSize)->get();
 
-        return ['data' => $data, 'total' => $total, 'currentPage' => $currentPage, 'totalPage' => int(ceil($total / $pageSize))];
+        return ['data' => $data, 'total' => $total, 'currentPage' => $currentPage, 'totalPage' => (int) ceil($total / $pageSize)];
     }
 
     // 保存

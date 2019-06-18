@@ -56,8 +56,8 @@ trait AccountChangeReportLogics
             $query->where('process_time', "<=", strtotime($c['end_time']));
         }
 
-        $currentPage = isset($c['page_index']) ? int($c['page_index']) : 1;
-        $pageSize = isset($c['page_size']) ? int($c['page_size']) : 1;
+        $currentPage = isset($c['page_index']) ? (int) $c['page_index'] : 1;
+        $pageSize = isset($c['page_size']) ? (int) $c['page_size'] : 1;
         $offset = ($currentPage - 1) * $pageSize;
 
         $total = $query->count();
@@ -67,7 +67,7 @@ trait AccountChangeReportLogics
             'data' => $menus,
             'total' => $total,
             'currentPage' => $currentPage,
-            'totalPage' => int(ceil($total / $pageSize)),
+            'totalPage' => (int) ceil($total / $pageSize),
         ];
     }
 

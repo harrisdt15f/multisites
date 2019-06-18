@@ -292,7 +292,7 @@ class LotteriesController extends FrontendApiMainController
                 return "对不起, 模式{$mode}, 不存在!";
             }
             // 奖金组 - 游戏
-            $prizeGroup = int($item['prize_group']);
+            $prizeGroup = (int) $item['prize_group'];
             if (!$lottery->isValidPrizeGroup($prizeGroup)) {
                 return "对不起, 奖金组{$prizeGroup}, 游戏未开放!";
             }
@@ -306,11 +306,11 @@ class LotteriesController extends FrontendApiMainController
                 return "对不起, 玩法{$methodId}, 注单号码不合法!";
             }
             // 倍数
-            $times = int($item['times']);
+            $times = (int) $item['times'];
             if (!$lottery->isValidTimes($times)) {
                 return "对不起, 倍数{$times}, 不合法!";
             }
-            $price = int($item['price']);
+            $price = (int) $item['price'];
             $priceConfig = config('game.main.price', [1, 2]);
             if (!$price || !in_array($price, $priceConfig)) {
                 return "对不起, 单价{$price}, 不合法!";
