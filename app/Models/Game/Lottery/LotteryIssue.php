@@ -37,4 +37,9 @@ class LotteryIssue extends BaseModel
         'encode_username',
         'day',
     ];
+
+    public function lottery()
+    {
+        return $this->hasOne(LotteryList::class, 'en_name', 'lottery_id')->select('en_name', 'series_id');
+    }
 }

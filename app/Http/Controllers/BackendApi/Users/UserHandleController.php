@@ -22,6 +22,8 @@ use App\Models\User\Fund\AccountChangeType;
 use App\Models\User\Fund\FrontendUsersAccount;
 use App\Models\User\UserRechargeHistory;
 use App\Models\User\UsersRechargeHistorie;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -30,11 +32,12 @@ class UserHandleController extends BackEndApiMainController
 {
     protected $eloqM = 'User\FrontendUser';
     protected $withNameSpace = 'Admin\BackendAdminAuditPasswordsList';
+
     /**
      * 创建总代时获取当前平台的奖金组
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function getUserPrizeGroup()
+    public function getUserPrizeGroup(): JsonResponse
     {
         $data['min'] = $this->currentPlatformEloq->prize_group_min;
         $data['max'] = $this->currentPlatformEloq->prize_group_max;
@@ -44,7 +47,7 @@ class UserHandleController extends BackEndApiMainController
     /**
      *创建总代与用户后台管理员操作创建
      */
-    public function createUser()
+    public function createUser(): JsonResponse
     {
         // ############################################
         // $inputDatas = $request->validated();
@@ -88,7 +91,7 @@ class UserHandleController extends BackEndApiMainController
             DB::commit();
             $data['name'] = $user->username;
             return $this->msgOut(true, $data);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
@@ -98,8 +101,11 @@ class UserHandleController extends BackEndApiMainController
 
     }
 
-    //用户管理的所有用户信息表
-    public function usersInfo()
+    /**
+     * 用户管理的所有用户信息表
+     * @return JsonResponse
+     */
+    public function usersInfo(): JsonResponse
     {
         //target model to join
         $fixedJoin = 1; //number of joining tables
@@ -121,20 +127,22 @@ class UserHandleController extends BackEndApiMainController
     }
 
     /**
-     * 18.申请用户密码功能
-     * @return \Illuminate\Http\JsonResponse
+     * 申请用户密码功能
+     * @param  UserHandleApplyResetUserPasswordRequest $request
+     * @return JsonResponse
      */
-    public function applyResetUserPassword(UserHandleApplyResetUserPasswordRequest $request)
+    public function applyResetUserPassword(UserHandleApplyResetUserPasswordRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         return $this->commonHandleUserPassword($inputDatas, 1);
     }
 
     /**
-     * 20.申请资金密码
-     * @return \Illuminate\Http\JsonResponse
+     * 申请资金密码
+     * @param  UserHandleApplyResetUserFundPasswordRequest $request
+     * @return JsonResponse
      */
-    public function applyResetUserFundPassword(UserHandleApplyResetUserFundPasswordRequest $request)
+    public function applyResetUserFundPassword(UserHandleApplyResetUserFundPasswordRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         return $this->commonHandleUserPassword($inputDatas, 2);
@@ -142,23 +150,23 @@ class UserHandleController extends BackEndApiMainController
 
     /**
      * 申请资金密码跟密码共用功能
-     * @param $inputDatas
-     * @param $type todo if type new added then should notice on error message
-     * @return \Illuminate\Http\JsonResponse
+     * @param  $inputDatas
+     * @param  $type todo if type new added then should notice on error message
+     * @return JsonResponse
      */
-    public function commonHandleUserPassword($inputDatas, $type)
+    public function commonHandleUserPassword($inputDatas, $type): JsonResponse
     {
         $applyUserEloq = $this->eloqM::find($inputDatas['id']);
-        if (!is_null($applyUserEloq)) {
+        if ($applyUserEloq !== null) {
             $auditFlowEloq = new BackendAdminAuditFlowList();
             $adminApplyEloq = new BackendAdminAuditPasswordsList();
             //###################
-            $adminApplyCheckEloq = $adminApplyEloq::where([
+            $adminApplyCheck = $adminApplyEloq::where([
                 ['user_id', '=', $applyUserEloq->id],
                 ['status', '=', 0],
                 ['type', '=', $type],
-            ])->first();
-            if (!is_null($adminApplyCheckEloq)) {
+            ])->exists();
+            if ($adminApplyCheckEloq === true) {
                 if ($type === 1) {
                     $code = '100100';
                 } else {
@@ -190,7 +198,7 @@ class UserHandleController extends BackEndApiMainController
                 $adminApplyResult->save();
                 DB::commit();
                 return $this->msgOut(true);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 DB::rollBack();
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
@@ -203,23 +211,26 @@ class UserHandleController extends BackEndApiMainController
 
     /**
      * 用户已申请的密码列表
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function appliedResetUserPasswordLists()
+    public function appliedResetUserPasswordLists(): JsonResponse
     {
         return $this->commonAppliedPasswordHandle();
     }
 
     /**
      * 用户资金密码已申请列表
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function appliedResetUserFundPasswordLists()
+    public function appliedResetUserFundPasswordLists(): JsonResponse
     {
         return $this->commonAppliedPasswordHandle();
     }
 
-    private function commonAppliedPasswordHandle()
+    /**
+     * @return JsonResponse
+     */
+    private function commonAppliedPasswordHandle(): JsonResponse
     {
         //main model
         $eloqM = $this->modelWithNameSpace($this->withNameSpace);
@@ -243,7 +254,11 @@ class UserHandleController extends BackEndApiMainController
         return $this->commonAuditPassword();
     }
 
-    public function commonAuditPassword(UserHandleCommonAuditPasswordRequest $request)
+    /**
+     * @param  UserHandleCommonAuditPasswordRequest $request
+     * @return JsonResponse
+     */
+    public function commonAuditPassword(UserHandleCommonAuditPasswordRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         $eloqM = $this->modelWithNameSpace($this->withNameSpace);
@@ -252,7 +267,7 @@ class UserHandleController extends BackEndApiMainController
             ['type', '=', $inputDatas['type']],
             ['status', '=', 0],
         ])->first();
-        if (!is_null($applyUserEloq)) {
+        if ($applyUserEloq !== null) {
             $auditFlowEloq = $applyUserEloq->auditFlow;
             //handle User
             $user = FrontendUser::find($applyUserEloq->user_id);
@@ -274,7 +289,7 @@ class UserHandleController extends BackEndApiMainController
                 $applyUserEloq->save();
                 DB::commit();
                 return $this->msgOut(true);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 DB::rollBack();
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
@@ -287,13 +302,14 @@ class UserHandleController extends BackEndApiMainController
 
     /**
      * 用户冻结账号功能
-     * @return \Illuminate\Http\JsonResponse
+     * @param  UserHandleDeactivateRequest $request
+     * @return JsonResponse
      */
-    public function deactivate(UserHandleDeactivateRequest $request)
+    public function deactivate(UserHandleDeactivateRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         $userEloq = $this->eloqM::find($inputDatas['user_id']);
-        if (!is_null($userEloq)) {
+        if ($userEloq !== null) {
             DB::beginTransaction();
             try {
                 $userEloq->frozen_type = $inputDatas['frozen_type'];
@@ -310,7 +326,7 @@ class UserHandleController extends BackEndApiMainController
                 $userAdmitFlowLog->save();
                 DB::commit();
                 return $this->msgOut(true);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 DB::rollBack();
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
@@ -319,22 +335,30 @@ class UserHandleController extends BackEndApiMainController
         }
     }
 
-    public function deactivateDetail(UserHandleDeactivateDetailRequest $request)
+    /**
+     * @param  UserHandleDeactivateDetailRequest $request
+     * @return JsonResponse
+     */
+    public function deactivateDetail(UserHandleDeactivateDetailRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         $userEloq = $this->eloqM::find($inputDatas['user_id']);
-        if (!is_null($userEloq)) {
-            $data = FrontendUsersPrivacyFlow::where('user_id', $inputDatas['user_id'])->where('created_at', '>=', $inputDatas['start_time'])->where('created_at', '<', $inputDatas['end_time'])->orderBy('created_at', 'desc')->get()->toArray();
+        if ($userEloq !== null) {
+            $data = FrontendUsersPrivacyFlow::where('user_id', $inputDatas['user_id'])->whereBetween('created_at', $inputDatas['start_time'], $inputDatas['end_time'])->orderBy('created_at', 'desc')->get()->toArray();
             return $this->msgOut(true, $data);
         }
 
     }
 
-    //用户帐变记录
-    public function userAccountChange(UserHandleUserAccountChangeRequest $request)
+    /**
+     * 用户帐变记录
+     * @param  UserHandleUserAccountChangeRequest $request
+     * @return JsonResponse
+     */
+    public function userAccountChange(UserHandleUserAccountChangeRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
-        $datas = AccountChangeReport::select('username', 'type_name', 'type_sign', 'amount', 'before_balance', 'balance', 'created_at')->with('changeType')->where('user_id', $inputDatas['user_id'])->where('created_at', '>=', $inputDatas['start_time'])->where('created_at', '<', $inputDatas['end_time'])->get()->toArray();
+        $datas = AccountChangeReport::select('username', 'type_name', 'type_sign', 'amount', 'before_balance', 'balance', 'created_at')->with('changeType')->where('user_id', $inputDatas['user_id'])->whereBetween('created_at', $inputDatas['start_time'], $inputDatas['end_time'])->get()->toArray();
         foreach ($datas as $key => $report) {
             $datas[$key]['in_out'] = $report['change_type']['in_out'];
             unset($datas[$key]['type_sign']);
@@ -343,21 +367,29 @@ class UserHandleController extends BackEndApiMainController
         return $this->msgOut(true, $datas);
     }
 
-    //用户充值记录
-    public function userRechargeHistory(UserHandleUserRechargeHistoryRequest $request)
+    /**
+     * 用户充值记录
+     * @param  UserHandleUserRechargeHistoryRequest $request
+     * @return JsonResponse
+     */
+    public function userRechargeHistory(UserHandleUserRechargeHistoryRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
-        $datas = UsersRechargeHistorie::select('user_name', 'amount', 'deposit_mode', 'status', 'created_at')->where('user_id', $inputDatas['user_id'])->where('created_at', '>=', $inputDatas['start_time'])->where('created_at', '<', $inputDatas['end_time'])->get()->toArray();
+        $datas = UsersRechargeHistorie::select('user_name', 'amount', 'deposit_mode', 'status', 'created_at')->where('user_id', $inputDatas['user_id'])->whereBetween('created_at', $inputDatas['start_time'], $inputDatas['end_time'])->get()->toArray();
         return $this->msgOut(true, $datas);
     }
 
-    //人工扣除用户资金
-    public function deductionBalance(UserHandleDeductionBalanceRequest $request)
+    /**
+     * 人工扣除用户资金
+     * @param  UserHandleDeductionBalanceRequest $request
+     * @return JsonResponse
+     */
+    public function deductionBalance(UserHandleDeductionBalanceRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         //检查是否存在 人工充值 的帐变类型表
-        $accountChangeTypeEloq = AccountChangeType::select('name', 'sign')->where('sign', 'artificial_deduction')->first();
-        if (is_null($accountChangeTypeEloq)) {
+        $isExistType = AccountChangeType::select('name', 'sign')->where('sign', 'artificial_deduction')->exists();
+        if ($isExistType === false) {
             return $this->msgOut(false, [], '100103');
         }
         $userAccountsEloq = FrontendUsersAccount::where('user_id', $inputDatas['user_id'])->first();
@@ -369,18 +401,15 @@ class UserHandleController extends BackEndApiMainController
             //扣除金额
             $newBalance = $userAccountsEloq->balance - $inputDatas['amount'];
             $editArr = ['balance' => $newBalance];
-            $editStatus = FrontendUsersAccount::where(function ($query) use ($userAccountsEloq) {
-                $query->where('user_id', $inputDatas['user_id'])
-                    ->where('updated_at', $userAccountsEloq->updated_at);
-            })->update($editArr);
+            $editStatus = FrontendUsersAccount::where('user_id', $inputDatas['user_id'])->where('updated_at', $userAccountsEloq->updated_at)->update($editArr);
             if ($editStatus === 0) {
                 return $this->msgOut(false, [], '100105');
             }
             //添加帐变记录
             $userEloq = $this->eloqM::select('id', 'sign', 'top_id', 'parent_id', 'rid', 'username')->where('id', $inputDatas['user_id'])->first();
             $accountChangeReportEloq = new AccountChangeReport();
-            $accountChangeClass = new AccountChange();
-            $accountChangeClass->addData($accountChangeReportEloq, $userEloq, $inputDatas['amount'], $userAccountsEloq->balance, $newBalance, $accountChangeTypeEloq);
+            $accountChangeObj = new AccountChange();
+            $accountChangeObj->addData($accountChangeReportEloq, $userEloq, $inputDatas['amount'], $userAccountsEloq->balance, $newBalance, $accountChangeTypeEloq);
             DB::commit();
             return $this->msgOut(true);
         } catch (Exception $e) {

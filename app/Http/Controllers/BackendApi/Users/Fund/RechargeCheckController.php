@@ -17,6 +17,8 @@ use App\Models\User\Fund\AccountChangeReport;
 use App\Models\User\Fund\AccountChangeType;
 use App\Models\User\Fund\FrontendUsersAccount;
 use App\Models\User\UsersRechargeHistorie;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
 class RechargeCheckController extends BackEndApiMainController
@@ -25,7 +27,11 @@ class RechargeCheckController extends BackEndApiMainController
     protected $successMessage = '你的人工充值申请已通过';
     protected $failureMessage = '你的人工充值申请被驳回';
 
-    public function detail()
+    /**
+     * 人工充值列表
+     * @return JsonResponse
+     */
+    public function detail(): JsonResponse
     {
         $fixedJoin = 1;
         $withTable = 'auditFlow';
@@ -38,18 +44,22 @@ class RechargeCheckController extends BackEndApiMainController
         return $this->msgOut(true, $data);
     }
 
-    //审核通过
-    public function auditSuccess(RechargeCheckAuditSuccessRequest $request)
+    /**
+     * 审核通过
+     * @param  RechargeCheckAuditSuccessRequest $request
+     * @return JsonResponse
+     */
+    public function auditSuccess(RechargeCheckAuditSuccessRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         // 审核表
         $rechargeLog = $this->eloqM::find($inputDatas['id']);
+        if ($rechargeLog->status !== 0) {
+            return $this->msgOut(false, [], '100900');
+        }
         $auditFlow = BackendAdminAuditFlowList::where('id', $rechargeLog->audit_flow_id)->first();
         if (is_null($auditFlow)) {
             return $this->msgOut(false, [], '100904');
-        }
-        if ($rechargeLog->status !== 0) {
-            return $this->msgOut(false, [], '100900');
         }
         //检查是否存在 人工充值 的帐变类型表
         $accountChangeTypeEloq = AccountChangeType::where('sign', 'artificial_recharge')->first();
@@ -74,10 +84,7 @@ class RechargeCheckController extends BackEndApiMainController
             //修改用户金额
             $UserAccounts = FrontendUsersAccount::where('user_id', $rechargeLog->user_id)->first();
             $UserAccountsEdit = ['balance' => $balance];
-            $editStatus = FrontendUsersAccount::where(function ($query) use ($UserAccounts) {
-                $query->where('user_id', $UserAccounts->user_id)
-                    ->where('updated_at', $UserAccounts->updated_at);
-            })->update($UserAccountsEdit);
+            $editStatus = FrontendUsersAccount::where('user_id', $UserAccounts->user_id)->where('updated_at', $UserAccounts->updated_at)->update($UserAccountsEdit);
             if ($editStatus === 0) {
                 DB::rollBack();
                 return $this->msgOut(false, [], '100902');
@@ -98,7 +105,12 @@ class RechargeCheckController extends BackEndApiMainController
         }
     }
 
-    public function auditFailure(RechargeCheckAuditFailureRequest $request)
+    /**
+     * 审核驳回
+     * @param  RechargeCheckAuditFailureRequest $request
+     * @return JsonResponse
+     */
+    public function auditFailure(RechargeCheckAuditFailureRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         $rechargeLog = $this->eloqM::find($inputDatas['id']);
@@ -146,7 +158,14 @@ class RechargeCheckController extends BackEndApiMainController
         }
     }
 
-    public function auditFlowEdit($eloq, $partnerAdmin, $auditor_note)
+    /**
+     * 审核时 修改审核表
+     * @param  object $eloq         [审核表Eloq]
+     * @param  object $partnerAdmin [adminEloq]
+     * @param  string $auditor_note [备注]
+     * @return void
+     */
+    public function auditFlowEdit($eloq, $partnerAdmin, $auditor_note): void
     {
         $editData = [
             'auditor_id' => $partnerAdmin->id,
@@ -158,18 +177,18 @@ class RechargeCheckController extends BackEndApiMainController
     }
 
     /**
-     * 发送站内消息给申请人
-     * @param  int $adminId 申请人id
-     * @param  string $message 消息内容
+     * 审核后发送站内消息提醒申请人
+     * @param  int     $adminId 申请人id
+     * @param  string  $message 消息内容
      * @return void
      */
-    public function sendMessage($adminId, $message)
+    public function sendMessage($adminId, $message): void
     {
-        $messageClass = new InternalNoticeMessage();
+        $messageObj = new InternalNoticeMessage();
         $type = BackendSystemNoticeList::AUDIT;
         $admin = BackendAdminUser::select('id', 'group_id')->find($adminId);
-        if (!is_null($admin)) {
-            $messageClass->insertMessage($type, $message, $admin->toArray());
+        if ($admin !== null) {
+            $messageObj->insertMessage($type, $message, $admin->toArray());
         }
     }
 }

@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-17 18:02:56
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-18 10:40:43
+ * @Last Modified time: 2019-06-18 15:37:12
  */
 namespace App\Http\Requests\Backend\Game\Lottery;
 
@@ -31,9 +31,10 @@ class LotteriesInputNumberRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'code' => 'required|array|min:5|max:5',
-            'code.*' => 'required|numeric|between:0,9',
-            'lottery_id' => 'required|string|exists:lottery_issues,lottery_id',
+            'code' => 'required|array|size:5',
+            'code.*' => 'required|numeric',
+            'series_id' => 'required|string|exists:lottery_series,series_name',
+            'lottery_id' => 'required|string|exists:lottery_lists,en_name',
             'issue' => 'required|integer',
         ];
     }

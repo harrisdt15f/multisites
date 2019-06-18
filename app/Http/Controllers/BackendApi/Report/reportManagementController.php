@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-05-27 11:02:52
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 17:56:41
+ * @Last Modified time: 2019-06-18 15:40:12
  */
 namespace App\Http\Controllers\BackendApi\Report;
 
@@ -12,11 +12,15 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Models\User\Fund\AccountChangeReport;
 use App\Models\User\Fund\AccountChangeType;
 use App\Models\User\UsersRechargeHistorie;
+use Illuminate\Http\JsonResponse;
 
 class reportManagementController extends BackEndApiMainController
 {
-    //玩家帐变报表
-    public function userAccountChange()
+    /**
+     * 玩家帐变报表
+     * @return JsonResponse
+     */
+    public function userAccountChange(): JsonResponse
     {
         $accountChangeEloq = new AccountChangeReport();
         $searchAbleFields = ['username', 'type_sign', 'is_for_agent'];
@@ -42,19 +46,24 @@ class reportManagementController extends BackEndApiMainController
         return $this->msgOut(true, $datas);
     }
 
-    //玩家充值报表
-    public function userRechargeHistory()
+    /**
+     * 玩家充值报表
+     * @return JsonResponse
+     */
+    public function userRechargeHistory(): JsonResponse
     {
         $rechargeHistoryEloq = new UsersRechargeHistorie();
         $searchAbleFields = ['user_name', 'company_order_num', 'deposit_mode', 'status'];
-        $fixedJoin = 0;
         $field = 'updated_at';
         $type = 'desc';
-        $datas = $this->generateSearchQuery($rechargeHistoryEloq, $searchAbleFields, $fixedJoin, null, null, $field, $type);
+        $datas = $this->generateSearchQuery($rechargeHistoryEloq, $searchAbleFields, 0, null, null, $field, $type);
         return $this->msgOut(true, $datas);
     }
 
-    public function accountChangeType()
+    /**
+     * @return JsonResponse
+     */
+    public function accountChangeType(): JsonResponse
     {
         $datas = AccountChangeType::select('name', 'sign')->get()->toArray();
         return $this->msgOut(true, $datas);
