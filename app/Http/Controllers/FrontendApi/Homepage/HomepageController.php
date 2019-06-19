@@ -8,12 +8,13 @@ use App\Models\Admin\Activity\FrontendActivityContent;
 use App\Models\Admin\Homepage\FrontendLotteryFnfBetableList;
 use App\Models\Admin\Homepage\FrontendLotteryRedirectBetList;
 use App\Models\Admin\Notice\FrontendMessageNotice;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 
 class HomepageController extends FrontendApiMainController
 {
-    protected $eloqM = 'DeveloperUsage\Frontend\FrontendAllocatedModel';
-    protected $offMsg = '当前模块为关闭状态';
+    public $eloqM = 'DeveloperUsage\Frontend\FrontendAllocatedModel';
+    public $offMsg = '当前模块为关闭状态';
 
     //需要展示的前台模块
     public function showHomepageModel()
@@ -31,8 +32,13 @@ class HomepageController extends FrontendApiMainController
         return $this->msgOut(true, $data);
     }
 
-    //轮播图
-    public function banner(HompageBanner $action)
+
+    /**
+     * 轮播图
+     * @param  HompageBanner  $action
+     * @return JsonResponse
+     */
+    public function banner(HompageBanner $action): JsonResponse
     {
         return $action->execute($this);
     }

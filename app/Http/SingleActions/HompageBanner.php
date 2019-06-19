@@ -9,24 +9,29 @@
 namespace App\Http\SingleActions;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Http\Controllers\WebControllers\HomeController;
 use App\Models\Admin\Homepage\FrontendPageBanner;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 
 
 class HompageBanner
 {
+    protected $model;
 
-    public function __construct()
+    /**
+     * HompageBanner constructor.
+     * @param  FrontendPageBanner  $frontendPageBanner
+     */
+    public function __construct(FrontendPageBanner $frontendPageBanner)
     {
-
+        $this->model =$frontendPageBanner;
     }
 
     /**
      * @param  FrontendApiMainController  $contll
-     * @return mixed
+     * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll)
+    public function execute(FrontendApiMainController $contll): JsonResponse
     {
         if (Cache::has('homepageBanner')) {
             $datas = Cache::get('homepageBanner');
@@ -35,7 +40,7 @@ class HompageBanner
             if ($status->status !== 1) {
                 return $contll->msgOut(false, [], '400', $contll->offMsg);
             }
-            $datas = FrontendPageBanner::select('id', 'title', 'pic_path', 'content', 'type', 'redirect_url',
+            $datas = $this->model::select('id', 'title', 'pic_path', 'content', 'type', 'redirect_url',
                 'activity_id')
                 ->with([
                     'activity' => static function ($query) {
