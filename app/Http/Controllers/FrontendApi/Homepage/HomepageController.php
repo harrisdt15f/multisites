@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\FrontendApi\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Http\SingleActions\HompageBanner;
+use App\Http\SingleActions\HompageBannerAction;
 use App\Models\Admin\Activity\FrontendActivityContent;
 use App\Models\Admin\Homepage\FrontendLotteryFnfBetableList;
 use App\Models\Admin\Homepage\FrontendLotteryRedirectBetList;
@@ -35,10 +35,10 @@ class HomepageController extends FrontendApiMainController
 
     /**
      * 轮播图
-     * @param  HompageBanner  $action
+     * @param  HompageBannerAction  $action
      * @return JsonResponse
      */
-    public function banner(HompageBanner $action): JsonResponse
+    public function banner(HompageBannerAction $action): JsonResponse
     {
         return $action->execute($this);
     }

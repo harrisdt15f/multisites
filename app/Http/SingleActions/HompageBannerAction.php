@@ -14,7 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 
 
-class HompageBanner
+class HompageBannerAction
 {
     protected $model;
 
