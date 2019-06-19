@@ -32,4 +32,6 @@ Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], function 
     Route::match(['post', 'options'], 'edit-method', ['as' => $namePrefix . 'edit-method', 'uses' => $controller . 'editMethod']);
     //录号
     Route::match(['post', 'options'], 'input-code', ['as' => $namePrefix . 'input-code', 'uses' => $controller . 'inputCode']);
+    //彩票号码合法长度
+    Route::match(['get', 'options'], 'lotteries-code-length', ['as' => $namePrefix . 'lotteries-code-length', 'uses' => $controller . 'lotteriesCodeLength']);
 });
