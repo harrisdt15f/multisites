@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\FrontendApi\Game\Lottery;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
+use App\Http\Requests\Frontend\Game\Lottery\LotteriesAvailableIssuesRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesBetRequest;
+use App\Http\Requests\Frontend\Game\Lottery\LotteriesIssueHistoryRequest;
+use App\Http\Requests\Frontend\Game\Lottery\LotteriesProjectHistoryRequest;
 use App\Lib\Locker\AccountLocker;
 use App\Lib\Logic\AccountChange;
 use App\Models\Game\Lottery\LotteryIssue;
@@ -142,15 +145,9 @@ class LotteriesController extends FrontendApiMainController
      * @return JsonResponse
      * @todo  需要改真实数据 暂时先从那边挪接口
      */
-    public function issueHistory(): JsonResponse
+    public function issueHistory(LotteriesIssueHistoryRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'lottery_sign' => 'required|string|min:4|max:10|exists:lottery_lists,en_name',
-            'count' => 'integer',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         $data = [
             [
                 'issue_no' => '201809221',
@@ -172,15 +169,10 @@ class LotteriesController extends FrontendApiMainController
      * 7. 游戏-可用奖期
      * @return JsonResponse
      */
-    public function availableIssues(): JsonResponse
+    public function availableIssues(LotteriesAvailableIssuesRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'lottery_sign' => 'required|string|min:4|max:10|exists:lottery_lists,en_name', //lottery_lists
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $lotterySign = $this->inputs['lottery_sign'];
+        $inputDatas = $request->validated();
+        $lotterySign = $inputDatas['lottery_sign'];
         $lottery = LotteryList::findBySign($lotterySign);
         $canUserInfo = LotteryIssue::getCanBetIssue($lotterySign, $lottery->max_trace_number);
         $canBetIssueData = [];
@@ -218,19 +210,12 @@ class LotteriesController extends FrontendApiMainController
         return $this->msgOut(true, $data);
     }
 
-    public function projectHistory()
+    public function projectHistory(LotteriesProjectHistoryRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'count' => 'required|integer|min:10|max:100',
-            'lottery_sign' => 'string|min:4|max:10|exists:lottery_lists,en_name',
-            'start' => 'required|integer',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $lotterySign = $this->inputs['lottery_sign'] ?? '*';
-        $start = $this->inputs['start']; //0
-        $count = $this->inputs['count']; //10
+        $inputDatas = $request->validated();
+        $lotterySign = $inputDatas['lottery_sign'] ?? '*';
+        $start = $inputDatas['start']; //0
+        $count = $inputDatas['count']; //10
         $data = Project::getGamePageList($lotterySign, $start, $count);
         return $this->msgOut(true, $data);
     }

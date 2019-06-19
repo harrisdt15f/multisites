@@ -2,9 +2,15 @@
 
 namespace App\Http\Controllers\FrontendApi;
 
+use App\Http\Requests\Frontend\FrontendAuthDeletePartnerAdminRequest;
+use App\Http\Requests\Frontend\FrontendAuthRegisterRequest;
+use App\Http\Requests\Frontend\FrontendAuthSelfResetPasswordRequest;
+use App\Http\Requests\Frontend\FrontendAuthUpdatePAdmPasswordRequest;
+use App\Http\Requests\Frontend\FrontendAuthUpdateUserGroupRequest;
 use App\Models\Admin\BackendAdminAccessGroup;
 use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
 use App\Models\Admin\SystemConfiguration;
+use Exception;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -73,7 +79,7 @@ class FrontendAuthController extends FrontendApiMainController
             try {
                 JWTAuth::setToken($user->remember_token);
                 JWTAuth::invalidate();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::info($e->getMessage());
             }
         }
@@ -130,22 +136,17 @@ class FrontendAuthController extends FrontendApiMainController
 
     /**
      * change partner user Password
+     * @param  FrontendAuthSelfResetPasswordRequest $request
      * @return JsonResponse
      */
-    public function selfResetPassword()
+    public function selfResetPassword(FrontendAuthSelfResetPasswordRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'old_password' => 'required|string',
-            'password' => 'required|string',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        if (!Hash::check($this->inputs['old_password'], $this->partnerAdmin->password)) {
+        $inputDatas = $request->validated();
+        if (!Hash::check($inputDatas['old_password'], $this->partnerAdmin->password)) {
             return $this->msgOut(false, [], '100003');
         } else {
             $token = $this->refresh();
-            $this->partnerAdmin->password = Hash::make($this->inputs['password']);
+            $this->partnerAdmin->password = Hash::make($inputDatas['password']);
             $this->partnerAdmin->remember_token = $token;
             try {
                 $this->partnerAdmin->save();
@@ -157,7 +158,7 @@ class FrontendAuthController extends FrontendApiMainController
                     'expires_at' => $expireAt,
                 ];
                 return $this->msgOut(true, $data);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
                 return $this->msgOut(false, [], $sqlState, $msg);
@@ -168,26 +169,18 @@ class FrontendAuthController extends FrontendApiMainController
 
     /**
      * Register api
+     * @param  FrontendAuthRegisterRequest $request
      * @return JsonResponse
      */
-    public function register(): JsonResponse
+    public function register(FrontendAuthRegisterRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'name' => 'required|unique:backend_admin_users',
-            'email' => 'required|email|unique:backend_admin_users',
-            'password' => 'required',
-            'is_test' => 'required|numeric',
-            'group_id' => 'required|numeric',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $group = BackendAdminAccessGroup::find($this->inputs['group_id']);
+        $inputDatas = $request->validated();
+        $group = BackendAdminAccessGroup::find($inputDatas['group_id']);
         $role = $group->role == '*' ? Arr::wrap($group->role) : Arr::wrap(json_decode($group->role, true));
         $isManualRecharge = false;
         $FundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
         $isManualRecharge = in_array($FundOperation['id'], $role, true);
-        $input = $this->inputs;
+        $input = $inputDatas;
         $input['password'] = bcrypt($input['password']);
         $input['platform_id'] = $this->currentPlatformEloq->platform_id;
         $user = BackendAdminUser::create($input);
@@ -218,26 +211,21 @@ class FrontendAuthController extends FrontendApiMainController
                 $result = $data->toArray();
             }
             return $this->msgOut(true, $result);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->msgOut(false, [], $e->getCode(), $e->getMessage());
         }
     }
 
     /**
+     * @param  FrontendAuthUpdateUserGroupRequest $request
      * @return JsonResponse|null
      */
-    public function updateUserGroup() :  ? JsonResponse
+    public function updateUserGroup(FrontendAuthUpdateUserGroupRequest $request) :  ? JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
-            'group_id' => 'required|numeric',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $targetUserEloq = $this->eloqM::find($this->inputs['id']);
+        $inputDatas = $request->validated();
+        $targetUserEloq = $this->eloqM::find($inputDatas['id']);
         if ($targetUserEloq !== null) {
-            $targetUserEloq->group_id = $this->inputs['group_id'];
+            $targetUserEloq->group_id = $inputDatas['group_id'];
             if ($targetUserEloq->save()) {
                 $result = $targetUserEloq->toArray();
                 return $this->msgOut(true, $result);
@@ -271,19 +259,12 @@ class FrontendAuthController extends FrontendApiMainController
         return response()->json($request->user());
     }
 
-    public function deletePartnerAdmin():  ? JsonResponse
+    public function deletePartnerAdmin(FrontendAuthDeletePartnerAdminRequest $request):  ? JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
-            'name' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-
+        $inputDatas = $request->validated();
         $targetUserEloq = $this->eloqM::where([
-            ['id', '=', $this->inputs['id']],
-            ['name', '=', $this->inputs['name']],
+            ['id', '=', $inputDatas['id']],
+            ['name', '=', $inputDatas['name']],
         ])->first();
         if ($targetUserEloq !== null) {
             $token = $targetUserEloq->token();
@@ -300,21 +281,15 @@ class FrontendAuthController extends FrontendApiMainController
         }
     }
 
-    public function updatePAdmPassword() :  ? JsonResponse
+    public function updatePAdmPassword(FrontendAuthUpdatePAdmPasswordRequest $request) :  ? JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
-            'password' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
+        $inputDatas = $request->validated();
         $targetUserEloq = $this->eloqM::where([
-            ['id', '=', $this->inputs['id']],
-            ['name', '=', $this->inputs['name']],
+            ['id', '=', $inputDatas['id']],
+            ['name', '=', $inputDatas['name']],
         ])->first();
         if ($targetUserEloq !== null) {
-            $targetUserEloq->password = Hash::make($this->inputs['password']);
+            $targetUserEloq->password = Hash::make($inputDatas['password']);
             if ($targetUserEloq->save()) {
 //用户更新密码
                 return $this->msgOut(true);

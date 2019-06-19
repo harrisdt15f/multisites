@@ -2,10 +2,16 @@
 
 namespace App\Http\Controllers\BackendApi;
 
+use App\Http\Requests\Backend\BackendAuthDeletePartnerAdminRequest;
+use App\Http\Requests\Backend\BackendAuthRegisterRequest;
+use App\Http\Requests\Backend\BackendAuthSelfResetPasswordRequest;
+use App\Http\Requests\Backend\BackendAuthUpdatePAdmPasswordRequest;
+use App\Http\Requests\Backend\BackendAuthUpdateUserGroupRequest;
 use App\Models\Admin\BackendAdminAccessGroup;
 use App\Models\Admin\BackendAdminUser;
 use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
 use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
+use Exception;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,7 +20,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -68,7 +73,7 @@ class BackendAuthController extends BackEndApiMainController
             try {
                 JWTAuth::setToken($user->remember_token);
                 JWTAuth::invalidate();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::info($e->getMessage());
             }
         }
@@ -97,20 +102,14 @@ class BackendAuthController extends BackEndApiMainController
      * change partner user Password
      * @return JsonResponse
      */
-    public function selfResetPassword()
+    public function selfResetPassword(BackendAuthSelfResetPasswordRequest $request)
     {
-        $validator = Validator::make($this->inputs, [
-            'old_password' => 'required|string',
-            'password' => 'required|string',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors());
-        }
-        if (!Hash::check($this->inputs['old_password'], $this->partnerAdmin->password)) {
+        $inputDatas = $request->validated();
+        if (!Hash::check($inputDatas['old_password'], $this->partnerAdmin->password)) {
             return $this->msgOut(false, [], '100003');
         } else {
             $token = $this->refresh();
-            $this->partnerAdmin->password = Hash::make($this->inputs['password']);
+            $this->partnerAdmin->password = Hash::make($inputDatas['password']);
             $this->partnerAdmin->remember_token = $token;
             try {
                 $this->partnerAdmin->save();
@@ -122,7 +121,7 @@ class BackendAuthController extends BackEndApiMainController
                     'expires_at' => $expireAt,
                 ];
                 return $this->msgOut(true, $data);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $errorObj = $e->getPrevious()->getPrevious();
                 [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
                 return $this->msgOut(false, [], $sqlState, $msg);
@@ -135,24 +134,15 @@ class BackendAuthController extends BackEndApiMainController
      * Register api
      * @return JsonResponse
      */
-    public function register(): JsonResponse
+    public function register(BackendAuthRegisterRequest $request): JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'name' => 'required|unique:backend_admin_users',
-            'email' => 'required|email|unique:backend_admin_users',
-            'password' => 'required',
-            'is_test' => 'required|numeric',
-            'group_id' => 'required|numeric',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $group = BackendAdminAccessGroup::find($this->inputs['group_id']);
+        $inputDatas = $request->validated();
+        $group = BackendAdminAccessGroup::find($inputDatas['group_id']);
         $role = $group->role == '*' ? Arr::wrap($group->role) : Arr::wrap(json_decode($group->role, true));
         $isManualRecharge = false;
         $fundOperation = BackendSystemMenu::select('id')->where('route', '/manage/recharge')->first()->toArray();
         $isManualRecharge = in_array($fundOperation['id'], $role, true);
-        $input = $this->inputs;
+        $input = $inputDatas;
         $input['password'] = bcrypt($input['password']);
         $input['platform_id'] = $this->currentPlatformEloq->platform_id;
         $user = BackendAdminUser::create($input);
@@ -183,7 +173,7 @@ class BackendAuthController extends BackEndApiMainController
                 $result = $data->toArray();
             }
             return $this->msgOut(true, $result);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->msgOut(false, [], $e->getCode(), $e->getMessage());
         }
     }
@@ -191,18 +181,12 @@ class BackendAuthController extends BackEndApiMainController
     /**
      * @return JsonResponse|null
      */
-    public function updateUserGroup() :  ? JsonResponse
+    public function updateUserGroup(BackendAuthUpdateUserGroupRequest $request) :  ? JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
-            'group_id' => 'required|numeric',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors());
-        }
-        $targetUserEloq = $this->eloqM::find($this->inputs['id']);
+        $inputDatas = $request->validated();
+        $targetUserEloq = $this->eloqM::find($inputDatas['id']);
         if ($targetUserEloq !== null) {
-            $targetUserEloq->group_id = $this->inputs['group_id'];
+            $targetUserEloq->group_id = $inputDatas['group_id'];
             if ($targetUserEloq->save()) {
                 $result = $targetUserEloq->toArray();
                 return $this->msgOut(true, $result);
@@ -249,19 +233,17 @@ class BackendAuthController extends BackEndApiMainController
         return response()->json($request->user());
     }
 
-    public function deletePartnerAdmin():  ? JsonResponse
+    /**
+     * 删除管理员
+     * @param  BackendAuthDeletePartnerAdminRequest $request
+     * @return JsonResponse
+     */
+    public function deletePartnerAdmin(BackendAuthDeletePartnerAdminRequest $request):  ? JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
-            'name' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors());
-        }
-
+        $inputDatas = $request->validated();
         $targetUserEloq = $this->eloqM::where([
-            ['id', '=', $this->inputs['id']],
-            ['name', '=', $this->inputs['name']],
+            ['id', '=', $inputDatas['id']],
+            ['name', '=', $inputDatas['name']],
         ])->first();
         if ($targetUserEloq !== null) {
             $token = $targetUserEloq->token();
@@ -278,21 +260,19 @@ class BackendAuthController extends BackEndApiMainController
         }
     }
 
-    public function updatePAdmPassword() :  ? JsonResponse
+    /**
+     * @param  BackendAuthUpdatePAdmPasswordRequest $request
+     * @return JsonResponse
+     */
+    public function updatePAdmPassword(BackendAuthUpdatePAdmPasswordRequest $request) :  ? JsonResponse
     {
-        $validator = Validator::make($this->inputs, [
-            'id' => 'required|numeric',
-            'password' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors());
-        }
+        $inputDatas = $request->validated();
         $targetUserEloq = $this->eloqM::where([
-            ['id', '=', $this->inputs['id']],
-            ['name', '=', $this->inputs['name']],
+            ['id', '=', $inputDatas['id']],
+            ['name', '=', $inputDatas['name']],
         ])->first();
         if ($targetUserEloq !== null) {
-            $targetUserEloq->password = Hash::make($this->inputs['password']);
+            $targetUserEloq->password = Hash::make($inputDatas['password']);
             if ($targetUserEloq->save()) {
 //用户更新密码
                 return $this->msgOut(true);

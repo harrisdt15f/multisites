@@ -9,7 +9,6 @@ use App\Models\Admin\Homepage\FrontendLotteryRedirectBetList;
 use App\Models\Admin\Homepage\FrontendPageBanner;
 use App\Models\Admin\Notice\FrontendMessageNotice;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Validator;
 
 class HomepageController extends FrontendApiMainController
 {
@@ -38,8 +37,8 @@ class HomepageController extends FrontendApiMainController
         if (Cache::has('homepageBanner')) {
             $datas = Cache::get('homepageBanner');
         } else {
-            $status = $this->eloqM::select('status')->where('en_name', 'banner')->first();
-            if ($status->status !== 1) {
+            $status = $this->eloqM::select('status')->where('en_name', 'banner')->value('status');
+            if ($status !== 1) {
                 return $this->msgOut(false, [], '400', $this->offMsg);
             }
             $datas = FrontendPageBanner::select('id', 'title', 'pic_path', 'content', 'type', 'redirect_url', 'activity_id')

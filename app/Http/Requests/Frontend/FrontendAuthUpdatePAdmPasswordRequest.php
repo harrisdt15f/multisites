@@ -2,15 +2,15 @@
 
 /**
  * @Author: LingPh
- * @Date:   2019-06-14 17:05:40
+ * @Date:   2019-06-19 14:20:34
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-19 11:30:09
+ * @Last Modified time: 2019-06-19 14:25:42
  */
-namespace App\Http\Requests\Backend\Users;
+namespace App\Http\Requests\Frontend;
 
 use App\Http\Requests\BaseFormRequest;
 
-class UserHandleCreateUserRequest extends BaseFormRequest
+class FrontendAuthUpdatePAdmPasswordRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,17 +29,10 @@ class UserHandleCreateUserRequest extends BaseFormRequest
      */
     public function rules(): array
     {
-        // ############################################
-        // $min $max   需要处理
-        // $min = $this->currentPlatformEloq->prize_group_min;
-        // $max = $this->currentPlatformEloq->prize_group_max;
         return [
-            'username' => 'required|unique:frontend_users',
+            'id' => 'required|numeric',
+            'name' => 'required',
             'password' => 'required',
-            'fund_password' => 'required',
-            'is_tester' => 'required|numeric',
-            'prize_group' => 'required|numeric|between:' . $min . ',' . $max,
-            'type' => 'required|numeric',
         ];
     }
 

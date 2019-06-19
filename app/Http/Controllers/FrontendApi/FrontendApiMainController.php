@@ -62,8 +62,8 @@ class FrontendApiMainController extends Controller
      */
     protected function msgOut($success = false, $data = [], $code = '', $message = ''): JsonResponse
     {
-        $defaultSuccessCode = 200;
-        $defaultErrorCode = 404;
+        $defaultSuccessCode = '200';
+        $defaultErrorCode = '404';
         if ($success === true) {
             $code = $code == '' ? $defaultSuccessCode : $code;
         } else {

@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\BackendApi\Users;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-// use App\Http\Requests\Backend\Users\UserHandleCreateUserRequest;
 use App\Http\Requests\Backend\Users\UserHandleApplyResetUserFundPasswordRequest;
 use App\Http\Requests\Backend\Users\UserHandleApplyResetUserPasswordRequest;
 use App\Http\Requests\Backend\Users\UserHandleCommonAuditPasswordRequest;
+// use App\Http\Requests\Backend\Users\UserHandleCreateUserRequest;
 use App\Http\Requests\Backend\Users\UserHandleDeactivateDetailRequest;
 use App\Http\Requests\Backend\Users\UserHandleDeactivateRequest;
 use App\Http\Requests\Backend\Users\UserHandleDeductionBalanceRequest;
@@ -51,7 +51,7 @@ class UserHandleController extends BackEndApiMainController
     {
         // ############################################
         // $inputDatas = $request->validated();
-        // validated $min $max 私有属性无法访问   需要处理
+        // ############################################
         $min = $this->currentPlatformEloq->prize_group_min;
         $max = $this->currentPlatformEloq->prize_group_max;
         $validator = Validator::make($this->inputs, [
