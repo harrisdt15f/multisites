@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\FrontendApi\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
+use App\Http\SingleActions\HompageBanner;
 use App\Models\Admin\Activity\FrontendActivityContent;
 use App\Models\Admin\Homepage\FrontendLotteryFnfBetableList;
 use App\Models\Admin\Homepage\FrontendLotteryRedirectBetList;
-use App\Models\Admin\Homepage\FrontendPageBanner;
 use App\Models\Admin\Notice\FrontendMessageNotice;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Validator;
 
 class HomepageController extends FrontendApiMainController
 {
@@ -33,29 +32,9 @@ class HomepageController extends FrontendApiMainController
     }
 
     //轮播图
-    public function banner()
+    public function banner(HompageBanner $action)
     {
-        if (Cache::has('homepageBanner')) {
-            $datas = Cache::get('homepageBanner');
-        } else {
-            $status = $this->eloqM::select('status')->where('en_name', 'banner')->first();
-            if ($status->status !== 1) {
-                return $this->msgOut(false, [], '400', $this->offMsg);
-            }
-            $datas = FrontendPageBanner::select('id', 'title', 'pic_path', 'content', 'type', 'redirect_url', 'activity_id')
-                ->with(['activity' => function ($query) {
-                    $query->select('id', 'redirect_url');
-                }])
-                ->where('status', 1)->orderBy('sort', 'asc')->get()->toArray();
-            foreach ($datas as $key => $data) {
-                if ($data['type'] === 2) {
-                    $datas[$key]['redirect_url'] = $data['activity']['redirect_url'];
-                }
-                unset($datas[$key]['activity'], $datas[$key]['activity_id']);
-            }
-            Cache::forever('homepageBanner', $datas);
-        }
-        return $this->msgOut(true, $datas);
+        return $action->execute($this);
     }
 
     //热门彩票

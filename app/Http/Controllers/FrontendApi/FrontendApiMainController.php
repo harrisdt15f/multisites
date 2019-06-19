@@ -16,7 +16,7 @@ class FrontendApiMainController extends Controller
     protected $partnerAdmin; //当前的商户用户
     protected $currentOptRoute; //目前路由
     protected $currentPlatformEloq = null; //当前商户存在的平台
-    protected $eloqM = ''; // 当前的eloquent
+    public $eloqM = ''; // 当前的eloquent
     //当前的route name;
     protected $log_uuid; //当前的logId
     protected $currentGuard = 'frontend-web';
@@ -60,7 +60,7 @@ class FrontendApiMainController extends Controller
      * @param  string  $code
      * @return JsonResponse
      */
-    protected function msgOut($success = false, $data = [], $code = '', $message = ''): JsonResponse
+    public function msgOut($success = false, $data = [], $code = '', $message = ''): JsonResponse
     {
         $defaultSuccessCode = 200;
         $defaultErrorCode = 404;
