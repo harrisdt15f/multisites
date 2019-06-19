@@ -10,6 +10,7 @@ use App\Models\SystemPlatform;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
@@ -46,6 +47,7 @@ class BackEndApiMainController extends Controller
                 $this->currentPlatformEloq = new SystemPlatform();
                 if ($this->partnerAdmin->platform()->exists()) {
                     $this->currentPlatformEloq = $this->partnerAdmin->platform; //获取目前账号用户属于平台的对象
+                    Cache::forever('currentPlatformEloq', $this->currentPlatformEloq);
                     if ($this->partnerAdmin->accessGroup()->exists()) {
                         $this->currentPartnerAccessGroup = $this->partnerAdmin->accessGroup;
                     }

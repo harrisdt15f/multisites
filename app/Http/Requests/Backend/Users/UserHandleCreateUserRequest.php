@@ -4,11 +4,12 @@
  * @Author: LingPh
  * @Date:   2019-06-14 17:05:40
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-19 11:30:09
+ * @Last Modified time: 2019-06-19 17:05:27
  */
 namespace App\Http\Requests\Backend\Users;
 
 use App\Http\Requests\BaseFormRequest;
+use Illuminate\Support\Facades\Cache;
 
 class UserHandleCreateUserRequest extends BaseFormRequest
 {
@@ -29,10 +30,9 @@ class UserHandleCreateUserRequest extends BaseFormRequest
      */
     public function rules(): array
     {
-        // ############################################
-        // $min $max   需要处理
-        // $min = $this->currentPlatformEloq->prize_group_min;
-        // $max = $this->currentPlatformEloq->prize_group_max;
+        $currentPlatformEloq = Cache::get('currentPlatformEloq');
+        $min = $currentPlatformEloq->prize_group_min;
+        $max = $currentPlatformEloq->prize_group_max;
         return [
             'username' => 'required|unique:frontend_users',
             'password' => 'required',

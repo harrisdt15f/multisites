@@ -6,7 +6,7 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Users\UserHandleApplyResetUserFundPasswordRequest;
 use App\Http\Requests\Backend\Users\UserHandleApplyResetUserPasswordRequest;
 use App\Http\Requests\Backend\Users\UserHandleCommonAuditPasswordRequest;
-// use App\Http\Requests\Backend\Users\UserHandleCreateUserRequest;
+use App\Http\Requests\Backend\Users\UserHandleCreateUserRequest;
 use App\Http\Requests\Backend\Users\UserHandleDeactivateDetailRequest;
 use App\Http\Requests\Backend\Users\UserHandleDeactivateRequest;
 use App\Http\Requests\Backend\Users\UserHandleDeductionBalanceRequest;
@@ -47,35 +47,20 @@ class UserHandleController extends BackEndApiMainController
     /**
      *创建总代与用户后台管理员操作创建
      */
-    public function createUser(): JsonResponse
+    public function createUser(UserHandleCreateUserRequest $request): JsonResponse
     {
-        // ############################################
-        // $inputDatas = $request->validated();
-        // ############################################
-        $min = $this->currentPlatformEloq->prize_group_min;
-        $max = $this->currentPlatformEloq->prize_group_max;
-        $validator = Validator::make($this->inputs, [
-            'username' => 'required|unique:frontend_users',
-            'password' => 'required',
-            'fund_password' => 'required',
-            'is_tester' => 'required|numeric',
-            'prize_group' => 'required|numeric|between:' . $min . ',' . $max,
-            'type' => 'required|numeric',
-        ]);
-        if ($validator->fails()) {
-            return $this->msgOut(false, [], '400', $validator->errors()->first());
-        }
-        $this->inputs['nickname'] = $this->inputs['username'];
-        $this->inputs['password'] = bcrypt($this->inputs['password']);
-        $this->inputs['fund_password'] = bcrypt($this->inputs['fund_password']);
-        $this->inputs['platform_id'] = $this->currentPlatformEloq->platform_id;
-        $this->inputs['sign'] = $this->currentPlatformEloq->platform_sign;
-        $this->inputs['vip_level'] = 0;
-        $this->inputs['parent_id'] = 0;
-        $this->inputs['register_ip'] = request()->ip();
+        $inputDatas = $request->validated();
+        $inputDatas['nickname'] = $inputDatas['username'];
+        $inputDatas['password'] = bcrypt($inputDatas['password']);
+        $inputDatas['fund_password'] = bcrypt($inputDatas['fund_password']);
+        $inputDatas['platform_id'] = $this->currentPlatformEloq->platform_id;
+        $inputDatas['sign'] = $this->currentPlatformEloq->platform_sign;
+        $inputDatas['vip_level'] = 0;
+        $inputDatas['parent_id'] = 0;
+        $inputDatas['register_ip'] = request()->ip();
         DB::beginTransaction();
         try {
-            $user = $this->eloqM::create($this->inputs);
+            $user = $this->eloqM::create($inputDatas);
             $user->rid = $user->id;
             $userAccountEloq = new FrontendUsersAccount();
             $userAccountData = [
