@@ -30,7 +30,7 @@ class FrontendAuthController extends FrontendApiMainController
 
     public $successStatus = 200;
 
-    protected $eloqM = 'User\FrontendUser';
+    public $eloqM = 'User\FrontendUser';
 
     public function username()
     {
