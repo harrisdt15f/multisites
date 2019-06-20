@@ -145,8 +145,10 @@ class LotteriesController extends BackEndApiMainController
         $searchAbleFields = ['lottery_id', 'issue'];
         $orderFields = 'begin_time';
         $orderFlow = 'asc';
+        $fixedJoin = 1;
+        $withTable = 'lottery';
         $this->inputs['time_condtions'] = $this->inputs['time_condtions'] ?? '[["begin_time",">=",' . Carbon::now()->timestamp . ']]'; // 从现在开始。如果。没有时间字段的话，就用当前时间以上的显示
-        $data = $this->generateSearchQuery($eloqM, $searchAbleFields, 0, null, null, $orderFields, $orderFlow);
+        $data = $this->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, null, $orderFields, $orderFlow);
         return $this->msgOut(true, $data);
     }
 
