@@ -124,4 +124,11 @@ class ImageArrange
     {
         return 'uploaded_files/' . $platform_name . '_' . $platform_id . '/' . $name . '_' . $platform_name . '_' . $platform_id;
     }
+
+    public function deleteImgs($pathArr)
+    {
+        foreach ($pathArr as $path) {
+            $this->deletePic($path);
+        }
+    }
 }

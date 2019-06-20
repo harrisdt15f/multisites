@@ -13,7 +13,6 @@ use App\Models\Admin\Homepage\FrontendPageBanner;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 
-
 class HompageBannerAction
 {
     protected $model;
@@ -24,7 +23,7 @@ class HompageBannerAction
      */
     public function __construct(FrontendPageBanner $frontendPageBanner)
     {
-        $this->model =$frontendPageBanner;
+        $this->model = $frontendPageBanner;
     }
 
     /**
@@ -45,7 +44,7 @@ class HompageBannerAction
                 ->with([
                     'activity' => static function ($query) {
                         $query->select('id', 'redirect_url');
-                    }
+                    },
                 ])
                 ->where('status', 1)->orderBy('sort', 'asc')->get()->toArray();
             foreach ($datas as $key => $data) {
@@ -56,8 +55,8 @@ class HompageBannerAction
             }
             Cache::forever('homepageBanner', $datas);
         }
+        dd($contll);
         return $contll->msgOut(true, $datas);
     }
-
 
 }

@@ -26,8 +26,12 @@ return [
     '100202' => '没有此组',
     //ActivityInfosController
     '100300' => '该活动名已存在',
+    '100301' => '获取平台信息失败',
+    '100302' => '获取商户信息失败',
     //ArticlesController
     '100500' => '文章名已存在',
+    '100501' => '获取商户信息失败',
+    '100502' => '获取平台信息失败',
     //PopularMethodsController
     '100600' => '该热门彩种已存在',
     //ConfiguresController

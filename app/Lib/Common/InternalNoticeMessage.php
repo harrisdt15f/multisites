@@ -4,15 +4,17 @@
  * @Author: LingPh
  * @Date:   2019-06-01 16:09:24
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-06 17:51:50
+ * @Last Modified time: 2019-06-20 17:53:48
  */
 namespace App\Lib\Common;
 
+use App\Models\Admin\BackendAdminUser;
 use App\Models\Admin\Message\BackendSystemInternalMessage;
 use App\Models\Admin\Message\BackendSystemNoticeList;
 
 class InternalNoticeMessage
 {
+    protected $articlesMessage = '有新的文章需要审核';
     /**
      * 生成backend_system_notice_lists表
      * @param $type     1手动发送 2审核相关 3充值体现相关
@@ -61,5 +63,13 @@ class InternalNoticeMessage
     {
         $message_id = $this->createNoticeMessages($type, $message);
         $this->createInternalNotice($adminsArr, $message_id, $send_id);
+    }
+
+    public function adminAddArticles()
+    {
+        $type = BackendSystemNoticeList::AUDIT;
+        $message = $this->articlesMessage;
+        $adminsArr = BackendAdminUser::select('id', 'group_id')->where('group_id', 1)->get()->toArray();
+        $this->insertMessage($type, $message, $adminsArr);
     }
 }

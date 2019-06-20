@@ -43,6 +43,7 @@ class BackEndApiMainController extends Controller
             $this->partnerAdmin = $this->currentAuth->user();
             if ($this->partnerAdmin !== null) {
                 //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
+                Cache::forever('partnerAdmin', $this->partnerAdmin);
                 $this->currentPartnerAccessGroup = new BackendAdminAccessGroup();
                 $this->currentPlatformEloq = new SystemPlatform();
                 if ($this->partnerAdmin->platform()->exists()) {
@@ -123,7 +124,7 @@ class BackEndApiMainController extends Controller
      * @param  string  $code
      * @return JsonResponse
      */
-    protected function msgOut($success = false, $data = [], $code = '', $message = ''): JsonResponse
+    public function msgOut($success = false, $data = [], $code = '', $message = ''): JsonResponse
     {
         /*if ($this->currentAuth->user())
         {
