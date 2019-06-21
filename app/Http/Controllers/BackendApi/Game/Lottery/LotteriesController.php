@@ -348,7 +348,7 @@ class LotteriesController extends BackEndApiMainController
      */
     public function lotteriesCodeLength(): JsonResponse
     {
-        $datas = $this->eloqM::select('en_name', 'code_length', 'valid_code', 'lottery_type', 'status_encode')->get()->toArray();
+        $datas = $this->eloqM::select('en_name', 'code_length', 'valid_code', 'lottery_type')->get()->toArray();
         return $this->msgOut(true, $datas);
     }
 }
