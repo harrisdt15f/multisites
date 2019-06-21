@@ -42,6 +42,9 @@ class LotteryIssue extends BaseModel
      */
     public const ISSUE_CODE_STATUS_ADVANCE_B = 64;
 
+    public const ENCODE_NONE = 0;
+    public const ENCODED = 1;
+
     /**
      * 计奖状态
      */
