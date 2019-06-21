@@ -10,7 +10,6 @@ use Illuminate\Http\JsonResponse;
 
 class AdvertisementTypeController extends BackEndApiMainController
 {
-    protected $eloqM = 'Advertisement\FrontendSystemAdsType';
 
     /**
      * 广告列表

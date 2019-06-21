@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-20 15:05:42
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-20 20:13:27
+ * @Last Modified time: 2019-06-21 21:12:48
  */
 namespace App\Http\SingleActions\Backend\Admin\Advertisement;
 
@@ -25,6 +25,7 @@ class AdvertisementTypeDetailAction
     }
 
     /**
+     * 广告列表
      * @param  BackEndApiMainController  $contll
      * @return JsonResponse
      */

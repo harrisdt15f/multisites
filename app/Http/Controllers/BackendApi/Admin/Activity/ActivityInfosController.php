@@ -17,7 +17,6 @@ use Illuminate\Http\JsonResponse;
 
 class ActivityInfosController extends BackEndApiMainController
 {
-    protected $eloqM = 'Admin\Activity\FrontendActivityContent';
     public $folderName = 'mobile_activity'; //活动图片存放的文件夹名称  (add,edit)
 
     /**

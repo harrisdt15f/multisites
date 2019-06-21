@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-19 14:36:57
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-20 20:13:46
+ * @Last Modified time: 2019-06-21 21:12:03
  */
 namespace App\Http\SingleActions\Backend\Admin\Activity;
 
@@ -25,6 +25,7 @@ class ActivityInfosDetailAction
     }
 
     /**
+     * 活动列表
      * @param  BackEndApiMainController  $contll
      * @return JsonResponse
      */

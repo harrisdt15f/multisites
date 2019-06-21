@@ -5,7 +5,7 @@ namespace App\Http\Controllers\BackendApi\Users\Fund;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Users\Fund\ArtificialRechargeRechargeRequest;
 use App\Lib\Common\AccountChange;
-use App\Lib\Common\FundOperationRecharge;
+use App\Lib\Common\FundOperation;
 use App\Lib\Common\InternalNoticeMessage;
 use App\Models\Admin\BackendAdminAccessGroup;
 use App\Models\Admin\BackendAdminUser;
@@ -247,7 +247,7 @@ class ArtificialRechargeController extends BackEndApiMainController
         $type = $this->currentPartnerAccessGroup->role !== '*' ? BackendAdminRechargehumanLog::ADMIN : 3;
         $in_out = BackendAdminRechargehumanLog::DECREMENT;
         $comment = '[给用户人工充值]==>-' . $amount . '|[目前额度]==>' . $newFund;
-        $fundOperationObj = new FundOperationRecharge();
+        $fundOperationObj = new FundOperation();
         $fundOperationObj->insertOperationDatas($rechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $userEloq->id, $userEloq->nickname, $amount, $comment, $auditFlowID);
     }
 

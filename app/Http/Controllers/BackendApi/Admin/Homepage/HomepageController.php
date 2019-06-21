@@ -6,145 +6,71 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Admin\Homepage\HomepageEditRequest;
 use App\Http\Requests\Backend\Admin\Homepage\HomepageUploadIcoRequest;
 use App\Http\Requests\Backend\Admin\Homepage\HomepageUploadPicRequest;
-use App\Lib\Common\ImageArrange;
-use Exception;
+use App\Http\SingleActions\Backend\Admin\Homepage\HomepageEditAction;
+use App\Http\SingleActions\Backend\Admin\Homepage\HomepageNavOneAction;
+use App\Http\SingleActions\Backend\Admin\Homepage\HomepagePageModelAction;
+use App\Http\SingleActions\Backend\Admin\Homepage\HomepageUploadIcoAction;
+use App\Http\SingleActions\Backend\Admin\Homepage\HomepageUploadPicAction;
+use App\Lib\Common\CacheRelated;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cache;
 
 class HomepageController extends BackEndApiMainController
 {
-    protected $eloqM = 'DeveloperUsage\Frontend\FrontendAllocatedModel';
 
     /**
      * 导航一列表
-     * @return JsonResponse
+     * @param   HomepageNavOneAction $action
+     * @return  JsonResponse
      */
-    public function navOne(): JsonResponse
+    public function navOne(HomepageNavOneAction $action): JsonResponse
     {
-        $frontendModelEloq = new $this->eloqM;
-        $navEloq = $frontendModelEloq->getModel('nav.one');
-        $datas = $this->eloqM::select('id', 'label', 'en_name', 'value', 'show_num', 'status')->where('pid', $navEloq->id)->get()->toArray();
-        return $this->msgOut(true, $datas);
+        return $action->execute($this);
     }
 
     /**
      * 主题板块列表
-     * @return JsonResponse
+     * @param   HomepagePageModelAction $action
+     * @return  JsonResponse
      */
-    public function pageModel(): JsonResponse
+    public function pageModel(HomepagePageModelAction $action): JsonResponse
     {
-        $frontendModelEloq = new $this->eloqM;
-        $pageEloq = $frontendModelEloq->getModel('page.model');
-        $datas = $this->eloqM::select('id', 'label', 'en_name', 'value', 'show_num', 'status')->where('pid', $pageEloq->id)->orWhere('en_name', 'banner')->get()->toArray();
-        return $this->msgOut(true, $datas);
+        return $action->execute($this);
     }
 
     /**
      * 编辑首页模块
-     * @param  HomepageEditRequest $request
-     * @return JsonResponse
+     * @param   HomepageEditRequest $request
+     * @param   HomepageEditAction  $action
+     * @return  JsonResponse
      */
-    public function edit(HomepageEditRequest $request): JsonResponse
+    public function edit(HomepageEditRequest $request, HomepageEditAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        $pastData = $this->eloqM::find($inputDatas['id']);
-        if (isset($inputDatas['status'])) {
-            $pastData->status = $inputDatas['status'];
-        }
-        if (isset($inputDatas['value'])) {
-            $pastData->value = $inputDatas['value'];
-        }
-        if (isset($inputDatas['show_num'])) {
-            $pastData->show_num = $inputDatas['show_num'];
-        }
-        try {
-            $pastData->save();
-            //如果修改了展示状态  清楚首页展示model的缓存
-            if (isset($inputDatas['status'])) {
-                if (Cache::has('showModel')) {
-                    Cache::forget('showModel');
-                }
-            }
-            //删除前台首页缓存
-            $this->deleteCache($pastData->key);
-            return $this->msgOut(true);
-        } catch (Exception $e) {
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * 修改首页模块下的图片
-     * @param  HomepageUploadPicRequest $request
-     * @return JsonResponse
+     * @param   HomepageUploadPicRequest $request
+     * @param   HomepageUploadPicAction  $action
+     * @return  JsonResponse
      */
-    public function uploadPic(HomepageUploadPicRequest $request): JsonResponse
+    public function uploadPic(HomepageUploadPicRequest $request, HomepageUploadPicAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        $pastData = $this->eloqM::where('en_name', $inputDatas['en_name'])->first();
-        //上传图片
-        $imageObj = new ImageArrange();
-        $depositPath = $imageObj->depositPath($inputDatas['en_name'], $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
-        $pic = $imageObj->uploadImg($inputDatas['pic'], $depositPath);
-        if ($pic['success'] === false) {
-            return $this->msgOut(false, [], '400', $pic['msg']);
-        }
-        $pastLogoPath = $pastData->value;
-        try {
-            $pastData->value = '/' . $pic['path'];
-            $pastData->save();
-            //删除原图
-            if ($pastLogoPath !== null) {
-                $imageObj->deletePic(substr($pastLogoPath, 1));
-            }
-            //删除前台首页缓存
-            $this->deleteCache($pastData->en_name);
-            return $this->msgOut(true);
-        } catch (Exception $e) {
-            $imageObj->deletePic($pic['path']);
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * 上传前台网站头ico
-     * @param  HomepageUploadIcoRequest $request
-     * @return JsonResponse
+     * @param   HomepageUploadIcoRequest $request
+     * @param   HomepageUploadIcoAction  $action
+     * @return  JsonResponse
      */
-    public function uploadIco(HomepageUploadIcoRequest $request): JsonResponse
+    public function uploadIco(HomepageUploadIcoRequest $request, HomepageUploadIcoAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        $pastData = $this->eloqM::where('en_name', 'frontend.ico')->first();
-        if (is_null($pastData)) {
-            return $this->msgOut(false, [], '101900');
-        }
-        //上传ico
-        $imageObj = new ImageArrange();
-        $folderName = 'frontend';
-        $depositPath = $imageObj->depositPath($folderName, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name) . '/ico';
-        $ico = $imageObj->uploadImg($inputDatas['ico'], $depositPath);
-        $pastIco = $pastData->value;
-        try {
-            $pastData->value = '/' . $ico['path'];
-            $pastData->save();
-            //删除前台首页缓存
-            $this->deleteCache($pastData->en_name);
-            //删除原图
-            if ($pastIco !== null) {
-                $imageObj->deletePic(substr($pastIco, 1));
-            }
-            return $this->msgOut(true);
-        } catch (Exception $e) {
-            //删除上传成功的图片
-            $imageObj->deletePic($ico['path']);
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 
     /**
@@ -161,10 +87,7 @@ class HomepageController extends BackEndApiMainController
             'logo' => 'homepageLogo',
             'frontend.ico' => 'homepageIco',
         ];
-        if (isset($homepageCache[$key])) {
-            if (Cache::has($homepageCache[$key])) {
-                Cache::forget($homepageCache[$key]);
-            }
-        }
+        $cacheRelated = new CacheRelated();
+        $cacheRelated->delete($homepageCache[$key]);
     }
 }

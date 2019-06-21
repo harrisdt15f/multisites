@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-20 18:16:25
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-20 20:13:21
+ * @Last Modified time: 2019-06-21 21:15:15
  */
 namespace App\Http\SingleActions\Backend\Admin\Article;
 
@@ -25,6 +25,7 @@ class CategorySelectAction
     }
 
     /**
+     * 操作文章时获取的分类列表
      * @param  BackEndApiMainController  $contll
      * @return JsonResponse
      */

@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-20 16:01:58
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-20 20:12:47
+ * @Last Modified time: 2019-06-21 21:13:30
  */
 namespace App\Http\SingleActions\Backend\Admin\Article;
 
@@ -27,6 +27,7 @@ class ArticlesSortAction
     }
 
     /**
+     * 文章排序
      * @param  BackEndApiMainController  $contll
      * @return JsonResponse
      */

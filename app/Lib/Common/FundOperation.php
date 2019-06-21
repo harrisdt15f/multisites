@@ -1,7 +1,9 @@
 <?php
 namespace App\Lib\Common;
 
-class FundOperationRecharge
+use App\Models\User\Fund\BackendAdminRechargehumanLog;
+
+class FundOperation
 {
     /**
      *
@@ -59,5 +61,23 @@ class FundOperationRecharge
         }
         $eloqM->fill($OperationDatas);
         $eloqM->save();
+    }
+
+    /**
+     * 查看该管理员今日 手动添加的充值额度是否在限额内
+     * @param  int     $adminId       [需要充值的管理员id]
+     * @param  folat   $rechargeFund  [充值的额度]
+     * @return array
+     */
+    public function checkRechargeToday($adminId, $rechargeFund)
+    {
+        $maxRechargeFund = 90000;
+        $today = date('Y-m-d');
+        $rechargeFundToday = BackendAdminRechargehumanLog::select('amount')->where('type', 1)->where('admin_id', $adminId)->whereDate('created_at', $today)->sum('amount');
+        if (($rechargeFundToday + $rechargeFund) > $maxRechargeFund) {
+            $restRechargeFund = $maxRechargeFund - $rechargeFundToday;
+            return ['success' => false, 'msg' => '管理员每日手动添加的最大充值额度为' . $maxRechargeFund . ',目前剩余额度' . $restRechargeFund];
+        }
+        return ['success' => true];
     }
 }

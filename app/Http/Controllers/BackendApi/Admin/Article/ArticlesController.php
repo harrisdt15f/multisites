@@ -25,7 +25,6 @@ use Illuminate\Http\JsonResponse;
 
 class ArticlesController extends BackEndApiMainController
 {
-    protected $eloqM = 'Admin\Activity\BackendAdminMessageArticle';
     public $folderName = 'articles';
 
     /**

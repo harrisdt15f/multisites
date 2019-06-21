@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-20 20:18:44
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-20 20:28:49
+ * @Last Modified time: 2019-06-21 21:15:38
  */
 namespace App\Http\SingleActions\Backend\Admin\FundOperate;
 
@@ -26,6 +26,7 @@ class BankEditAction
     }
 
     /**
+     * 编辑银行
      * @param  BackEndApiMainController  $contll
      * @return JsonResponse
      */

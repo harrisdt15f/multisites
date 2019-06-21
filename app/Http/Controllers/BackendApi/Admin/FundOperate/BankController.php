@@ -15,7 +15,6 @@ use Illuminate\Http\JsonResponse;
 
 class BankController extends BackEndApiMainController
 {
-    protected $eloqM = 'Admin\Fund\FrontendSystemBank';
 
     /**
      * 银行列表

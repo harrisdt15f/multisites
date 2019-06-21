@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-20 16:09:07
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-20 20:12:51
+ * @Last Modified time: 2019-06-21 21:13:37
  */
 namespace App\Http\SingleActions\Backend\Admin\Article;
 
@@ -27,6 +27,7 @@ class ArticlesTopAction
     }
 
     /**
+     * 文章置顶
      * @param  BackEndApiMainController  $contll
      * @return JsonResponse
      */

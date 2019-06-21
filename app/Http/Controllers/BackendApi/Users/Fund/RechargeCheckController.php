@@ -6,7 +6,7 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Users\Fund\RechargeCheckAuditFailureRequest;
 use App\Http\Requests\Backend\Users\Fund\RechargeCheckAuditSuccessRequest;
 use App\Lib\Common\AccountChange;
-use App\Lib\Common\FundOperationRecharge;
+use App\Lib\Common\FundOperation;
 use App\Lib\Common\InternalNoticeMessage;
 use App\Models\Admin\BackendAdminUser;
 use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
@@ -144,7 +144,7 @@ class RechargeCheckController extends BackEndApiMainController
             $type = $rechargeLogeloqM::SYSTEM;
             $in_out = $rechargeLogeloqM::INCREMENT;
             $comment = '[充值审核失败额度返还]==>+' . $rechargeLog['amount'] . '|[目前额度]==>' . $newFund;
-            $fundOperationObj = new FundOperationRecharge();
+            $fundOperationObj = new FundOperation();
             $fundOperationObj->insertOperationDatas($rechargeLogeloqM, $type, $in_out, null, null, $auditFlow->admin_id, $auditFlow->admin_name, $rechargeLog->amount, $comment, null);
             //发送站内消息提醒管理员
             $this->sendMessage($rechargeLog->admin_id, $this->failureMessage);

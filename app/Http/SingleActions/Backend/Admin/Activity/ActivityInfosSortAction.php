@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-20 14:24:46
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-20 20:13:54
+ * @Last Modified time: 2019-06-21 21:12:36
  */
 namespace App\Http\SingleActions\Backend\Admin\Activity;
 
@@ -27,6 +27,7 @@ class ActivityInfosSortAction
     }
 
     /**
+     * 活动排序
      * @param  BackEndApiMainController  $contll
      * @param  $inputDatas
      * @return JsonResponse

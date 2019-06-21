@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-20 16:15:40
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-20 20:13:11
+ * @Last Modified time: 2019-06-21 21:13:47
  */
 namespace App\Http\SingleActions\Backend\Admin\Article;
 
@@ -28,6 +28,7 @@ class ArticlesUploadPicAction
     }
 
     /**
+     * 图片上传
      * @param  BackEndApiMainController  $contll
      * @return JsonResponse
      */

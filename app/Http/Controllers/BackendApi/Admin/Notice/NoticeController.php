@@ -8,167 +8,85 @@ use App\Http\Requests\Backend\Admin\Notice\NoticeDeleteRequest;
 use App\Http\Requests\Backend\Admin\Notice\NoticeEditRequest;
 use App\Http\Requests\Backend\Admin\Notice\NoticeSortRequest;
 use App\Http\Requests\Backend\Admin\Notice\NoticeTopRequest;
-use Exception;
+use App\Http\SingleActions\Backend\Admin\Notice\NoticeAddAction;
+use App\Http\SingleActions\Backend\Admin\Notice\NoticeDeleteAction;
+use App\Http\SingleActions\Backend\Admin\Notice\NoticeDetailAction;
+use App\Http\SingleActions\Backend\Admin\Notice\NoticeEditAction;
+use App\Http\SingleActions\Backend\Admin\Notice\NoticeSortAction;
+use App\Http\SingleActions\Backend\Admin\Notice\NoticeTopAction;
+use App\Lib\Common\CacheRelated;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 class NoticeController extends BackEndApiMainController
 {
-    protected $eloqM = 'Admin\Notice\FrontendMessageNotice';
-
     /**
      * 公告列表
+     * @param  NoticeDetailAction $action
      * @return JsonResponse
      */
-    public function detail(): JsonResponse
+    public function detail(NoticeDetailAction $action): JsonResponse
     {
-        $noticeDatas = $this->eloqM::select('id', 'type', 'title', 'content', 'start_time', 'end_time', 'sort', 'status', 'admin_id')->with('admin')->orderBy('sort', 'asc')->get()->toArray();
-        foreach ($noticeDatas as $key => $data) {
-            $noticeDatas[$key]['admin_name'] = $data['admin']['name'];
-            unset($noticeDatas[$key]['admin_id'], $noticeDatas[$key]['admin']);
-        }
-        return $this->msgOut(true, $noticeDatas);
+        return $action->execute($this);
     }
 
     /**
      * 添加公告
      * @param  NoticeAddRequest $request
+     * @param  NoticeAddAction  $action
      * @return JsonResponse
      */
-    public function add(NoticeAddRequest $request): JsonResponse
+    public function add(NoticeAddRequest $request, NoticeAddAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        $addData = $inputDatas;
-        $addData['admin_id'] = $this->partnerAdmin->id;
-        $maxSort = $this->eloqM::select('sort')->max('sort');
-        $addData['sort'] = ++$maxSort;
-        try {
-            $noticeEloq = new $this->eloqM;
-            $noticeEloq->fill($addData);
-            $noticeEloq->save();
-            //删除前台首页缓存
-            $this->deleteCache();
-            return $this->msgOut(true);
-        } catch (Exception $e) {
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * 编辑公告
      * @param  NoticeEditRequest $request
+     * @param  NoticeEditAction  $action
      * @return JsonResponse
      */
-    public function edit(NoticeEditRequest $request): JsonResponse
+    public function edit(NoticeEditRequest $request, NoticeEditAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        $pastEloq = $this->eloqM::find($inputDatas['id']);
-        $checkTitle = $this->eloqM::where('title', $inputDatas['title'])->where('id', '!=', $inputDatas['id'])->exists();
-        if ($checkTitle === true) {
-            return $this->msgOut(false, [], '102100');
-        }
-        try {
-            $this->editAssignment($pastEloq, $inputDatas);
-            $pastEloq->save();
-            //删除前台首页缓存
-            $this->deleteCache();
-            return $this->msgOut(true);
-        } catch (Exception $e) {
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * 删除公告
      * @param  NoticeDeleteRequest $request
+     * @param  NoticeDeleteAction  $action
      * @return JsonResponse
      */
-    public function delete(NoticeDeleteRequest $request): JsonResponse
+    public function delete(NoticeDeleteRequest $request, NoticeDeleteAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        $pastDataEloq = $this->eloqM::find($inputDatas['id']);
-        //sort
-        $sort = $pastDataEloq->sort;
-        DB::beginTransaction();
-        try {
-            $pastDataEloq->delete();
-            $this->eloqM::where('sort', '>', $sort)->decrement('sort');
-            DB::commit();
-            //删除前台首页缓存
-            $this->deleteCache();
-            return $this->msgOut(true);
-        } catch (Exception $e) {
-            DB::rollback();
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * 公告排序
      * @param  NoticeSortRequest $request
+     * @param  NoticeSortAction  $action
      * @return JsonResponse
      */
-    public function sort(NoticeSortRequest $request): JsonResponse
+    public function sort(NoticeSortRequest $request, NoticeSortAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        DB::beginTransaction();
-        try {
-            //上拉排序
-            if ($inputDatas['sort_type'] == 1) {
-                $stationaryData = $this->eloqM::find($inputDatas['front_id']);
-                $stationaryData->sort = $inputDatas['front_sort'];
-                $this->eloqM::where('sort', '>=', $inputDatas['front_sort'])->where('sort', '<', $inputDatas['rearways_sort'])->increment('sort');
-                //下拉排序
-            } elseif ($inputDatas['sort_type'] == 2) {
-                $stationaryData = $this->eloqM::find($inputDatas['rearways_id']);
-                $stationaryData->sort = $inputDatas['rearways_sort'];
-                $this->eloqM::where('sort', '>', $inputDatas['front_sort'])->where('sort', '<=', $inputDatas['rearways_sort'])->decrement('sort');
-            }
-            $stationaryData->save();
-            DB::commit();
-            //删除前台首页缓存
-            $this->deleteCache();
-            return $this->msgOut(true);
-        } catch (Exception $e) {
-            DB::rollback();
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * 公告置顶
      * @param  NoticeTopRequest $request
+     * @param  NoticeTopAction  $action
      * @return JsonResponse
      */
-    public function top(NoticeTopRequest $request): JsonResponse
+    public function top(NoticeTopRequest $request, NoticeTopAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        $pastDataEloq = $this->eloqM::find($inputDatas['id']);
-        $sort = $pastEloq->sort;
-        DB::beginTransaction();
-        try {
-            $pastDataEloq->sort = 1;
-            $pastDataEloq->save();
-            $this->eloqM::where('sort', '<', $sort)->where('id', '!=', $inputDatas['id'])->increment('sort');
-            DB::commit();
-            //删除前台首页缓存
-            $this->deleteCache();
-            return $this->msgOut(true);
-        } catch (Exception $e) {
-            DB::rollback();
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 
     /**
@@ -177,8 +95,7 @@ class NoticeController extends BackEndApiMainController
      */
     public function deleteCache(): void
     {
-        if (Cache::has('homepageNotice')) {
-            Cache::forget('homepageNotice');
-        }
+        $cacheRelated = new CacheRelated();
+        $cacheRelated->delete('homepageNotice');
     }
 }

@@ -9,7 +9,6 @@ use Illuminate\Http\JsonResponse;
 
 class CategoryController extends BackEndApiMainController
 {
-    protected $eloqM = 'Admin\Activity\FrontendInfoCategorie';
 
     /**
      * 分类管理列表

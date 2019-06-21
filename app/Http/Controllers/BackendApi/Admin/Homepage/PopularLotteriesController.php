@@ -7,193 +7,83 @@ use App\Http\Requests\Backend\Admin\Homepage\PopularLotteriesAddRequest;
 use App\Http\Requests\Backend\Admin\Homepage\PopularLotteriesDeleteRequest;
 use App\Http\Requests\Backend\Admin\Homepage\PopularLotteriesEditRequest;
 use App\Http\Requests\Backend\Admin\Homepage\PopularLotteriesSortRequest;
-use App\Lib\Common\ImageArrange;
-use App\Models\Game\Lottery\LotteryList;
-use Exception;
+use App\Http\SingleActions\Backend\Admin\Homepage\PopularLotteriesAddAction;
+use App\Http\SingleActions\Backend\Admin\Homepage\PopularLotteriesDeleteAction;
+use App\Http\SingleActions\Backend\Admin\Homepage\PopularLotteriesDetailAction;
+use App\Http\SingleActions\Backend\Admin\Homepage\PopularLotteriesEditAction;
+use App\Http\SingleActions\Backend\Admin\Homepage\PopularLotteriesLotteriesListAction;
+use App\Http\SingleActions\Backend\Admin\Homepage\PopularLotteriesSortAction;
+use App\Lib\Common\CacheRelated;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 class PopularLotteriesController extends BackEndApiMainController
 {
-    protected $eloqM = 'Admin\Homepage\FrontendLotteryRedirectBetList';
-
     /**
      * 热门彩票列表
-     * @return JsonResponse
+     * @param   PopularLotteriesDetailAction $action
+     * @return  JsonResponse
      */
-    public function detail(): JsonResponse
+    public function detail(PopularLotteriesDetailAction $action): JsonResponse
     {
-        $lotterieEloqs = $this->eloqM::select('id', 'lotteries_id', 'pic_path', 'sort')->with(['lotteries' => function ($query) {
-            $query->select('id', 'cn_name');
-        }])->orderBy('sort', 'asc')->get();
-        $datas = [];
-        foreach ($lotterieEloqs as $lotterie) {
-            $data = [
-                'id' => $lotterie->id,
-                'pic_path' => $lotterie->pic_path,
-                'cn_name' => $lotterie->lotteries->cn_name,
-                'sort' => $lotterie->sort,
-            ];
-            $datas[] = $data;
-        }
-        return $this->msgOut(true, $datas);
+        return $action->execute($this);
     }
 
     /**
      * 添加热门彩票一
-     * @param PopularLotteriesAddRequest $request
-     * @return JsonResponse
+     * @param   PopularLotteriesAddRequest $request
+     * @param   PopularLotteriesAddAction  $action
+     * @return  JsonResponse
      */
-    public function add(PopularLotteriesAddRequest $request): JsonResponse
+    public function add(PopularLotteriesAddRequest $request, PopularLotteriesAddAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        //sort
-        $maxSort = $this->eloqM::select('sort')->max('sort');
-        $sort = ++$maxSort;
-        //上传图片
-        $imageObj = new ImageArrange();
-        $depositPath = $imageObj->depositPath('popular_lotteries', $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
-        $pic = $imageObj->uploadImg($inputDatas['pic'], $depositPath);
-        if ($pic['success'] === false) {
-            return $this->msgOut(false, [], '400', $pic['msg']);
-        }
-        $addData = [
-            'lotteries_id' => $inputDatas['lotteries_id'],
-            'sort' => $sort,
-            'pic_path' => '/' . $pic['path'],
-        ];
-        try {
-            $popularLotteriesEloq = new $this->eloqM;
-            $popularLotteriesEloq->fill($addData);
-            $popularLotteriesEloq->save();
-            //清除首页热门彩票缓存
-            $this->deleteCache();
-            return $this->msgOut(true);
-        } catch (Exception $e) {
-            $imageObj->deletePic($pic['path']);
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * 编辑热门彩票
-     * @param  PopularLotteriesEditRequest $request
-     * @return JsonResponse
+     * @param   PopularLotteriesEditRequest $request
+     * @param   PopularLotteriesEditAction  $action
+     * @return  JsonResponse
      */
-    public function edit(PopularLotteriesEditRequest $request): JsonResponse
+    public function edit(PopularLotteriesEditRequest $request, PopularLotteriesEditAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        $pastDataEloq = $this->eloqM::find($inputDatas['id']);
-        //检查该热门类型是否存在重复彩票
-        $checkData = $this->eloqM::where('lotteries_id', $inputDatas['lotteries_id'])->where('id', '!=', $inputDatas['id'])->first();
-        if ($checkData !== null) {
-            return $this->msgOut(false, [], '102000');
-        }
-        //修改了图片的操作
-        if (isset($inputDatas['pic'])) {
-            $pastPic = $pastDataEloq->pic_path;
-            $imageObj = new ImageArrange();
-            $depositPath = $imageObj->depositPath('popular_lotteries', $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
-            $pic = $imageObj->uploadImg($inputDatas['pic'], $depositPath);
-            if ($pic['success'] === false) {
-                return $this->msgOut(false, [], '400', $pic['msg']);
-            }
-            $pastDataEloq->pic_path = '/' . $pic['path'];
-        }
-        try {
-            $pastDataEloq->lotteries_id = $inputDatas['lotteries_id'];
-            $pastDataEloq->save();
-            if (isset($pastPic)) {
-                $imageObj->deletePic(substr($pastPic, 1));
-            }
-            //清除首页热门彩票缓存
-            $this->deleteCache();
-            return $this->msgOut(true);
-        } catch (Exception $e) {
-            if (isset($pic)) {
-                $imageObj->deletePic($pic['path']);
-            }
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * 删除热门彩票
-     * @param  PopularLotteriesDeleteRequest $request
-     * @return JsonResponse
+     * @param   PopularLotteriesDeleteRequest $request
+     * @param   PopularLotteriesDeleteAction  $action
+     * @return  JsonResponse
      */
-    public function delete(PopularLotteriesDeleteRequest $request): JsonResponse
+    public function delete(PopularLotteriesDeleteRequest $request, PopularLotteriesDeleteAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        $pastDataEloq = $this->eloqM::find($inputDatas['id']);
-        $pastData = $pastDataEloq;
-        DB::beginTransaction();
-        try {
-            $pastDataEloq->delete();
-            //重新排序
-            $datas = $this->eloqM::where('sort', '>', $pastData->sort)->decrement('sort');
-            DB::commit();
-            //删除图片
-            $imageObj = new ImageArrange();
-            $imageObj->deletePic(substr($pastData->pic_path, 1));
-            //清除首页热门彩票缓存
-            $this->deleteCache();
-            return $this->msgOut(true);
-        } catch (Exception $e) {
-            DB::rollback();
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * 热门彩票拉动排序
-     * @param  PopularLotteriesSortRequest $request
-     * @return JsonResponse
+     * @param   PopularLotteriesSortRequest $request
+     * @param   PopularLotteriesSortAction  $action
+     * @return  JsonResponse
      */
-    public function sort(PopularLotteriesSortRequest $request): JsonResponse
+    public function sort(PopularLotteriesSortRequest $request, PopularLotteriesSortAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        DB::beginTransaction();
-        try {
-            //上拉排序
-            if ($inputDatas['sort_type'] == 1) {
-                $stationaryData = $this->eloqM::find($inputDatas['front_id']);
-                $stationaryData->sort = $inputDatas['front_sort'];
-                $this->eloqM::where('sort', '>=', $inputDatas['front_sort'])->where('sort', '<', $inputDatas['rearways_sort'])->increment('sort');
-            } elseif ($inputDatas['sort_type'] == 2) {
-                //下拉排序
-                $stationaryData = $this->eloqM::find($inputDatas['rearways_id']);
-                $stationaryData->sort = $inputDatas['rearways_sort'];
-                $this->eloqM::where('sort', '>', $inputDatas['front_sort'])->where('sort', '<=', $inputDatas['rearways_sort'])->decrement('sort');
-            }
-            $stationaryData->save();
-            DB::commit();
-            //清除首页热门彩票缓存
-            $this->deleteCache();
-            return $this->msgOut(true);
-        } catch (Exception $e) {
-            DB::rollback();
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * 选择的彩种列表
-     * @return JsonResponse
+     * @param   PopularLotteriesLotteriesListAction  $action
+     * @return  JsonResponse
      */
-    public function lotteriesList(): JsonResponse
+    public function lotteriesList(PopularLotteriesLotteriesListAction $action): JsonResponse
     {
-        $lotteries = LotteryList::select('id', 'cn_name', 'en_name')->get();
-        return $this->msgOut(true, $lotteries);
+        return $action->execute($this);
     }
 
     /**
@@ -202,8 +92,7 @@ class PopularLotteriesController extends BackEndApiMainController
      */
     public function deleteCache(): void
     {
-        if (Cache::has('popularLotteries')) {
-            Cache::forget('popularLotteries');
-        }
+        $cacheRelated = new CacheRelated();
+        $cacheRelated->delete('popularLotteries');
     }
 }
