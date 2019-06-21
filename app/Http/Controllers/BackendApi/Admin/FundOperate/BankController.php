@@ -18,6 +18,7 @@ class BankController extends BackEndApiMainController
 
     /**
      * 银行列表
+     * @param  BankDetailAction $action
      * @return JsonResponse
      */
     public function detail(BankDetailAction $action): JsonResponse
