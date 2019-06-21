@@ -329,7 +329,10 @@ class LotteriesController extends BackEndApiMainController
         if ($issueEloq->official_code !== null) {
             return $this->msgOut(false, [], '101704');
         }
+        $status_encode = LotteryIssue::ENCODED;
         try {
+            $issueEloq->status_encode = $status_encode;
+            $issueEloq->encode_time = time();
             $issueEloq->official_code = $inputDatas['code'];
             $issueEloq->save();
             return $this->msgOut(true);
@@ -345,7 +348,7 @@ class LotteriesController extends BackEndApiMainController
      */
     public function lotteriesCodeLength(): JsonResponse
     {
-        $datas = $this->eloqM::select('en_name', 'code_length', 'valid_code', 'lottery_type')->get()->toArray();
+        $datas = $this->eloqM::select('en_name', 'code_length', 'valid_code', 'lottery_type', 'status_encode')->get()->toArray();
         return $this->msgOut(true, $datas);
     }
 }
