@@ -2,6 +2,7 @@
 
 namespace App\Models\Logics;
 
+use App\Models\DeveloperUsage\MethodLevel\LotteryMethodsWaysLevel;
 use App\Models\LotteryTrace;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
@@ -26,21 +27,26 @@ trait ProjectTraits
         if (isset($condition['en_name'])) {
             $query->where('en_name', '=', $condition['en_name']);
         }
-        $currentPage = isset($condition['page_index']) ? (int) $condition['page_index'] : 1;
-        $pageSize = isset($condition['page_size']) ? (int) $condition['page_size'] : 15;
+        $currentPage = isset($condition['page_index']) ? (int)$condition['page_index'] : 1;
+        $pageSize = isset($condition['page_size']) ? (int)$condition['page_size'] : 15;
         $offset = ($currentPage - 1) * $pageSize;
 
         $total = $query->count();
         $menus = $query->skip($offset)->take($pageSize)->get();
 
-        return ['data' => $menus, 'total' => $total, 'currentPage' => $currentPage, 'totalPage' => (int) ceil($total / $pageSize)];
+        return [
+            'data' => $menus,
+            'total' => $total,
+            'currentPage' => $currentPage,
+            'totalPage' => (int)ceil($total / $pageSize)
+        ];
     }
 
     /**
      * 获取投注页需要的注单数据
      * @param $lotterySign
-     * @param int        $start
-     * @param int        $count
+     * @param  int  $start
+     * @param  int  $count
      * @return array
      */
     public static function getGamePageList($lotterySign, $start = 0, $count = 10): array
@@ -70,7 +76,8 @@ trait ProjectTraits
             ];
         }
         $traceData = [];
-        $traceList = LotteryTrace::orderBy('id', 'desc')->where('lottery_sign', '=', $lotterySign)->skip($start)->take($count)->get();
+        $traceList = LotteryTrace::orderBy('id', 'desc')->where('lottery_sign', '=',
+            $lotterySign)->skip($start)->take($count)->get();
         foreach ($traceList as $item) {
             $traceData[] = [
                 'id' => $item->id,
@@ -96,7 +103,7 @@ trait ProjectTraits
      * @param $currentIssue
      * @param $data
      * @param $traceData
-     * @param int $from
+     * @param  int  $from
      * @return array
      */
     public static function addProject($user, $lottery, $currentIssue, $data, $traceData, $from = 1): array
@@ -253,5 +260,31 @@ trait ProjectTraits
         }
         $project->save();
         return [];
+    }
+
+    public function setWon($sWnNumber, $aPrized)
+    {
+        $totalBonus = 0;
+        foreach ($aPrized as $iBasicMethodId => $aPrizeOfBasicMethod) {
+            $iLevel = key($aPrizeOfBasicMethod);
+            $iCount = current($aPrizeOfBasicMethod);
+            $PrizeEloq = LotteryMethodsWaysLevel::where([
+                ['basic_method_id', '=', $iBasicMethodId],
+                ['level', '=', $iLevel]
+            ])->first();
+            $bonus = $this->bet_prize_group * $PrizeEloq->prize / 1800;
+            $bonus = $bonus * $iCount * $this->times * $this->mode;
+            if ($this->price === 1) {
+                $bonus /= 2;
+            }
+            $totalBonus += $bonus;
+            $data = [
+                'basic_method_id' => $iBasicMethodId,
+                'winning_number' => $sWnNumber,
+                'level' => $iLevel,
+                'bonus' => $totalBonus,
+                'status' => self::STATUS_WON
+            ];
+        }
     }
 }
