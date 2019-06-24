@@ -9,4 +9,6 @@ Route::group(['prefix' => 'reportManagement', 'namespace' => 'Report'], function
     Route::match(['post', 'options'], 'user-recharge-history', ['as' => $namePrefix . 'user-recharge-history', 'uses' => $controller . 'userRechargeHistory']);
     //搜索时获取的帐变类型接口
     Route::match(['get', 'options'], 'account_change_type', ['as' => $namePrefix . 'account_change_type', 'uses' => $controller . 'accountChangeType']);
+    //玩家注单报表
+    Route::match(['post', 'options'], 'user-bets', ['as' => $namePrefix . 'user-bets', 'uses' => $controller . 'userBets']);
 });
