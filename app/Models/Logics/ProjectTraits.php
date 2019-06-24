@@ -4,6 +4,7 @@ namespace App\Models\Logics;
 
 use App\Models\DeveloperUsage\MethodLevel\LotteryMethodsWaysLevel;
 use App\Models\LotteryTrace;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 
@@ -285,6 +286,12 @@ trait ProjectTraits
                 'bonus' => $totalBonus,
                 'status' => self::STATUS_WON
             ];
+            try {
+                $this->update($data);
+            } catch (Exception $e) {
+                return $e->getMessage();
+            }
+            return true;
         }
     }
 }
