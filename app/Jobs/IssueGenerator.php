@@ -31,15 +31,16 @@ class IssueGenerator implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $lotteryId = $this->datas['lottery_id'];
         $lottery = LotteryList::where('en_name', $lotteryId)->first();
         if (!$lottery) {
             Log::channel('issues')->error('游戏不存在');
         }
+        $start_issue = $this->datas['start_issue'] ?? '';
         // 生成
-        $res = $lottery->genIssue($this->datas['start_time'], $this->datas['end_time'], $this->datas['start_issue']);
+        $res = $lottery->genIssue($this->datas['start_time'], $this->datas['end_time'], $start_issue);
         if ($res === true) {
             Log::channel('issues')->info('添加到 分开生成奖期队列完成');
         }
