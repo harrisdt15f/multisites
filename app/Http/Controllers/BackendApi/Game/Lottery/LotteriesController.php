@@ -24,7 +24,6 @@ use App\Http\SingleActions\Backend\Game\Lottery\LotteriesMethodRowSwitchAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesMethodSwitchAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesSeriesListsAction;
 use App\Lib\Common\CacheRelated;
-use App\Jobs\Lottery\Encode\IssueEncoder;
 use Illuminate\Http\JsonResponse;
 
 class LotteriesController extends BackEndApiMainController

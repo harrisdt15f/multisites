@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-24 16:12:52
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-24 16:27:04
+ * @Last Modified time: 2019-06-24 22:04:38
  */
 namespace App\Http\SingleActions\Backend\Game\Lottery;
 
@@ -50,7 +50,8 @@ class LotteriesIssueListsAction
         $orderFlow = 'asc';
         $fixedJoin = 1;
         $withTable = 'lottery';
-        $contll->inputs['time_condtions'] = $contll->inputs['time_condtions'] ?? '[["begin_time",">=",' . Carbon::now()->timestamp . ']]'; // 从现在开始。如果。没有时间字段的话，就用当前时间以上的显示
+        $afewMinutes = Carbon::now()->subMinute('20')->timestamp;
+        $this->inputs['time_condtions'] = $this->inputs['time_condtions'] ?? '[["end_time",">=",' . $afewMinutes . ']]'; // 从现在开始。如果。没有时间字段的话，就用当前时间以上的显示
         $data = $contll->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, null, $orderFields, $orderFlow);
         return $contll->msgOut(true, $data);
     }
