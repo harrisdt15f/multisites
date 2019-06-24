@@ -304,7 +304,7 @@ class LotteriesController extends FrontendApiMainController
 
             // 单价花费
             $singleCost = $mode * $times * $price * $item['count'];
-            if ($singleCost != $item['cost']) {
+            if ($singleCost !== $item['cost']) {
                 return $this->msgOut(false, [], '', '对不起, 总价计算错误!');
             }
             $_totalCost += $singleCost;
