@@ -38,11 +38,11 @@ class ArtificialRechargeController extends BackEndApiMainController
     {
         $inputDatas = $request->validated();
         DB::beginTransaction();
+        $partnerAdmin = $this->partnerAdmin;
         try {
             //普通管理员人工充值需要审核的操作
             if ($this->currentPartnerAccessGroup->role !== '*') {
                 //扣除管理员额度
-                $partnerAdmin = $this->partnerAdmin;
                 $adminFundData = BackendAdminRechargePocessAmount::where('admin_id', $partnerAdmin->id)->first();
                 if (is_null($adminFundData)) {
                     return $this->msgOut(false, [], '101100');
@@ -62,8 +62,8 @@ class ArtificialRechargeController extends BackEndApiMainController
                 $this->sendMessage();
             } else {
                 //超管操作不需审核 直接给用户充值
-                $isExistsType = AccountChangeType::where('sign', 'artificial_recharge')->exists();
-                if ($isExistsType === false) {
+                $accountChangeTypeEloq = AccountChangeType::where('sign', 'artificial_recharge')->first();
+                if ($accountChangeTypeEloq === null) {
                     return $this->msgOut(false, [], '100901');
                 }
                 //修改用户金额
