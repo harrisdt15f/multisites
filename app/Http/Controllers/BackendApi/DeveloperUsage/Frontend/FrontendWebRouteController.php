@@ -6,7 +6,10 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\DeveloperUsage\Frontend\FrontendWebRouteAddRequest;
 use App\Http\Requests\Backend\DeveloperUsage\Frontend\FrontendWebRouteDeleteRequest;
 use App\Http\Requests\Backend\DeveloperUsage\Frontend\FrontendWebRouteIsOpenRequest;
-use Exception;
+use App\Http\SingleActions\Backend\DeveloperUsage\Frontend\FrontendWebRouteAddAction;
+use App\Http\SingleActions\Backend\DeveloperUsage\Frontend\FrontendWebRouteDeleteAction;
+use App\Http\SingleActions\Backend\DeveloperUsage\Frontend\FrontendWebRouteDetailAction;
+use App\Http\SingleActions\Backend\DeveloperUsage\Frontend\FrontendWebRouteIsOpenAction;
 use Illuminate\Http\JsonResponse;
 
 class FrontendWebRouteController extends BackEndApiMainController
@@ -15,69 +18,47 @@ class FrontendWebRouteController extends BackEndApiMainController
 
     /**
      * web路由列表
-     * @return JsonResponse
+     * @param   FrontendWebRouteDetailAction $action
+     * @return  JsonResponse
      */
-    public function detail(): JsonResponse
+    public function detail(FrontendWebRouteDetailAction $action): JsonResponse
     {
-        $datas = $this->eloqM::select('id', 'route_name', 'frontend_model_id', 'title', 'description', 'is_open')->get()->toArray();
-        return $this->msgOut(true, $datas);
+        return $action->execute($this);
     }
 
     /**
      * 添加web路由
-     * @param FrontendAppRouteAddRequest $request
-     * @return JsonResponse
+     * @param   FrontendAppRouteAddRequest $request
+     * @param   FrontendWebRouteAddAction  $action
+     * @return  JsonResponse
      */
-    public function add(FrontendWebRouteAddRequest $request): JsonResponse
+    public function add(FrontendWebRouteAddRequest $request, FrontendWebRouteAddAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        try {
-            $routeEloq = new $this->eloqM;
-            $routeEloq->fill($inputDatas);
-            $routeEloq->save();
-            return $this->msgOut(true);
-        } catch (Exception $e) {
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * 删除web路由
-     * @param  FrontendAppRouteDeleteRequest $request
-     * @return JsonResponse
+     * @param   FrontendAppRouteDeleteRequest $request
+     * @param   FrontendWebRouteDeleteAction  $action
+     * @return  JsonResponse
      */
-    public function delete(FrontendWebRouteDeleteRequest $request): JsonResponse
+    public function delete(FrontendWebRouteDeleteRequest $request, FrontendWebRouteDeleteAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        try {
-            $this->eloqM::where('id', $inputDatas['id'])->delete();
-            return $this->msgOut(true);
-        } catch (Exception $e) {
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * 设置web路由是否开放
-     * @param  FrontendAppRouteIsOpenRequest $request
-     * @return JsonResponse
+     * @param   FrontendAppRouteIsOpenRequest $request
+     * @param   FrontendWebRouteIsOpenAction  $action
+     * @return  JsonResponse
      */
-    public function isOpen(FrontendWebRouteIsOpenRequest $request): JsonResponse
+    public function isOpen(FrontendWebRouteIsOpenRequest $request, FrontendWebRouteIsOpenAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        $pastDataEloq = $this->eloqM::find($inputDatas['id']);
-        try {
-            $pastDataEloq->is_open = $inputDatas['is_open'];
-            $pastDataEloq->save();
-            return $this->msgOut(true);
-        } catch (Exception $e) {
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 }

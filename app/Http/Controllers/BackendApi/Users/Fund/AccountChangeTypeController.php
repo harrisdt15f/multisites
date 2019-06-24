@@ -6,7 +6,10 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Users\Fund\AccountChangeTypeAddRequest;
 use App\Http\Requests\Backend\Users\Fund\AccountChangeTypeDeleteRequest;
 use App\Http\Requests\Backend\Users\Fund\AccountChangeTypeEditRequest;
-use Exception;
+use App\Http\SingleActions\Backend\Users\Fund\AccountChangeTypeAddAction;
+use App\Http\SingleActions\Backend\Users\Fund\AccountChangeTypeDeleteAction;
+use App\Http\SingleActions\Backend\Users\Fund\AccountChangeTypeDetailAction;
+use App\Http\SingleActions\Backend\Users\Fund\AccountChangeTypeEditAction;
 use Illuminate\Http\JsonResponse;
 
 class AccountChangeTypeController extends BackEndApiMainController
@@ -15,74 +18,47 @@ class AccountChangeTypeController extends BackEndApiMainController
 
     /**
      * 帐变类型列表
-     * @return JsonResponse
+     * @param   AccountChangeTypeDetailAction $action
+     * @return  JsonResponse
      */
-    public function detail(): JsonResponse
+    public function detail(AccountChangeTypeDetailAction $action): JsonResponse
     {
-        $searchAbleFields = ['name', 'sign', 'in_out', 'type'];
-        $datas = $this->generateSearchQuery($this->eloqM, $searchAbleFields);
-        return $this->msgout(true, $datas);
+        return $action->execute($this);
     }
 
     /**
      * 添加帐变类型
-     * @param AccountChangeTypeAddRequest $request
-     * @return JsonResponse
+     * @param   AccountChangeTypeAddRequest $request
+     * @param   AccountChangeTypeAddAction  $action
+     * @return  JsonResponse
      */
-    public function add(AccountChangeTypeAddRequest $request): JsonResponse
+    public function add(AccountChangeTypeAddRequest $request, AccountChangeTypeAddAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        try {
-            $eloqM = new $this->eloqM;
-            $eloqM->fill($inputDatas);
-            $eloqM->save();
-            return $this->msgout(true);
-        } catch (Exception $e) {
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * 编辑帐变类型
-     * @param  AccountChangeTypeEditRequest $request
-     * @return JsonResponse
+     * @param   AccountChangeTypeEditRequest $request
+     * @param   AccountChangeTypeEditAction  $action
+     * @return  JsonResponse
      */
-    public function edit(AccountChangeTypeEditRequest $request): JsonResponse
+    public function edit(AccountChangeTypeEditRequest $request, AccountChangeTypeEditAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        $isExistSign = $this->eloqM::where('sign', $inputDatas['sign'])->where('id', '!=', $inputDatas['id'])->exists();
-        if ($isExistSign === true) {
-            return $this->msgout(false, [], '101200');
-        }
-        $pastEloq = $this->eloqM::find($inputDatas['id']);
-        try {
-            $this->editAssignment($pastEloq, $inputDatas);
-            $pastEloq->save();
-            return $this->msgout(true);
-        } catch (Exception $e) {
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * 删除帐变类型
-     * @param  AccountChangeTypeDeleteRequest $request
-     * @return JsonResponse
+     * @param   AccountChangeTypeDeleteRequest $request
+     * @param   AccountChangeTypeDeleteAction  $action
+     * @return  JsonResponse
      */
-    public function delete(AccountChangeTypeDeleteRequest $request): JsonResponse
+    public function delete(AccountChangeTypeDeleteRequest $request, AccountChangeTypeDeleteAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        try {
-            $this->eloqM::find($inputDatas['id'])->delete();
-            return $this->msgout(true);
-        } catch (Exception $e) {
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 }

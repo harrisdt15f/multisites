@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-14 16:02:58
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 17:19:53
+ * @Last Modified time: 2019-06-24 15:34:35
  */
 namespace App\Http\Requests\Backend\DeveloperUsage\MethodLevel;
 
@@ -30,8 +30,8 @@ class MethodLevelAddRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'method_id' => 'required|string|exists:lottery_methods,id',
-            'level' => 'required|numeric|gt:0|lt:11',
+            'method_id' => 'required|string|exists:lottery_methods,method_id',
+            'level' => 'required|numeric|between:1,10',
             'position' => 'required|string',
             'count' => 'required|numeric',
             'prize' => 'required|numeric',

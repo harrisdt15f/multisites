@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-14 16:31:39
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 17:21:27
+ * @Last Modified time: 2019-06-24 20:19:11
  */
 namespace App\Http\Requests\Backend\Users\Fund;
 
@@ -34,7 +34,6 @@ class AccountChangeTypeEditRequest extends BaseFormRequest
             'name' => 'required|string',
             'sign' => 'required|string',
             'in_out' => 'required|numeric|in:0,1',
-            'type' => 'required|numeric',
         ];
     }
 

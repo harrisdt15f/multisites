@@ -4,13 +4,13 @@
  * @Author: LingPh
  * @Date:   2019-06-14 15:29:25
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 17:17:53
+ * @Last Modified time: 2019-06-24 14:08:44
  */
 namespace App\Http\Requests\Backend\DeveloperUsage\Backend\Routes;
 
 use App\Http\Requests\BaseFormRequest;
 
-class RoutesEditRequest extends BaseFormRequest
+class RouteEditRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-14 18:02:59
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 18:06:40
+ * @Last Modified time: 2019-06-24 17:30:06
  */
 namespace App\Http\Requests\Backend\Game\Lottery;
 
@@ -31,7 +31,7 @@ class LotteriesMethodGroupSwitchRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'lottery_id' => 'required|string|exists:lottery_lists,id',
+            'lottery_id' => 'required|string|exists:lottery_lists,en_name',
             'method_group' => 'required|string|exists:lottery_methods,method_group',
             'status' => 'required|numeric|in:0,1',
         ];

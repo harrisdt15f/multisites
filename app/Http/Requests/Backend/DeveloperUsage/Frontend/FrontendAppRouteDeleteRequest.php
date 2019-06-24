@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-14 15:49:27
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 17:18:43
+ * @Last Modified time: 2019-06-24 14:57:30
  */
 namespace App\Http\Requests\Backend\DeveloperUsage\Frontend;
 
@@ -30,7 +30,7 @@ class FrontendAppRouteDeleteRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|numeric|unique:frontend_app_routes,id',
+            'id' => 'required|numeric|exists:frontend_app_routes,id',
         ];
     }
 

@@ -13,7 +13,8 @@ class AccountChangeType extends BaseModel
         'name',
         'sign',
         'in_out',
-        'amount, user_id',
+        'amount',
+        'user_id',
         'project_id',
         'lottery_id',
         'method_id',
@@ -23,7 +24,7 @@ class AccountChangeType extends BaseModel
         'to_id',
         'frozen_type',
         'activity_sign',
-        'admin_id'
+        'admin_id',
     ];
 
     public static $rules = [

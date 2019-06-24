@@ -19,7 +19,7 @@ use Illuminate\Support\Str;
 
 class BackEndApiMainController extends Controller
 {
-    protected $inputs;
+    public $inputs;
     protected $partnerAdmin; //当前的商户用户
     protected $currentOptRoute; //目前路由
     protected $fullMenuLists; //所有的菜单
@@ -147,7 +147,7 @@ class BackEndApiMainController extends Controller
         return response()->json($datas);
     }
 
-    protected function modelWithNameSpace($eloqM = null)
+    public function modelWithNameSpace($eloqM = null)
     {
         return $eloqM !== null ? 'App\\Models\\' . $eloqM : $eloqM;
     }

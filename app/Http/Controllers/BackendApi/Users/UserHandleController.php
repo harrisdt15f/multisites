@@ -12,21 +12,19 @@ use App\Http\Requests\Backend\Users\UserHandleDeactivateRequest;
 use App\Http\Requests\Backend\Users\UserHandleDeductionBalanceRequest;
 use App\Http\Requests\Backend\Users\UserHandleUserAccountChangeRequest;
 use App\Http\Requests\Backend\Users\UserHandleUserRechargeHistoryRequest;
-use App\Lib\Common\AccountChange;
+use App\Http\SingleActions\Backend\Users\UserHandleCreateUserAction;
+use App\Http\SingleActions\Backend\Users\UserHandleDeactivateAction;
+use App\Http\SingleActions\Backend\Users\UserHandleDeactivateDetailAction;
+use App\Http\SingleActions\Backend\Users\UserHandleDeductionBalanceAction;
+use App\Http\SingleActions\Backend\Users\UserHandleUserAccountChangeAction;
+use App\Http\SingleActions\Backend\Users\UserHandleUserRechargeHistoryAction;
+use App\Http\SingleActions\Backend\Users\UserHandleUsersInfoAction;
 use App\Models\Admin\BackendAdminAuditPasswordsList;
-use App\Models\Admin\FrontendUsersPrivacyFlow;
 use App\Models\BackendAdminAuditFlowList;
-use App\Models\User\FrontendUser;
-use App\Models\User\Fund\AccountChangeReport;
-use App\Models\User\Fund\AccountChangeType;
-use App\Models\User\Fund\FrontendUsersAccount;
-use App\Models\User\UserRechargeHistory;
-use App\Models\User\UsersRechargeHistorie;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 
 class UserHandleController extends BackEndApiMainController
 {
@@ -45,70 +43,25 @@ class UserHandleController extends BackEndApiMainController
     }
 
     /**
-     *创建总代与用户后台管理员操作创建
+     * 创建总代与用户后台管理员操作创建
+     * @param  UserHandleCreateUserRequest $request
+     * @param  UserHandleCreateUserAction  $action
+     * @return JsonResponse
      */
-    public function createUser(UserHandleCreateUserRequest $request): JsonResponse
+    public function createUser(UserHandleCreateUserRequest $request, UserHandleCreateUserAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        $inputDatas['nickname'] = $inputDatas['username'];
-        $inputDatas['password'] = bcrypt($inputDatas['password']);
-        $inputDatas['fund_password'] = bcrypt($inputDatas['fund_password']);
-        $inputDatas['platform_id'] = $this->currentPlatformEloq->platform_id;
-        $inputDatas['sign'] = $this->currentPlatformEloq->platform_sign;
-        $inputDatas['vip_level'] = 0;
-        $inputDatas['parent_id'] = 0;
-        $inputDatas['register_ip'] = request()->ip();
-        DB::beginTransaction();
-        try {
-            $user = $this->eloqM::create($inputDatas);
-            $user->rid = $user->id;
-            $userAccountEloq = new FrontendUsersAccount();
-            $userAccountData = [
-                'user_id' => $user->id,
-                'balance' => 0,
-                'frozen' => 0,
-                'status' => 1,
-            ];
-            $userAccountEloq = $userAccountEloq->fill($userAccountData);
-            $userAccountEloq->save();
-            $user->account_id = $userAccountEloq->id;
-            $user->save();
-            DB::commit();
-            $data['name'] = $user->username;
-            return $this->msgOut(true, $data);
-        } catch (Exception $e) {
-            DB::rollBack();
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
-//        $success['token'] = $user->createToken('前端')->accessToken;
-
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * 用户管理的所有用户信息表
+     * @param  UserHandleUsersInfoAction  $action
      * @return JsonResponse
      */
-    public function usersInfo(): JsonResponse
+    public function usersInfo(UserHandleUsersInfoAction $action): JsonResponse
     {
-        //target model to join
-        $fixedJoin = 1; //number of joining tables
-        $withTable = 'account';
-        $searchAbleFields = [
-            'username',
-            'type',
-            'vip_level',
-            'is_tester',
-            'frozen_type',
-            'prize_group',
-            'level_deep',
-            'register_ip',
-        ];
-        $withSearchAbleFields = ['balance'];
-        $data = $this->generateSearchQuery($this->eloqM, $searchAbleFields, $fixedJoin, $withTable,
-            $withSearchAbleFields);
-        return $this->msgOut(true, $data);
+        return $action->execute($this);
     }
 
     /**
@@ -288,119 +241,60 @@ class UserHandleController extends BackEndApiMainController
     /**
      * 用户冻结账号功能
      * @param  UserHandleDeactivateRequest $request
+     * @param  UserHandleDeactivateAction  $action
      * @return JsonResponse
      */
-    public function deactivate(UserHandleDeactivateRequest $request): JsonResponse
+    public function deactivate(UserHandleDeactivateRequest $request, UserHandleDeactivateAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        $userEloq = $this->eloqM::find($inputDatas['user_id']);
-        if ($userEloq !== null) {
-            DB::beginTransaction();
-            try {
-                $userEloq->frozen_type = $inputDatas['frozen_type'];
-                $userEloq->save();
-                $userAdmitFlowLog = new FrontendUsersPrivacyFlow();
-                $data = [
-                    'admin_id' => $this->partnerAdmin->id,
-                    'admin_name' => $this->partnerAdmin->name,
-                    'user_id' => $userEloq->id,
-                    'username' => $userEloq->username,
-                    'comment' => $inputDatas['comment'],
-                ];
-                $userAdmitFlowLog->fill($data);
-                $userAdmitFlowLog->save();
-                DB::commit();
-                return $this->msgOut(true);
-            } catch (Exception $e) {
-                DB::rollBack();
-                $errorObj = $e->getPrevious()->getPrevious();
-                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-                return $this->msgOut(false, [], $sqlState, $msg);
-            }
-        }
+        return $action->execute($this, $inputDatas);
     }
 
     /**
+     * 用户冻结记录
      * @param  UserHandleDeactivateDetailRequest $request
+     * @param  UserHandleDeactivateDetailAction  $action
      * @return JsonResponse
      */
-    public function deactivateDetail(UserHandleDeactivateDetailRequest $request): JsonResponse
+    public function deactivateDetail(UserHandleDeactivateDetailRequest $request, UserHandleDeactivateDetailAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        $userEloq = $this->eloqM::find($inputDatas['user_id']);
-        if ($userEloq !== null) {
-            $data = FrontendUsersPrivacyFlow::where('user_id', $inputDatas['user_id'])->whereBetween('created_at', $inputDatas['start_time'], $inputDatas['end_time'])->orderBy('created_at', 'desc')->get()->toArray();
-            return $this->msgOut(true, $data);
-        }
-
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * 用户帐变记录
      * @param  UserHandleUserAccountChangeRequest $request
+     * @param  UserHandleUserAccountChangeAction  $action
      * @return JsonResponse
      */
-    public function userAccountChange(UserHandleUserAccountChangeRequest $request): JsonResponse
+    public function userAccountChange(UserHandleUserAccountChangeRequest $request, UserHandleUserAccountChangeAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        $datas = AccountChangeReport::select('username', 'type_name', 'type_sign', 'amount', 'before_balance', 'balance', 'created_at')->with('changeType')->where('user_id', $inputDatas['user_id'])->whereBetween('created_at', $inputDatas['start_time'], $inputDatas['end_time'])->get()->toArray();
-        foreach ($datas as $key => $report) {
-            $datas[$key]['in_out'] = $report['change_type']['in_out'];
-            unset($datas[$key]['type_sign'], $datas[$key]['change_type']);
-        }
-        return $this->msgOut(true, $datas);
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * 用户充值记录
      * @param  UserHandleUserRechargeHistoryRequest $request
+     * @param  UserHandleUserRechargeHistoryAction  $action
      * @return JsonResponse
      */
-    public function userRechargeHistory(UserHandleUserRechargeHistoryRequest $request): JsonResponse
+    public function userRechargeHistory(UserHandleUserRechargeHistoryRequest $request, UserHandleUserRechargeHistoryAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        $datas = UsersRechargeHistorie::select('user_name', 'amount', 'deposit_mode', 'status', 'created_at')->where('user_id', $inputDatas['user_id'])->whereBetween('created_at', $inputDatas['start_time'], $inputDatas['end_time'])->get()->toArray();
-        return $this->msgOut(true, $datas);
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * 人工扣除用户资金
      * @param  UserHandleDeductionBalanceRequest $request
+     * @param  UserHandleDeductionBalanceAction  $action
      * @return JsonResponse
      */
-    public function deductionBalance(UserHandleDeductionBalanceRequest $request): JsonResponse
+    public function deductionBalance(UserHandleDeductionBalanceRequest $request, UserHandleDeductionBalanceAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        //检查是否存在 人工充值 的帐变类型表
-        $isExistType = AccountChangeType::select('name', 'sign')->where('sign', 'artificial_deduction')->exists();
-        if ($isExistType === false) {
-            return $this->msgOut(false, [], '100103');
-        }
-        $userAccountsEloq = FrontendUsersAccount::where('user_id', $inputDatas['user_id'])->first();
-        if ($userAccountsEloq->balance < $inputDatas['amount']) {
-            return $this->msgOut(false, [], '100104');
-        }
-        DB::beginTransaction();
-        try {
-            //扣除金额
-            $newBalance = $userAccountsEloq->balance - $inputDatas['amount'];
-            $editArr = ['balance' => $newBalance];
-            $editStatus = FrontendUsersAccount::where('user_id', $inputDatas['user_id'])->where('updated_at', $userAccountsEloq->updated_at)->update($editArr);
-            if ($editStatus === 0) {
-                return $this->msgOut(false, [], '100105');
-            }
-            //添加帐变记录
-            $userEloq = $this->eloqM::select('id', 'sign', 'top_id', 'parent_id', 'rid', 'username')->where('id', $inputDatas['user_id'])->first();
-            $accountChangeReportEloq = new AccountChangeReport();
-            $accountChangeObj = new AccountChange();
-            $accountChangeObj->addData($accountChangeReportEloq, $userEloq, $inputDatas['amount'], $userAccountsEloq->balance, $newBalance, $accountChangeTypeEloq);
-            DB::commit();
-            return $this->msgOut(true);
-        } catch (Exception $e) {
-            DB::rollBack();
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 }

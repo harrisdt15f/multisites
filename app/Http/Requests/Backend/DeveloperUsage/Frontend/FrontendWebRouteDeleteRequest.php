@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-14 15:54:24
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 17:18:54
+ * @Last Modified time: 2019-06-24 15:20:35
  */
 namespace App\Http\Requests\Backend\DeveloperUsage\Frontend;
 
@@ -30,7 +30,7 @@ class FrontendWebRouteDeleteRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|numeric|unique:frontend_web_routes,id',
+            'id' => 'required|numeric|exists:frontend_web_routes,id',
         ];
     }
 

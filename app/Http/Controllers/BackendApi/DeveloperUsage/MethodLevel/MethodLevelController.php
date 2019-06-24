@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-05-30 14:28:04
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-18 18:04:21
+ * @Last Modified time: 2019-06-24 15:51:17
  */
 namespace App\Http\Controllers\BackendApi\DeveloperUsage\MethodLevel;
 
@@ -12,93 +12,70 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\DeveloperUsage\MethodLevel\MethodLevelAddRequest;
 use App\Http\Requests\Backend\DeveloperUsage\MethodLevel\MethodLevelDeleteRequest;
 use App\Http\Requests\Backend\DeveloperUsage\MethodLevel\MethodLevelEditRequest;
-use App\Models\Game\Lottery\LotteryMethod;
+use App\Http\SingleActions\Backend\DeveloperUsage\MethodLevel\MethodLevelAddAction;
+use App\Http\SingleActions\Backend\DeveloperUsage\MethodLevel\MethodLevelDeleteAction;
+use App\Http\SingleActions\Backend\DeveloperUsage\MethodLevel\MethodLevelDetailAction;
+use App\Http\SingleActions\Backend\DeveloperUsage\MethodLevel\MethodLevelEditAction;
+use App\Lib\Common\CacheRelated;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 
 class MethodLevelController extends BackEndApiMainController
 {
-    protected $eloqM = 'DeveloperUsage\MethodLevel\LotteryMethodsWaysLevel';
-
-    //玩法等级管理列表
-    public function detail()
+    /**
+     * 玩法等级管理列表
+     * @param   MethodLevelDetailAction $action
+     * @return  JsonResponse
+     */
+    public function detail(MethodLevelDetailAction $action): JsonResponse
     {
-        if (Cache::has('methodLeveDetail')) {
-            $data = Cache::get('methodLeveDetail');
-        } else {
-            $methodLevelEloq = new $this->eloqM;
-            $data = $methodLevelEloq->methodLevelDetail();
-            Cache::forever('methodLeveDetail', $data);
-        }
-        return $this->msgOut(true, $data);
+        return $action->execute($this);
     }
 
-    //添加玩法等级
-    public function add(MethodLevelAddRequest $request)
+    /**
+     * 添加玩法等级
+     * @param   MethodLevelAddRequest $request
+     * @param   MethodLevelAddAction  $action
+     * @return  JsonResponse
+     */
+    public function add(MethodLevelAddRequest $request, MethodLevelAddAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        //检查玩法等级
-        $checkMethodLevel = $this->eloqM::where('method_id', $inputDatas['method_id'])->where('level', $inputDatas['level'])->first();
-        if ($checkMethodLevel !== null) {
-            return $this->msgOut(false, [], '102201');
-        }
-        try {
-            $methodLevelEloq = new $this->eloqM;
-            $methodLevelEloq->fill($inputDatas);
-            $methodLevelEloq->save();
-            //删除玩法等级列表缓存
-            $this->deleteCache();
-            return $this->msgOut(true);
-        } catch (Exception $e) {
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 
-    //编辑玩法等级
-    public function edit(MethodLevelEditRequest $request)
+    /**
+     * 编辑玩法等级
+     * @param   MethodLevelEditRequest $request
+     * @param   MethodLevelEditAction  $action
+     * @return  JsonResponse
+     */
+    public function edit(MethodLevelEditRequest $request, MethodLevelEditAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        $pastDataEloq = $this->eloqM::find($inputDatas['id']);
-        //检查玩法等级
-        $checkMethodLevel = $this->eloqM::where('method_id', $pastDataEloq->method_id)->where('level', $inputDatas['level'])->where('id', '!=', $inputDatas['id'])->first();
-        if ($checkMethodLevel !== null) {
-            return $this->msgOut(false, [], '102200');
-        }
-        try {
-            $this->editAssignment($pastDataEloq, $inputDatas);
-            $pastDataEloq->save();
-            //删除玩法等级列表缓存
-            $this->deleteCache();
-            return $this->msgOut(true);
-        } catch (Exception $e) {
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 
-    //删除玩法等级
-    public function delete(MethodLevelDeleteRequest $request)
+    /**
+     * 删除玩法等级
+     * @param   MethodLevelDeleteRequest $request
+     * @param   MethodLevelDeleteAction  $action
+     * @return  JsonResponse
+     */
+    public function delete(MethodLevelDeleteRequest $request, MethodLevelDeleteAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        try {
-            $this->eloqM::where('id', $inputDatas['id'])->delete();
-            //删除玩法等级列表缓存
-            $this->deleteCache();
-            return $this->msgOut(true);
-        } catch (Exception $e) {
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
-        }
+        return $action->execute($this, $inputDatas);
     }
 
-    //删除玩法等级列表缓存
-    public function deleteCache()
+    /**
+     * 删除玩法等级列表缓存
+     * @return void
+     */
+    public function deleteCache(): void
     {
-        if (Cache::has('methodLeveDetail')) {
-            Cache::forget('methodLeveDetail');
-        }
+        $key = 'methodLeveDetail';
+        $cacheRelated = new CacheRelated();
+        $cacheRelated->delete($key);
     }
 }

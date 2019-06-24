@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-14 15:54:53
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 17:18:58
+ * @Last Modified time: 2019-06-24 15:20:16
  */
 namespace App\Http\Requests\Backend\DeveloperUsage\Frontend;
 
@@ -30,7 +30,7 @@ class FrontendWebRouteIsOpenRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|numeric|unique:frontend_web_routes,id',
+            'id' => 'required|numeric|exists:frontend_web_routes,id',
             'is_open' => 'required|numeric|in:0,1',
         ];
     }

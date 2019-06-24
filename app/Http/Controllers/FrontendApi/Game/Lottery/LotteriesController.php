@@ -7,6 +7,7 @@ use App\Http\Requests\Frontend\Game\Lottery\LotteriesAvailableIssuesRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesBetRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesIssueHistoryRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesProjectHistoryRequest;
+use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryListAction;
 use App\Lib\Locker\AccountLocker;
 use App\Lib\Logic\AccountChange;
 use App\Models\Game\Lottery\LotteryIssue;
@@ -22,45 +23,14 @@ use Illuminate\Support\Facades\Validator;
 
 class LotteriesController extends FrontendApiMainController
 {
-    public function lotteryList(): JsonResponse
+    /**
+     * 获取彩票列表
+     * @param  LotteriesLotteryListAction $action
+     * @return JsonResponse
+     */
+    public function lotteryList(LotteriesLotteryListAction $action): JsonResponse
     {
-        $lotteries = LotteryList::with(['issueRule:lottery_id,begin_time,end_time'])->get([
-            'cn_name as name',
-            'en_name',
-            'series_id',
-            'min_times',
-            'max_times',
-            'valid_modes',
-            'min_prize_group',
-            'max_prize_group',
-            'max_trace_number',
-            'day_issue',
-        ]);
-        $seriesConfig = config('game.main.series');
-        $data = [];
-        foreach ($lotteries as $lottery) {
-            if (!isset($data[$lottery->series_id])) {
-                $data[$lottery->series_id] = [
-                    'name' => $seriesConfig[$lottery->series_id],
-                    'sign' => $lottery->series_id,
-                    'list' => [],
-                ];
-            }
-            $data[$lottery->series_id]['list'][] = [
-                'id' => $lottery->en_name,
-                'name' => $lottery->name,
-                'min_times' => $lottery->min_times,
-                'max_times' => $lottery->max_times,
-                'valid_modes' => $lottery->valid_modes,
-                'min_prize_group' => $lottery->min_prize_group,
-                'max_prize_group' => $lottery->max_prize_group,
-                'max_trace_number' => $lottery->max_trace_number,
-                'day_issue' => $lottery->day_issue,
-                'begin_time' => $lottery->issueRule['begin_time'],
-                'end_time' => $lottery->issueRule['end_time'],
-            ];
-        }
-        return $this->msgOut(true, $data);
+        return $action->execute($this);
     }
 
     public function lotteryInfo(): JsonResponse
@@ -386,6 +356,6 @@ class LotteriesController extends FrontendApiMainController
 
     public function setWinPrize()
     {
-        LotteryIssue::calculateEncodedNumber('cqssc','190619037');
+        LotteryIssue::calculateEncodedNumber('cqssc', '190619037');
     }
 }

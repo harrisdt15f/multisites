@@ -2,15 +2,17 @@
 
 /**
  * @Author: LingPh
- * @Date:   2019-06-14 15:31:17
+ * @Date:   2019-06-17 18:02:56
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 17:17:49
+ * @Last Modified time: 2019-06-24 17:50:15
  */
-namespace App\Http\Requests\Backend\DeveloperUsage\Backend\Routes;
+namespace App\Http\Requests\Backend\Game\Lottery;
 
 use App\Http\Requests\BaseFormRequest;
+use App\Models\Game\Lottery\LotteryList;
+use Illuminate\Support\Facades\Config;
 
-class RoutesDeleteRequest extends BaseFormRequest
+class LotteriesInputCodeRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,9 +31,14 @@ class RoutesDeleteRequest extends BaseFormRequest
      */
     public function rules(): array
     {
-        return [
-            'id' => 'required|numeric|exists:backend_admin_routes,id',
+        $lottery_id = $this->get('lottery_id');
+        $lenght = LotteryList::where('en_name', $lottery_id)->value('code_length');
+        $rules = [
+            'lottery_id' => 'required|string|exists:lottery_lists,en_name',
+            'code' => 'required|string|size:' . $lenght,
+            'issue' => 'required|integer',
         ];
+        return $rules;
     }
 
     /*public function messages()

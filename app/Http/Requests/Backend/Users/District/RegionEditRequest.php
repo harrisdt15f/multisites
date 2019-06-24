@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-14 16:25:52
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 17:20:26
+ * @Last Modified time: 2019-06-24 19:46:17
  */
 namespace App\Http\Requests\Backend\Users\District;
 
@@ -31,6 +31,7 @@ class RegionEditRequest extends BaseFormRequest
     {
         return [
             'id' => 'required|numeric|exists:users_regions,id',
+            'region_parent_id' => 'required|numeric|exists:users_regions,region_id',
             'region_id' => 'required|numeric',
             'region_name' => 'required',
             'region_level' => 'required|in:1,2,3,4',

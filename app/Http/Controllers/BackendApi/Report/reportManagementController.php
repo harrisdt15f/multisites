@@ -4,68 +4,56 @@
  * @Author: LingPh
  * @Date:   2019-05-27 11:02:52
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-18 15:40:12
+ * @Last Modified time: 2019-06-24 18:19:50
  */
 namespace App\Http\Controllers\BackendApi\Report;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Models\User\Fund\AccountChangeReport;
-use App\Models\User\Fund\AccountChangeType;
-use App\Models\User\UsersRechargeHistorie;
+use App\Http\SingleActions\Backend\Report\reportManagementAccountChangeTypeAction;
+use App\Http\SingleActions\Backend\Report\reportManagementUserAccountChangeAction;
+use App\Http\SingleActions\Backend\Report\reportManagementUserBetsAction;
+use App\Http\SingleActions\Backend\Report\reportManagementUserRechargeHistoryAction;
 use Illuminate\Http\JsonResponse;
 
 class reportManagementController extends BackEndApiMainController
 {
     /**
      * 玩家帐变报表
-     * @return JsonResponse
+     * @param   reportManagementUserAccountChangeAction $action
+     * @return  JsonResponse
      */
-    public function userAccountChange(): JsonResponse
+    public function userAccountChange(reportManagementUserAccountChangeAction $action): JsonResponse
     {
-        $accountChangeEloq = new AccountChangeReport();
-        $searchAbleFields = ['username', 'type_sign', 'is_for_agent'];
-        $fixedJoin = 1;
-        $withTable = 'changeType';
-        $withSearchAbleFields = ['in_out', 'type'];
-        $field = 'updated_at';
-        $type = 'desc';
-        $datas = $this->generateSearchQuery($accountChangeEloq, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields, $field, $type);
-        foreach ($datas as $key => $report) {
-            $data = $report->toArray();
-            $reportArr = [
-                'username' => $data['username'],
-                'amount' => $data['amount'],
-                'balance' => $data['balance'],
-                'type_name' => $data['type_name'],
-                'type_sign' => $data['type_sign'],
-                'in_out' => $data['change_type']['in_out'],
-                'created_at' => $data['created_at'],
-            ];
-            $datas[$key] = $reportArr;
-        }
-        return $this->msgOut(true, $datas);
+        return $action->execute($this);
     }
 
     /**
      * 玩家充值报表
-     * @return JsonResponse
+     * @param   reportManagementUserRechargeHistoryAction $action
+     * @return  JsonResponse
      */
-    public function userRechargeHistory(): JsonResponse
+    public function userRechargeHistory(reportManagementUserRechargeHistoryAction $action): JsonResponse
     {
-        $rechargeHistoryEloq = new UsersRechargeHistorie();
-        $searchAbleFields = ['user_name', 'company_order_num', 'deposit_mode', 'status'];
-        $field = 'updated_at';
-        $type = 'desc';
-        $datas = $this->generateSearchQuery($rechargeHistoryEloq, $searchAbleFields, 0, null, null, $field, $type);
-        return $this->msgOut(true, $datas);
+        return $action->execute($this);
     }
 
     /**
-     * @return JsonResponse
+     * 帐变类型列表
+     * @param   reportManagementAccountChangeTypeAction $action
+     * @return  JsonResponse
      */
-    public function accountChangeType(): JsonResponse
+    public function accountChangeType(reportManagementAccountChangeTypeAction $action): JsonResponse
     {
-        $datas = AccountChangeType::select('name', 'sign')->get()->toArray();
-        return $this->msgOut(true, $datas);
+        return $action->execute($this);
+    }
+
+    /**
+     * 玩家注单报表
+     * @param   reportManagementUserBetsAction $action
+     * @return  JsonResponse
+     */
+    public function userBets(reportManagementUserBetsAction $action): JsonResponse
+    {
+        return $action->execute($this);
     }
 }
