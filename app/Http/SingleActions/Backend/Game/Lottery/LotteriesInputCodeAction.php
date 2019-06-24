@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-24 17:47:58
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-24 22:07:54
+ * @Last Modified time: 2019-06-24 22:10:31
  */
 namespace App\Http\SingleActions\Backend\Game\Lottery;
 
@@ -30,10 +30,10 @@ class LotteriesInputCodeAction
             ['end_time', '<=', now()->timestamp],
         ])->first();
         if ($issueEloq === null) {
-            return $this->msgOut(false, [], '101703');
+            return $contll->msgOut(false, [], '101703');
         }
         if ($issueEloq->official_code !== null) {
-            return $this->msgOut(false, [], '101704');
+            return $contll->msgOut(false, [], '101704');
         }
         $status_encode = LotteryIssue::ENCODED;
         try {
@@ -44,11 +44,11 @@ class LotteriesInputCodeAction
             if (!empty($issueEloq->toArray())) {
                 dispatch(new IssueEncoder($issueEloq->toArray()))->onQueue('issues');
             }
-            return $this->msgOut(true);
+            return $contll->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $this->msgOut(false, [], $sqlState, $msg);
+            return $contll->msgOut(false, [], $sqlState, $msg);
         }
     }
 }
