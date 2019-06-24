@@ -12,6 +12,7 @@ use App\Http\Requests\Backend\Game\Lottery\LotteriesLotteriesSwitchRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesMethodGroupSwitchRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesMethodRowSwitchRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesMethodSwitchRequest;
+use App\Jobs\Lottery\Encode\IssueEncoder;
 use App\Models\Game\Lottery\LotteryIssue;
 use App\Models\Game\Lottery\LotteryList;
 use App\Models\Game\Lottery\LotteryMethod;
@@ -40,7 +41,7 @@ class LotteriesController extends BackEndApiMainController
 
     /**
      * 获取彩种接口
-     * @param  LotteriesListsRequest $request
+     * @param  LotteriesListsRequest  $request
      * @return JsonResponse
      */
     public function lists(LotteriesListsRequest $request): JsonResponse
@@ -84,7 +85,8 @@ class LotteriesController extends BackEndApiMainController
                     $methodGrops = $litems->methodGroups;
                     foreach ($methodGrops as $mgItems) {
                         $curentMethodGroup = $mgItems->method_group;
-                        $methodGroupBool = $mgItems->where('lottery_id', $currentLotteryId)->where('method_group', $curentMethodGroup)->where('status', 1)->exists();
+                        $methodGroupBool = $mgItems->where('lottery_id', $currentLotteryId)->where('method_group',
+                            $curentMethodGroup)->where('status', 1)->exists();
                         $methodGroupstatus = $methodGroupBool ? LotteryMethod::OPEN : LotteryMethod::CLOSE;
                         //玩法组 data
                         $methodGroup = $this->methodData($currentLotteryId, $curentMethodGroup, $methodGroupstatus);
@@ -95,15 +97,19 @@ class LotteriesController extends BackEndApiMainController
                         $methodRows = $mgItems->methodRows->where('lottery_id', $currentLotteryId);
                         foreach ($methodRows as $mrItems) {
                             $currentMethodRow = $mrItems->method_row;
-                            $methodRowBool = $mrItems->where('lottery_id', $currentLotteryId)->where('method_group', $curentMethodGroup)->where('method_row', $currentMethodRow)->where('status', 1)->exists();
+                            $methodRowBool = $mrItems->where('lottery_id', $currentLotteryId)->where('method_group',
+                                $curentMethodGroup)->where('method_row', $currentMethodRow)->where('status',
+                                1)->exists();
                             $methodRowstatus = $methodRowBool ? LotteryMethod::OPEN : LotteryMethod::CLOSE;
                             //玩法行 data
-                            $methodRow = $this->methodData($currentLotteryId, $curentMethodGroup, $methodRowstatus, $currentMethodRow);
+                            $methodRow = $this->methodData($currentLotteryId, $curentMethodGroup, $methodRowstatus,
+                                $currentMethodRow);
                             //$temp 插入玩法行data
                             $temp[$seriesId][$currentLotteryId]['child'][$curentMethodGroup]['child'][$mrItems->method_row]['data'] = $methodRow;
                             //玩法data
                             //###########################################################################################
-                            $methodData = LotteryMethod::where('lottery_id', $currentLotteryId)->where('method_group', $curentMethodGroup)->where('method_row', $currentMethodRow)->get();
+                            $methodData = LotteryMethod::where('lottery_id', $currentLotteryId)->where('method_group',
+                                $curentMethodGroup)->where('method_row', $currentMethodRow)->get();
                             // $methodData = $mrItems->methodDetails
                             //     ->where('method_group', $curentMethodGroup)
                             //     ->where('method_row', $currentMethodRow);
@@ -147,14 +153,15 @@ class LotteriesController extends BackEndApiMainController
         $orderFlow = 'asc';
         $fixedJoin = 1;
         $withTable = 'lottery';
-        $this->inputs['time_condtions'] = $this->inputs['time_condtions'] ?? '[["begin_time",">=",' . Carbon::now()->timestamp . ']]'; // 从现在开始。如果。没有时间字段的话，就用当前时间以上的显示
-        $data = $this->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, null, $orderFields, $orderFlow);
+        $this->inputs['time_condtions'] = $this->inputs['time_condtions'] ?? '[["end_time",">=",'.Carbon::now()->timestamp.']]'; // 从现在开始。如果。没有时间字段的话，就用当前时间以上的显示
+        $data = $this->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, null, $orderFields,
+            $orderFlow);
         return $this->msgOut(true, $data);
     }
 
     /**
      * 生成奖期
-     * @param  LotteriesGenerateIssueRequest $request
+     * @param  LotteriesGenerateIssueRequest  $request
      * @return JsonResponse
      */
     public function generateIssue(LotteriesGenerateIssueRequest $request): JsonResponse
@@ -166,10 +173,10 @@ class LotteriesController extends BackEndApiMainController
 
     /**
      * 彩种开关
-     * @param  LotteriesLotteriesSwitchRequest $request
+     * @param  LotteriesLotteriesSwitchRequest  $request
      * @return JsonResponse
      */
-    public function lotteriesSwitch(LotteriesLotteriesSwitchRequest $request):  ? JsonResponse
+    public function lotteriesSwitch(LotteriesLotteriesSwitchRequest $request): ?JsonResponse
     {
         $inputDatas = $request->validated();
         $lotteriesEloq = $this->eloqM::find($inputDatas['id']);
@@ -188,13 +195,14 @@ class LotteriesController extends BackEndApiMainController
 
     /**
      * 玩法组开关
-     * @param  LotteriesMethodGroupSwitchRequest $request
+     * @param  LotteriesMethodGroupSwitchRequest  $request
      * @return JsonResponse
      */
-    public function methodGroupSwitch(LotteriesMethodGroupSwitchRequest $request) :  ? JsonResponse
+    public function methodGroupSwitch(LotteriesMethodGroupSwitchRequest $request): ?JsonResponse
     {
         $inputDatas = $request->validated();
-        $methodGroupIds = LotteryMethod::where('lottery_id', $inputDatas['lottery_id'])->where('method_group', $inputDatas['method_group'])->pluck('id');
+        $methodGroupIds = LotteryMethod::where('lottery_id', $inputDatas['lottery_id'])->where('method_group',
+            $inputDatas['method_group'])->pluck('id');
         if (empty($methodGroupIds)) {
             return $this->msgOut(false, [], '101701');
         }
@@ -213,13 +221,14 @@ class LotteriesController extends BackEndApiMainController
 
     /**
      * 玩法行开关
-     * @param  LotteriesMethodRowSwitchRequest $request
+     * @param  LotteriesMethodRowSwitchRequest  $request
      * @return JsonResponse
      */
-    public function methodRowSwitch(LotteriesMethodRowSwitchRequest $request) :  ? JsonResponse
+    public function methodRowSwitch(LotteriesMethodRowSwitchRequest $request): ?JsonResponse
     {
         $inputDatas = $request->validated();
-        $methodGroupIds = LotteryMethod::where('lottery_id', $inputDatas['lottery_id'])->where('method_group', $inputDatas['method_group'])->where('method_row', $inputDatas['method_row'])->pluck('id');
+        $methodGroupIds = LotteryMethod::where('lottery_id', $inputDatas['lottery_id'])->where('method_group',
+            $inputDatas['method_group'])->where('method_row', $inputDatas['method_row'])->pluck('id');
         if (empty($methodGroupIds)) {
             return $this->msgOut(false, [], '101702');
         }
@@ -238,10 +247,10 @@ class LotteriesController extends BackEndApiMainController
 
     /**
      * 玩法开关
-     * @param  LotteriesMethodSwitchRequest $request
+     * @param  LotteriesMethodSwitchRequest  $request
      * @return JsonResponse
      */
-    public function methodSwitch(LotteriesMethodSwitchRequest $request) :  ? JsonResponse
+    public function methodSwitch(LotteriesMethodSwitchRequest $request): ?JsonResponse
     {
         $inputDatas = $request->validated();
         $pastData = LotteryMethod::find($inputDatas['id']);
@@ -265,7 +274,7 @@ class LotteriesController extends BackEndApiMainController
      * 清理玩法缓存
      * @return void
      */
-    public function clearMethodCache() : void
+    public function clearMethodCache(): void
     {
         $redisKey = $this->methodCacheName;
         if (Cache::has($redisKey)) {
@@ -275,10 +284,10 @@ class LotteriesController extends BackEndApiMainController
 
     /**
      * 编辑玩法
-     * @param  LotteriesEditMethodRequest $request
+     * @param  LotteriesEditMethodRequest  $request
      * @return JsonResponse
      */
-    public function editMethod(LotteriesEditMethodRequest $request):  ? JsonResponse
+    public function editMethod(LotteriesEditMethodRequest $request): ?JsonResponse
     {
         $inputDatas = $request->validated();
         $pastData = LotteryMethod::find($inputDatas['id']);
@@ -295,13 +304,13 @@ class LotteriesController extends BackEndApiMainController
 
     /**
      * 组装玩法组和玩法行data
-     * @param  int $lotteryId   [彩种]
-     * @param  int $methodGroup [玩法组]
-     * @param  int $status      [开启状态]
-     * @param  int $methodRow   [玩法行]
+     * @param  int  $lotteryId  [彩种]
+     * @param  int  $methodGroup  [玩法组]
+     * @param  int  $status  [开启状态]
+     * @param  int  $methodRow  [玩法行]
      * @return array  $dataArr
      */
-    public function methodData($lotteryId, $methodGroup, $status, $methodRow = null) : array
+    public function methodData($lotteryId, $methodGroup, $status, $methodRow = null): array
     {
         $dataArr = [
             'lottery_id' => $lotteryId,
@@ -316,13 +325,14 @@ class LotteriesController extends BackEndApiMainController
 
     /**
      * 奖期录号
-     * @param  LotteriesInputNumberRequest $request
+     * @param  LotteriesInputNumberRequest  $request
      * @return JsonResponse
      */
     public function inputCode(LotteriesInputNumberRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
-        $issueEloq = LotteryIssue::where('lottery_id', $inputDatas['lottery_id'])->where('issue', $inputDatas['issue'])->first();
+        $issueEloq = LotteryIssue::where('lottery_id', $inputDatas['lottery_id'])->where('issue',
+            $inputDatas['issue'])->first();
         if ($issueEloq === null) {
             return $this->msgOut(false, [], '101703');
         }
@@ -335,6 +345,9 @@ class LotteriesController extends BackEndApiMainController
             $issueEloq->encode_time = time();
             $issueEloq->official_code = $inputDatas['code'];
             $issueEloq->save();
+            if (!empty($issueEloq->toArray())) {
+                dispatch(new IssueEncoder($issueEloq->toArray()))->onQueue('issues');
+            }
             return $this->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();

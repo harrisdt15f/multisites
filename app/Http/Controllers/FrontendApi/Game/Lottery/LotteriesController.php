@@ -167,6 +167,7 @@ class LotteriesController extends FrontendApiMainController
 
     /**
      * 7. 游戏-可用奖期
+     * @param  LotteriesAvailableIssuesRequest  $request
      * @return JsonResponse
      */
     public function availableIssues(LotteriesAvailableIssuesRequest $request): JsonResponse
@@ -386,6 +387,6 @@ class LotteriesController extends FrontendApiMainController
 
     public function setWinPrize()
     {
-        LotteryIssue::calculateEncodedNumber('cqssc','190619037');
+
     }
 }
