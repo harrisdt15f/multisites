@@ -153,7 +153,8 @@ class LotteriesController extends BackEndApiMainController
         $orderFlow = 'asc';
         $fixedJoin = 1;
         $withTable = 'lottery';
-        $this->inputs['time_condtions'] = $this->inputs['time_condtions'] ?? '[["end_time",">=",'.Carbon::now()->timestamp.']]'; // 从现在开始。如果。没有时间字段的话，就用当前时间以上的显示
+        $afewMinutes = Carbon::now()->subMinute('20')->timestamp;
+        $this->inputs['time_condtions'] = $this->inputs['time_condtions'] ?? '[["end_time",">=",'.$afewMinutes.']]'; // 从现在开始。如果。没有时间字段的话，就用当前时间以上的显示
         $data = $this->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, null, $orderFields,
             $orderFlow);
         return $this->msgOut(true, $data);
@@ -331,8 +332,11 @@ class LotteriesController extends BackEndApiMainController
     public function inputCode(LotteriesInputNumberRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
-        $issueEloq = LotteryIssue::where('lottery_id', $inputDatas['lottery_id'])->where('issue',
-            $inputDatas['issue'])->first();
+        $issueEloq = LotteryIssue::where([
+            ['issue', '=', $inputDatas['issue']],
+            ['lottery_id', $inputDatas['lottery_id']],
+            ['end_time', '<=', now()->timestamp]
+        ])->first();
         if ($issueEloq === null) {
             return $this->msgOut(false, [], '101703');
         }
