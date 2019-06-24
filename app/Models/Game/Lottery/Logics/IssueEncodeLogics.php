@@ -72,7 +72,11 @@ trait IssueEncodeLogics
                                                 foreach ($oProjectsToCalculate as $project) {
                                                     $aPrized = $oBasicWay->checkPrize($oSeriesWay, $project->bet_number,
                                                         $sPostion = null);
-                                                    $project->setWon($oIssue->wn_number, $aPrized);//@todo Trace
+                                                    $result = $project->setWon($oIssue->wn_number,
+                                                        $aPrized);//@todo Trace
+                                                    if ($result !== true) {
+                                                        Log::channel('issues')->info($result);
+                                                    }
                                                 }
                                             } else {
                                                 Log::channel('issues')->info('no basic way');
