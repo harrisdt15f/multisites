@@ -8,7 +8,6 @@
 
 namespace App\Models\Game\Lottery\Logics;
 
-
 use App\Models\Game\Lottery\LotterySeriesMethod;
 use App\Models\Game\Lottery\LotterySeriesWay;
 
@@ -31,10 +30,8 @@ trait LotteryBasicWayLogics
             $oBasicMethod->sPosition = $sPosition;
             $prizeLevel = $oBasicMethod->prizeLevel;
             $iCount = $oBasicMethod->getPrizeCount($oSeriesWay, $this, $sWnNumber, $sBetNumber);
-            if ($iCount) {
                 $iLevel = $prizeLevel->level;
                 $aPrized[$oSeriesMethod->basic_method_id][$iLevel] = $iCount;
-            }
         }
         return $aPrized;
     }

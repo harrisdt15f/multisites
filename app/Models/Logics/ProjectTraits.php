@@ -263,6 +263,11 @@ trait ProjectTraits
         return [];
     }
 
+    /**
+     * @param $sWnNumber
+     * @param $aPrized
+     * @return bool|string
+     */
     public function setWon($sWnNumber, $aPrized)
     {
         $totalBonus = 0;
@@ -273,41 +278,59 @@ trait ProjectTraits
                 ['basic_method_id', '=', $iBasicMethodId],
                 ['level', '=', $iLevel]
             ])->first();
-            $bonus = $this->bet_prize_group * $PrizeEloq->prize / 1800;
-            $bonus = $bonus * $iCount * $this->times * $this->mode;
-            if ($this->price === 1) {
-                $bonus /= 2;
+            if ($iCount>0)
+            {
+                $bonus = $this->bet_prize_group * $PrizeEloq->prize / 1800;
+                $bonus = $bonus * $iCount * $this->times * $this->mode;
+                if ($this->price === 1) {
+                    $bonus /= 2;
+                }
+                $totalBonus += $bonus;
+                $data = [
+                    'basic_method_id' => $iBasicMethodId,
+                    'winning_number' => $sWnNumber,
+                    'level' => $iLevel,
+                    'bonus' => $totalBonus,
+                    'is_win' => 1,
+                    'time_count' => now()->timestamp,
+                    'status' => self::STATUS_WON
+                ];
+                try {
+                    DB::beginTransaction();
+                    $lockProject = $this->lockForUpdate()->find($this->id);
+                    $lockProject->update($data);
+                    DB::commit();
+                } catch (Exception $e) {
+                    Log::channel('issues')->info($e->getMessage());
+                    DB::rollBack();
+                    return $e->getMessage();
+                }
             }
-            $totalBonus += $bonus;
-            $data = [
-                'basic_method_id' => $iBasicMethodId,
-                'winning_number' => $sWnNumber,
-                'level' => $iLevel,
-                'bonus' => $totalBonus,
-                'is_win' => 1,
-                'time_count' => now()->timestamp,
-                'status' => self::STATUS_WON
-            ];
-            try {
-                DB::beginTransaction();
-                $lockProject = $this->lockForUpdate()->find($this->id);
-                $lockProject->update($data);
-                DB::commit();
-            } catch (Exception $e) {
-                Log::channel('issues')->info($e->getMessage());
-                DB::rollBack();
-                return $e->getMessage();
+            else{
+                $this->setFail($iBasicMethodId,$sWnNumber);
             }
             return true;
         }
     }
 
-    public function setFail(): bool
+    /**
+     * @param $iBasicMethodId
+     * @param $sWnNumber
+     * @return bool
+     */
+    public function setFail($iBasicMethodId,$sWnNumber): bool
     {
         try {
             DB::beginTransaction();
             $lockProject = $this->lockForUpdate()->find($this->id);
             $this->status = $lockProject->status = self::STATUS_LOST;
+            $data = [
+                'basic_method_id' => $iBasicMethodId,
+                'winning_number' => $sWnNumber,
+                'time_count' => now()->timestamp,
+                'status' => self::STATUS_LOST
+            ];
+            $lockProject->update($data);
             if ($lockProject->save()) {
                 DB::commit();
             } else {
