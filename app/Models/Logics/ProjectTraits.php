@@ -161,9 +161,9 @@ trait ProjectTraits
                     'total_issues' => count($traceData),
                     'finished_issues' => 0,
                     'canceled_issues' => 0,
-                    'start_issue' => $traceData[1],
+                    'start_issue' => $traceData[key($traceData)],
                     'now_issue' => '',
-                    'end_issue' => $traceData[count($traceData) - 1],
+                    'end_issue' => $traceData[array_key_last($traceData)],
                     'stop_issue' => '',
                     'issue_process' => json_encode($traceData),
                     'add_time' => time(),
@@ -179,7 +179,7 @@ trait ProjectTraits
                 // 保存追号
                 $traceListData = [];
                 foreach ($traceData as $issue => $mark) {
-                    foreach ($data as $_item) {
+                    foreach ($data as $dataItem) {
                         $traceListData[] = [
                             'user_id' => $user->id,
                             'username' => $user->username,
@@ -189,16 +189,16 @@ trait ProjectTraits
                             'is_tester' => $user->is_tester,
                             'series_id' => $lottery->series_id,
                             'lottery_sign' => $lottery->en_name,
-                            'method_sign' => $_item['method_id'],
-                            'method_name' => $_item['method_name'],
+                            'method_sign' => $dataItem['method_id'],
+                            'method_name' => $dataItem['method_name'],
                             'issue' => $issue,
-                            'bet_number' => $_item['code'],
-                            'mode' => $_item['mode'],
-                            'times' => $_item['times'],
-                            'single_price' => $_item['price'],
-                            'total_price' => $_item['total_price'],
+                            'bet_number' => $dataItem['code'],
+                            'mode' => $dataItem['mode'],
+                            'times' => $dataItem['times'],
+                            'single_price' => $dataItem['price'],
+                            'total_price' => $dataItem['total_price'],
                             'user_prize_group' => $user->prize_group,
-                            'bet_prize_group' => $_item['prize_group'],
+                            'bet_prize_group' => $dataItem['prize_group'],
                             'ip' => Request::ip(),
                             'proxy_ip' => json_encode(Request::ip()),
                             'day' => date('Ymd'),

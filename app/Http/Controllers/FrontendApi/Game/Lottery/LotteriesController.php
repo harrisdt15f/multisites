@@ -29,7 +29,7 @@ class LotteriesController extends FrontendApiMainController
 {
     /**
      * 获取彩票列表
-     * @param  LotteriesLotteryListAction $action
+     * @param  LotteriesLotteryListAction  $action
      * @return JsonResponse
      */
     public function lotteryList(LotteriesLotteryListAction $action): JsonResponse
@@ -39,7 +39,7 @@ class LotteriesController extends FrontendApiMainController
 
     /**
      * 游戏 彩种详情
-     * @param  LotteriesLotteryInfoAction $action
+     * @param  LotteriesLotteryInfoAction  $action
      * @return JsonResponse
      */
     public function lotteryInfo(LotteriesLotteryInfoAction $action): JsonResponse
@@ -50,12 +50,14 @@ class LotteriesController extends FrontendApiMainController
     /**
      * 历史奖期
      * @param  LotteriesIssueHistoryRequest  $request
-     * @param  LotteriesIssueHistoryAction   $action
+     * @param  LotteriesIssueHistoryAction  $action
      * @return JsonResponse
      * @todo  需要改真实数据 暂时先从那边挪接口
      */
-    public function issueHistory(LotteriesIssueHistoryRequest $request, LotteriesIssueHistoryAction $action): JsonResponse
-    {
+    public function issueHistory(
+        LotteriesIssueHistoryRequest $request,
+        LotteriesIssueHistoryAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -63,23 +65,27 @@ class LotteriesController extends FrontendApiMainController
     /**
      * 7. 游戏-可用奖期
      * @param  LotteriesAvailableIssuesRequest  $request
-     * @param  LotteriesAvailableIssuesAction   $action
+     * @param  LotteriesAvailableIssuesAction  $action
      * @return JsonResponse
      */
-    public function availableIssues(LotteriesAvailableIssuesRequest $request, LotteriesAvailableIssuesAction $action): JsonResponse
-    {
+    public function availableIssues(
+        LotteriesAvailableIssuesRequest $request,
+        LotteriesAvailableIssuesAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
 
     /**
      * 游戏-下注历史
-     * @param  LotteriesProjectHistoryRequest $request
+     * @param  LotteriesProjectHistoryRequest  $request
      * @param  LotteriesProjectHistoryAction  $action
      * @return JsonResponse
      */
-    public function projectHistory(LotteriesProjectHistoryRequest $request, LotteriesProjectHistoryAction $action): JsonResponse
-    {
+    public function projectHistory(
+        LotteriesProjectHistoryRequest $request,
+        LotteriesProjectHistoryAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -112,7 +118,7 @@ class LotteriesController extends FrontendApiMainController
             if ($oMethod->supportExpand) {
                 $position = [];
                 if (isset($item['position'])) {
-                    $position = (array) $item['position'];
+                    $position = (array)$item['position'];
                 }
                 if (!$oMethod->checkPos($position)) {
                     return "对不起, 玩法{$method['name']}位置不正确!";
@@ -141,7 +147,7 @@ class LotteriesController extends FrontendApiMainController
                 return $this->msgOut(false, [], '', "对不起, 模式{$mode}, 不存在!");
             }
             // 奖金组 - 游戏
-            $prizeGroup = (int) $item['prize_group'];
+            $prizeGroup = (int)$item['prize_group'];
             if (!$lottery->isValidPrizeGroup($prizeGroup)) {
                 return $this->msgOut(false, [], '', "对不起, 奖金组{$prizeGroup}, 游戏未开放!");
             }
@@ -155,11 +161,11 @@ class LotteriesController extends FrontendApiMainController
                 return $this->msgOut(false, [], '', "对不起, 玩法{$methodId}, 注单号码不合法!");
             }
             // 倍数
-            $times = (int) $item['times'];
+            $times = (int)$item['times'];
             if (!$lottery->isValidTimes($times)) {
                 return $this->msgOut(false, [], '', "对不起, 倍数{$times}, 不合法!");
             }
-            $price = (int) $item['price'];
+            $price = (int)$item['price'];
             $priceConfig = config('game.main.price', [1, 2]);
             if (!$price || !in_array($price, $priceConfig)) {
                 return $this->msgOut(false, [], '', "对不起, 单价{$price}, 不合法!");
@@ -183,7 +189,7 @@ class LotteriesController extends FrontendApiMainController
             ];
         }
         // 投注期号
-        $traceData = $inputDatas['trace_issues'];
+        $traceData = array_keys($inputDatas['trace_issues']);
         // 检测追号奖期
         if (!$traceData || !is_array($traceData)) {
             return $this->msgOut(false, [], '', '对不起, 无效的追号奖期数据!');
@@ -192,7 +198,6 @@ class LotteriesController extends FrontendApiMainController
         if (count($traceData) !== $traceDataCollection->count()) {
             return $this->msgOut(false, [], '', '对不起, 追号奖期不正确!');
         }
-        $traceData = $traceDataCollection->pluck('issue');
         // 获取当前奖期
         $currentIssue = LotteryIssue::getCurrentIssue($lottery->en_name);
         if (!$currentIssue) {
@@ -213,7 +218,7 @@ class LotteriesController extends FrontendApiMainController
         }
         DB::beginTransaction();
         try {
-            $traceData = count($traceData) > 1 ? array_slice($traceData, 1) : [];
+            $traceData = count($inputDatas['trace_issues']) > 1 ? array_slice($inputDatas['trace_issues'], 1) : [];
             $from = $inputDatas['from'] ?? 1;
             $data = Project::addProject($usr, $lottery, $currentIssue, $betDetail, $traceData, $from);
             // 帐变
@@ -233,7 +238,7 @@ class LotteriesController extends FrontendApiMainController
                 if ($res !== true) {
                     DB::rollBack();
                     $accountLocker->release();
-                    return $this->msgOut(false, [], '', '对不起, ' . $res);
+                    return $this->msgOut(false, [], '', '对不起, '.$res);
                 }
             }
             $accountChange->triggerSave();
@@ -241,8 +246,8 @@ class LotteriesController extends FrontendApiMainController
         } catch (\Exception $e) {
             DB::rollBack();
             $accountLocker->release();
-            Log::info('投注-异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine()); //Clog::userBet
-            return $this->msgOut(false, [], '', '对不起, ' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine());
+            Log::info('投注-异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine()); //Clog::userBet
+            return $this->msgOut(false, [], '', '对不起, '.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine());
         }
         $accountLocker->release();
         return $this->msgOut(true, $data);
@@ -250,6 +255,6 @@ class LotteriesController extends FrontendApiMainController
 
     public function setWinPrize()
     {
-        LotteryIssue::calculateEncodedNumber('cqssc','190624052');
+        LotteryIssue::calculateEncodedNumber('cqssc', '190624052');
     }
 }
