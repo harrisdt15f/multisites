@@ -55,16 +55,7 @@ trait IssueEncodeLogics
                                         //不中奖的时候
                                         if ($oSeriesWay->WinningNumber === false) {
                                             foreach ($oProjectsToCalculate as $project) {
-                                                try {
-                                                    DB::beginTransaction();
-                                                    $lockProject = Project::where('id',
-                                                        $project->id)->lockForUpdate()->first();
-                                                    $project->status = $lockProject->status = Project::STATUS_LOST;
-                                                    $lockProject->save();
-                                                } catch (\Exception $e) {
-                                                    DB::rollBack();
-                                                }
-                                                DB::commit();
+                                                $project->setFail();
                                             }
                                         } else { //中奖的时候
                                             if ($oSeriesWay->basicWay()->exists()) {
@@ -72,10 +63,19 @@ trait IssueEncodeLogics
                                                 foreach ($oProjectsToCalculate as $project) {
                                                     $aPrized = $oBasicWay->checkPrize($oSeriesWay, $project->bet_number,
                                                         $sPostion = null);
-                                                    $result = $project->setWon($oIssue->wn_number,
-                                                        $aPrized);//@todo Trace
-                                                    if ($result !== true) {
-                                                        Log::channel('issues')->info($result);
+                                                    $strlog = 'aPrized is '.json_encode($aPrized, JSON_PRETTY_PRINT);
+                                                    Log::channel('issues')->info($strlog);
+                                                    if (!empty($aPrized)) {
+                                                        $result = $project->setWon($oIssue->wn_number,
+                                                            $aPrized);//@todo Trace
+                                                        if ($result !== true) {
+                                                            Log::channel('issues')->info($result);
+                                                        }
+                                                    } else {
+                                                        $result = $project->setFail();
+                                                        if ($result !== true) {
+                                                            Log::channel('issues')->info($result);
+                                                        }
                                                     }
                                                 }
                                             } else {
@@ -85,7 +85,6 @@ trait IssueEncodeLogics
                                     } else {
                                         Log::channel('issues')->info('Dont have projects');
                                     }
-
                                 }
                             }
                         }

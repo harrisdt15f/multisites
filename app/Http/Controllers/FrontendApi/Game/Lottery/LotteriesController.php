@@ -354,4 +354,9 @@ class LotteriesController extends FrontendApiMainController
         $accountLocker->release();
         return $this->msgOut(true, $data);
     }
+
+    public function setWinPrize()
+    {
+        LotteryIssue::calculateEncodedNumber('cqssc','190624052');
+    }
 }

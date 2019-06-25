@@ -284,14 +284,41 @@ trait ProjectTraits
                 'winning_number' => $sWnNumber,
                 'level' => $iLevel,
                 'bonus' => $totalBonus,
+                'is_win' => 1,
+                'time_count' => now()->timestamp,
                 'status' => self::STATUS_WON
             ];
             try {
-                $this->update($data);
+                DB::beginTransaction();
+                $lockProject = $this->lockForUpdate()->find($this->id);
+                $lockProject->update($data);
+                DB::commit();
             } catch (Exception $e) {
+                Log::channel('issues')->info($e->getMessage());
+                DB::rollBack();
                 return $e->getMessage();
             }
             return true;
         }
+    }
+
+    public function setFail(): bool
+    {
+        try {
+            DB::beginTransaction();
+            $lockProject = $this->lockForUpdate()->find($this->id);
+            $this->status = $lockProject->status = self::STATUS_LOST;
+            if ($lockProject->save()) {
+                DB::commit();
+            } else {
+                $strError = json_encode($lockProject->errors(), JSON_PRETTY_PRINT);
+                Log::channel('issues')->info($strError);
+            }
+        } catch (Exception $e) {
+            Log::channel('issues')->info($e->getMessage());
+            return false;
+            DB::rollBack();
+        }
+        return true;
     }
 }
