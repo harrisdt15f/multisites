@@ -14,4 +14,8 @@ Route::group(['prefix' => 'user'], function () {
     //创建总代
     Route::match(['post', 'options'], 'detail', ['as' => $namePrefix . 'userDetail', 'uses' => $controller . 'userDetail']);
     Route::match(['get', 'options'], 'logout', ['as' => $namePrefix . 'logout', 'uses' => $controller . 'logout']);
+    //用户修改登录密码
+    Route::match(['post', 'options'], 'reset-user-password', ['as' => $namePrefix . 'reset-user-password', 'uses' => $controller . 'resetUserPassword']);
+    //用户修改资金密码
+    Route::match(['post', 'options'], 'reset-fund-password', ['as' => $namePrefix . 'reset-fund-password', 'uses' => $controller . 'resetFundPassword']);
 });

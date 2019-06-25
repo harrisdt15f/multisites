@@ -4,6 +4,8 @@ namespace App\Http\Controllers\FrontendApi;
 
 use App\Http\Requests\Frontend\FrontendAuthDeletePartnerAdminRequest;
 use App\Http\Requests\Frontend\FrontendAuthRegisterRequest;
+use App\Http\Requests\Frontend\FrontendAuthResetFundPasswordRequest;
+use App\Http\Requests\Frontend\FrontendAuthResetUserPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthSelfResetPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthUpdatePAdmPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthUpdateUserGroupRequest;
@@ -281,21 +283,68 @@ class FrontendAuthController extends FrontendApiMainController
         }
     }
 
-    public function updatePAdmPassword(FrontendAuthUpdatePAdmPasswordRequest $request) :  ? JsonResponse
+    /**
+     * 用户修改登录密码
+     * @param  FrontendAuthResetUserPasswordRequest $request
+     * @return JsonResponse
+     */
+    public function resetUserPassword(FrontendAuthResetUserPasswordRequest $request) : JsonResponse
     {
         $inputDatas = $request->validated();
+        return $this->commonHandleUserPassword($inputDatas, 1);
+    }
+
+    /**
+     * 用户修改资金密码
+     * @param  FrontendAuthResetFundPasswordRequest $request
+     * @return JsonResponse
+     */
+    public function resetFundPassword(FrontendAuthResetFundPasswordRequest $request): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $this->commonHandleUserPassword($inputDatas, 2);
+    }
+
+    /**
+     * 修改 用户密码1 资金密码2 共用处理
+     * @param  array  $inputDatas
+     * @param  int    $type
+     * @return JsonResponse
+     */
+    public function commonHandleUserPassword($inputDatas, $type): JsonResponse
+    {
         $targetUserEloq = $this->eloqM::where([
             ['id', '=', $inputDatas['id']],
-            ['name', '=', $inputDatas['name']],
+            ['username', '=', $inputDatas['username']],
         ])->first();
-        if ($targetUserEloq !== null) {
-            $targetUserEloq->password = Hash::make($inputDatas['password']);
-            if ($targetUserEloq->save()) {
-//用户更新密码
-                return $this->msgOut(true);
-            }
+        if ($targetUserEloq === null) {
+            return $this->msgOut(false, [], '100006');
+        }
+        if ($inputDatas['old_password'] === $inputDatas['new_password']) {
+            return $this->msgOut(false, [], '100007');
+        }
+        if ($inputDatas['new_password'] !== $inputDatas['confirm_password']) {
+            return $this->msgOut(false, [], '100008');
+        }
+        if ($type === 1) {
+            $field = 'password';
+            $oldPassword = $targetUserEloq->password;
+        } elseif ($type === 2) {
+            $field = 'fund_password';
+            $oldPassword = $targetUserEloq->fund_password;
         } else {
-            return $this->msgOut(false, [], '100004');
+            return $this->msgOut(false, [], '100010');
+        }
+        //校验密码
+        if (!Hash::check($inputDatas['old_password'], $oldPassword)) {
+            return $this->msgOut(false, [], '100009');
+        }
+        //修改密码
+        $targetUserEloq->$field = Hash::make($inputDatas['new_password']);
+        if ($targetUserEloq->save()) {
+            return $this->msgOut(true);
+        } else {
+            return $this->msgOut(false, [], '100011');
         }
     }
 }
