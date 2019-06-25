@@ -31,7 +31,7 @@ class LotteriesBetRequest extends BaseFormRequest
     {
         return [
             'lottery_sign' => 'required|string|min:4|max:10|exists:lottery_lists,en_name',
-            'trace_issues' => 'required',
+            'trace_issues.*' => 'required|integer|between:1,100',
 //            'trace_issues' => ['required', 'regex:/^\{(\d{9,15}\:(true|false)\,?)+\}$/'],
             //{20180405001:true,20180405001:false,20180405001:true}
 
@@ -49,6 +49,7 @@ class LotteriesBetRequest extends BaseFormRequest
             'trace_win_stop' => 'required|integer',
             'total_cost' => 'required|integer',
             'from' => 'integer',
+            'is_trace' => 'required|integer|in:0,1',
         ];
     }
 
