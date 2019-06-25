@@ -53,7 +53,7 @@ trait IssueEncodeLogics
                                         //不中奖的时候
                                         if ($oSeriesWay->WinningNumber === false) {
                                             foreach ($oProjectsToCalculate as $project) {
-                                                $project->setFail(null, $oIssue->official_code);
+                                                $project->setFail($oIssue->official_code);
                                             }
                                         } else { //中奖的时候
                                             $sWnNumber = current($oSeriesWay->WinningNumber);
@@ -64,7 +64,7 @@ trait IssueEncodeLogics
                                                         $sPostion = null);
                                                     $strlog = 'aPrized is '.json_encode($aPrized, JSON_PRETTY_PRINT);
                                                     Log::channel('issues')->info($strlog);
-                                                    $result = $project->setWon($sWnNumber,
+                                                    $result = $project->setWon($oIssue->official_code,$sWnNumber,
                                                         $aPrized);//@todo Trace
                                                     if ($result !== true) {
                                                         Log::channel('issues')->info($result);
