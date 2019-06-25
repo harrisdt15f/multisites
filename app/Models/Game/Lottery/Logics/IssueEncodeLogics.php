@@ -9,10 +9,8 @@
 namespace App\Models\Game\Lottery\Logics;
 
 use App\Models\Game\Lottery\LotteryIssue;
-use App\Models\Game\Lottery\LotterySerie;
 use App\Models\Game\Lottery\LotterySeriesMethod;
 use App\Models\Project;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 trait IssueEncodeLogics
@@ -55,24 +53,18 @@ trait IssueEncodeLogics
                                         //不中奖的时候
                                         if ($oSeriesWay->WinningNumber === false) {
                                             foreach ($oProjectsToCalculate as $project) {
-                                                try {
-                                                    DB::beginTransaction();
-                                                    $lockProject = Project::where('id',
-                                                        $project->id)->lockForUpdate()->first();
-                                                    $project->status = $lockProject->status = Project::STATUS_LOST;
-                                                    $lockProject->save();
-                                                } catch (\Exception $e) {
-                                                    DB::rollBack();
-                                                }
-                                                DB::commit();
+                                                $project->setFail(null, $oIssue->official_code);
                                             }
                                         } else { //中奖的时候
+                                            $sWnNumber = current($oSeriesWay->WinningNumber);
                                             if ($oSeriesWay->basicWay()->exists()) {
                                                 $oBasicWay = $oSeriesWay->basicWay;
                                                 foreach ($oProjectsToCalculate as $project) {
                                                     $aPrized = $oBasicWay->checkPrize($oSeriesWay, $project->bet_number,
                                                         $sPostion = null);
-                                                    $result = $project->setWon($oIssue->wn_number,
+                                                    $strlog = 'aPrized is '.json_encode($aPrized, JSON_PRETTY_PRINT);
+                                                    Log::channel('issues')->info($strlog);
+                                                    $result = $project->setWon($sWnNumber,
                                                         $aPrized);//@todo Trace
                                                     if ($result !== true) {
                                                         Log::channel('issues')->info($result);
@@ -85,7 +77,6 @@ trait IssueEncodeLogics
                                     } else {
                                         Log::channel('issues')->info('Dont have projects');
                                     }
-
                                 }
                             }
                         }

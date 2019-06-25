@@ -216,7 +216,7 @@ trait LotteryBasicMethodLogics
                     $p[] = '[\d]*'.$iDigital.'[\d]*';
                 }
                 $pattern = '/^'.implode('\|', $p).'$/';
-                $result = preg_match($pattern, $sBetNumber);
+                $result = (int)preg_match($pattern, $sBetNumber);
                 break;
             /**
              * 计算单区型组选复式的中奖注数
@@ -226,7 +226,7 @@ trait LotteryBasicMethodLogics
                     $aBetDigitals = str_split($sBetNumber);
                     $aWnDigitals = str_split($sWnNumber);
                     $aDiff = array_diff($aWnDigitals, $aBetDigitals);
-                    $result = intval(empty($aDiff));
+                    $result = (int)empty($aDiff);
                 } else {
                     $aBetNumber = explode($this->splitChar, $sBetNumber);
                     $aWnDigitals = array_count_values(str_split($sWnNumber));
@@ -235,7 +235,7 @@ trait LotteryBasicMethodLogics
                     $aDiffMax = array_diff($aWnMaxs, str_split($aBetNumber[0]));
                     $aDiffMin = isset($aBetNumber[1]) ? array_diff($aWnMins,
                         str_split($aBetNumber[1])) : array_diff($aWnMins, str_split($aBetNumber[0]));
-                    $result = intval(empty($aDiffMax) && empty($aDiffMin));
+                    $result = (int)(empty($aDiffMax) && empty($aDiffMin));
                 }
                 break;
             /**
@@ -279,7 +279,7 @@ trait LotteryBasicMethodLogics
                 $aDiffMax = array_diff($aWnMaxs, str_split($aBetNumber[0]));
                 $aDiffMin = isset($aBetNumber[1]) ? array_diff($aWnMins,
                     str_split($aBetNumber[1])) : array_diff($aWnMins, str_split($aBetNumber[0]));
-                $result = intval(empty($aDiffMax) && empty($aDiffMin));
+                $result = (int)(empty($aDiffMax) && empty($aDiffMin));
                 break;
             /**
              * 返回和尾的中奖注数
@@ -287,13 +287,13 @@ trait LotteryBasicMethodLogics
             case 'prizeSumTailSumTail'://prizeSumTailSum_tail
                 $iSumTail = DigitalNumber::getSumTail($sWnNumber);
                 $aBetNumbers = str_split($sBetNumber);
-                $result = intval(in_array((string)$iSumTail, $aBetNumbers, true));
+                $result = (int)in_array((string)$iSumTail, $aBetNumbers, true);
                 break;
             /**
              * 返回三星特殊的中奖注数
              */
             case 'prizeSpecialConstitutedSpecial':
-                $result = preg_match("/$sWnNumber/", $sBetNumber);
+                $result = (int)preg_match("/$sWnNumber/", $sBetNumber);
                 break;
             /**
              * 返回直选跨度的中奖注数
@@ -301,14 +301,14 @@ trait LotteryBasicMethodLogics
             case 'prizeSpanEqual':
                 $iSpan = DigitalNumber::getSpan($sWnNumber);
                 $aBetNumbers = str_split($sBetNumber);
-                $result = intval(in_array((string)$iSpan, $aBetNumbers, true));
+                $result = (int)in_array((string)$iSpan, $aBetNumbers, true);
                 break;
             /**
              * 返回组选包胆的中奖注数
              */
             case 'prizeNecessaryCombin':
                 $aWnDigitals = array_unique(str_split($sWnNumber));
-                $result = intval(in_array($sBetNumber, $aWnDigitals, true));
+                $result = (int)in_array($sBetNumber, $aWnDigitals, true);
                 break;
 
             case 'prizeSumEqual':
@@ -321,16 +321,16 @@ trait LotteryBasicMethodLogics
                  */
                 $iSum = DigitalNumber::getSum($sWnNumber);
                 $aBetNumbers = explode($this->splitChar, $sBetNumber);
-                $result = intval(in_array((string)$iSum, $aBetNumbers, true));
+                $result = (int)in_array((string)$iSum, $aBetNumbers, true);
                 break;
             case 'prizeMultiOneEqual':
                 /**
                  * 返回定位胆的中奖注数
                  */
-                $result = preg_match("/$sWnNumber/", $sBetNumber);
+                $result = (int)preg_match("/$sWnNumber/", $sBetNumber);
                 break;
             default:
-                $result = false;
+                $result = 0;
         }
         return $result;
     }
