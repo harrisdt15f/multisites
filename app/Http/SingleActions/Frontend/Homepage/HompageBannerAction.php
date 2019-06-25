@@ -6,7 +6,7 @@
  * Time: 11:53 AM
  */
 
-namespace App\Http\SingleActions;
+namespace App\Http\SingleActions\Frontend\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Models\Admin\Homepage\FrontendPageBanner;
@@ -27,6 +27,7 @@ class HompageBannerAction
     }
 
     /**
+     * 首页轮播图列表
      * @param  FrontendApiMainController  $contll
      * @return JsonResponse
      */
@@ -55,7 +56,6 @@ class HompageBannerAction
             }
             Cache::forever('homepageBanner', $datas);
         }
-        dd($contll);
         return $contll->msgOut(true, $datas);
     }
 
