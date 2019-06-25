@@ -248,7 +248,7 @@ class ArtificialRechargeController extends BackEndApiMainController
         $in_out = BackendAdminRechargehumanLog::DECREMENT;
         $comment = '[给用户人工充值]==>-' . $amount . '|[目前额度]==>' . $newFund;
         $fundOperationObj = new FundOperation();
-        $fundOperationObj->insertOperationDatas($rechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $userEloq->id, $userEloq->nickname, $amount, $comment, $auditFlowID);
+        $fundOperationObj->insertOperationDatas($rechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $userEloq->id, $userEloq->username, $amount, $comment, $auditFlowID);
     }
 
     /**
@@ -263,7 +263,7 @@ class ArtificialRechargeController extends BackEndApiMainController
     {
         $userRechargeHistory = new UsersRechargeHistorie();
         $status = $this->currentPartnerAccessGroup->role !== '*' ? UsersRechargeHistorie::UNDERWAYAUDIT : UsersRechargeHistorie::AUDITSUCCESS;
-        $rechargeHistoryArr = $this->insertRechargeHistoryArr($userEloq->id, $userEloq->nickname, $userEloq->is_tester, $userEloq->top_id, $amount, $auditFlowID, $status, $deposit_mode);
+        $rechargeHistoryArr = $this->insertRechargeHistoryArr($userEloq->id, $userEloq->username, $userEloq->is_tester, $userEloq->top_id, $amount, $auditFlowID, $status, $deposit_mode);
         $userRechargeHistory->fill($rechargeHistoryArr);
         $userRechargeHistory->save();
         return $userRechargeHistory->company_order_num;

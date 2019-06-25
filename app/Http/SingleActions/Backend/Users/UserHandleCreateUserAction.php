@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-24 20:26:17
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-24 20:34:13
+ * @Last Modified time: 2019-06-25 20:55:44
  */
 namespace App\Http\SingleActions\Backend\Users;
 
@@ -40,7 +40,6 @@ class UserHandleCreateUserAction
             return $contll->msgOut(false, [], '100106');
         }
         $currentPlatformEloq = Cache::get('currentPlatformEloq');
-        $inputDatas['nickname'] = $inputDatas['username'];
         $inputDatas['password'] = bcrypt($inputDatas['password']);
         $inputDatas['fund_password'] = bcrypt($inputDatas['fund_password']);
         $inputDatas['platform_id'] = $currentPlatformEloq->platform_id;
