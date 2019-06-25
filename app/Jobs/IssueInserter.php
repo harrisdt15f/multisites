@@ -34,9 +34,17 @@ class IssueInserter implements ShouldQueue
     public function handle()
     {
         try {
-            LotteryIssue::insert($this->datas);
-            $message = 'Finished >>>>' . json_encode($this->datas, JSON_UNESCAPED_UNICODE) . "\n";
-            Log::channel('issues')->info($message);
+            if (!empty($this->datas))
+            {
+                $message = 'started >>>>' . json_encode($this->datas, JSON_UNESCAPED_UNICODE) . "\n";
+                Log::channel('issues')->info($message);
+                foreach ($this->datas as $data)
+                {
+                    LotteryIssue::updateOrCreate($data);
+                    $message = 'Finished >>>>' . json_encode($data, JSON_UNESCAPED_UNICODE) . "\n";
+                    Log::channel('issues')->info($message);
+                }
+            }
         } catch (\Exception $e) {
             Log::channel('issues')->error($e->getMessage());
         }
