@@ -3,38 +3,34 @@
 namespace App\Http\Controllers\FrontendApi\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Http\SingleActions\HompageBannerAction;
-use App\Models\Admin\Activity\FrontendActivityContent;
-use App\Models\Admin\Homepage\FrontendLotteryFnfBetableList;
-use App\Models\Admin\Homepage\FrontendLotteryRedirectBetList;
-use App\Models\Admin\Notice\FrontendMessageNotice;
+use App\Http\SingleActions\Frontend\Homepage\HomepageShowHomepageModelAction;
+use App\Http\SingleActions\Frontend\Homepage\HompageActivityAction;
+use App\Http\SingleActions\Frontend\Homepage\HompageBannerAction;
+use App\Http\SingleActions\Frontend\Homepage\HompageIcoAction;
+use App\Http\SingleActions\Frontend\Homepage\HompageLogoAction;
+use App\Http\SingleActions\Frontend\Homepage\HompageNoticeAction;
+use App\Http\SingleActions\Frontend\Homepage\HompagePopularLotteriesAction;
+use App\Http\SingleActions\Frontend\Homepage\HompagePopularMethodsAction;
+use App\Http\SingleActions\Frontend\Homepage\HompageQrCodeAction;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cache;
 
 class HomepageController extends FrontendApiMainController
 {
     public $eloqM = 'DeveloperUsage\Frontend\FrontendAllocatedModel';
     public $offMsg = '当前模块为关闭状态';
 
-    //需要展示的前台模块
-    public function showHomepageModel()
+    /**
+     * 需要展示的前台模块
+     * @param  HomepageShowHomepageModelAction $action
+     * @return JsonResponse
+     */
+    public function showHomepageModel(HomepageShowHomepageModelAction $action): JsonResponse
     {
-        if (Cache::has('showModel')) {
-            $data = Cache::get('showModel');
-        } else {
-            $homepageModel = $this->eloqM::select('en_name', 'status')->where('is_homepage_display', 1)->get();
-            $data = [];
-            foreach ($homepageModel as $value) {
-                $data[$value->en_name] = $value->status;
-            }
-            Cache::forever('showModel', $data);
-        }
-        return $this->msgOut(true, $data);
+        return $action->execute($this);
     }
 
-
     /**
-     * 轮播图
+     * 首页轮播图列表
      * @param  HompageBannerAction  $action
      * @return JsonResponse
      */
@@ -43,132 +39,73 @@ class HomepageController extends FrontendApiMainController
         return $action->execute($this);
     }
 
-    //热门彩票
-    public function popularLotteries()
+    /**
+     * 热门彩票一
+     * @param  HompagePopularLotteriesAction $action
+     * @return JsonResponse
+     */
+    public function popularLotteries(HompagePopularLotteriesAction $action): JsonResponse
     {
-        if (Cache::has('popularLotteries')) {
-            $datas = Cache::get('popularLotteries');
-        } else {
-            $lotteriesEloq = $this->eloqM::select('show_num', 'status')->where('en_name', 'popularLotteries.one')->first();
-            if ($lotteriesEloq->status !== 1) {
-                return $this->msgOut(false, [], '400', $this->offMsg);
-            }
-            $dataEloq = FrontendLotteryRedirectBetList::select('id', 'lotteries_id', 'pic_path')->with(['lotteries' => function ($query) {
-                $query->select('id', 'day_issue', 'en_name');
-            }])->orderBy('sort', 'asc')->limit($lotteriesEloq->show_num)->get();
-            $datas = [];
-            foreach ($dataEloq as $key => $dataIthem) {
-                $datas[$key]['en_name'] = $dataIthem->lotteries->en_name;
-                $datas[$key]['pic_path'] = $dataIthem->pic_path;
-                $datas[$key]['day_issue'] = $dataIthem->lotteries->day_issue;
-            }
-            Cache::forever('popularLotteries', $datas);
-        }
-        return $this->msgOut(true, $datas);
+        return $action->execute($this);
     }
 
-    //热门玩法
-    public function popularMethods()
+    /**
+     * 热门彩票二-玩法
+     * @param  HompagePopularMethodsAction $action
+     * @return JsonResponse
+     */
+    public function popularMethods(HompagePopularMethodsAction $action): JsonResponse
     {
-        if (Cache::has('popularMethods')) {
-            $datas = Cache::get('popularMethods');
-        } else {
-            $lotteriesEloq = $this->eloqM::select('show_num', 'status')->where('en_name', 'popularLotteries.two')->first();
-            if ($lotteriesEloq->status !== 1) {
-                return $this->msgOut(false, [], '400', $this->offMsg);
-            }
-            $methodsEloq = FrontendLotteryFnfBetableList::orderBy('sort', 'asc')->limit($lotteriesEloq->show_num)->with('method')->get();
-            $datas = [];
-            foreach ($methodsEloq as $method) {
-                $data = [
-                    'method_id' => $method->method_id,
-                    'lottery_name' => $method->method->lottery_name,
-                    'method_name' => $method->method->method_name,
-                ];
-                $datas[] = $data;
-            }
-            Cache::forever('popularMethods', $datas);
-        }
-        return $this->msgOut(true, $datas);
+        return $action->execute($this);
     }
 
-    //二维码
-    public function qrCode()
+    /**
+     * 首页二维码
+     * @param  HompageQrCodeAction $action
+     * @return JsonResponse
+     */
+    public function qrCode(HompageQrCodeAction $action): JsonResponse
     {
-        if (Cache::has('homepageQrCode')) {
-            $data = Cache::get('homepageQrCode');
-        } else {
-            $data = $this->eloqM::select('value', 'status')->where('en_name', 'qr.code')->first()->toArray();
-            if ($data['status'] !== 1) {
-                return $this->msgOut(false, [], '400', $this->offMsg);
-            }
-            unset($data['status']);
-            Cache::forever('homepageQrCode', $data);
-        }
-        return $this->msgOut(true, $data);
+        return $action->execute($this);
     }
 
-    //活动
-    public function activity()
+    /**
+     * 首页活动列表
+     * @param  HompageActivityAction $action
+     * @return JsonResponse
+     */
+    public function activity(HompageActivityAction $action): JsonResponse
     {
-        if (Cache::has('homepageActivity')) {
-            $data = Cache::get('homepageActivity');
-        } else {
-            $activityEloq = $this->eloqM::select('show_num', 'status')->where('en_name', 'activity')->first();
-            if ($activityEloq->status !== 1) {
-                return $this->msgOut(false, [], '400', $this->offMsg);
-            }
-            $data = FrontendActivityContent::select('id', 'title', 'content', 'thumbnail_path', 'redirect_url')->where('status', 1)->orderBy('sort', 'asc')->limit($activityEloq->show_num)->get()->toArray();
-            Cache::forever('homepageActivity', $data);
-        }
-        return $this->msgOut(true, $data);
+        return $action->execute($this);
     }
 
-    //LOGO
-    public function logo()
+    /**
+     * 首页LOGO
+     * @param  HompageLogoAction $action
+     * @return JsonResponse
+     */
+    public function logo(HompageLogoAction $action): JsonResponse
     {
-        if (Cache::has('homepageLogo')) {
-            $data = Cache::get('homepageLogo');
-        } else {
-            $data = $this->eloqM::select('value', 'status')->where('en_name', 'logo')->first()->toArray();
-            if ($data['status'] !== 1) {
-                return $this->msgOut(false, [], '400', $this->offMsg);
-            }
-            unset($data['status']);
-            Cache::forever('homepageLogo', $data);
-        }
-        return $this->msgOut(true, $data);
+        return $action->execute($this);
     }
 
-    //公告
-    public function notice()
+    /**
+     * 首页公告列表
+     * @param  HompageNoticeAction $action
+     * @return JsonResponse
+     */
+    public function notice(HompageNoticeAction $action): JsonResponse
     {
-        if (Cache::has('homepageNotice')) {
-            $datas = Cache::get('homepageNotice');
-        } else {
-            $noticeEloq = $this->eloqM::select('show_num', 'status')->where('en_name', 'notice')->first();
-            if ($noticeEloq->status !== 1) {
-                return $this->msgOut(false, [], '400', $this->offMsg);
-            }
-            $datas = FrontendMessageNotice::select('id', 'title')->where('status', 1)->orderBy('sort', 'asc')->limit($noticeEloq->show_num)->get();
-            Cache::forever('homepageNotice', $datas);
-        }
-        return $this->msgOut(true, $datas);
+        return $action->execute($this);
     }
 
-    //前台网站头ico
-    public function ico()
+    /**
+     * 前台网站头ico
+     * @param  HompageIcoAction $action
+     * @return JsonResponse
+     */
+    public function ico(HompageIcoAction $action): JsonResponse
     {
-        if (Cache::has('homepageIco')) {
-            $data = Cache::get('homepageIco');
-        } else {
-            $icoEloq = $this->eloqM::select('value', 'status')->where('en_name', 'frontend.ico')->first();
-            if ($icoEloq->status !== 1) {
-                return $this->msgOut(false, [], '400', $this->offMsg);
-            };
-            $data = $icoEloq->value;
-            Cache::forever('homepageIco', $data);
-        }
-        return $this->msgOut(true, $data);
+        return $action->execute($this);
     }
 }
