@@ -181,7 +181,11 @@ class LotteriesController extends FrontendApiMainController
         return $this->msgOut(true, $data);
     }
 
-    public function projectHistory(LotteriesProjectHistoryRequest $request)
+    /**
+     * @param  LotteriesProjectHistoryRequest  $request
+     * @return JsonResponse
+     */
+    public function projectHistory(LotteriesProjectHistoryRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         $lotterySign = $inputDatas['lottery_sign'] ?? '*';

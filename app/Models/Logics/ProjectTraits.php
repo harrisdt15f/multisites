@@ -57,10 +57,10 @@ trait ProjectTraits
         }
         $projectData = [];
         $where = $lotterySign === '*' ? ['lottery_sign' => ['!=', null]] : [];
-        $projectList = self::orderBy('id', 'desc')->where(function ($query) use ($lotterySign) {
+        $projectList = self::orderBy('id', 'desc')->where(static function ($query) use ($lotterySign) {
             if ($lotterySign !== '*') {
                 $query->where('lottery_sign', '=', $lotterySign);
-            };
+            }
         })->skip($start)->take($count)->get();
         foreach ($projectList as $item) {
             $projectData[] = [
@@ -70,8 +70,9 @@ trait ProjectTraits
                 'issue' => $item->issue,
                 'open_codes' => $item->open_number,
                 'bet_codes' => $item->bet_number,
-                'total_cost' => $item->cost,
-                'prize' => $item->total_prize,
+                'total_cost' => $item->total_cost,
+                'single_price' => $item->price,
+                'bonus' =>$item->bonus,
                 'prize_group' => $item->bet_prize_group,
                 'status' => $item->status,
             ];
@@ -264,11 +265,12 @@ trait ProjectTraits
     }
 
     /**
+     * @param $openNumber
      * @param $sWnNumber
      * @param $aPrized
      * @return bool|string
      */
-    public function setWon($sWnNumber, $aPrized)
+    public function setWon($openNumber, $sWnNumber, $aPrized)
     {
         $totalBonus = 0;
         foreach ($aPrized as $iBasicMethodId => $aPrizeOfBasicMethod) {
@@ -278,8 +280,7 @@ trait ProjectTraits
                 ['basic_method_id', '=', $iBasicMethodId],
                 ['level', '=', $iLevel]
             ])->first();
-            if ($iCount>0)
-            {
+            if ($iCount > 0) {
                 $bonus = $this->bet_prize_group * $PrizeEloq->prize / 1800;
                 $bonus = $bonus * $iCount * $this->times * $this->mode;
                 if ($this->price === 1) {
@@ -288,6 +289,7 @@ trait ProjectTraits
                 $totalBonus += $bonus;
                 $data = [
                     'basic_method_id' => $iBasicMethodId,
+                    'open_number' => $openNumber,
                     'winning_number' => $sWnNumber,
                     'level' => $iLevel,
                     'bonus' => $totalBonus,
@@ -305,20 +307,20 @@ trait ProjectTraits
                     DB::rollBack();
                     return $e->getMessage();
                 }
-            }
-            else{
-                $this->setFail($iBasicMethodId,$sWnNumber);
+            } else {
+                $this->setFail($openNumber, $sWnNumber, $iBasicMethodId);
             }
             return true;
         }
     }
 
     /**
-     * @param $iBasicMethodId
+     * @param $openNumber
      * @param $sWnNumber
+     * @param $iBasicMethodId
      * @return bool
      */
-    public function setFail($iBasicMethodId,$sWnNumber): bool
+    public function setFail($openNumber, $sWnNumber = null, $iBasicMethodId = null): bool
     {
         try {
             DB::beginTransaction();
@@ -326,6 +328,7 @@ trait ProjectTraits
             $this->status = $lockProject->status = self::STATUS_LOST;
             $data = [
                 'basic_method_id' => $iBasicMethodId,
+                'open_number' => $openNumber,
                 'winning_number' => $sWnNumber,
                 'time_count' => now()->timestamp,
                 'status' => self::STATUS_LOST
