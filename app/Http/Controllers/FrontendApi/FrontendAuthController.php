@@ -362,8 +362,13 @@ class FrontendAuthController extends FrontendApiMainController
         return $this->msgOut(true, $status);
     }
 
-    //用户设置详细信息
-    public function resetSpecificInfos(FrontendAuthResetSpecificInfosRequest $request, FrontendAuthResetSpecificInfosAction $action)
+    /**
+     * 用户设置详细信息
+     * @param  FrontendAuthResetSpecificInfosRequest $request
+     * @param  FrontendAuthResetSpecificInfosAction  $action
+     * @return JsonResponse
+     */
+    public function resetSpecificInfos(FrontendAuthResetSpecificInfosRequest $request, FrontendAuthResetSpecificInfosAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);

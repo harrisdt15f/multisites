@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-26 11:03:18
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-26 11:16:48
+ * @Last Modified time: 2019-06-26 11:49:06
  */
 namespace App\Http\SingleActions\Frontend;
 
@@ -35,8 +35,4 @@ class FrontendAuthResetSpecificInfosAction
             return $contll->msgOut(false, [], '100012');
         }
     }
-
-    // public function createSpecificInfo($id,$inputDatas){
-
-    // }
 }

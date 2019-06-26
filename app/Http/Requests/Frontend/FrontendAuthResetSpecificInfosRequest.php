@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-25 21:48:02
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-26 10:54:44
+ * @Last Modified time: 2019-06-26 12:24:39
  */
 namespace App\Http\Requests\Frontend;
 
@@ -30,12 +30,12 @@ class FrontendAuthResetSpecificInfosRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'nickname' => 'required|string',
-            'realname' => 'required|string',
-            'mobile' => ['required', 'regex:/^0?(13[0-9]|15[012356789]|18[0-9]|14[57])[0-9]{8}$/'],
-            'email' => 'required|email',
-            'zip_code' => ['required', 'regex:/^\d{6}$/'],
-            'address' => 'required|string',
+            'nickname' => 'required|string', //称昵
+            'realname' => 'required|string', //真实姓名
+            'mobile' => ['required', 'regex:/^0?(13[0-9]|15[012356789]|18[0-9]|14[57])[0-9]{8}$/'], //手机号码
+            'email' => 'required|email', //邮箱
+            'zip_code' => ['required', 'regex:/^\d{6}$/'], //邮编
+            'address' => 'required|string', //地址
         ];
     }
 
