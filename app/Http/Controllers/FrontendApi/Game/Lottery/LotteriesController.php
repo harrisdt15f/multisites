@@ -95,6 +95,7 @@ class LotteriesController extends FrontendApiMainController
         $lottery = LotteryList::getLottery($lotterySign);
         $betDetail = [];
         $_totalCost = 0;
+        $singleCost = 0;
         // 初次解析
         $_balls = [];
         foreach ($inputDatas['balls'] as $item) {
@@ -162,16 +163,10 @@ class LotteriesController extends FrontendApiMainController
             if (!$lottery->isValidTimes($times)) {
                 return $this->msgOut(false, [], '', "对不起, 倍数{$times}, 不合法!");
             }
-            $price = (int)$item['price'];
-            $priceConfig = config('game.main.price', [1, 2]);
-            if (!$price || !in_array($price, $priceConfig)) {
-                return $this->msgOut(false, [], '', "对不起, 单价{$price}, 不合法!");
-            }
-
             // 单价花费
-            $singleCost = $mode * $times * $price * $item['count'];
+            $singleCost = $mode * $times * $item['price'] * $item['count'];
             if ($singleCost !== $item['cost']) {
-                return $this->msgOut(false, [], '', '对不起, 总价计算错误!');
+                return $this->msgOut(false, [], '', '对不起, 单价不符合!');
             }
             $_totalCost += $singleCost;
             $betDetail[] = [
@@ -180,10 +175,22 @@ class LotteriesController extends FrontendApiMainController
                 'mode' => $mode,
                 'prize_group' => $prizeGroup,
                 'times' => $times,
-                'price' => $price,
+                'price' => $item['price'],
                 'total_price' => $singleCost,
                 'code' => $ball,
             ];
+        }
+        if ((int)$inputDatas['is_trace'] === 1) {
+            $i = 0;
+            foreach ($inputDatas['trace_issues'] as $traceMultiple) {
+                if ($i++ < 1) {
+                    continue;
+                }
+                $_totalCost += $traceMultiple * $singleCost;
+            }
+        }
+        if ($_totalCost !== (int)$inputDatas['total_cost']) {
+            return $this->msgOut(false, [], '', '对不起, 总价不符合!');
         }
         // 投注期号
         $traceData = array_keys($inputDatas['trace_issues']);
@@ -195,7 +202,7 @@ class LotteriesController extends FrontendApiMainController
         if (count($traceData) !== $traceDataCollection->count()) {
             return $this->msgOut(false, [], '', '对不起, 追号奖期不正确!');
         }
-        // 获取当前奖期
+        // 获取当前奖期 @todo 判断过期 还是其他期
         $currentIssue = LotteryIssue::getCurrentIssue($lottery->en_name);
         if (!$currentIssue) {
             return $this->msgOut(false, [], '', '对不起, 奖期已过期!');
