@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-25 16:30:35
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-25 17:44:50
+ * @Last Modified time: 2019-06-26 16:46:48
  */
 namespace App\Http\Requests\Frontend\User\Fund;
 
@@ -30,13 +30,13 @@ class UserBankCardAddRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'owner_name' => 'required|string',
-            'bank_sign' => 'required|alpha',
-            'bank_name' => 'required|string',
-            'card_number' => 'required|integer',
-            'province_id' => 'required|exists:users_regions,id',
-            'city_id' => 'required|exists:users_regions,id',
-            'branch' => 'required|string',
+            'owner_name' => 'required|string', //姓名
+            'bank_sign' => 'required|alpha', //银行code
+            'bank_name' => 'required|string', //银行名称
+            'card_number' => ['required', 'regex:/^(\d{15}|\d{16}|\d{19})$/'], //银行卡号
+            'province_id' => 'required|exists:users_regions,id', //省份id
+            'city_id' => 'required|exists:users_regions,id', //城市id
+            'branch' => 'required|string', //支行
         ];
     }
 

@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-25 16:59:44
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-25 17:19:33
+ * @Last Modified time: 2019-06-26 16:49:51
  */
 namespace App\Http\SingleActions\Frontend\User\Fund;
 
@@ -28,13 +28,12 @@ class UserBankCardDeleteAction
      * 用户删除绑定银行卡
      * @param  FrontendApiMainController  $contll
      * @param  $inputDatas
-     * @param  $userid
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $inputDatas, $userid): JsonResponse
+    public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
     {
         $bankCardEloq = $this->model::find($inputDatas['id']);
-        if ($bankCardEloq->user_id != $userid) {
+        if ($bankCardEloq->user_id != $contll->partnerAdmin->id) {
             return $contll->msgOut(false, [], '100200');
         }
         if ($bankCardEloq->delete()) {

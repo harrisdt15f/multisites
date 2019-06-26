@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-25 16:57:54
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-25 19:02:10
+ * @Last Modified time: 2019-06-26 16:49:23
  */
 namespace App\Http\SingleActions\Frontend\User\Fund;
 
@@ -31,26 +31,25 @@ class UserBankCardAddAction
      * 用户添加绑定银行卡
      * @param  FrontendApiMainController  $contll
      * @param  $inputDatas
-     * @param  $userEloq
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $inputDatas, $userEloq): JsonResponse
+    public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
     {
         $configEloq = SystemConfiguration::where('sign', $this->numberSign)->first();
         if ($configEloq === null) {
             $configEloq = $this->createConfig();
         }
         $maxNumber = $configEloq->value;
-        $nowNumber = $this->model::where('user_id', $userEloq->id)->count();
+        $nowNumber = $this->model::where('user_id', $contll->partnerAdmin->id)->count();
         if ($nowNumber >= $maxNumber) {
             return $contll->msgOut(false, [], '100202');
         }
         $addData = [
-            'user_id' => $userEloq->id,
-            'parent_id' => $userEloq->parent_id,
-            'top_id' => $userEloq->top_id,
-            'rid' => $userEloq->rid,
-            'username' => $userEloq->username,
+            'user_id' => $contll->partnerAdmin->id,
+            'parent_id' => $contll->partnerAdmin->parent_id,
+            'top_id' => $contll->partnerAdmin->top_id,
+            'rid' => $contll->partnerAdmin->rid,
+            'username' => $contll->partnerAdmin->username,
             'bank_sign' => $inputDatas['bank_sign'],
             'bank_name' => $inputDatas['bank_name'],
             'owner_name' => $inputDatas['owner_name'],

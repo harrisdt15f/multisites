@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-25 16:23:01
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-25 16:57:37
+ * @Last Modified time: 2019-06-26 16:28:42
  */
 namespace App\Http\SingleActions\Frontend\User\Fund;
 
@@ -31,6 +31,7 @@ class UserBankCardListsAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        return $contll->msgOut(true);
+        $data = $this->model::select('id', 'bank_sign', 'bank_name', 'owner_name', 'card_number', 'branch', 'status')->where('user_id', $contll->partnerAdmin->id)->get()->toArray();
+        return $contll->msgOut(true, $data);
     }
 }

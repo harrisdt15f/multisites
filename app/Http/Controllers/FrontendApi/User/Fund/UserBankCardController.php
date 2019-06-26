@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-25 16:20:55
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-25 20:03:17
+ * @Last Modified time: 2019-06-26 16:50:38
  */
 
 namespace App\Http\Controllers\FrontendApi\User\Fund;
@@ -23,40 +23,67 @@ use Illuminate\Http\JsonResponse;
 
 class UserBankCardController extends FrontendApiMainController
 {
-    //用户银行卡列表
-    public function lists(): JsonResponse
+    /**
+     * 用户银行卡列表
+     * @param  UserBankCardListsAction $action
+     * @return JsonResponse
+     */
+    public function lists(UserBankCardListsAction $action): JsonResponse
     {
         return $action->execute($this);
     }
 
-    //用户添加绑定银行卡
+    /**
+     * 用户添加绑定银行卡
+     * @param UserBankCardAddRequest $request
+     * @param UserBankCardAddAction  $action
+     * @return JsonResponse
+     */
     public function add(UserBankCardAddRequest $request, UserBankCardAddAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        return $action->execute($this, $inputDatas, $this->partnerAdmin);
+        return $action->execute($this, $inputDatas);
     }
 
-    //用户删除绑定银行卡
+    /**
+     * 用户删除绑定银行卡
+     * @param  UserBankCardDeleteRequest $request
+     * @param  UserBankCardDeleteAction  $action
+     * @return JsonResponse
+     */
     public function delete(UserBankCardDeleteRequest $request, UserBankCardDeleteAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        return $action->execute($this, $inputDatas, $this->partnerAdmin->id);
+        return $action->execute($this, $inputDatas);
     }
 
-    //添加银行卡时选择的银行列表
-    public function bankLists(UserBankBankListsAction $action)
+    /**
+     * 添加银行卡时选择的银行列表
+     * @param  UserBankBankListsAction $action
+     * @return JsonResponse
+     */
+    public function bankLists(UserBankBankListsAction $action): JsonResponse
     {
         return $action->execute($this);
     }
 
-    //添加银行卡时选择的省份列表
-    public function provinceLists(UserBankProvinceListsAction $action)
+    /**
+     * 添加银行卡时选择的省份列表
+     * @param  UserBankProvinceListsAction $action
+     * @return JsonResponse
+     */
+    public function provinceLists(UserBankProvinceListsAction $action): JsonResponse
     {
         return $action->execute($this);
     }
 
-    //添加银行卡时选择的城市列表
-    public function cityLists(UserBankCityListsRequest $request, UserBankCityListsAction $action)
+    /**
+     * 添加银行卡时选择的城市列表
+     * @param  UserBankCityListsRequest $request
+     * @param  UserBankCityListsAction  $action
+     * @return JsonResponse
+     */
+    public function cityLists(UserBankCityListsRequest $request, UserBankCityListsAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
