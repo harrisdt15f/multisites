@@ -8,9 +8,11 @@ use App\Http\Requests\Frontend\FrontendAuthResetFundPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthResetSpecificInfosRequest;
 use App\Http\Requests\Frontend\FrontendAuthResetUserPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthSelfResetPasswordRequest;
+use App\Http\Requests\Frontend\FrontendAuthSetFundPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthUpdatePAdmPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthUpdateUserGroupRequest;
 use App\Http\SingleActions\Frontend\FrontendAuthResetSpecificInfosAction;
+use App\Http\SingleActions\Frontend\FrontendAuthSetFundPasswordAction;
 use App\Http\SingleActions\Frontend\FrontendAuthUserSpecificInfosAction;
 use App\Models\Admin\BackendAdminAccessGroup;
 use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
@@ -359,6 +361,12 @@ class FrontendAuthController extends FrontendApiMainController
         return $this->msgOut(true, $status);
     }
 
+    //用户设置资金密码
+    public function setFundPassword(FrontendAuthSetFundPasswordRequest $request, FrontendAuthSetFundPasswordAction $action): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
+    }
     /**
      * 用户个人信息
      * @param  FrontendAuthUserSpecificInfosAction $action

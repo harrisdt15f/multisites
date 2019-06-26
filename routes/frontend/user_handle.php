@@ -20,6 +20,8 @@ Route::group(['prefix' => 'user'], function () {
     Route::match(['post', 'options'], 'reset-fund-password', ['as' => $namePrefix . 'reset-fund-password', 'uses' => $controller . 'resetFundPassword']);
     //用户是否设置了资金密码
     Route::match(['get', 'options'], 'exist-fund-password', ['as' => $namePrefix . 'exist-fund-password', 'uses' => $controller . 'isExistFundPassword']);
+    //用户设置资金密码
+    Route::match(['post', 'options'], 'set-fund-password', ['as' => $namePrefix . 'set-fund-password', 'uses' => $controller . 'setFundPassword']);
     //用户个人资料列表
     Route::match(['get', 'options'], 'user-specific-infos', ['as' => $namePrefix . 'user-specific-infos', 'uses' => $controller . 'UserSpecificInfos']);
     //用户设置个人资料
