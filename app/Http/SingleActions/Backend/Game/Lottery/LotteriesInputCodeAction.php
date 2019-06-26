@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-24 17:47:58
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-24 22:10:31
+ * @Last Modified time: 2019-06-26 11:41:43
  */
 namespace App\Http\SingleActions\Backend\Game\Lottery;
 
@@ -40,6 +40,8 @@ class LotteriesInputCodeAction
             $issueEloq->status_encode = $status_encode;
             $issueEloq->encode_time = time();
             $issueEloq->official_code = $inputDatas['code'];
+            $issueEloq->encode_id = $contll->partnerAdmin->id;
+            $issueEloq->encode_name = $contll->partnerAdmin->name;
             $issueEloq->save();
             if (!empty($issueEloq->toArray())) {
                 dispatch(new IssueEncoder($issueEloq->toArray()))->onQueue('issues');
