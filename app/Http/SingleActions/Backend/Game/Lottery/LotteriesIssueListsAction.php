@@ -55,17 +55,17 @@ class LotteriesIssueListsAction
         $isExistField = arr::has($contll->inputs, $searchFieldArr);
         if ($isExistField === false) {
             //如果直接按时间段搜索时执行
-            if (isset($contll->inputs['begin_time']) && isset($contll->inputs['end_time'])) {
+            if (isset($contll->inputs['begin_time'], $contll->inputs['end_time'])) {
                 $timeCondtions = '[["end_time",">=",' . $contll->inputs['begin_time'] . '],["end_time","<=",' . $contll->inputs['end_time'] . ']]';
             } else {
-                $previousTime = 20;
+                $timeToSubstract = 20;
                 //选定彩种并展示已过期的期数
-                if (isset($contll->inputs['lottery_id']) && isset($contll->inputs['previous_number'])) {
+                if (isset($contll->inputs['lottery_id'], $contll->inputs['previous_number'])) {
                     $lotteryEloq = LotteryList::where('en_name', $contll->inputs['lottery_id'])->first();
                     $issueSeconds = $lotteryEloq->issueRule->issue_seconds;
-                    $previousTime = ($issueSeconds * $contll->inputs['previous_number']) / 60;
+                    $timeToSubstract = ($issueSeconds * $contll->inputs['previous_number']) / 60;
                 }
-                $afewMinutes = Carbon::now()->subMinute($previousTime)->timestamp;
+                $afewMinutes = Carbon::now()->subMinute($timeToSubstract)->timestamp;
                 $timeCondtions = '[["end_time",">=",' . $afewMinutes . ']]';
             }
             $contll->inputs['time_condtions'] = $contll->inputs['time_condtions'] ?? $timeCondtions; // 从现在开始。如果。没有时间字段的话，就用当前时间以上的显示
