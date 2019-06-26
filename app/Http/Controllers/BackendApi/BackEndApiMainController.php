@@ -20,7 +20,7 @@ use Illuminate\Support\Str;
 class BackEndApiMainController extends Controller
 {
     public $inputs;
-    protected $partnerAdmin; //当前的商户用户
+    public $partnerAdmin; //当前的商户用户
     protected $currentOptRoute; //目前路由
     protected $fullMenuLists; //所有的菜单
     protected $currentPlatformEloq = null; //当前商户存在的平台

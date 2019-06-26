@@ -2,15 +2,15 @@
 
 /**
  * @Author: LingPh
- * @Date:   2019-06-25 14:30:45
+ * @Date:   2019-06-25 21:48:02
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-26 10:31:22
+ * @Last Modified time: 2019-06-26 10:54:44
  */
 namespace App\Http\Requests\Frontend;
 
 use App\Http\Requests\BaseFormRequest;
 
-class FrontendAuthResetUserPasswordRequest extends BaseFormRequest
+class FrontendAuthResetSpecificInfosRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -30,11 +30,12 @@ class FrontendAuthResetUserPasswordRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            // 'id' => 'required|numeric|exists:frontend_users',
-            // 'username' => 'required|exists:frontend_users',
-            'old_password' => 'required|string',
-            'new_password' => 'required|string',
-            'confirm_password' => 'required|string',
+            'nickname' => 'required|string',
+            'realname' => 'required|string',
+            'mobile' => ['required', 'regex:/^0?(13[0-9]|15[012356789]|18[0-9]|14[57])[0-9]{8}$/'],
+            'email' => 'required|email',
+            'zip_code' => ['required', 'regex:/^\d{6}$/'],
+            'address' => 'required|string',
         ];
     }
 

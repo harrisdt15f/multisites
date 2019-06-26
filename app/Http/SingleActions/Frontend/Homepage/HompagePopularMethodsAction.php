@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-25 11:24:17
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-25 11:27:56
+ * @Last Modified time: 2019-06-26 10:59:24
  */
 namespace App\Http\SingleActions\Frontend\Homepage;
 
@@ -45,6 +45,7 @@ class HompagePopularMethodsAction
             $datas = [];
             foreach ($methodsEloq as $method) {
                 $data = [
+                    'lotteries_id' => $method->lotteries_id,
                     'method_id' => $method->method_id,
                     'lottery_name' => $method->method->lottery_name,
                     'method_name' => $method->method->method_name,
