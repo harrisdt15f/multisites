@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-25 11:24:17
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-26 10:59:24
+ * @Last Modified time: 2019-06-26 20:38:53
  */
 namespace App\Http\SingleActions\Frontend\Homepage;
 
@@ -19,7 +19,6 @@ class HompagePopularMethodsAction
     protected $model;
 
     /**
-     * HompageBanner constructor.
      * @param  FrontendAllocatedModel  $frontendAllocatedModel
      */
     public function __construct(FrontendAllocatedModel $frontendAllocatedModel)

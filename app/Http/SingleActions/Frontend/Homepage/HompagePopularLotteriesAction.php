@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-25 11:13:31
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-25 11:20:24
+ * @Last Modified time: 2019-06-26 20:38:48
  */
 namespace App\Http\SingleActions\Frontend\Homepage;
 
@@ -20,7 +20,6 @@ class HompagePopularLotteriesAction
     protected $model;
 
     /**
-     * HompageBanner constructor.
      * @param  FrontendAllocatedModel  $frontendAllocatedModel
      */
     public function __construct(FrontendAllocatedModel $frontendAllocatedModel)

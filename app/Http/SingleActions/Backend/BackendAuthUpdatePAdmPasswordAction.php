@@ -4,13 +4,14 @@
  * @Author: LingPh
  * @Date:   2019-06-26 19:06:15
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-26 19:33:25
+ * @Last Modified time: 2019-06-26 20:13:34
  */
 namespace App\Http\SingleActions\Backend;
 
 use App\Http\Controllers\backendApi\BackEndApiMainController;
 use App\Models\Admin\BackendAdminUser;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Hash;
 
 class BackendAuthUpdatePAdmPasswordAction
 {
