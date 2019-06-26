@@ -4,13 +4,12 @@
  * @Author: LingPh
  * @Date:   2019-06-24 20:26:17
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-25 21:27:16
+ * @Last Modified time: 2019-06-25 22:00:01
  */
 namespace App\Http\SingleActions\Backend\Users;
 
 use App\Http\Controllers\backendApi\BackEndApiMainController;
 use App\Models\User\FrontendUser;
-use App\Models\User\FrontendUsersSpecificInfo;
 use App\Models\User\Fund\FrontendUsersAccount;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -61,10 +60,7 @@ class UserHandleCreateUserAction
             ];
             $userAccountEloq = $userAccountEloq->fill($userAccountData);
             $userAccountEloq->save();
-            $specificInfoEloq = new FrontendUsersSpecificInfo();
-            $specificInfoEloq->save();
             $user->account_id = $userAccountEloq->id;
-            $user->user_specific_id = $specificInfoEloq->id;
             $user->save();
             DB::commit();
             $data['name'] = $user->username;

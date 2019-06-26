@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 class FrontendApiMainController extends Controller
 {
     protected $inputs;
-    protected $partnerAdmin; //当前的商户用户
+    public $partnerAdmin; //当前的商户用户
     protected $currentOptRoute; //目前路由
     protected $currentPlatformEloq = null; //当前商户存在的平台
     public $eloqM = ''; // 当前的eloquent

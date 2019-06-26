@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-25 15:43:21
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-25 15:43:31
+ * @Last Modified time: 2019-06-26 10:31:30
  */
 namespace App\Http\Requests\Frontend;
 
@@ -30,8 +30,8 @@ class FrontendAuthResetFundPasswordRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|numeric|exists:frontend_users',
-            'username' => 'required|exists:frontend_users',
+            // 'id' => 'required|numeric|exists:frontend_users',
+            // 'username' => 'required|exists:frontend_users',
             'old_password' => 'required|string',
             'new_password' => 'required|string',
             'confirm_password' => 'required|string',

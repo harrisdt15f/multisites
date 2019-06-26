@@ -5,10 +5,12 @@ namespace App\Http\Controllers\FrontendApi;
 use App\Http\Requests\Frontend\FrontendAuthDeletePartnerAdminRequest;
 use App\Http\Requests\Frontend\FrontendAuthRegisterRequest;
 use App\Http\Requests\Frontend\FrontendAuthResetFundPasswordRequest;
+use App\Http\Requests\Frontend\FrontendAuthResetSpecificInfosRequest;
 use App\Http\Requests\Frontend\FrontendAuthResetUserPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthSelfResetPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthUpdatePAdmPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthUpdateUserGroupRequest;
+use App\Http\SingleActions\Frontend\FrontendAuthResetSpecificInfosAction;
 use App\Models\Admin\BackendAdminAccessGroup;
 use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
 use App\Models\Admin\SystemConfiguration;
@@ -313,13 +315,11 @@ class FrontendAuthController extends FrontendApiMainController
      */
     public function commonHandleUserPassword($inputDatas, $type): JsonResponse
     {
-        $targetUserEloq = $this->eloqM::where([
-            ['id', '=', $inputDatas['id']],
-            ['username', '=', $inputDatas['username']],
-        ])->first();
-        if ($targetUserEloq === null) {
-            return $this->msgOut(false, [], '100006');
-        }
+        // $targetUserEloq = $this->eloqM::where([
+        //     ['id', '=', $inputDatas['id']],
+        //     ['username', '=', $inputDatas['username']],
+        // ])->first();
+        $targetUserEloq = $this->eloqM::find($this->partnerAdmin->id);
         if ($inputDatas['old_password'] === $inputDatas['new_password']) {
             return $this->msgOut(false, [], '100007');
         }
@@ -360,5 +360,12 @@ class FrontendAuthController extends FrontendApiMainController
             $status = false;
         }
         return $this->msgOut(true, $status);
+    }
+
+    //用户设置详细信息
+    public function resetSpecificInfos(FrontendAuthResetSpecificInfosRequest $request, FrontendAuthResetSpecificInfosAction $action)
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
     }
 }
