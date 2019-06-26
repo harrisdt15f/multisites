@@ -231,7 +231,7 @@ trait ProjectTraits
             ])->first();
             if ($iCount > 0) {
                 $bonus = $this->bet_prize_group * $PrizeEloq->prize / 1800;
-                $bonus = $bonus * $iCount * $this->times * $this->mode;
+                $bonus *= $this->mode * $this->times * $iCount;
                 if ($this->price === 1) {
                     $bonus /= 2;
                 }
