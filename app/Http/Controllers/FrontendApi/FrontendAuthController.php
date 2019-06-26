@@ -11,6 +11,7 @@ use App\Http\Requests\Frontend\FrontendAuthSelfResetPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthUpdatePAdmPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthUpdateUserGroupRequest;
 use App\Http\SingleActions\Frontend\FrontendAuthResetSpecificInfosAction;
+use App\Http\SingleActions\Frontend\FrontendAuthUserSpecificInfosAction;
 use App\Models\Admin\BackendAdminAccessGroup;
 use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
 use App\Models\Admin\SystemConfiguration;
@@ -315,10 +316,6 @@ class FrontendAuthController extends FrontendApiMainController
      */
     public function commonHandleUserPassword($inputDatas, $type): JsonResponse
     {
-        // $targetUserEloq = $this->eloqM::where([
-        //     ['id', '=', $inputDatas['id']],
-        //     ['username', '=', $inputDatas['username']],
-        // ])->first();
         $targetUserEloq = $this->eloqM::find($this->partnerUser->id);
         if ($inputDatas['old_password'] === $inputDatas['new_password']) {
             return $this->msgOut(false, [], '100007');
@@ -363,7 +360,16 @@ class FrontendAuthController extends FrontendApiMainController
     }
 
     /**
-     * 用户设置详细信息
+     * 用户个人信息
+     * @param  FrontendAuthUserSpecificInfosAction $action
+     * @return JsonResponse
+     */
+    public function userSpecificInfos(FrontendAuthUserSpecificInfosAction $action): JsonResponse
+    {
+        return $action->execute($this);
+    }
+    /**
+     * 用户设置个人信息
      * @param  FrontendAuthResetSpecificInfosRequest $request
      * @param  FrontendAuthResetSpecificInfosAction  $action
      * @return JsonResponse

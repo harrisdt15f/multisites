@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-26 11:03:18
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-26 11:49:06
+ * @Last Modified time: 2019-06-26 20:08:13
  */
 namespace App\Http\SingleActions\Frontend;
 
@@ -15,18 +15,18 @@ use Illuminate\Http\JsonResponse;
 class FrontendAuthResetSpecificInfosAction
 {
     /**
-     * 用户设置详细信息
+     * 用户设置个人信息
      * @param  FrontendApiMainController  $contll
      * @param  $inputDatas
      * @return JsonResponse
      */
     public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
     {
-        $specificinfoEloq = FrontendUsersSpecificInfo::where('user_id', $contll->partnerAdmin->id)->first();
+        $specificinfoEloq = FrontendUsersSpecificInfo::where('user_id', $contll->partnerUser->id)->first();
         if ($specificinfoEloq === null) {
             $specificinfoEloq = new FrontendUsersSpecificInfo();
         }
-        $inputDatas['user_id'] = $contll->partnerAdmin->id;
+        $inputDatas['user_id'] = $contll->partnerUser->id;
         $contll->editAssignment($specificinfoEloq, $inputDatas);
         try {
             $specificinfoEloq->save();
