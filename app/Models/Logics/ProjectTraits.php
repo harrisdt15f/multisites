@@ -8,12 +8,6 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 
-/**
- * @Author: LingPh
- * @Date:   2019-05-29 17:44:08
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-18 22:20:47
- */
 trait ProjectTraits
 {
 
@@ -218,53 +212,8 @@ trait ProjectTraits
         return $returnData;
     }
 
-    // 开奖
-    public function open($openCode)
-    {
-        $project = $this;
-        $lottery = Lottery::getLottery($project->lottery_id);
-        $methodArr = $lottery->getMethod($project->method_id);
-        $oMethod = $methodArr['object'];
-
-        $openCodeArr = $lottery->formatOpenCode($openCode);
-        $result = $oMethod->assert($project->bet_number, $openCodeArr);
-        $totalBonus = 0;
-        if ($result) {
-            foreach ($result as $level => $count) {
-                $levelConfig = $oMethod->levels;
-                if (isset($levelConfig[$level])) {
-                    $prize = $levelConfig[$level]['prize'];
-                    $bonus = 2000 * $project->bet_prize_group / $prize;
-                    $bonus = $bonus * $count * $project->times * $project->mode;
-                    if ($project->single_price == 1) {
-                        $bonus = $bonus / 2;
-                    }
-                    $totalBonus += $bonus;
-                }
-            }
-        }
-        $project->status_count = 1;
-        $project->time_count = time();
-        $project->status_prize = 1;
-        $project->time_prize = time();
-        if ($totalBonus > 0) {
-            $project->is_win = 1;
-            $project->bonus = $totalBonus;
-            $project->save();
-            return [
-                'user_id' => $project->user_id,
-                'project_id' => $project->id,
-                'lottery_id' => $project->lottery_id,
-                'method_id' => $project->method_id,
-                'issue' => $project->issue,
-                'amount' => $totalBonus,
-            ];
-        }
-        $project->save();
-        return [];
-    }
-
     /**
+     * 开奖
      * @param $openNumber
      * @param $sWnNumber
      * @param $aPrized
