@@ -68,7 +68,7 @@ trait ProjectTraits
                 'bet_codes' => $item->bet_number,
                 'total_cost' => $item->total_cost,
                 'single_price' => $item->price,
-                'bonus' =>$item->bonus,
+                'bonus' => $item->bonus,
                 'prize_group' => $item->bet_prize_group,
                 'status' => $item->status,
             ];
@@ -133,7 +133,7 @@ trait ProjectTraits
                 'bet_from' => $from,
                 'time_bought' => time(),
             ];
-            $projectId =  Project::insertGetId($projectData);
+            $projectId = Project::create($projectData)->id;
             if ($traceData) {
                 $traceMainData = [
                     'user_id' => $user->id,
@@ -170,12 +170,11 @@ trait ProjectTraits
                     'bet_from' => $from,
                 ];
                 // 保存追号主
-                $traceId = LotteryTrace::insertGetId($traceMainData);
+                $traceId = LotteryTrace::create($traceMainData)->id;
                 // 保存追号
-                $traceListData = [];
-                foreach ($traceData as $issue => $mark) {
+                foreach ($traceData as $issue => $multiple) {
                     foreach ($data as $dataItem) {
-                        $traceListData[] = [
+                        $traceListData = [
                             'user_id' => $user->id,
                             'username' => $user->username,
                             'top_id' => $user->top_id,
@@ -189,9 +188,9 @@ trait ProjectTraits
                             'issue' => $issue,
                             'bet_number' => $dataItem['code'],
                             'mode' => $dataItem['mode'],
-                            'times' => $dataItem['times'],
+                            'times' => $dataItem['times'] * $multiple,
                             'single_price' => $dataItem['price'],
-                            'total_price' => $dataItem['total_price'],
+                            'total_price' => $dataItem['total_price'] * $multiple,
                             'user_prize_group' => $user->prize_group,
                             'bet_prize_group' => $dataItem['prize_group'],
                             'ip' => Request::ip(),
@@ -199,9 +198,9 @@ trait ProjectTraits
                             'day' => date('Ymd'),
                             'bet_from' => $from,
                         ];
+                        LotteryTraceList::create($traceListData);
                     }
                 }
-                LotteryTraceList::insert($traceListData);
             }
             $returnData['project'][] = [
                 'id' => $projectId,
