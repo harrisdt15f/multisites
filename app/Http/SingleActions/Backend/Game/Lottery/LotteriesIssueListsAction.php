@@ -51,7 +51,7 @@ class LotteriesIssueListsAction
         $fixedJoin = 1;
         $withTable = 'lottery';
         $afewMinutes = Carbon::now()->subMinute('20')->timestamp;
-        $this->inputs['time_condtions'] = $this->inputs['time_condtions'] ?? '[["end_time",">=",' . $afewMinutes . ']]'; // 从现在开始。如果。没有时间字段的话，就用当前时间以上的显示
+        $contll->inputs['time_condtions'] = $contll->inputs['time_condtions'] ?? '[["end_time",">=",' . $afewMinutes . ']]'; // 从现在开始。如果。没有时间字段的话，就用当前时间以上的显示
         $data = $contll->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, null, $orderFields, $orderFlow);
         return $contll->msgOut(true, $data);
     }
