@@ -3,7 +3,9 @@
 namespace App\Models\Logics;
 
 use App\Models\DeveloperUsage\MethodLevel\LotteryMethodsWaysLevel;
+use App\Models\Game\Lottery\LotteryTraceList;
 use App\Models\LotteryTrace;
+use App\Models\Project;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
@@ -105,7 +107,6 @@ trait ProjectTraits
     public static function addProject($user, $lottery, $currentIssue, $data, $traceData, $from = 1): array
     {
         $returnData = [];
-        $traceMainData = [];
         foreach ($data as $_item) {
             $projectData = [
                 'user_id' => $user->id,
@@ -132,9 +133,9 @@ trait ProjectTraits
                 'bet_from' => $from,
                 'time_bought' => time(),
             ];
-            $id = DB::table('projects')->insertGetId($projectData);
+            $projectId =  Project::insertGetId($projectData);
             if ($traceData) {
-                $traceMainData[] = [
+                $traceMainData = [
                     'user_id' => $user->id,
                     'username' => $user->username,
                     'top_id' => $user->top_id,
@@ -169,7 +170,7 @@ trait ProjectTraits
                     'bet_from' => $from,
                 ];
                 // 保存追号主
-                DB::table('lottery_traces')->insert($traceMainData);
+                $traceId = LotteryTrace::insertGetId($traceMainData);
                 // 保存追号
                 $traceListData = [];
                 foreach ($traceData as $issue => $mark) {
@@ -200,10 +201,10 @@ trait ProjectTraits
                         ];
                     }
                 }
-                DB::table('lottery_trace_lists')->insert($traceListData);
+                LotteryTraceList::insert($traceListData);
             }
             $returnData['project'][] = [
-                'id' => $id,
+                'id' => $projectId,
                 'cost' => $_item['total_price'],
                 'lottery_id' => $lottery->en_name,
                 'method_id' => $_item['method_id'],
