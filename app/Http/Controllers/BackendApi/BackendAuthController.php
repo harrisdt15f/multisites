@@ -7,10 +7,13 @@ use App\Http\Requests\Backend\BackendAuthRegisterRequest;
 use App\Http\Requests\Backend\BackendAuthSelfResetPasswordRequest;
 use App\Http\Requests\Backend\BackendAuthUpdatePAdmPasswordRequest;
 use App\Http\Requests\Backend\BackendAuthUpdateUserGroupRequest;
-use App\Models\Admin\BackendAdminAccessGroup;
+use App\Http\SingleActions\Backend\BackendAuthAllUserAction;
+use App\Http\SingleActions\Backend\BackendAuthDeletePartnerAdminAction;
+use App\Http\SingleActions\Backend\BackendAuthRegisterAction;
+use App\Http\SingleActions\Backend\BackendAuthSelfResetPasswordAction;
+use App\Http\SingleActions\Backend\BackendAuthUpdatePAdmPasswordAction;
+use App\Http\SingleActions\Backend\BackendAuthUpdateUserGroupAction;
 use App\Models\Admin\BackendAdminUser;
-use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
-use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
 use Exception;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
@@ -27,7 +30,7 @@ class BackendAuthController extends BackEndApiMainController
 {
     use AuthenticatesUsers;
 
-    public $successStatus = 200;
+    public $successStatus = '200';
 
     protected $eloqM = 'Admin\BackendAdminUser';
 
@@ -100,98 +103,48 @@ class BackendAuthController extends BackEndApiMainController
 
     /**
      * change partner user Password
+     * @param  BackendAuthSelfResetPasswordRequest $request
+     * @param  BackendAuthSelfResetPasswordAction  $action
      * @return JsonResponse
      */
-    public function selfResetPassword(BackendAuthSelfResetPasswordRequest $request)
+    public function selfResetPassword(BackendAuthSelfResetPasswordRequest $request, BackendAuthSelfResetPasswordAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        if (!Hash::check($inputDatas['old_password'], $this->partnerAdmin->password)) {
-            return $this->msgOut(false, [], '100003');
-        } else {
-            $token = $this->refresh();
-            $this->partnerAdmin->password = Hash::make($inputDatas['password']);
-            $this->partnerAdmin->remember_token = $token;
-            try {
-                $this->partnerAdmin->save();
-                $expireInMinute = $this->currentAuth->factory()->getTTL();
-                $expireAt = Carbon::now()->addMinutes($expireInMinute)->format('Y-m-d H:i:s');
-                $data = [
-                    'access_token' => $token,
-                    'token_type' => 'Bearer',
-                    'expires_at' => $expireAt,
-                ];
-                return $this->msgOut(true, $data);
-            } catch (Exception $e) {
-                $errorObj = $e->getPrevious()->getPrevious();
-                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-                return $this->msgOut(false, [], $sqlState, $msg);
-            }
-        }
-
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * Register api
+     * @param  BackendAuthRegisterRequest $request
+     * @param  BackendAuthRegisterAction  $action
      * @return JsonResponse
      */
-    public function register(BackendAuthRegisterRequest $request): JsonResponse
+    public function register(BackendAuthRegisterRequest $request, BackendAuthRegisterAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        $group = BackendAdminAccessGroup::find($inputDatas['group_id']);
-        $role = $group->role == '*' ? Arr::wrap($group->role) : Arr::wrap(json_decode($group->role, true));
-        $isManualRecharge = false;
-        $fundOperation = BackendSystemMenu::select('id')->where('route', '/manage/recharge')->first()->toArray();
-        $isManualRecharge = in_array($fundOperation['id'], $role, true);
-        $input = $inputDatas;
-        $input['password'] = bcrypt($input['password']);
-        $input['platform_id'] = $this->currentPlatformEloq->platform_id;
-        $user = BackendAdminUser::create($input);
-        if ($isManualRecharge === true) {
-            $insertData = ['admin_id' => $user->id];
-            $fundOperationEloq = new BackendAdminRechargePocessAmount();
-            $fundOperationEloq->fill($insertData);
-            $fundOperationEloq->save();
-        }
-        $credentials = request(['email', 'password']);
-        $token = $this->currentAuth->attempt($credentials);
-        $success['token'] = $token;
-        $success['name'] = $user->name;
-        return $this->msgOut(true, $success);
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * 获取所有当前平台的商户管理员用户
+     * @param  BackendAuthAllUserAction  $action
      * @return JsonResponse
      */
-    public function allUser():  ? JsonResponse
+    public function allUser(BackendAuthAllUserAction $action):  ? JsonResponse
     {
-        try {
-            $data = $this->currentPlatformEloq->partnerAdminUsers;
-            if (is_null($data)) {
-                $result = Arr::wrap($data);
-            } else {
-                $result = $data->toArray();
-            }
-            return $this->msgOut(true, $result);
-        } catch (Exception $e) {
-            return $this->msgOut(false, [], $e->getCode(), $e->getMessage());
-        }
+        return $action->execute($this);
     }
 
     /**
-     * @return JsonResponse|null
+     * 修改管理员的归属组
+     * @param  BackendAuthUpdateUserGroupRequest $request
+     * @param  BackendAuthUpdateUserGroupAction  $action
+     * @return JsonResponse
      */
-    public function updateUserGroup(BackendAuthUpdateUserGroupRequest $request) :  ? JsonResponse
+    public function updateUserGroup(BackendAuthUpdateUserGroupRequest $request, BackendAuthUpdateUserGroupAction $action) : JsonResponse
     {
         $inputDatas = $request->validated();
-        $targetUserEloq = $this->eloqM::find($inputDatas['id']);
-        if ($targetUserEloq !== null) {
-            $targetUserEloq->group_id = $inputDatas['group_id'];
-            if ($targetUserEloq->save()) {
-                $result = $targetUserEloq->toArray();
-                return $this->msgOut(true, $result);
-            }
-        }
+        return $action->execute($this, $inputDatas);
     }
 
     /**
@@ -199,7 +152,7 @@ class BackendAuthController extends BackEndApiMainController
      *
      * @return Response
      */
-    public function details() : Response
+    public function details(): Response
     {
         $user = $this->partnerAdmin;
         return $this->msgOut(true, $user);
@@ -236,49 +189,23 @@ class BackendAuthController extends BackEndApiMainController
     /**
      * 删除管理员
      * @param  BackendAuthDeletePartnerAdminRequest $request
+     * @param  BackendAuthDeletePartnerAdminAction  $action
      * @return JsonResponse
      */
-    public function deletePartnerAdmin(BackendAuthDeletePartnerAdminRequest $request):  ? JsonResponse
+    public function deletePartnerAdmin(BackendAuthDeletePartnerAdminRequest $request, BackendAuthDeletePartnerAdminAction $action):  ? JsonResponse
     {
         $inputDatas = $request->validated();
-        $targetUserEloq = $this->eloqM::where([
-            ['id', '=', $inputDatas['id']],
-            ['name', '=', $inputDatas['name']],
-        ])->first();
-        if ($targetUserEloq !== null) {
-            $token = $targetUserEloq->token();
-            if ($token) {
-                $token->revoke(); //取消目前登录中的状态
-            }
-//            OauthAccessTokens::clearOldToken($targetUserEloq->id); //删除相关登录的token
-            if ($targetUserEloq->delete()) {
-//删除用户
-                return $this->msgOut(true);
-            }
-        } else {
-            return $this->msgOut(false, [], '100004');
-        }
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * @param  BackendAuthUpdatePAdmPasswordRequest $request
+     * @param  BackendAuthUpdatePAdmPasswordAction  $action
      * @return JsonResponse
      */
-    public function updatePAdmPassword(BackendAuthUpdatePAdmPasswordRequest $request) :  ? JsonResponse
+    public function updatePAdmPassword(BackendAuthUpdatePAdmPasswordRequest $request, BackendAuthUpdatePAdmPasswordAction $action) :  ? JsonResponse
     {
         $inputDatas = $request->validated();
-        $targetUserEloq = $this->eloqM::where([
-            ['id', '=', $inputDatas['id']],
-            ['name', '=', $inputDatas['name']],
-        ])->first();
-        if ($targetUserEloq !== null) {
-            $targetUserEloq->password = Hash::make($inputDatas['password']);
-            if ($targetUserEloq->save()) {
-//用户更新密码
-                return $this->msgOut(true);
-            }
-        } else {
-            return $this->msgOut(false, [], '100004');
-        }
+        return $action->execute($this, $inputDatas);
     }
 }

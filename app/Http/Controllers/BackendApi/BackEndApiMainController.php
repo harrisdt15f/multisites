@@ -31,7 +31,7 @@ class BackEndApiMainController extends Controller
     protected $routeAccessable = false;
     protected $log_uuid; //当前的logId
     protected $currentGuard = 'backend';
-    protected $currentAuth;
+    public $currentAuth;
 
     /**
      * AdminMainController constructor.
