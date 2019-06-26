@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-20 15:35:02
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-21 21:13:13
+ * @Last Modified time: 2019-06-26 16:54:17
  */
 namespace App\Http\SingleActions\Backend\Admin\Article;
 
@@ -35,10 +35,6 @@ class ArticlesAddAction
      */
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
-        if (!Cache::has('partnerAdmin')) {
-            return $contll->msgOut(false, [], '100501');
-        }
-        $partnerAdmin = Cache::get('partnerAdmin');
         DB::beginTransaction();
         try {
             //插入 backend_admin_audit_flow_lists 审核表
@@ -51,8 +47,8 @@ class ArticlesAddAction
             $sort = ++$maxSort;
             $addDatas['sort'] = $sort;
             $addDatas['status'] = 0;
-            $addDatas['add_admin_id'] = $partnerAdmin->id;
-            $addDatas['last_update_admin_id'] = $partnerAdmin->id;
+            $addDatas['add_admin_id'] = $contll->partnerAdmin->id;
+            $addDatas['last_update_admin_id'] = $contll->partnerAdmin->id;
             if (isset($inputDatas['pic_path']) && $inputDatas['pic_path'] !== '') {
                 $addDatas['pic_path'] = implode('|', $inputDatas['pic_path']);
             }

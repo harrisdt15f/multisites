@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-21 19:11:58
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-21 21:21:03
+ * @Last Modified time: 2019-06-26 17:00:39
  */
 namespace App\Http\SingleActions\Backend\Admin\Message;
 
@@ -32,11 +32,7 @@ class NoticeMessagesAdminMessagesAction
      */
     public function execute(BackEndApiMainController $contll): JsonResponse
     {
-        if (!Cache::has('partnerAdmin')) {
-            return $contll->msgOut(false, [], '100302');
-        }
-        $partnerAdmin = Cache::get('partnerAdmin');
-        $messagesEloq = $this->model::where('receive_admin_id', $partnerAdmin->id)->with('noticeMessage')->orderBy('created_at', 'desc')->get();
+        $messagesEloq = $this->model::where('receive_admin_id', $contll->partnerAdmin->id)->with('noticeMessage')->orderBy('created_at', 'desc')->get();
         $messages = [];
         foreach ($messagesEloq as $messageEloq) {
             $data = [

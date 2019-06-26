@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-21 15:29:50
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-21 21:16:38
+ * @Last Modified time: 2019-06-26 17:04:39
  */
 namespace App\Http\SingleActions\Backend\Admin\Homepage;
 
@@ -35,10 +35,6 @@ class HomepageBannerEditAction
      */
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
-        if (!Cache::has('currentPlatformEloq')) {
-            return $contll->msgOut(false, [], '101802');
-        }
-        $currentPlatformEloq = Cache::get('currentPlatformEloq');
         $checkTitle = $this->model::where('title', $inputDatas['title'])->where('id', '!=', $inputDatas['id'])->exists();
         if ($checkTitle === true) {
             return $contll->msgOut(false, [], '101800');
@@ -51,7 +47,7 @@ class HomepageBannerEditAction
             $imageObj = new ImageArrange();
             $imageObj->deletePic(substr($pastData['pic_path'], 1));
             $imageObj->deletePic(substr($pastData['thumbnail_path'], 1));
-            $depositPath = $imageObj->depositPath($contll->folderName, $currentPlatformEloq->platform_id, $currentPlatformEloq->platform_name);
+            $depositPath = $imageObj->depositPath($contll->folderName, $contll->currentPlatformEloq->platform_id, $contll->currentPlatformEloq->platform_name);
             $picData = $imageObj->uploadImg($inputDatas['pic'], $depositPath);
             if ($picData['success'] === false) {
                 return $contll->msgOut(false, [], $picData['code']);

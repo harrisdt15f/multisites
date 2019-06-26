@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-20 16:15:40
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-21 21:13:47
+ * @Last Modified time: 2019-06-26 17:03:53
  */
 namespace App\Http\SingleActions\Backend\Admin\Article;
 
@@ -34,13 +34,9 @@ class ArticlesUploadPicAction
      */
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
-        if (!Cache::has('currentPlatformEloq')) {
-            return $contll->msgOut(false, [], '100502');
-        }
-        $currentPlatformEloq = Cache::get('currentPlatformEloq');
         $imageObj = new ImageArrange();
         $file = $inputDatas['pic'];
-        $depositPath = $imageObj->depositPath($contll->folderName, $currentPlatformEloq->platform_id, $currentPlatformEloq->platform_name);
+        $depositPath = $imageObj->depositPath($contll->folderName, $contll->currentPlatformEloq->platform_id, $contll->currentPlatformEloq->platform_name);
         //进行上传
         $pic = $imageObj->uploadImg($file, $depositPath);
         if ($pic['success'] === false) {

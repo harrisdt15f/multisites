@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-21 17:29:43
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-21 21:19:18
+ * @Last Modified time: 2019-06-26 17:05:15
  */
 namespace App\Http\SingleActions\Backend\Admin\Homepage;
 
@@ -35,12 +35,8 @@ class PopularLotteriesAddAction
      */
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
-        if (!Cache::has('currentPlatformEloq')) {
-            return $contll->msgOut(false, [], '102001');
-        }
-        $currentPlatformEloq = Cache::get('currentPlatformEloq');
         $imageObj = new ImageArrange();
-        $depositPath = $imageObj->depositPath('popular_lotteries', $currentPlatformEloq->platform_id, $currentPlatformEloq->platform_name);
+        $depositPath = $imageObj->depositPath('popular_lotteries', $contll->currentPlatformEloq->platform_id, $contll->currentPlatformEloq->platform_name);
         //sort
         $maxSort = $this->model::select('sort')->max('sort');
         $sort = ++$maxSort;

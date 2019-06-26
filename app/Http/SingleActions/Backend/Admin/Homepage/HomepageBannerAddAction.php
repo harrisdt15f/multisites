@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-21 15:22:11
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-21 21:16:30
+ * @Last Modified time: 2019-06-26 17:04:22
  */
 namespace App\Http\SingleActions\Backend\Admin\Homepage;
 
@@ -35,13 +35,9 @@ class HomepageBannerAddAction
      */
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
-        if (!Cache::has('currentPlatformEloq')) {
-            return $contll->msgOut(false, [], '101802');
-        }
-        $currentPlatformEloq = Cache::get('currentPlatformEloq');
         $imageObj = new ImageArrange();
         $folderName = $contll->folderName;
-        $depositPath = $imageObj->depositPath($folderName, $currentPlatformEloq->platform_id, $currentPlatformEloq->platform_name);
+        $depositPath = $imageObj->depositPath($folderName, $contll->currentPlatformEloq->platform_id, $contll->currentPlatformEloq->platform_name);
         $pic = $imageObj->uploadImg($inputDatas['pic'], $depositPath);
         if ($pic['success'] === false) {
             return $contll->msgOut(false, [], '400', $pic['msg']);

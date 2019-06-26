@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-20 16:44:35
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-20 16:46:42
+ * @Last Modified time: 2019-06-26 17:01:48
  */
 namespace App\Lib\Common;
 
@@ -20,14 +20,10 @@ class AuditFlow
      */
     public function insertAuditFlow($apply_note): int
     {
-        if (!Cache::has('partnerAdmin')) {
-            return $contll->msgOut(false, [], '100302');
-        }
-        $partnerAdmin = Cache::get('partnerAdmin');
         $flowDatas = [
-            'admin_id' => $partnerAdmin->id,
+            'admin_id' => $contll->partnerAdmin->id,
             'apply_note' => $apply_note,
-            'admin_name' => $partnerAdmin->name,
+            'admin_name' => $contll->partnerAdmin->name,
         ];
         $flowConfigure = new BackendAdminAuditFlowList;
         $flowConfigure->fill($flowDatas);

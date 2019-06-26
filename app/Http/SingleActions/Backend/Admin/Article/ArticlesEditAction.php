@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-20 15:44:35
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-21 21:13:19
+ * @Last Modified time: 2019-06-26 16:54:37
  */
 namespace App\Http\SingleActions\Backend\Admin\Article;
 
@@ -37,10 +37,6 @@ class ArticlesEditAction
         if ($issetTitle === true) {
             return $contll->msgOut(false, [], '100500');
         }
-        if (!Cache::has('partnerAdmin')) {
-            return $contll->msgOut(false, [], '100501');
-        }
-        $partnerAdmin = Cache::get('partnerAdmin');
         try {
             $pastEloq = $this->model::find($inputDatas['id']);
             //插入 backend_admin_audit_flow_lists 审核表
@@ -52,7 +48,7 @@ class ArticlesEditAction
             unset($editDatas['pic_name'], $editDatas['apply_note']);
             $contll->editAssignment($pastEloq, $editDatas);
             $pastEloq->status = 0;
-            $pastEloq->last_update_admin_id = $partnerAdmin->id;
+            $pastEloq->last_update_admin_id = $contll->partnerAdmin->id;
             //查看是否修改图片
             $new_pic_path = $inputDatas['pic_path'];
             if ($new_pic_path != $pastPicPath) {

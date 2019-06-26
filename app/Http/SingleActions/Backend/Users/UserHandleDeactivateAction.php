@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-24 20:40:39
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-24 21:00:00
+ * @Last Modified time: 2019-06-26 17:01:32
  */
 namespace App\Http\SingleActions\Backend\Users;
 
@@ -35,11 +35,6 @@ class UserHandleDeactivateAction
      */
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
-
-        if (!Cache::has('partnerAdmin')) {
-            return $contll->msgOut(false, [], '100107');
-        }
-        $partnerAdmin = Cache::get('partnerAdmin');
         $userEloq = $this->model::find($inputDatas['user_id']);
         if ($userEloq !== null) {
             DB::beginTransaction();
@@ -48,8 +43,8 @@ class UserHandleDeactivateAction
                 $userEloq->save();
                 $userAdmitFlowLog = new FrontendUsersPrivacyFlow();
                 $data = [
-                    'admin_id' => $partnerAdmin->id,
-                    'admin_name' => $partnerAdmin->name,
+                    'admin_id' => $contll->partnerAdmin->id,
+                    'admin_name' => $contll->partnerAdmin->name,
                     'user_id' => $userEloq->id,
                     'username' => $userEloq->username,
                     'comment' => $inputDatas['comment'],

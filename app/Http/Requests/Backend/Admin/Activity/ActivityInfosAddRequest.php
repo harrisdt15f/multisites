@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-13 18:18:35
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-15 15:32:54
+ * @Last Modified time: 2019-06-26 16:59:00
  */
 namespace App\Http\Requests\Backend\Admin\Activity;
 
@@ -30,7 +30,7 @@ class ActivityInfosAddRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required',
+            'title' => 'required|unique:frontend_activity_contents',
             'content' => 'required',
             'pic' => 'required|image|mimes:jpeg,png,jpg',
             'start_time' => 'date_format:Y-m-d H:i:s|required_if:is_time_interval,1',

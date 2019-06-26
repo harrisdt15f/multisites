@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-20 13:44:02
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-21 21:12:22
+ * @Last Modified time: 2019-06-26 17:03:30
  */
 namespace App\Http\SingleActions\Backend\Admin\Activity;
 
@@ -35,10 +35,6 @@ class ActivityInfosEditAction
      */
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
-        if (!Cache::has('currentPlatformEloq')) {
-            return $contll->msgOut(false, [], '100301');
-        }
-        $currentPlatformEloq = Cache::get('currentPlatformEloq');
         $issetTitle = $this->model::where('title', $inputDatas['title'])->where('id', '!=', $inputDatas['id'])->exists();
         if ($issetTitle === true) {
             return $contll->msgOut(false, [], '100300');
@@ -52,7 +48,7 @@ class ActivityInfosEditAction
             $pastThumbnail = $pastDataEloq->thumbnail_path;
             //接收文件信息
             $imageObj = new ImageArrange();
-            $depositPath = $imageObj->depositPath($contll->folderName, $currentPlatformEloq->platform_id, $currentPlatformEloq->platform_name);
+            $depositPath = $imageObj->depositPath($contll->folderName, $contll->currentPlatformEloq->platform_id, $contll->currentPlatformEloq->platform_name);
             //进行上传
             $picdata = $imageObj->uploadImg($inputDatas['pic'], $depositPath);
             if ($picdata['success'] === false) {

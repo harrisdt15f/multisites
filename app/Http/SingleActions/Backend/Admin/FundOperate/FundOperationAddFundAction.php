@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-21 14:02:21
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-21 21:16:02
+ * @Last Modified time: 2019-06-26 17:00:24
  */
 namespace App\Http\SingleActions\Backend\Admin\FundOperate;
 
@@ -28,10 +28,6 @@ class FundOperationAddFundAction
      */
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
-        if (!Cache::has('partnerAdmin')) {
-            return $contll->msgOut(false, [], '101302');
-        }
-        $partnerAdmin = Cache::get('partnerAdmin');
         $adminDataEloq = BackendAdminUser::find($inputDatas['id']);
         $fundOperationAdmin = BackendAdminRechargePocessAmount::where('admin_id', $inputDatas['id'])->first();
         if (is_null($fundOperationAdmin)) {
@@ -53,7 +49,7 @@ class FundOperationAddFundAction
             $in_out = BackendAdminRechargehumanLog::INCREMENT;
             $rechargeLog = new BackendAdminRechargehumanLog();
             $comment = '[人工充值额度操作]==>+' . $inputDatas['fund'] . '|[目前额度]==>' . $newFund;
-            $fundOperationObj->insertOperationDatas($rechargeLog, $type, $in_out, $partnerAdmin->id, $partnerAdmin->name, $adminDataEloq->id, $adminDataEloq->name, $inputDatas['fund'], $comment, null);
+            $fundOperationObj->insertOperationDatas($rechargeLog, $type, $in_out, $contll->partnerAdmin->id, $contll->partnerAdmin->name, $adminDataEloq->id, $adminDataEloq->name, $inputDatas['fund'], $comment, null);
             DB::commit();
             return $contll->msgOut(true);
         } catch (Exception $e) {

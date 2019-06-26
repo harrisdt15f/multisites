@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-21 20:05:55
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-21 21:22:08
+ * @Last Modified time: 2019-06-26 17:04:09
  */
 namespace App\Http\SingleActions\Backend\Admin;
 
@@ -34,18 +34,10 @@ class ConfiguresAddAction
      */
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
-        if (!Cache::has('currentPlatformEloq')) {
-            return $contll->msgOut(false, [], '100701');
-        }
-        $currentPlatformEloq = Cache::get('currentPlatformEloq');
-        if (!Cache::has('partnerAdmin')) {
-            return $contll->msgOut(false, [], '100703');
-        }
-        $partnerAdmin = Cache::get('partnerAdmin');
         $addDatas = $inputDatas;
-        $addDatas['pid'] = $currentPlatformEloq->platform_id;
-        $addDatas['add_admin_id'] = $partnerAdmin->id;
-        $addDatas['last_update_admin_id'] = $partnerAdmin->id;
+        $addDatas['pid'] = $contll->currentPlatformEloq->platform_id;
+        $addDatas['add_admin_id'] = $contll->partnerAdmin->id;
+        $addDatas['last_update_admin_id'] = $contll->partnerAdmin->id;
         $addDatas['status'] = 1;
         try {
             $configure = new $this->model();

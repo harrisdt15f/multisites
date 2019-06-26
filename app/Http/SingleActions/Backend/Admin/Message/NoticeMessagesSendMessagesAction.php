@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-21 19:21:58
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-21 21:21:10
+ * @Last Modified time: 2019-06-26 17:00:56
  */
 namespace App\Http\SingleActions\Backend\Admin\Message;
 
@@ -27,17 +27,13 @@ class NoticeMessagesSendMessagesAction
      */
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
-        if (!Cache::has('partnerAdmin')) {
-            return $contll->msgOut(false, [], '100302');
-        }
-        $partnerAdmin = Cache::get('partnerAdmin');
         $adminsArr = BackendAdminUser::select('id', 'group_id')->whereIn('id', $inputDatas['admins_id'])->get()->toArray();
         DB::beginTransaction();
         try {
             $messageObj = new InternalNoticeMessage();
             $type = BackendSystemNoticeList::ARTIFICIAL;
             $message = $inputDatas['message'];
-            $messageObj->insertMessage($type, $message, $adminsArr, $partnerAdmin->id);
+            $messageObj->insertMessage($type, $message, $adminsArr, $contll->partnerAdmin->id);
             DB::commit();
             return $contll->msgOut(true);
         } catch (Exception $e) {

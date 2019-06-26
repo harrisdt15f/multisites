@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-20 11:51:13
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-21 21:11:05
+ * @Last Modified time: 2019-06-26 17:03:16
  */
 namespace App\Http\SingleActions\Backend\Admin\Activity;
 
@@ -35,17 +35,9 @@ class ActivityInfosAddAction
      */
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
-        if (!Cache::has('currentPlatformEloq')) {
-            return $contll->msgOut(false, [], '100301');
-        }
-        $currentPlatformEloq = Cache::get('currentPlatformEloq');
-        if (!Cache::has('partnerAdmin')) {
-            return $contll->msgOut(false, [], '100302');
-        }
-        $partnerAdmin = Cache::get('partnerAdmin');
         //接收文件信息
         $imageObj = new ImageArrange();
-        $depositPath = $imageObj->depositPath($contll->folderName, $currentPlatformEloq->platform_id, $currentPlatformEloq->platform_name);
+        $depositPath = $imageObj->depositPath($contll->folderName, $contll->currentPlatformEloq->platform_id, $contll->currentPlatformEloq->platform_name);
         //进行上传
         $pic = $imageObj->uploadImg($inputDatas['pic'], $depositPath);
         if ($pic['success'] === false) {
@@ -61,15 +53,15 @@ class ActivityInfosAddAction
         $addDatas['sort'] = $sort;
         $addDatas['pic_path'] = '/' . $pic['path'];
         $addDatas['thumbnail_path'] = '/' . $thumbnailPath;
-        $addDatas['admin_id'] = $partnerAdmin->id;
-        $addDatas['admin_name'] = $partnerAdmin->name;
+        $addDatas['admin_id'] = $contll->partnerAdmin->id;
+        $addDatas['admin_name'] = $contll->partnerAdmin->name;
         try {
-            $configure = new $this->eloqM();
+            $configure = new $this->model();
             $configure->fill($addDatas);
             $configure->save();
             //删除前台首页缓存
             $contll->deleteCache();
-            return $this->msgOut(true);
+            return $contll->msgOut(true);
         } catch (Exception $e) {
             $imageObj->deletePic($pic['path']);
             $imageObj->deletePic($thumbnailPath);

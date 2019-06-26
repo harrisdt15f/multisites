@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-24 10:43:34
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-24 11:19:05
+ * @Last Modified time: 2019-06-26 17:05:41
  */
 namespace App\Http\SingleActions\Backend\Admin;
 
@@ -36,12 +36,8 @@ class PartnerAdminGroupCreateAction
      */
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
-        if (!Cache::has('currentPlatformEloq')) {
-            return $contll->msgOut(false, [], '100203');
-        }
-        $currentPlatformEloq = Cache::get('currentPlatformEloq');
         try {
-            $data['platform_id'] = $currentPlatformEloq->platform_id;
+            $data['platform_id'] = $contll->currentPlatformEloq->platform_id;
             $data['group_name'] = $inputDatas['group_name'];
             $data['role'] = $inputDatas['role'];
             $role = $inputDatas['role'] == '*' ? Arr::wrap($inputDatas['role']) : Arr::wrap(json_decode($inputDatas['role'],

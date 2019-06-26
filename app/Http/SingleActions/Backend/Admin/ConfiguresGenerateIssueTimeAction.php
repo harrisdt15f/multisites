@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-21 20:27:38
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-21 21:22:36
+ * @Last Modified time: 2019-06-26 16:55:22
  */
 namespace App\Http\SingleActions\Backend\Admin;
 
@@ -64,10 +64,6 @@ class ConfiguresGenerateIssueTimeAction
      */
     public function createIssueConfigure($time): bool
     {
-        if (!Cache::has('partnerAdmin')) {
-            return $contll->msgOut(false, [], '100302');
-        }
-        $partnerAdmin = Cache::get('partnerAdmin');
         DB::beginTransaction();
         try {
             //生成父级 奖期相关 系统配置
@@ -77,8 +73,8 @@ class ConfiguresGenerateIssueTimeAction
                 'sign' => 'issue',
                 'name' => '奖期相关',
                 'description' => '奖期相关的所有配置',
-                'add_admin_id' => $partnerAdmin->id,
-                'last_update_admin_id' => $partnerAdmin->id,
+                'add_admin_id' => $contll->partnerAdmin->id,
+                'last_update_admin_id' => $contll->partnerAdmin->id,
                 'status' => 1,
                 'display' => 0,
             ];
@@ -93,8 +89,8 @@ class ConfiguresGenerateIssueTimeAction
                 'name' => '生成奖期时间',
                 'description' => '每天自动生成奖期的时间',
                 'value' => $time,
-                'add_admin_id' => $partnerAdmin->id,
-                'last_update_admin_id' => $partnerAdmin->id,
+                'add_admin_id' => $contll->partnerAdmin->id,
+                'last_update_admin_id' => $contll->partnerAdmin->id,
                 'status' => 1,
                 'display' => 0,
             ];

@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-21 17:12:39
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-21 21:18:59
+ * @Last Modified time: 2019-06-26 17:04:50
  */
 namespace App\Http\SingleActions\Backend\Admin\Homepage;
 
@@ -35,14 +35,10 @@ class HomepageUploadIcoAction
      */
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
-        if (!Cache::has('currentPlatformEloq')) {
-            return $contll->msgOut(false, [], '101901');
-        }
-        $currentPlatformEloq = Cache::get('currentPlatformEloq');
         $pastData = $this->model::where('en_name', 'frontend.ico')->first();
         $imageObj = new ImageArrange();
         $folderName = 'frontend';
-        $depositPath = $imageObj->depositPath($folderName, $currentPlatformEloq->platform_id, $currentPlatformEloq->platform_name) . '/ico';
+        $depositPath = $imageObj->depositPath($folderName, $contll->currentPlatformEloq->platform_id, $contll->currentPlatformEloq->platform_name) . '/ico';
         $ico = $imageObj->uploadImg($inputDatas['ico'], $depositPath);
         $pastIco = $pastData->value;
         try {

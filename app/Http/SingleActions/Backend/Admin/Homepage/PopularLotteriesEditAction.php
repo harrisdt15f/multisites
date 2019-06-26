@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-21 17:34:31
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-21 21:19:28
+ * @Last Modified time: 2019-06-26 17:05:29
  */
 namespace App\Http\SingleActions\Backend\Admin\Homepage;
 
@@ -35,10 +35,6 @@ class PopularLotteriesEditAction
      */
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
-        if (!Cache::has('currentPlatformEloq')) {
-            return $contll->msgOut(false, [], '102001');
-        }
-        $currentPlatformEloq = Cache::get('currentPlatformEloq');
         //检查该热门类型是否存在重复彩票
         $checkData = $this->model::where('lotteries_id', $inputDatas['lotteries_id'])->where('id', '!=', $inputDatas['id'])->first();
         if ($checkData === true) {
@@ -49,7 +45,7 @@ class PopularLotteriesEditAction
         if (isset($inputDatas['pic'])) {
             $pastPic = $pastDataEloq->pic_path;
             $imageObj = new ImageArrange();
-            $depositPath = $imageObj->depositPath('popular_lotteries', $currentPlatformEloq->platform_id, $currentPlatformEloq->platform_name);
+            $depositPath = $imageObj->depositPath('popular_lotteries', $contll->currentPlatformEloq->platform_id, $contll->currentPlatformEloq->platform_name);
             $pic = $imageObj->uploadImg($inputDatas['pic'], $depositPath);
             if ($pic['success'] === false) {
                 return $contll->msgOut(false, [], '400', $pic['msg']);

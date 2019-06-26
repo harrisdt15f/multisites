@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-24 20:26:17
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-25 22:00:01
+ * @Last Modified time: 2019-06-26 17:05:52
  */
 namespace App\Http\SingleActions\Backend\Users;
 
@@ -36,14 +36,10 @@ class UserHandleCreateUserAction
      */
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
-        if (!Cache::has('currentPlatformEloq')) {
-            return $contll->msgOut(false, [], '100106');
-        }
-        $currentPlatformEloq = Cache::get('currentPlatformEloq');
         $inputDatas['password'] = bcrypt($inputDatas['password']);
         $inputDatas['fund_password'] = bcrypt($inputDatas['fund_password']);
-        $inputDatas['platform_id'] = $currentPlatformEloq->platform_id;
-        $inputDatas['sign'] = $currentPlatformEloq->platform_sign;
+        $inputDatas['platform_id'] = $contll->currentPlatformEloq->platform_id;
+        $inputDatas['sign'] = $contll->currentPlatformEloq->platform_sign;
         $inputDatas['vip_level'] = 0;
         $inputDatas['parent_id'] = 0;
         $inputDatas['register_ip'] = request()->ip();

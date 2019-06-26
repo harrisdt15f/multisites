@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-21 19:34:58
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-21 21:21:26
+ * @Last Modified time: 2019-06-26 17:01:09
  */
 namespace App\Http\SingleActions\Backend\Admin\Notice;
 
@@ -34,12 +34,8 @@ class NoticeAddAction
      */
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
-        if (!Cache::has('partnerAdmin')) {
-            return $contll->msgOut(false, [], '102104');
-        }
-        $partnerAdmin = Cache::get('partnerAdmin');
         $addData = $inputDatas;
-        $addData['admin_id'] = $partnerAdmin->id;
+        $addData['admin_id'] = $contll->partnerAdmin->id;
         $maxSort = $this->model::select('sort')->max('sort');
         $addData['sort'] = ++$maxSort;
         try {

@@ -23,7 +23,7 @@ class BackEndApiMainController extends Controller
     public $partnerAdmin; //当前的商户用户
     protected $currentOptRoute; //目前路由
     protected $fullMenuLists; //所有的菜单
-    protected $currentPlatformEloq = null; //当前商户存在的平台
+    public $currentPlatformEloq = null; //当前商户存在的平台
     protected $currentPartnerAccessGroup = null; //当前商户的权限组
     protected $partnerMenulists; //目前所有的菜单为前端展示用的
     protected $eloqM = ''; // 当前的eloquent
@@ -43,7 +43,6 @@ class BackEndApiMainController extends Controller
             $this->partnerAdmin = $this->currentAuth->user();
             if ($this->partnerAdmin !== null) {
                 //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
-                Cache::forever('partnerAdmin', $this->partnerAdmin);
                 $this->currentPartnerAccessGroup = new BackendAdminAccessGroup();
                 $this->currentPlatformEloq = new SystemPlatform();
                 if ($this->partnerAdmin->platform()->exists()) {
