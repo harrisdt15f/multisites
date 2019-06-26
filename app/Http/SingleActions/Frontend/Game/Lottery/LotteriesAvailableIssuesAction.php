@@ -51,7 +51,7 @@ class LotteriesAvailableIssuesAction
             'begin_time' => $_lastIssue->begin_time,
             'end_time' => $_lastIssue->end_time,
             'open_time' => $_lastIssue->allow_encode_time,
-            'open_code' => '1,2,3,4,5',
+            'open_code' => $_lastIssue->official_code,
         ] : [];
         $data = [
             'issueInfo' => $canBetIssueData,

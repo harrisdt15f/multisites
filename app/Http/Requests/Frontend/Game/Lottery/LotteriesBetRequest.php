@@ -47,7 +47,7 @@ class LotteriesBetRequest extends BaseFormRequest
             'balls.*.price' => 'required|integer',
 
             'trace_win_stop' => 'required|integer',
-            'total_cost' => 'required|integer',
+            'total_cost' => 'required|regex:/^\d+(\.\d{1,2})?$/',
             'from' => 'integer',
             'is_trace' => 'required|integer|in:0,1',
         ];
