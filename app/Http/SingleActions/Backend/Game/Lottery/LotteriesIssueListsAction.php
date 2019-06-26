@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-24 16:12:52
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-26 15:47:47
+ * @Last Modified time: 2019-06-26 17:43:40
  */
 namespace App\Http\SingleActions\Backend\Game\Lottery;
 
@@ -58,14 +58,14 @@ class LotteriesIssueListsAction
             if (isset($contll->inputs['begin_time'], $contll->inputs['end_time'])) {
                 $timeCondtions = '[["end_time",">=",' . $contll->inputs['begin_time'] . '],["end_time","<=",' . $contll->inputs['end_time'] . ']]';
             } else {
-                $timeToSubstract = 20;
+                $timeToSubstract = 1200; // 秒
                 //选定彩种并展示已过期的期数
                 if (isset($contll->inputs['lottery_id'], $contll->inputs['previous_number'])) {
                     $lotteryEloq = LotteryList::where('en_name', $contll->inputs['lottery_id'])->first();
                     $issueSeconds = $lotteryEloq->issueRule->issue_seconds;
-                    $timeToSubstract = ($issueSeconds * $contll->inputs['previous_number']) / 60;
+                    $timeToSubstract = $issueSeconds * $contll->inputs['previous_number'];
                 }
-                $afewMinutes = Carbon::now()->subMinute($timeToSubstract)->timestamp;
+                $afewMinutes = Carbon::now()->subSeconds($timeToSubstract)->timestamp;
                 $timeCondtions = '[["end_time",">=",' . $afewMinutes . ']]';
             }
             $contll->inputs['time_condtions'] = $contll->inputs['time_condtions'] ?? $timeCondtions; // 从现在开始。如果。没有时间字段的话，就用当前时间以上的显示
