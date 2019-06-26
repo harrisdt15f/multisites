@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-25 16:57:54
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-26 16:49:23
+ * @Last Modified time: 2019-06-26 17:58:03
  */
 namespace App\Http\SingleActions\Frontend\User\Fund;
 
@@ -40,16 +40,16 @@ class UserBankCardAddAction
             $configEloq = $this->createConfig();
         }
         $maxNumber = $configEloq->value;
-        $nowNumber = $this->model::where('user_id', $contll->partnerAdmin->id)->count();
+        $nowNumber = $this->model::where('user_id', $contll->partnerUser->id)->count();
         if ($nowNumber >= $maxNumber) {
             return $contll->msgOut(false, [], '100202');
         }
         $addData = [
-            'user_id' => $contll->partnerAdmin->id,
-            'parent_id' => $contll->partnerAdmin->parent_id,
-            'top_id' => $contll->partnerAdmin->top_id,
-            'rid' => $contll->partnerAdmin->rid,
-            'username' => $contll->partnerAdmin->username,
+            'user_id' => $contll->partnerUser->id,
+            'parent_id' => $contll->partnerUser->parent_id,
+            'top_id' => $contll->partnerUser->top_id,
+            'rid' => $contll->partnerUser->rid,
+            'username' => $contll->partnerUser->username,
             'bank_sign' => $inputDatas['bank_sign'],
             'bank_name' => $inputDatas['bank_name'],
             'owner_name' => $inputDatas['owner_name'],

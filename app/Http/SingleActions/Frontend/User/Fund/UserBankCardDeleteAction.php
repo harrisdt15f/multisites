@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-25 16:59:44
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-26 16:49:51
+ * @Last Modified time: 2019-06-26 17:58:11
  */
 namespace App\Http\SingleActions\Frontend\User\Fund;
 
@@ -33,7 +33,7 @@ class UserBankCardDeleteAction
     public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
     {
         $bankCardEloq = $this->model::find($inputDatas['id']);
-        if ($bankCardEloq->user_id != $contll->partnerAdmin->id) {
+        if ($bankCardEloq->user_id != $contll->partnerUser->id) {
             return $contll->msgOut(false, [], '100200');
         }
         if ($bankCardEloq->delete()) {

@@ -146,14 +146,14 @@ class FrontendAuthController extends FrontendApiMainController
     public function selfResetPassword(FrontendAuthSelfResetPasswordRequest $request)
     {
         $inputDatas = $request->validated();
-        if (!Hash::check($inputDatas['old_password'], $this->partnerAdmin->password)) {
+        if (!Hash::check($inputDatas['old_password'], $this->partnerUser->password)) {
             return $this->msgOut(false, [], '100003');
         } else {
             $token = $this->refresh();
-            $this->partnerAdmin->password = Hash::make($inputDatas['password']);
-            $this->partnerAdmin->remember_token = $token;
+            $this->partnerUser->password = Hash::make($inputDatas['password']);
+            $this->partnerUser->remember_token = $token;
             try {
-                $this->partnerAdmin->save();
+                $this->partnerUser->save();
                 $expireInMinute = $this->currentAuth->factory()->getTTL();
                 $expireAt = Carbon::now()->addMinutes($expireInMinute)->format('Y-m-d H:i:s');
                 $data = [
@@ -319,7 +319,7 @@ class FrontendAuthController extends FrontendApiMainController
         //     ['id', '=', $inputDatas['id']],
         //     ['username', '=', $inputDatas['username']],
         // ])->first();
-        $targetUserEloq = $this->eloqM::find($this->partnerAdmin->id);
+        $targetUserEloq = $this->eloqM::find($this->partnerUser->id);
         if ($inputDatas['old_password'] === $inputDatas['new_password']) {
             return $this->msgOut(false, [], '100007');
         }
@@ -354,7 +354,7 @@ class FrontendAuthController extends FrontendApiMainController
      */
     public function isExistFundPassword(): JsonResponse
     {
-        if ($this->partnerAdmin->fund_password !== null) {
+        if ($this->partnerUser->fund_password !== null) {
             $status = true;
         } else {
             $status = false;

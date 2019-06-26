@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 class FrontendApiMainController extends Controller
 {
     protected $inputs;
-    public $partnerAdmin; //当前的商户用户
+    public $partnerUser; //当前的用户
     protected $currentOptRoute; //目前路由
     protected $currentPlatformEloq = null; //当前商户存在的平台
     public $eloqM = ''; // 当前的eloquent
@@ -31,7 +31,7 @@ class FrontendApiMainController extends Controller
         $this->middleware('auth:frontend-web', ['except' => $open_route]);
         $this->middleware(function ($request, $next) {
             $this->currentAuth = auth($this->currentGuard);
-            $this->partnerAdmin = $this->currentAuth->user();
+            $this->partnerUser = $this->currentAuth->user();
             $this->inputs = Input::all(); //获取所有相关的传参数据
             //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
             $this->userOperateLog();
