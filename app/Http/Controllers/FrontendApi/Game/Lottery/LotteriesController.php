@@ -14,6 +14,7 @@ use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryInfoAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryListAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesProjectHistoryAction;
 use App\Models\Game\Lottery\LotteryIssue;
+use Exception;
 use Illuminate\Http\JsonResponse;
 
 class LotteriesController extends FrontendApiMainController
@@ -83,9 +84,10 @@ class LotteriesController extends FrontendApiMainController
 
     /**
      * 游戏-投注
-     * @param  LotteriesBetRequest $request
+     * @param  LotteriesBetRequest  $request
      * @param  LotteriesBetAction  $action
      * @return JsonResponse
+     * @throws Exception
      */
     public function bet(LotteriesBetRequest $request, LotteriesBetAction $action): JsonResponse
     {

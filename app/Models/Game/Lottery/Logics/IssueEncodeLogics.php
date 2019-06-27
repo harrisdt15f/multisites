@@ -14,7 +14,6 @@ use App\Models\Game\Lottery\LotteryTraceList;
 use App\Models\LotteryTrace;
 use App\Models\Project;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Request;
 
 trait IssueEncodeLogics
 {
