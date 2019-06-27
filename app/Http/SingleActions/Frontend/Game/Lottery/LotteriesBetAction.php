@@ -142,33 +142,22 @@ class LotteriesBetAction
         /*if ($currentIssue->issue != $traceData[0]) {
         return $this->msgOut(false, [], '', '对不起, 奖期已过期!');
         }*/
-        $accountLocker = new AccountLocker($usr->id);
-        if (!$accountLocker->getLock()) {
-            return $contll->msgOut(false, [], '100311');
-        }
         if ($usr->account()->exists()) {
             $account = $usr->account;
             if ($account->balance < $_totalCost) {
-//不知道 $totalcost * 10000 所以去掉了
-                $accountLocker->release();
                 return $contll->msgOut(false, [], '100312');
             }
         } else {
             return $contll->msgOut(false, [], '100313');
         }
-
+        if ((int)$inputDatas['is_trace'] === 1 && count($inputDatas['trace_issues']) > 1) {
+            $traceData = array_slice($inputDatas['trace_issues'], 1, null, true);
+        } else {
+            $traceData = [];
+        }
         DB::beginTransaction();
         try {
-            if ((int)$inputDatas['is_trace'] === 1 && count($inputDatas['trace_issues']) > 1) {
-                $traceData = array_slice($inputDatas['trace_issues'], 1, null, true);
-            } else {
-                $traceData = [];
-            }
             $data = Project::addProject($usr, $lottery, $currentIssue, $betDetail, $traceData, $inputDatas);
-            // 帐变
-            $accountChange = new AccountChange();
-            $accountChange->setReportMode(AccountChange::MODE_REPORT_AFTER);
-            $accountChange->setChangeMode(AccountChange::MODE_CHANGE_AFTER);
             foreach ($data['project'] as $item) {
                 $params = [
                     'user_id' => $usr->id,
@@ -178,22 +167,18 @@ class LotteriesBetAction
                     'project_id' => $item['id'],
                     'issue' => $currentIssue->issue,
                 ];
-                $res = $accountChange->doChange($account, 'bet_cost', $params);
+                $res = $account->operateAccount($params, 'bet_cost');
                 if ($res !== true) {
                     DB::rollBack();
-                    $accountLocker->release();
-                    return $contll->msgOut(false, [], '', '对不起, '.$res);
+                    return $contll->msgOut(false, [], '', $res);
                 }
             }
-            $accountChange->triggerSave();
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
-            $accountLocker->release();
             Log::info('投注-异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine()); //Clog::userBet
             return $contll->msgOut(false, [], '', '对不起, '.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine());
         }
-        $accountLocker->release();
         return $contll->msgOut(true, $data);
     }
 }

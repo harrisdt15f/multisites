@@ -3,9 +3,14 @@
 namespace App\Models\User\Fund\Logics;
 
 use App\Lib\Clog;
+use App\Lib\Locker\AccountLocker;
+use App\Lib\Logic\AccountChange;
 use App\Models\Account\AccountChangeType;
+use App\Models\Project;
 use App\Models\User\FrontendUsersAccount;
+use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Created by PhpStorm.
@@ -31,7 +36,7 @@ trait UserAccountLogics
         if (isset($c['parent_name']) && $c['parent_name']) {
             $query->where('frontend_users_accounts.parent_name', $c['parent_name']);
         }
-        $currentPage =  $c['page_index'] ?? 1;
+        $currentPage = $c['page_index'] ?? 1;
         $pageSize = $c['page_size'] ?? 15;
         $offset = ($currentPage - 1) * $pageSize;
         $total = $query->count();
@@ -257,5 +262,31 @@ trait UserAccountLogics
             $this->frozen -= $money;
         }
         return $ret;
+    }
+
+    public function operateAccount($params, $type)
+    {
+        $accountLocker = new AccountLocker($this->user->id);
+        if (!$accountLocker->getLock()) {
+            return '对不起, 获取账户锁失败!';
+        }
+        try {
+            // 帐变
+            $accountChange = new AccountChange();
+            $accountChange->setReportMode(AccountChange::MODE_REPORT_AFTER);
+            $accountChange->setChangeMode(AccountChange::MODE_CHANGE_AFTER);
+            $res = $accountChange->doChange($this, $type, $params);
+            if ($res !== true) {
+                $accountLocker->release();
+                return '对不起, '.$res;
+            }
+            $accountChange->triggerSave();
+            $accountLocker->release();
+            return true;
+        } catch (Exception $e) {
+            $accountLocker->release();
+            Log::info('投注-异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine()); //Clog::userBet
+            return '对不起, '.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine();
+        }
     }
 }

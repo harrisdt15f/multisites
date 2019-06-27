@@ -203,6 +203,7 @@ trait ProjectTraits
                             'day' => date('Ymd'),
                             'bet_from' => $from,
                         ];
+                        $_item['total_price'] += $traceListData['total_price'];
                         LotteryTraceList::create($traceListData);
                     }
                     $i++;
