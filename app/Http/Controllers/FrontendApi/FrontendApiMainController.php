@@ -20,7 +20,7 @@ class FrontendApiMainController extends Controller
     //当前的route name;
     protected $log_uuid; //当前的logId
     protected $currentGuard = 'frontend-web';
-    protected $currentAuth;
+    public $currentAuth;
 
     /**
      * AdminMainController constructor.
