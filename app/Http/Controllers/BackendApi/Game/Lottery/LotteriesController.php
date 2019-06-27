@@ -28,7 +28,7 @@ use Illuminate\Http\JsonResponse;
 
 class LotteriesController extends BackEndApiMainController
 {
-    public $lotteryIssueEloq = 'Game\Lottery\LotteryIssue';
+    public $lotteryIssueEloq = 'Game\Lottery\LotteryIssue'; //issueLists
 
     /**
      * 获取系列接口
