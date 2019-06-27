@@ -222,8 +222,12 @@ class LotteriesController extends FrontendApiMainController
         }
         DB::beginTransaction();
         try {
-            $traceData = count($inputDatas['trace_issues']) > 1 ? array_slice($inputDatas['trace_issues'], 1) : [];
-            $from = $inputDatas['from'] ?? 1;
+            if ((int)$inputDatas['is_trace'] === 1 && count($inputDatas['trace_issues']) > 1) {
+                $traceData = array_slice($inputDatas['trace_issues'], 1, null, true);
+            } else {
+                $traceData = [];
+            }
+            $from = $inputDatas['from'] ?? 1;//手机端 还是 pc 端
             $data = Project::addProject($usr, $lottery, $currentIssue, $betDetail, $traceData, $from);
             // 帐变
             $accountChange = new AccountChange();

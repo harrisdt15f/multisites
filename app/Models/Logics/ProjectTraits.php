@@ -3,17 +3,13 @@
 namespace App\Models\Logics;
 
 use App\Models\DeveloperUsage\MethodLevel\LotteryMethodsWaysLevel;
+use App\Models\Game\Lottery\LotteryTraceList;
 use App\Models\LotteryTrace;
+use App\Models\Project;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 
-/**
- * @Author: LingPh
- * @Date:   2019-05-29 17:44:08
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-18 22:20:47
- */
 trait ProjectTraits
 {
 
@@ -72,7 +68,7 @@ trait ProjectTraits
                 'bet_codes' => $item->bet_number,
                 'total_cost' => $item->total_cost,
                 'single_price' => $item->price,
-                'bonus' =>$item->bonus,
+                'bonus' => $item->bonus,
                 'prize_group' => $item->bet_prize_group,
                 'status' => $item->status,
             ];
@@ -111,7 +107,6 @@ trait ProjectTraits
     public static function addProject($user, $lottery, $currentIssue, $data, $traceData, $from = 1): array
     {
         $returnData = [];
-        $traceMainData = [];
         foreach ($data as $_item) {
             $projectData = [
                 'user_id' => $user->id,
@@ -138,9 +133,9 @@ trait ProjectTraits
                 'bet_from' => $from,
                 'time_bought' => time(),
             ];
-            $id = DB::table('projects')->insertGetId($projectData);
+            $projectId = Project::create($projectData)->id;
             if ($traceData) {
-                $traceMainData[] = [
+                $traceMainData = [
                     'user_id' => $user->id,
                     'username' => $user->username,
                     'top_id' => $user->top_id,
@@ -175,12 +170,11 @@ trait ProjectTraits
                     'bet_from' => $from,
                 ];
                 // 保存追号主
-                DB::table('lottery_traces')->insert($traceMainData);
+                $traceId = LotteryTrace::create($traceMainData)->id;
                 // 保存追号
-                $traceListData = [];
-                foreach ($traceData as $issue => $mark) {
+                foreach ($traceData as $issue => $multiple) {
                     foreach ($data as $dataItem) {
-                        $traceListData[] = [
+                        $traceListData = [
                             'user_id' => $user->id,
                             'username' => $user->username,
                             'top_id' => $user->top_id,
@@ -194,9 +188,9 @@ trait ProjectTraits
                             'issue' => $issue,
                             'bet_number' => $dataItem['code'],
                             'mode' => $dataItem['mode'],
-                            'times' => $dataItem['times'],
+                            'times' => $dataItem['times'] * $multiple,
                             'single_price' => $dataItem['price'],
-                            'total_price' => $dataItem['total_price'],
+                            'total_price' => $dataItem['total_price'] * $multiple,
                             'user_prize_group' => $user->prize_group,
                             'bet_prize_group' => $dataItem['prize_group'],
                             'ip' => Request::ip(),
@@ -204,12 +198,12 @@ trait ProjectTraits
                             'day' => date('Ymd'),
                             'bet_from' => $from,
                         ];
+                        LotteryTraceList::create($traceListData);
                     }
                 }
-                DB::table('lottery_trace_lists')->insert($traceListData);
             }
             $returnData['project'][] = [
-                'id' => $id,
+                'id' => $projectId,
                 'cost' => $_item['total_price'],
                 'lottery_id' => $lottery->en_name,
                 'method_id' => $_item['method_id'],
@@ -218,53 +212,8 @@ trait ProjectTraits
         return $returnData;
     }
 
-    // 开奖
-    public function open($openCode)
-    {
-        $project = $this;
-        $lottery = Lottery::getLottery($project->lottery_id);
-        $methodArr = $lottery->getMethod($project->method_id);
-        $oMethod = $methodArr['object'];
-
-        $openCodeArr = $lottery->formatOpenCode($openCode);
-        $result = $oMethod->assert($project->bet_number, $openCodeArr);
-        $totalBonus = 0;
-        if ($result) {
-            foreach ($result as $level => $count) {
-                $levelConfig = $oMethod->levels;
-                if (isset($levelConfig[$level])) {
-                    $prize = $levelConfig[$level]['prize'];
-                    $bonus = 2000 * $project->bet_prize_group / $prize;
-                    $bonus = $bonus * $count * $project->times * $project->mode;
-                    if ($project->single_price == 1) {
-                        $bonus = $bonus / 2;
-                    }
-                    $totalBonus += $bonus;
-                }
-            }
-        }
-        $project->status_count = 1;
-        $project->time_count = time();
-        $project->status_prize = 1;
-        $project->time_prize = time();
-        if ($totalBonus > 0) {
-            $project->is_win = 1;
-            $project->bonus = $totalBonus;
-            $project->save();
-            return [
-                'user_id' => $project->user_id,
-                'project_id' => $project->id,
-                'lottery_id' => $project->lottery_id,
-                'method_id' => $project->method_id,
-                'issue' => $project->issue,
-                'amount' => $totalBonus,
-            ];
-        }
-        $project->save();
-        return [];
-    }
-
     /**
+     * 开奖
      * @param $openNumber
      * @param $sWnNumber
      * @param $aPrized
@@ -282,7 +231,7 @@ trait ProjectTraits
             ])->first();
             if ($iCount > 0) {
                 $bonus = $this->bet_prize_group * $PrizeEloq->prize / 1800;
-                $bonus = $bonus * $iCount * $this->times * $this->mode;
+                $bonus *= $this->mode * $this->times * $iCount;
                 if ($this->price === 1) {
                     $bonus /= 2;
                 }
