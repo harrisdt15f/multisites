@@ -28,7 +28,6 @@ use Illuminate\Http\JsonResponse;
 
 class LotteriesController extends BackEndApiMainController
 {
-    protected $methodCacheName = 'play_method_list';
     public $lotteryIssueEloq = 'Game\Lottery\LotteryIssue';
 
     /**
@@ -139,9 +138,8 @@ class LotteriesController extends BackEndApiMainController
      */
     public function clearMethodCache(): void
     {
-        $redisKey = $this->methodCacheName;
         $cacheRelated = new CacheRelated();
-        $cacheRelated->delete($redisKey);
+        $cacheRelated->delete('play_method_list');
     }
 
     /**

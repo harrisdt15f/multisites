@@ -15,8 +15,6 @@ use Illuminate\Http\JsonResponse;
 
 class FrontendAppRouteController extends BackEndApiMainController
 {
-    protected $eloqM = 'DeveloperUsage\Frontend\FrontendAppRoute';
-
     /**
      * APP路由列表
      * @param   FrontendAppRouteDetailAction $action

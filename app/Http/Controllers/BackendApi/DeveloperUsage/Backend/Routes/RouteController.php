@@ -14,8 +14,6 @@ use Illuminate\Http\JsonResponse;
 
 class RouteController extends BackEndApiMainController
 {
-    protected $eloqM = 'DeveloperUsage\Backend\BackendAdminRoute';
-
     /**
      * 路由列表
      * @param   RouteDetailAction $action

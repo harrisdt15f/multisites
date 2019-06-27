@@ -24,12 +24,12 @@ class BackEndApiMainController extends Controller
     protected $currentOptRoute; //目前路由
     protected $fullMenuLists; //所有的菜单
     public $currentPlatformEloq = null; //当前商户存在的平台
-    protected $currentPartnerAccessGroup = null; //当前商户的权限组
+    public $currentPartnerAccessGroup = null; //当前商户的权限组
     protected $partnerMenulists; //目前所有的菜单为前端展示用的
     protected $eloqM = ''; // 当前的eloquent
     protected $currentRouteName; //当前的route name;
     protected $routeAccessable = false;
-    protected $log_uuid; //当前的logId
+    public $log_uuid; //当前的logId
     protected $currentGuard = 'backend';
     public $currentAuth;
 

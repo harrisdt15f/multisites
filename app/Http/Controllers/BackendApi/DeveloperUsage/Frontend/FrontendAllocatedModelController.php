@@ -15,8 +15,6 @@ use Illuminate\Http\JsonResponse;
 
 class FrontendAllocatedModelController extends BackEndApiMainController
 {
-    protected $eloqM = 'DeveloperUsage\Frontend\FrontendAllocatedModel';
-
     /**
      * 前端模块列表
      * @param   FrontendAllocatedModelDetailRequest $request

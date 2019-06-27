@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-24 15:18:22
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-24 15:19:06
+ * @Last Modified time: 2019-06-27 10:35:18
  */
 namespace App\Http\SingleActions\Backend\DeveloperUsage\Frontend;
 
@@ -26,7 +26,7 @@ class FrontendWebRouteIsOpenAction
     }
 
     /**
-     * 删除web路由
+     * 设置web路由是否开放
      * @param   BackEndApiMainController  $contll
      * @param   $inputDatas
      * @return  JsonResponse
