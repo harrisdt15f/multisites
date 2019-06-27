@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-24 18:37:49
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-24 18:38:42
+ * @Last Modified time: 2019-06-27 10:48:03
  */
 namespace App\Http\SingleActions\Backend\Users\District;
 
@@ -25,7 +25,7 @@ class RegionSearchTownAction
     }
 
     /**
-     * 获取 镇(街道) 列表
+     * 模糊搜索 镇(街道)
      * @param  BackEndApiMainController  $contll
      * @param  $inputDatas
      * @return JsonResponse

@@ -20,7 +20,7 @@ use Illuminate\Http\JsonResponse;
 
 class HomepageBannerController extends BackEndApiMainController
 {
-    public $folderName = 'Homepagec_Rotation_chart';
+    public $folderName = 'homepage_banner';
 
     /**
      * 首页轮播图列表

@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-24 19:39:16
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-24 19:47:10
+ * @Last Modified time: 2019-06-27 10:50:53
  */
 namespace App\Http\SingleActions\Backend\Users\District;
 
@@ -33,20 +33,21 @@ class RegionEditAction
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
         $isExist = $this->model::where([
-            'region_parent_id' => $inputDatas['region_parent_id'],
-            'region_name' => $inputDatas['region_name'],
-        ])->orwhere('region_id', $inputDatas['region_id'])->exists();
+            ['region_id', '=', $inputDatas['region_id']],
+            ['id', '!=', $inputDatas['id']],
+        ])->exists();
         if ($isExist === true) {
             return $contll->msgOut(false, [], '101001');
         }
         try {
-            $configure = new $this->model();
-            $configure->fill($inputDatas);
-            $configure->save();
+            $editDataEloq = $this->model::find($inputDatas['id']);
+            $editDataEloq->region_id = $inputDatas['region_id'];
+            $editDataEloq->region_name = $inputDatas['region_name'];
+            $editDataEloq->save();
             return $contll->msgOut(true);
         } catch (Exception $e) {
             $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
+            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
             return $contll->msgOut(false, [], $sqlState, $msg);
         }
     }

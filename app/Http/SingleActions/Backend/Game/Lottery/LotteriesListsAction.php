@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-24 16:00:38
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-24 16:02:48
+ * @Last Modified time: 2019-06-27 10:39:09
  */
 namespace App\Http\SingleActions\Backend\Game\Lottery;
 
@@ -33,7 +33,7 @@ class LotteriesListsAction
      */
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
-        $lotteriesEloq = $this->model::where([
+        $lotteries = $this->model::where([
             ['series_id', '=', $inputDatas['series_id']],
             ['status', '=', 1],
         ])->with([
@@ -42,6 +42,6 @@ class LotteriesListsAction
                     'first_time', 'adjust_time', 'encode_time', 'issue_count', 'status', 'created_at', 'updated_at');
             },
         ])->get()->toArray();
-        return $contll->msgOut(true, $lotteriesEloq);
+        return $contll->msgOut(true, $lotteries);
     }
 }

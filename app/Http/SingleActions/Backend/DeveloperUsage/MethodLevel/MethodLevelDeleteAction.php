@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-24 15:45:28
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-24 15:54:18
+ * @Last Modified time: 2019-06-27 10:37:52
  */
 namespace App\Http\SingleActions\Backend\DeveloperUsage\MethodLevel;
 
@@ -34,7 +34,7 @@ class MethodLevelDeleteAction
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
         try {
-            $this->model::where('id', $inputDatas['id'])->delete();
+            $this->model::find($inputDatas['id'])->delete();
             //删除玩法等级列表缓存
             $contll->deleteCache();
             return $contll->msgOut(true);

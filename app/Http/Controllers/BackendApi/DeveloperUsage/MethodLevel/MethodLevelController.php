@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-05-30 14:28:04
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-24 15:51:17
+ * @Last Modified time: 2019-06-27 10:35:47
  */
 namespace App\Http\Controllers\BackendApi\DeveloperUsage\MethodLevel;
 
@@ -18,7 +18,6 @@ use App\Http\SingleActions\Backend\DeveloperUsage\MethodLevel\MethodLevelDetailA
 use App\Http\SingleActions\Backend\DeveloperUsage\MethodLevel\MethodLevelEditAction;
 use App\Lib\Common\CacheRelated;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cache;
 
 class MethodLevelController extends BackEndApiMainController
 {

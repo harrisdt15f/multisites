@@ -4,7 +4,7 @@
  * @Author: LingPh
  * @Date:   2019-06-24 16:04:21
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-24 17:39:34
+ * @Last Modified time: 2019-06-27 10:39:24
  */
 namespace App\Http\SingleActions\Backend\Game\Lottery;
 
@@ -29,7 +29,7 @@ class LotteriesMethodListsAction
     }
 
     /**
-     * 获取彩种接口
+     * 获取玩法结果。
      * @param   BackEndApiMainController  $contll
      * @return  JsonResponse
      */
