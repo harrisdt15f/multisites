@@ -9,6 +9,8 @@ use App\Http\Requests\Frontend\FrontendAuthResetUserPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthSelfResetPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthSetFundPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthUpdatePAdmPasswordRequest;
+use App\Http\SingleActions\Frontend\FrontendAuthLoginAction;
+use App\Http\SingleActions\Frontend\FrontendAuthLogoutAction;
 use App\Http\SingleActions\Frontend\FrontendAuthResetSpecificInfosAction;
 use App\Http\SingleActions\Frontend\FrontendAuthSetFundPasswordAction;
 use App\Http\SingleActions\Frontend\FrontendAuthUserDetailAction;
@@ -16,20 +18,15 @@ use App\Http\SingleActions\Frontend\FrontendAuthUserSpecificInfosAction;
 use App\Models\Admin\BackendAdminAccessGroup;
 use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
 use Exception;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class FrontendAuthController extends FrontendApiMainController
 {
-    use AuthenticatesUsers;
 
     public $successStatus = 200;
 
@@ -43,59 +40,13 @@ class FrontendAuthController extends FrontendApiMainController
     /**
      * Login user and create token
      *
-     * @param  Request  $request
-     * @return JsonResponse [string] access_token
+     * @param  Request                  $request
+     * @param  FrontendAuthLoginAction  $action
+     * @return JsonResponse [string]    access_token
      */
-    public function login(Request $request): JsonResponse
+    public function login(Request $request, FrontendAuthLoginAction $action): JsonResponse
     {
-        $request->validate([
-            'username' => 'required|string|alpha_dash',
-            'password' => 'required|string',
-            'remember_me' => 'boolean',
-        ]);
-        $credentials = request(['username', 'password']);
-        $this->maxAttempts = 1; //1 times
-        $this->decayMinutes = 1; //1 minutes
-        // If the class is using the ThrottlesLogins trait, we can automatically throttle
-        // the login attempts for this application. We'll key this by the username and
-        // the IP address of the client making these requests into this application.
-        if ($this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
-            $seconds = $this->limiter()->availableIn(
-                $this->throttleKey($request)
-            );
-            return $this->msgOut(false, [], '100005');
-        }
-        if (!$token = $this->currentAuth->attempt($credentials)) {
-            return $this->msgOut(false, [], '100002');
-        }
-        $request->session()->regenerate();
-        $this->clearLoginAttempts($request);
-        // If the login attempt was unsuccessful we will increment the number of attempts
-        // to login and redirect the user back to the login form. Of course, when this
-        // user surpasses their maximum number of attempts they will get locked out.
-        $this->incrementLoginAttempts($request);
-        $expireInMinute = $this->currentAuth->factory()->getTTL();
-        $expireAt = Carbon::now()->addMinutes($expireInMinute)->format('Y-m-d H:i:s');
-        $user = $this->currentAuth->user();
-        if ($user->remember_token !== null) {
-            try {
-                JWTAuth::setToken($user->remember_token);
-                JWTAuth::invalidate();
-            } catch (Exception $e) {
-                Log::info($e->getMessage());
-            }
-        }
-        $user->remember_token = $token;
-        $user->last_login_ip = request()->ip();
-        $user->last_login_time = Carbon::now()->timestamp;
-        $user->save();
-        $data = [
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            'expires_at' => $expireAt,
-        ];
-        return $this->msgOut(true, $data);
+        return $action->execute($this, $request);
     }
 
     /**
@@ -186,14 +137,9 @@ class FrontendAuthController extends FrontendApiMainController
      * @param  Request  $request
      * @return JsonResponse [string] message
      */
-    public function logout(Request $request): JsonResponse
+    public function logout(Request $request, FrontendAuthLogoutAction $action): JsonResponse
     {
-        $throtleKey = Str::lower($this->username() . '|' . $request->ip());
-        $request->session()->invalidate();
-        $this->limiter()->clear($throtleKey);
-        $this->currentAuth->logout();
-        $this->currentAuth->invalidate();
-        return $this->msgOut(true, []); //'Successfully logged out'
+        return $action->execute($this, $request);
     }
 
     /**
