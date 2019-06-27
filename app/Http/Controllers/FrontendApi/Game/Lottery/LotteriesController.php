@@ -216,7 +216,7 @@ class LotteriesController extends FrontendApiMainController
             return $this->msgOut(false, [], '', '对不起, 获取账户锁失败!');
         }
         $account = $usr->account()->first();
-        if ($account->balance < $_totalCost * 10000) {
+        if ($account->balance < $_totalCost) {//不知道 $totalcost * 10000 所以去掉了
             $accountLocker->release();
             return $this->msgOut(false, [], '', '对不起, 当前余额不足!');
         }
@@ -236,7 +236,7 @@ class LotteriesController extends FrontendApiMainController
             foreach ($data['project'] as $item) {
                 $params = [
                     'user_id' => $usr->id,
-                    'amount' => $item['cost'] * 10000,
+                    'amount' => $item['cost'],
                     'lottery_id' => $item['lottery_id'],
                     'method_id' => $item['method_id'],
                     'project_id' => $item['id'],
