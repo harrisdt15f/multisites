@@ -51,7 +51,7 @@ class LotteriesBetAction
             if ($oMethod->supportExpand) {
                 $position = [];
                 if (isset($item['position'])) {
-                    $position = (array) $item['position'];
+                    $position = (array)$item['position'];
                 }
                 if (!$oMethod->checkPos($position)) {
                     return $contll->msgOut(false, [], '100300', '', 'methodName', $oMethod->name);
@@ -80,7 +80,7 @@ class LotteriesBetAction
                 return $contll->msgOut(false, [], '100301', '', 'mode', $mode);
             }
             // 奖金组 - 游戏
-            $prizeGroup = (int) $item['prize_group'];
+            $prizeGroup = (int)$item['prize_group'];
             if (!$lottery->isValidPrizeGroup($prizeGroup)) {
                 return $contll->msgOut(false, [], '100302', '', 'prizeGroup', $prizeGroup);
             }
@@ -94,7 +94,7 @@ class LotteriesBetAction
                 return $contll->msgOut(false, [], '100304', '', 'methodId', $methodId);
             }
             // 倍数
-            $times = (int) $item['times'];
+            $times = (int)$item['times'];
             if (!$lottery->isValidTimes($times)) {
                 return $contll->msgOut(false, [], '100305', '', 'times', $times);
             }
@@ -115,7 +115,7 @@ class LotteriesBetAction
                 'code' => $ball,
             ];
         }
-        if ((int) $inputDatas['is_trace'] === 1) {
+        if ((int)$inputDatas['is_trace'] === 1) {
             $i = 0;
             foreach ($inputDatas['trace_issues'] as $traceMultiple) {
                 if ($i++ < 1) {
@@ -124,7 +124,7 @@ class LotteriesBetAction
                 $_totalCost += $traceMultiple * $singleCost;
             }
         }
-        if ($_totalCost !== (int) $inputDatas['total_cost']) {
+        if ($_totalCost !== (int)$inputDatas['total_cost']) {
             return $contll->msgOut(false, [], '100307');
         }
         // 投注期号
@@ -146,15 +146,20 @@ class LotteriesBetAction
         if (!$accountLocker->getLock()) {
             return $contll->msgOut(false, [], '100311');
         }
-        $account = $usr->account()->first();
-        if ($account->balance < $_totalCost) {
+        if ($usr->account()->exists()) {
+            $account = $usr->account;
+            if ($account->balance < $_totalCost) {
 //不知道 $totalcost * 10000 所以去掉了
-            $accountLocker->release();
-            return $contll->msgOut(false, [], '100312');
+                $accountLocker->release();
+                return $contll->msgOut(false, [], '100312');
+            }
+        } else {
+            return $contll->msgOut(false, [], '100313');
         }
+
         DB::beginTransaction();
         try {
-            if ((int) $inputDatas['is_trace'] === 1 && count($inputDatas['trace_issues']) > 1) {
+            if ((int)$inputDatas['is_trace'] === 1 && count($inputDatas['trace_issues']) > 1) {
                 $traceData = array_slice($inputDatas['trace_issues'], 1, null, true);
             } else {
                 $traceData = [];
@@ -177,7 +182,7 @@ class LotteriesBetAction
                 if ($res !== true) {
                     DB::rollBack();
                     $accountLocker->release();
-                    return $contll->msgOut(false, [], '', '对不起, ' . $res);
+                    return $contll->msgOut(false, [], '', '对不起, '.$res);
                 }
             }
             $accountChange->triggerSave();
@@ -185,8 +190,8 @@ class LotteriesBetAction
         } catch (Exception $e) {
             DB::rollBack();
             $accountLocker->release();
-            Log::info('投注-异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine()); //Clog::userBet
-            return $contll->msgOut(false, [], '', '对不起, ' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine());
+            Log::info('投注-异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine()); //Clog::userBet
+            return $contll->msgOut(false, [], '', '对不起, '.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine());
         }
         $accountLocker->release();
         return $contll->msgOut(true, $data);

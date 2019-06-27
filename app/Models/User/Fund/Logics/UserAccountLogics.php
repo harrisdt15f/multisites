@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 trait UserAccountLogics
 {
 
-    public static function getList($c)
+    public static function getList($c): array
     {
         $query = FrontendUsersAccount::select(
             DB::raw('frontend_users_accounts.*'),
@@ -31,8 +31,8 @@ trait UserAccountLogics
         if (isset($c['parent_name']) && $c['parent_name']) {
             $query->where('frontend_users_accounts.parent_name', $c['parent_name']);
         }
-        $currentPage = isset($c['page_index']) ? (int) $c['page_index'] : 1;
-        $pageSize = isset($c['page_size']) ? (int) $c['page_size'] : 15;
+        $currentPage =  $c['page_index'] ?? 1;
+        $pageSize = $c['page_size'] ?? 15;
         $offset = ($currentPage - 1) * $pageSize;
         $total = $query->count();
         $data = $query->skip($offset)->take($pageSize)->get();
@@ -40,12 +40,12 @@ trait UserAccountLogics
             'data' => $data,
             'total' => $total,
             'currentPage' => $currentPage,
-            'totalPage' => (int) ceil($total / $pageSize),
+            'totalPage' => (int)ceil($total / $pageSize),
         ];
     }
 
     // 设置模式
-    public function setChangeMode($mode)
+    public function setChangeMode($mode): void
     {
         $this->mode = $mode;
     }
@@ -56,7 +56,7 @@ trait UserAccountLogics
         try {
             return $this->doChange($type, $params);
         } catch (\Exception $e) {
-            Clog::account('error-' . $e->getMessage() . '|' . $e->getLine() . '|' . $e->getFile());
+            Clog::account('error-'.$e->getMessage().'|'.$e->getLine().'|'.$e->getFile());
             return $e->getMessage();
         }
     }
@@ -202,7 +202,7 @@ trait UserAccountLogics
     }
 
     // 资金增加
-    public function add($money)
+    public function add($money): bool
     {
         $updated_at = date('Y-m-d H:i:s');
         $sql = "update `frontend_users_accounts` set `balance`=`balance`+'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}'";
@@ -214,7 +214,7 @@ trait UserAccountLogics
     }
 
     // 消耗资金
-    public function cost($money)
+    public function cost($money): bool
     {
         $updated_at = date('Y-m-d H:i:s');
         $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}' and `balance`>='{$money}'") > 0;
