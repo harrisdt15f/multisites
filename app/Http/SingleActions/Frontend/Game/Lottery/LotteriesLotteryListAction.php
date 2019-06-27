@@ -4,11 +4,13 @@
  * @Author: LingPh
  * @Date:   2019-06-24 21:43:49
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-24 21:52:15
+ * @Last Modified time: 2019-06-27 15:27:48
  */
 namespace App\Http\SingleActions\Frontend\Game\Lottery;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
+use App\Lib\Common\configurationsRelated;
+use App\Models\Admin\SystemConfiguration;
 use App\Models\Game\Lottery\LotteryList;
 use Illuminate\Http\JsonResponse;
 
@@ -21,6 +23,10 @@ class LotteriesLotteryListAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
+        $maxMultiples = SystemConfiguration::where('sign', 'max_multiples')->value('value');
+        if ($maxMultiples === null) {
+            $maxMultiples = $this->createMaxMultiplesConfig();
+        }
         $lotteries = LotteryList::with(['issueRule:lottery_id,begin_time,end_time'])->get([
             'cn_name as name',
             'en_name',
@@ -55,8 +61,21 @@ class LotteriesLotteryListAction
                 'day_issue' => $lottery->day_issue,
                 'begin_time' => $lottery->issueRule['begin_time'],
                 'end_time' => $lottery->issueRule['end_time'],
+                'maxMultiples' => $maxMultiples,
             ];
         }
         return $contll->msgOut(true, $data);
+    }
+
+    public function createMaxMultiplesConfig()
+    {
+        $configurationsRelated = new configurationsRelated();
+        $parentId = systemConfiguration::where('sign', 'system')->value('id');
+        if ($parentId === null) {
+            $systemELoq = $configurationsRelated->create(0, 'system', '系统相关', '所有系统相关配置都保存此', null, 1, 1);
+            $parentId = $systemELoq->id;
+        }
+        $maxMultiplesEloq = $configurationsRelated->create($parentId, 'max_multiples', '投注最大倍数', '玩家投注时可选择的最大倍数', 10000, 1, 1);
+        return $maxMultiplesEloq->value;
     }
 }

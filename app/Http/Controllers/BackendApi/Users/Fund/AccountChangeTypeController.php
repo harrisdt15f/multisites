@@ -14,8 +14,6 @@ use Illuminate\Http\JsonResponse;
 
 class AccountChangeTypeController extends BackEndApiMainController
 {
-    protected $eloqM = 'User\Fund\AccountChangeType';
-
     /**
      * 帐变类型列表
      * @param   AccountChangeTypeDetailAction $action

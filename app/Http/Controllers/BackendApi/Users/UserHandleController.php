@@ -12,6 +12,9 @@ use App\Http\Requests\Backend\Users\UserHandleDeactivateRequest;
 use App\Http\Requests\Backend\Users\UserHandleDeductionBalanceRequest;
 use App\Http\Requests\Backend\Users\UserHandleUserAccountChangeRequest;
 use App\Http\Requests\Backend\Users\UserHandleUserRechargeHistoryRequest;
+use App\Http\SingleActions\Backend\Users\UserHandleCommonAppliedPasswordHandleAction;
+use App\Http\SingleActions\Backend\Users\UserHandleCommonAuditPasswordAction;
+use App\Http\SingleActions\Backend\Users\UserHandleCommonHandleUserPasswordAction;
 use App\Http\SingleActions\Backend\Users\UserHandleCreateUserAction;
 use App\Http\SingleActions\Backend\Users\UserHandleDeactivateAction;
 use App\Http\SingleActions\Backend\Users\UserHandleDeactivateDetailAction;
@@ -20,16 +23,11 @@ use App\Http\SingleActions\Backend\Users\UserHandleUserAccountChangeAction;
 use App\Http\SingleActions\Backend\Users\UserHandleUserRechargeHistoryAction;
 use App\Http\SingleActions\Backend\Users\UserHandleUsersInfoAction;
 use App\Models\Admin\BackendAdminAuditPasswordsList;
-use App\Models\BackendAdminAuditFlowList;
-use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 
 class UserHandleController extends BackEndApiMainController
 {
-    protected $eloqM = 'User\FrontendUser';
-    protected $withNameSpace = 'Admin\BackendAdminAuditPasswordsList';
+    public $withNameSpace = 'Admin\BackendAdminAuditPasswordsList';
 
     /**
      * 创建总代时获取当前平台的奖金组
@@ -69,10 +67,10 @@ class UserHandleController extends BackEndApiMainController
      * @param  UserHandleApplyResetUserPasswordRequest $request
      * @return JsonResponse
      */
-    public function applyResetUserPassword(UserHandleApplyResetUserPasswordRequest $request): JsonResponse
+    public function applyResetUserPassword(UserHandleApplyResetUserPasswordRequest $request, UserHandleCommonHandleUserPasswordAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        return $this->commonHandleUserPassword($inputDatas, 1);
+        return $this->commonHandleUserPassword($inputDatas, $action, 1);
     }
 
     /**
@@ -80,162 +78,81 @@ class UserHandleController extends BackEndApiMainController
      * @param  UserHandleApplyResetUserFundPasswordRequest $request
      * @return JsonResponse
      */
-    public function applyResetUserFundPassword(UserHandleApplyResetUserFundPasswordRequest $request): JsonResponse
+    public function applyResetUserFundPassword(UserHandleApplyResetUserFundPasswordRequest $request, UserHandleCommonHandleUserPasswordAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        return $this->commonHandleUserPassword($inputDatas, 2);
+        return $this->commonHandleUserPassword($inputDatas, $action, 2);
     }
 
     /**
      * 申请资金密码跟密码共用功能
      * @param  $inputDatas
+     * @param  $action
      * @param  $type todo if type new added then should notice on error message
      * @return JsonResponse
      */
-    public function commonHandleUserPassword($inputDatas, $type): JsonResponse
+    public function commonHandleUserPassword($inputDatas, $action, $type): JsonResponse
     {
-        $applyUserEloq = $this->eloqM::find($inputDatas['id']);
-        if ($applyUserEloq !== null) {
-            $auditFlowEloq = new BackendAdminAuditFlowList();
-            $adminApplyEloq = new BackendAdminAuditPasswordsList();
-            //###################
-            $adminApplyCheck = $adminApplyEloq::where([
-                ['user_id', '=', $applyUserEloq->id],
-                ['status', '=', 0],
-                ['type', '=', $type],
-            ])->exists();
-            if ($adminApplyCheckEloq === true) {
-                if ($type === 1) {
-                    $code = '100100';
-                } else {
-                    if ($type === 2) {
-                        $code = '100101';
-                    }
-                }
-                return $this->msgOut(false, [], $code);
-            }
-            //###################
-            $flowData = [
-                'admin_id' => $this->partnerAdmin->id,
-                'admin_name' => $this->partnerAdmin->name,
-                'username' => $applyUserEloq->username,
-                'apply_note' => $inputDatas['apply_note'] ?? '',
-            ];
-            DB::beginTransaction();
-            try {
-                $auditResult = $auditFlowEloq->fill($flowData);
-                $auditResult->save();
-                $auditData = [
-                    'type' => $type,
-                    'user_id' => $applyUserEloq->id,
-                    'audit_data' => Hash::make($inputDatas['password']),
-                    'audit_flow_id' => $auditResult->id,
-                    'status' => 0,
-                ];
-                $adminApplyResult = $adminApplyEloq->fill($auditData);
-                $adminApplyResult->save();
-                DB::commit();
-                return $this->msgOut(true);
-            } catch (Exception $e) {
-                DB::rollBack();
-                $errorObj = $e->getPrevious()->getPrevious();
-                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-                return $this->msgOut(false, [], $sqlState, $msg);
-            }
-        } else {
-            return $this->msgOut(false, [], '100004');
-        }
+        return $action->execute($this, $inputDatas, $type);
     }
 
     /**
      * 用户已申请的密码列表
      * @return JsonResponse
      */
-    public function appliedResetUserPasswordLists(): JsonResponse
+    public function appliedResetUserPasswordLists(UserHandleCommonAppliedPasswordHandleAction $action): JsonResponse
     {
-        return $this->commonAppliedPasswordHandle();
+        return $this->commonAppliedPasswordHandle($action);
     }
 
     /**
      * 用户资金密码已申请列表
      * @return JsonResponse
      */
-    public function appliedResetUserFundPasswordLists(): JsonResponse
+    public function appliedResetUserFundPasswordLists(UserHandleCommonAppliedPasswordHandleAction $action): JsonResponse
     {
-        return $this->commonAppliedPasswordHandle();
+        return $this->commonAppliedPasswordHandle($action);
     }
 
     /**
+     * 用户登录密码和资金密码公用列表
+     * @param  UserHandleCommonAppliedPasswordHandleAction $action
      * @return JsonResponse
      */
-    private function commonAppliedPasswordHandle(): JsonResponse
+    private function commonAppliedPasswordHandle($action): JsonResponse
     {
-        //main model
-        $eloqM = $this->modelWithNameSpace($this->withNameSpace);
-        //target model to join
-        $fixedJoin = 1; //number of joining tables
-        $withTable = 'auditFlow';
-        $witTableCriterias = $withTable . ':id,admin_id,auditor_id,apply_note,auditor_note,updated_at,admin_name,auditor_name,username';
-        $searchAbleFields = ['type', 'status', 'created_at', 'updated_at'];
-        $withSearchAbleFields = ['username'];
-        $data = $this->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields);
-        return $this->msgOut(true, $data);
-    }
-
-    public function auditApplyUserPassword()
-    {
-        return $this->commonAuditPassword();
-    }
-
-    public function auditApplyUserFundPassword()
-    {
-        return $this->commonAuditPassword();
+        return $action->execute($this);
     }
 
     /**
      * @param  UserHandleCommonAuditPasswordRequest $request
+     * @param  UserHandleCommonAuditPasswordAction  $action
      * @return JsonResponse
      */
-    public function commonAuditPassword(UserHandleCommonAuditPasswordRequest $request): JsonResponse
+    public function auditApplyUserPassword(UserHandleCommonAuditPasswordRequest $request, UserHandleCommonAuditPasswordAction $action): JsonResponse
+    {
+        return $this->commonAuditPassword($request, $action);
+    }
+
+    /**
+     * @param  UserHandleCommonAuditPasswordRequest $request
+     * @param  UserHandleCommonAuditPasswordAction  $action
+     * @return JsonResponse
+     */
+    public function auditApplyUserFundPassword(UserHandleCommonAuditPasswordRequest $request, UserHandleCommonAuditPasswordAction $action): JsonResponse
+    {
+        return $this->commonAuditPassword($request, $action);
+    }
+
+    /**
+     * @param  $request
+     * @param  $action
+     * @return JsonResponse
+     */
+    public function commonAuditPassword($request, $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        $eloqM = $this->modelWithNameSpace($this->withNameSpace);
-        $applyUserEloq = $eloqM::where([
-            ['id', '=', $inputDatas['id']],
-            ['type', '=', $inputDatas['type']],
-            ['status', '=', 0],
-        ])->first();
-        if ($applyUserEloq !== null) {
-            $auditFlowEloq = $applyUserEloq->auditFlow;
-            //handle User
-            $user = FrontendUser::find($applyUserEloq->user_id);
-            if ($applyUserEloq->type == 1) {
-                $user->password = $applyUserEloq->audit_data;
-            } else {
-                $user->fund_password = $applyUserEloq->audit_data;
-            }
-            DB::beginTransaction();
-            try {
-                if ($inputDatas['status'] == 1) {
-                    $user->save();
-                }
-                $auditFlowEloq->auditor_id = $this->partnerAdmin->id;
-                $auditFlowEloq->auditor_note = $tinputDatas['auditor_note'];
-                $auditFlowEloq->auditor_name = $this->partnerAdmin->name;
-                $auditFlowEloq->save();
-                $applyUserEloq->status = $inputDatas['status'];
-                $applyUserEloq->save();
-                DB::commit();
-                return $this->msgOut(true);
-            } catch (Exception $e) {
-                DB::rollBack();
-                $errorObj = $e->getPrevious()->getPrevious();
-                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-                return $this->msgOut(false, [], $sqlState, $msg);
-            }
-        } else {
-            return $this->msgOut(false, [], '100102');
-        }
+        return $action->execute($this, $inputDatas);
     }
 
     /**

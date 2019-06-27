@@ -10,7 +10,6 @@ use App\Http\SingleActions\Backend\DeveloperUsage\Frontend\FrontendAppRouteAddAc
 use App\Http\SingleActions\Backend\DeveloperUsage\Frontend\FrontendAppRouteDeleteAction;
 use App\Http\SingleActions\Backend\DeveloperUsage\Frontend\FrontendAppRouteDetailAction;
 use App\Http\SingleActions\Backend\DeveloperUsage\Frontend\FrontendAppRouteIsOpenAction;
-use Exception;
 use Illuminate\Http\JsonResponse;
 
 class FrontendAppRouteController extends BackEndApiMainController

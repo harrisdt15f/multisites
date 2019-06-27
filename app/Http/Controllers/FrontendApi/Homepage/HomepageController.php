@@ -16,7 +16,6 @@ use Illuminate\Http\JsonResponse;
 
 class HomepageController extends FrontendApiMainController
 {
-    public $eloqM = 'DeveloperUsage\Frontend\FrontendAllocatedModel';
     public $offMsg = '当前模块为关闭状态';
 
     /**

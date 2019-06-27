@@ -15,8 +15,8 @@ use Illuminate\Http\JsonResponse;
 
 class RechargeCheckController extends BackEndApiMainController
 {
-    public $successMessage = '你的人工充值申请已通过';
-    public $failureMessage = '你的人工充值申请被驳回';
+    public $successMessage = '你的人工充值申请已通过'; //auditSuccess
+    public $failureMessage = '你的人工充值申请被驳回'; //auditFailure
 
     /**
      * 人工充值列表

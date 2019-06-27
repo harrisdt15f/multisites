@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\FrontendApi;
 
-use App\Http\Requests\Frontend\FrontendAuthDeletePartnerAdminRequest;
 use App\Http\Requests\Frontend\FrontendAuthRegisterRequest;
 use App\Http\Requests\Frontend\FrontendAuthResetFundPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthResetSpecificInfosRequest;
@@ -10,30 +9,24 @@ use App\Http\Requests\Frontend\FrontendAuthResetUserPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthSelfResetPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthSetFundPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthUpdatePAdmPasswordRequest;
-use App\Http\Requests\Frontend\FrontendAuthUpdateUserGroupRequest;
+use App\Http\SingleActions\Frontend\FrontendAuthLoginAction;
+use App\Http\SingleActions\Frontend\FrontendAuthLogoutAction;
 use App\Http\SingleActions\Frontend\FrontendAuthResetSpecificInfosAction;
 use App\Http\SingleActions\Frontend\FrontendAuthSetFundPasswordAction;
+use App\Http\SingleActions\Frontend\FrontendAuthUserDetailAction;
 use App\Http\SingleActions\Frontend\FrontendAuthUserSpecificInfosAction;
 use App\Models\Admin\BackendAdminAccessGroup;
 use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
-use App\Models\Admin\SystemConfiguration;
 use Exception;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class FrontendAuthController extends FrontendApiMainController
 {
-    use AuthenticatesUsers;
 
     public $successStatus = 200;
 
@@ -47,87 +40,23 @@ class FrontendAuthController extends FrontendApiMainController
     /**
      * Login user and create token
      *
-     * @param  Request  $request
-     * @return JsonResponse [string] access_token
+     * @param  Request                  $request
+     * @param  FrontendAuthLoginAction  $action
+     * @return JsonResponse [string]    access_token
      */
-    public function login(Request $request): JsonResponse
+    public function login(Request $request, FrontendAuthLoginAction $action): JsonResponse
     {
-        $request->validate([
-            'username' => 'required|string|alpha_dash',
-            'password' => 'required|string',
-            'remember_me' => 'boolean',
-        ]);
-        $credentials = request(['username', 'password']);
-        $this->maxAttempts = 1; //1 times
-        $this->decayMinutes = 1; //1 minutes
-        // If the class is using the ThrottlesLogins trait, we can automatically throttle
-        // the login attempts for this application. We'll key this by the username and
-        // the IP address of the client making these requests into this application.
-        if ($this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
-            $seconds = $this->limiter()->availableIn(
-                $this->throttleKey($request)
-            );
-            return $this->msgOut(false, [], '100005');
-        }
-        if (!$token = $this->currentAuth->attempt($credentials)) {
-            return $this->msgOut(false, [], '100002');
-        }
-        $request->session()->regenerate();
-        $this->clearLoginAttempts($request);
-        // If the login attempt was unsuccessful we will increment the number of attempts
-        // to login and redirect the user back to the login form. Of course, when this
-        // user surpasses their maximum number of attempts they will get locked out.
-        $this->incrementLoginAttempts($request);
-        $expireInMinute = $this->currentAuth->factory()->getTTL();
-        $expireAt = Carbon::now()->addMinutes($expireInMinute)->format('Y-m-d H:i:s');
-        $user = $this->currentAuth->user();
-        if ($user->remember_token !== null) {
-            try {
-                JWTAuth::setToken($user->remember_token);
-                JWTAuth::invalidate();
-            } catch (Exception $e) {
-                Log::info($e->getMessage());
-            }
-        }
-        $user->remember_token = $token;
-        $user->last_login_ip = request()->ip();
-        $user->last_login_time = Carbon::now()->timestamp;
-        $user->save();
-        $data = [
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            'expires_at' => $expireAt,
-        ];
-        return $this->msgOut(true, $data);
+        return $action->execute($this, $request);
     }
 
-    public function userDetail()
+    /**
+     * 用户信息
+     * @param  FrontendAuthUserDetailAction $action
+     * @return JsonResponse
+     */
+    public function userDetail(FrontendAuthUserDetailAction $action): JsonResponse
     {
-        $user = $this->currentAuth->user();
-        $account = $user->account;
-        $balance = $account->balance;
-        $frozen = $account->frozen;
-        $data = [
-            'user_id' => $user->id,
-            'username' => $user->username,
-            'prize_group' => $user->prize_group,
-            'user_type' => $user->type,
-            'is_tester' => $user->is_tester,
-            'last_login_time' => $user->last_login_time->toDateTimeString(),
-            'levels' => $user->levels,
-            'can_withdraw' => $user->frozen_type <= 0, //$user->frozen_type > 0 ? false : true
-            'today_withdraw' => 0, //
-            'daysalary_percentage' => 0,
-            'bonus_percentage' => 0,
-            'allowed_transfer' => true,
-            'balance' => sprintf('%1.4f', substr($balance, 0, strrpos($balance, '.', 0) + 1 + 4)),
-            'frozen_balance' => sprintf('%1.4f', substr($frozen, 0, strrpos($frozen, '.', 0) + 1 + 4)),
-            'has_funds_password' => $user->fund_password ? true : false,
-            'download_url' => SystemConfiguration::getConfigValue('app_download_url') . '/' . $user->invite_code,
-            'version' => SystemConfiguration::getConfigValue('app_version'),
-        ];
-        return $this->msgOut(true, $data);
+        return $action->execute($this);
     }
 
     /**
@@ -171,7 +100,6 @@ class FrontendAuthController extends FrontendApiMainController
                 return $this->msgOut(false, [], $sqlState, $msg);
             }
         }
-
     }
 
     /**
@@ -205,54 +133,13 @@ class FrontendAuthController extends FrontendApiMainController
     }
 
     /**
-     * 获取所有当前平台的商户管理员用户
-     * @return JsonResponse
-     */
-    public function allUser():  ? JsonResponse
-    {
-        try {
-            $data = $this->currentPlatformEloq->partnerAdminUsers;
-            if (is_null($data)) {
-                $result = Arr::wrap($data);
-            } else {
-                $result = $data->toArray();
-            }
-            return $this->msgOut(true, $result);
-        } catch (Exception $e) {
-            return $this->msgOut(false, [], $e->getCode(), $e->getMessage());
-        }
-    }
-
-    /**
-     * @param  FrontendAuthUpdateUserGroupRequest $request
-     * @return JsonResponse|null
-     */
-    public function updateUserGroup(FrontendAuthUpdateUserGroupRequest $request) :  ? JsonResponse
-    {
-        $inputDatas = $request->validated();
-        $targetUserEloq = $this->eloqM::find($inputDatas['id']);
-        if ($targetUserEloq !== null) {
-            $targetUserEloq->group_id = $inputDatas['group_id'];
-            if ($targetUserEloq->save()) {
-                $result = $targetUserEloq->toArray();
-                return $this->msgOut(true, $result);
-            }
-        }
-    }
-
-    /**
      * Logout user (Revoke the token)
      * @param  Request  $request
      * @return JsonResponse [string] message
      */
-    public function logout(Request $request) : JsonResponse
+    public function logout(Request $request, FrontendAuthLogoutAction $action): JsonResponse
     {
-        $throtleKey = Str::lower($this->username() . '|' . $request->ip());
-        $request->session()->invalidate();
-        $this->limiter()->clear($throtleKey);
-        $this->currentAuth->logout();
-        $this->currentAuth->invalidate();
-        return $this->msgOut(true, []); //'Successfully logged out'
+        return $action->execute($this, $request);
     }
 
     /**
@@ -266,34 +153,12 @@ class FrontendAuthController extends FrontendApiMainController
         return response()->json($request->user());
     }
 
-    public function deletePartnerAdmin(FrontendAuthDeletePartnerAdminRequest $request):  ? JsonResponse
-    {
-        $inputDatas = $request->validated();
-        $targetUserEloq = $this->eloqM::where([
-            ['id', '=', $inputDatas['id']],
-            ['name', '=', $inputDatas['name']],
-        ])->first();
-        if ($targetUserEloq !== null) {
-            $token = $targetUserEloq->token();
-            if ($token) {
-                $token->revoke(); //取消目前登录中的状态
-            }
-//            OauthAccessTokens::clearOldToken($targetUserEloq->id); //删除相关登录的token
-            if ($targetUserEloq->delete()) {
-//删除用户
-                return $this->msgOut(true);
-            }
-        } else {
-            return $this->msgOut(false, [], '100004');
-        }
-    }
-
     /**
      * 用户修改登录密码
      * @param  FrontendAuthResetUserPasswordRequest $request
      * @return JsonResponse
      */
-    public function resetUserPassword(FrontendAuthResetUserPasswordRequest $request) : JsonResponse
+    public function resetUserPassword(FrontendAuthResetUserPasswordRequest $request): JsonResponse
     {
         $inputDatas = $request->validated();
         return $this->commonHandleUserPassword($inputDatas, 1);
@@ -328,6 +193,8 @@ class FrontendAuthController extends FrontendApiMainController
         if ($type === 1) {
             $field = 'password';
             $oldPassword = $targetUserEloq->password;
+            $token = $this->refresh();
+            $targetUserEloq->remember_token = $token;
         } elseif ($type === 2) {
             $field = 'fund_password';
             $oldPassword = $targetUserEloq->fund_password;

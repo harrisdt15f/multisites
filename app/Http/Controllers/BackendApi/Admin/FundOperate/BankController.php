@@ -10,7 +10,6 @@ use App\Http\SingleActions\Backend\Admin\FundOperate\BankAddAction;
 use App\Http\SingleActions\Backend\Admin\FundOperate\BankDeleteAction;
 use App\Http\SingleActions\Backend\Admin\FundOperate\BankDetailAction;
 use App\Http\SingleActions\Backend\Admin\FundOperate\BankEditAction;
-use Exception;
 use Illuminate\Http\JsonResponse;
 
 class BankController extends BackEndApiMainController

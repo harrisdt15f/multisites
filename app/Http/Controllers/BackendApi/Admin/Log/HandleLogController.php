@@ -24,7 +24,7 @@ class HandleLogController extends BackEndApiMainController
     /**
      * 前台日志列表
      * @param   HandleLogFrontendLogsAction $action
-     * @return JsonResponse
+     * @return  JsonResponse
      */
     public function frontendLogs(HandleLogFrontendLogsAction $action): JsonResponse
     {
@@ -33,9 +33,9 @@ class HandleLogController extends BackEndApiMainController
 
     /**
      * IP获取地址
-     * @param  HandleLogGetAddressRequest $request
+     * @param   HandleLogGetAddressRequest $request
      * @param   HandleLogGetAddressAction $action
-     * @return JsonResponse
+     * @return  JsonResponse
      */
     public function getAddress(HandleLogGetAddressRequest $request, HandleLogGetAddressAction $action): JsonResponse
     {
