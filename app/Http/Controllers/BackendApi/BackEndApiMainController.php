@@ -123,7 +123,7 @@ class BackEndApiMainController extends Controller
      * @param  string  $code
      * @return JsonResponse
      */
-    public function msgOut($success = false, $data = [], $code = '', $message = ''): JsonResponse
+    public function msgOut($success = false, $data = [], $code = '', $message = '', $key = null, $value = null): JsonResponse
     {
         /*if ($this->currentAuth->user())
         {
@@ -136,7 +136,11 @@ class BackEndApiMainController extends Controller
         } else {
             $code = $code == '' ? $defaultErrorCode : $code;
         }
-        $message = $message == '' ? __('codes-map.' . $code) : $message;
+        if ($key === null || $value === null) {
+            $message = $message == '' ? __('frontend-codes-map.' . $code) : $message;
+        } else {
+            $message = $message == '' ? __('frontend-codes-map.' . $code, [$key => $value]) : $message;
+        }
         $datas = [
             'success' => $success,
             'code' => $code,

@@ -60,7 +60,7 @@ class FrontendApiMainController extends Controller
      * @param  string  $code
      * @return JsonResponse
      */
-    public function msgOut($success = false, $data = [], $code = '', $message = ''): JsonResponse
+    public function msgOut($success = false, $data = [], $code = '', $message = '', $key = null, $value = null): JsonResponse
     {
         $defaultSuccessCode = '200';
         $defaultErrorCode = '404';
@@ -69,7 +69,11 @@ class FrontendApiMainController extends Controller
         } else {
             $code = $code == '' ? $defaultErrorCode : $code;
         }
-        $message = $message == '' ? __('frontend-codes-map.' . $code) : $message;
+        if ($key === null || $value === null) {
+            $message = $message == '' ? __('frontend-codes-map.' . $code) : $message;
+        } else {
+            $message = $message == '' ? __('frontend-codes-map.' . $code, [$key => $value]) : $message;
+        }
         $datas = [
             'success' => $success,
             'code' => $code,

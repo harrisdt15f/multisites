@@ -54,7 +54,7 @@ class LotteriesController extends FrontendApiMainController
     public function issueHistory(
         LotteriesIssueHistoryRequest $request,
         LotteriesIssueHistoryAction $action
-    ): JsonResponse {
+    ): JsonResponse{
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -68,7 +68,7 @@ class LotteriesController extends FrontendApiMainController
     public function availableIssues(
         LotteriesAvailableIssuesRequest $request,
         LotteriesAvailableIssuesAction $action
-    ): JsonResponse {
+    ): JsonResponse{
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -82,7 +82,7 @@ class LotteriesController extends FrontendApiMainController
     public function projectHistory(
         LotteriesProjectHistoryRequest $request,
         LotteriesProjectHistoryAction $action
-    ): JsonResponse {
+    ): JsonResponse{
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -116,10 +116,10 @@ class LotteriesController extends FrontendApiMainController
             if ($oMethod->supportExpand) {
                 $position = [];
                 if (isset($item['position'])) {
-                    $position = (array)$item['position'];
+                    $position = (array) $item['position'];
                 }
-                if (!$oMethod->checkPos($position)) {
-                    return "对不起, 玩法{$method['name']}位置不正确!";
+                if (!$oMethod->checkPos($position) || 1 != 2) {
+                    return $this->msgOut(false, [], '100300', '', 'methodName', $oMethod->name);
                 }
                 $expands = $oMethod->expand($item['codes'], $position);
                 foreach ($expands as $expand) {
@@ -142,31 +142,31 @@ class LotteriesController extends FrontendApiMainController
             $mode = $item['mode'];
             $modes = config('game.main.modes_array');
             if (!in_array($mode, $modes)) {
-                return $this->msgOut(false, [], '', "对不起, 模式{$mode}, 不存在!");
+                return $this->msgOut(false, [], '100301', '', 'mode', $mode);
             }
             // 奖金组 - 游戏
-            $prizeGroup = (int)$item['prize_group'];
+            $prizeGroup = (int) $item['prize_group'];
             if (!$lottery->isValidPrizeGroup($prizeGroup)) {
-                return $this->msgOut(false, [], '', "对不起, 奖金组{$prizeGroup}, 游戏未开放!");
+                return $this->msgOut(false, [], '100302', '', 'prizeGroup', $prizeGroup);
             }
             // 奖金组 - 用户
             if ($usr->prize_group < $prizeGroup) {
-                return $this->msgOut(false, [], '', "对不起, 奖金组{$prizeGroup}, 用户不合法!");
+                return $this->msgOut(false, [], '100303', '', 'prizeGroup', $prizeGroup);
             }
             // 投注号码
             $ball = $item['codes'];
             if (!$oMethod->regexp($ball)) {
-                return $this->msgOut(false, [], '', "对不起, 玩法{$methodId}, 注单号码不合法!");
+                return $this->msgOut(false, [], '100304', '', 'methodId', $methodId);
             }
             // 倍数
-            $times = (int)$item['times'];
+            $times = (int) $item['times'];
             if (!$lottery->isValidTimes($times)) {
-                return $this->msgOut(false, [], '', "对不起, 倍数{$times}, 不合法!");
+                return $this->msgOut(false, [], '100305', '', 'times', $times);
             }
             // 单价花费
             $singleCost = $mode * $times * $item['price'] * $item['count'];
             if ($singleCost !== $item['cost']) {
-                return $this->msgOut(false, [], '', '对不起, 单价不符合!');
+                return $this->msgOut(false, [], '100306');
             }
             $_totalCost += $singleCost;
             $betDetail[] = [
@@ -180,7 +180,7 @@ class LotteriesController extends FrontendApiMainController
                 'code' => $ball,
             ];
         }
-        if ((int)$inputDatas['is_trace'] === 1) {
+        if ((int) $inputDatas['is_trace'] === 1) {
             $i = 0;
             foreach ($inputDatas['trace_issues'] as $traceMultiple) {
                 if ($i++ < 1) {
@@ -189,23 +189,23 @@ class LotteriesController extends FrontendApiMainController
                 $_totalCost += $traceMultiple * $singleCost;
             }
         }
-        if ($_totalCost !== (int)$inputDatas['total_cost']) {
-            return $this->msgOut(false, [], '', '对不起, 总价不符合!');
+        if ($_totalCost !== (int) $inputDatas['total_cost']) {
+            return $this->msgOut(false, [], '100307');
         }
         // 投注期号
         $traceData = array_keys($inputDatas['trace_issues']);
         // 检测追号奖期
         if (!$traceData || !is_array($traceData)) {
-            return $this->msgOut(false, [], '', '对不起, 无效的追号奖期数据!');
+            return $this->msgOut(false, [], '100308');
         }
         $traceDataCollection = $lottery->checkTraceData($traceData);
         if (count($traceData) !== $traceDataCollection->count()) {
-            return $this->msgOut(false, [], '', '对不起, 追号奖期不正确!');
+            return $this->msgOut(false, [], '100309');
         }
         // 获取当前奖期 @todo 判断过期 还是其他期
         $currentIssue = LotteryIssue::getCurrentIssue($lottery->en_name);
         if (!$currentIssue) {
-            return $this->msgOut(false, [], '', '对不起, 奖期已过期!');
+            return $this->msgOut(false, [], '100310');
         }
         // 奖期和追号
         /*if ($currentIssue->issue != $traceData[0]) {
@@ -213,21 +213,22 @@ class LotteriesController extends FrontendApiMainController
         }*/
         $accountLocker = new AccountLocker($usr->id);
         if (!$accountLocker->getLock()) {
-            return $this->msgOut(false, [], '', '对不起, 获取账户锁失败!');
+            return $this->msgOut(false, [], '100311');
         }
         $account = $usr->account()->first();
-        if ($account->balance < $_totalCost) {//不知道 $totalcost * 10000 所以去掉了
+        if ($account->balance < $_totalCost) {
+//不知道 $totalcost * 10000 所以去掉了
             $accountLocker->release();
-            return $this->msgOut(false, [], '', '对不起, 当前余额不足!');
+            return $this->msgOut(false, [], '100312');
         }
         DB::beginTransaction();
         try {
-            if ((int)$inputDatas['is_trace'] === 1 && count($inputDatas['trace_issues']) > 1) {
+            if ((int) $inputDatas['is_trace'] === 1 && count($inputDatas['trace_issues']) > 1) {
                 $traceData = array_slice($inputDatas['trace_issues'], 1, null, true);
             } else {
                 $traceData = [];
             }
-            $from = $inputDatas['from'] ?? 1;//手机端 还是 pc 端
+            $from = $inputDatas['from'] ?? 1; //手机端 还是 pc 端
             $data = Project::addProject($usr, $lottery, $currentIssue, $betDetail, $traceData, $from);
             // 帐变
             $accountChange = new AccountChange();
@@ -246,7 +247,7 @@ class LotteriesController extends FrontendApiMainController
                 if ($res !== true) {
                     DB::rollBack();
                     $accountLocker->release();
-                    return $this->msgOut(false, [], '', '对不起, '.$res);
+                    return $this->msgOut(false, [], '', '对不起, ' . $res);
                 }
             }
             $accountChange->triggerSave();
@@ -254,8 +255,8 @@ class LotteriesController extends FrontendApiMainController
         } catch (\Exception $e) {
             DB::rollBack();
             $accountLocker->release();
-            Log::info('投注-异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine()); //Clog::userBet
-            return $this->msgOut(false, [], '', '对不起, '.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine());
+            Log::info('投注-异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine()); //Clog::userBet
+            return $this->msgOut(false, [], '', '对不起, ' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine());
         }
         $accountLocker->release();
         return $this->msgOut(true, $data);
