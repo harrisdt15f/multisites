@@ -12,16 +12,10 @@ use App\Http\SingleActions\Backend\DeveloperUsage\Backend\Menu\MenuAllRequireInf
 use App\Http\SingleActions\Backend\DeveloperUsage\Backend\Menu\MenuChangeParentAction;
 use App\Http\SingleActions\Backend\DeveloperUsage\Backend\Menu\MenuDeleteAction;
 use App\Http\SingleActions\Backend\DeveloperUsage\Backend\Menu\MenuEditAction;
-use App\Models\DeveloperUsage\Backend\BackendAdminRoute;
-use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
-use Exception;
-use function GuzzleHttp\json_decode;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Route;
 
 class MenuController extends BackEndApiMainController
 {
-    protected $eloqM = 'DeveloperUsage\Menu\BackendSystemMenu';
 
     public function getAllMenu()
     {
