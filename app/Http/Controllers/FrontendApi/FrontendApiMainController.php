@@ -56,8 +56,10 @@ class FrontendApiMainController extends Controller
     /**
      * @param  bool  $success
      * @param  array  $data
-     * @param  string  $message
      * @param  string  $code
+     * @param  string  $message
+     * @param  null  $key
+     * @param  null  $value
      * @return JsonResponse
      */
     public function msgOut($success = false, $data = [], $code = '', $message = '', $key = null, $value = null): JsonResponse

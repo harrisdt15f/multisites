@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-27 18:03:02
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-27 18:07:21
- */
 namespace App\Http\SingleActions\Frontend\Game\Lottery;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
@@ -14,6 +8,7 @@ use App\Lib\Logic\AccountChange;
 use App\Models\Game\Lottery\LotteryIssue;
 use App\Models\Game\Lottery\LotteryList;
 use App\Models\Project;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -26,6 +21,7 @@ class LotteriesBetAction
      * @param  FrontendApiMainController  $contll
      * @param  $inputDatas
      * @return JsonResponse
+     * @throws Exception
      */
     public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
     {
@@ -57,7 +53,7 @@ class LotteriesBetAction
                 if (isset($item['position'])) {
                     $position = (array) $item['position'];
                 }
-                if (!$oMethod->checkPos($position) || 1 != 2) {
+                if (!$oMethod->checkPos($position)) {
                     return $contll->msgOut(false, [], '100300', '', 'methodName', $oMethod->name);
                 }
                 $expands = $oMethod->expand($item['codes'], $position);
@@ -132,13 +128,9 @@ class LotteriesBetAction
             return $contll->msgOut(false, [], '100307');
         }
         // 投注期号
-        $traceData = array_keys($inputDatas['trace_issues']);
-        // 检测追号奖期
-        if (!$traceData || !is_array($traceData)) {
-            return $contll->msgOut(false, [], '100308');
-        }
-        $traceDataCollection = $lottery->checkTraceData($traceData);
-        if (count($traceData) !== $traceDataCollection->count()) {
+        $arrTraceKeys = array_keys($inputDatas['trace_issues']);
+        $traceDataCollection = $lottery->checkTraceData($arrTraceKeys);
+        if (count($arrTraceKeys) !== $traceDataCollection->count()) {
             return $contll->msgOut(false, [], '100309');
         }
         // 获取当前奖期 @todo 判断过期 还是其他期
@@ -167,8 +159,7 @@ class LotteriesBetAction
             } else {
                 $traceData = [];
             }
-            $from = $inputDatas['from'] ?? 1; //手机端 还是 pc 端
-            $data = Project::addProject($usr, $lottery, $currentIssue, $betDetail, $traceData, $from);
+            $data = Project::addProject($usr, $lottery, $currentIssue, $betDetail, $traceData, $inputDatas);
             // 帐变
             $accountChange = new AccountChange();
             $accountChange->setReportMode(AccountChange::MODE_REPORT_AFTER);
@@ -191,7 +182,7 @@ class LotteriesBetAction
             }
             $accountChange->triggerSave();
             DB::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             $accountLocker->release();
             Log::info('投注-异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine()); //Clog::userBet
