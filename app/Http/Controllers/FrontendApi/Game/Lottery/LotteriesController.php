@@ -193,13 +193,9 @@ class LotteriesController extends FrontendApiMainController
             return $this->msgOut(false, [], '', '对不起, 总价不符合!');
         }
         // 投注期号
-        $traceData = array_keys($inputDatas['trace_issues']);
-        // 检测追号奖期
-        if (!$traceData || !is_array($traceData)) {
-            return $this->msgOut(false, [], '', '对不起, 无效的追号奖期数据!');
-        }
-        $traceDataCollection = $lottery->checkTraceData($traceData);
-        if (count($traceData) !== $traceDataCollection->count()) {
+        $arrTraceKeys = array_keys($inputDatas['trace_issues']);
+        $traceDataCollection = $lottery->checkTraceData($arrTraceKeys);
+        if (count($arrTraceKeys) !== $traceDataCollection->count()) {
             return $this->msgOut(false, [], '', '对不起, 追号奖期不正确!');
         }
         // 获取当前奖期 @todo 判断过期 还是其他期
@@ -227,8 +223,7 @@ class LotteriesController extends FrontendApiMainController
             } else {
                 $traceData = [];
             }
-            $from = $inputDatas['from'] ?? 1;//手机端 还是 pc 端
-            $data = Project::addProject($usr, $lottery, $currentIssue, $betDetail, $traceData, $from);
+            $data = Project::addProject($usr, $lottery, $currentIssue, $betDetail, $traceData, $inputDatas);
             // 帐变
             $accountChange = new AccountChange();
             $accountChange->setReportMode(AccountChange::MODE_REPORT_AFTER);
@@ -263,6 +258,6 @@ class LotteriesController extends FrontendApiMainController
 
     public function setWinPrize()
     {
-        LotteryIssue::calculateEncodedNumber('cqssc', '190624052');
+        LotteryIssue::calculateEncodedNumber('cqssc', '190627048');
     }
 }

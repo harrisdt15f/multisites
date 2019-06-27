@@ -101,11 +101,12 @@ trait ProjectTraits
      * @param $currentIssue
      * @param $data
      * @param $traceData
-     * @param  int  $from
+     * @param $inputDatas
      * @return array
      */
-    public static function addProject($user, $lottery, $currentIssue, $data, $traceData, $from = 1): array
+    public static function addProject($user, $lottery, $currentIssue, $data, $traceData, $inputDatas): array
     {
+        $from = $inputDatas['from'] ?? 1;//手机端 还是 pc 端
         $returnData = [];
         foreach ($data as $_item) {
             $projectData = [
@@ -153,12 +154,13 @@ trait ProjectTraits
                     'times' => $_item['times'],
                     'single_price' => $_item['price'],
                     'total_price' => $_item['total_price'],
+                    'win_stop' => $inputDatas['trace_win_stop'],
                     'total_issues' => count($traceData),
                     'finished_issues' => 0,
                     'canceled_issues' => 0,
-                    'start_issue' => $traceData[key($traceData)],
+                    'start_issue' => key($traceData),
                     'now_issue' => '',
-                    'end_issue' => $traceData[array_key_last($traceData)],
+                    'end_issue' => array_key_last($traceData),
                     'stop_issue' => '',
                     'issue_process' => json_encode($traceData),
                     'add_time' => time(),
@@ -172,6 +174,7 @@ trait ProjectTraits
                 // 保存追号主
                 $traceId = LotteryTrace::create($traceMainData)->id;
                 // 保存追号
+                $i = 1;
                 foreach ($traceData as $issue => $multiple) {
                     foreach ($data as $dataItem) {
                         $traceListData = [
@@ -179,6 +182,8 @@ trait ProjectTraits
                             'username' => $user->username,
                             'top_id' => $user->top_id,
                             'rid' => $user->rid,
+                            'trace_id' => $traceId,
+                            'order_queue' => $i,
                             'parent_id' => $user->parent_id,
                             'is_tester' => $user->is_tester,
                             'series_id' => $lottery->series_id,
@@ -200,6 +205,7 @@ trait ProjectTraits
                         ];
                         LotteryTraceList::create($traceListData);
                     }
+                    $i++;
                 }
             }
             $returnData['project'][] = [
@@ -217,9 +223,10 @@ trait ProjectTraits
      * @param $openNumber
      * @param $sWnNumber
      * @param $aPrized
+     * @param  int  $win
      * @return bool|string
      */
-    public function setWon($openNumber, $sWnNumber, $aPrized)
+    public function setWon($openNumber, $sWnNumber, $aPrized, &$win = 0)
     {
         $totalBonus = 0;
         foreach ($aPrized as $iBasicMethodId => $aPrizeOfBasicMethod) {
@@ -251,6 +258,7 @@ trait ProjectTraits
                     $lockProject = $this->lockForUpdate()->find($this->id);
                     $lockProject->update($data);
                     DB::commit();
+                    $win = 1;
                 } catch (Exception $e) {
                     Log::channel('issues')->info($e->getMessage());
                     DB::rollBack();
