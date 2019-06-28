@@ -124,7 +124,7 @@ class LotteriesBetAction
                 $_totalCost += $traceMultiple * $singleCost;
             }
         }
-        if ($_totalCost !== (int)$inputDatas['total_cost']) {
+        if ($_totalCost !== (float)$inputDatas['total_cost']) {
             return $contll->msgOut(false, [], '100307');
         }
         // 获取当前奖期 @todo 判断过期 还是其他期
