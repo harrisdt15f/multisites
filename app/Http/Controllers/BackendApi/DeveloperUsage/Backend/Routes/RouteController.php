@@ -6,10 +6,12 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\DeveloperUsage\Backend\Routes\RouteAddRequest;
 use App\Http\Requests\Backend\DeveloperUsage\Backend\Routes\RouteDeleteRequest;
 use App\Http\Requests\Backend\DeveloperUsage\Backend\Routes\RouteEditRequest;
+use App\Http\Requests\Backend\DeveloperUsage\Backend\Routes\RouteIsOpenRequest;
 use App\Http\SingleActions\Backend\DeveloperUsage\Backend\Routes\RouteAddAction;
 use App\Http\SingleActions\Backend\DeveloperUsage\Backend\Routes\RouteDeleteAction;
 use App\Http\SingleActions\Backend\DeveloperUsage\Backend\Routes\RouteDetailAction;
 use App\Http\SingleActions\Backend\DeveloperUsage\Backend\Routes\RouteEditAction;
+use App\Http\SingleActions\Backend\DeveloperUsage\Backend\Routes\RouteIsOpenAction;
 use Illuminate\Http\JsonResponse;
 
 class RouteController extends BackEndApiMainController
@@ -55,6 +57,18 @@ class RouteController extends BackEndApiMainController
      * @return  JsonResponse
      */
     public function delete(RouteDeleteRequest $request, RouteDeleteAction $action): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
+    }
+
+    /**
+     * 路由开放接口
+     * @param  RouteIsOpenRequest $request
+     * @param  RouteIsOpenAction  $action
+     * @return JsonResponse
+     */
+    public function isOpen(RouteIsOpenRequest $request, RouteIsOpenAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
