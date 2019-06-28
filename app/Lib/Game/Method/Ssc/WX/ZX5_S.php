@@ -39,13 +39,17 @@ class ZX5_S extends Base
         return $this->_encode64(explode(',', $codes));
     }
 
+    /**
+     * @param $sCodes
+     * @return bool
+     */
     public function regexp($sCodes)
     {
         //重复号码
         $data['code'] = explode('|', $sCodes);
         $validator = Validator::make($data, [
-            'code' => 'required|array|max:100000',//只能三万个号码能传过来
-            'code.*' => ['regex:/^((?!\&)(?!.*\&$)(?!.*?\&\&)[\d&]{1,12}?)$/'],//1&2&3&4&5
+            'code' => 'required|array|max:100000',//只能十万个号码能传过来
+            'code.*' => ['regex:/^((?!\&)(?!.*\&$)(?!.*?\&\&)[\d&]{1,11}?)$/'],//1&2&3&4&5
         ]);
         if ($validator->fails()) {
             return false;
