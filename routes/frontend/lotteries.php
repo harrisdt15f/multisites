@@ -6,7 +6,7 @@
  * Time: 2:17 PM
  */
 //游戏接口
-Route::group(['prefix' => 'lotteries','namespace'=>'Game\Lottery'], function () {
+Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], function () {
     $namePrefix = 'web-api.LotteriesController.';
     $controller = 'LotteriesController@';
     //获取彩种接口
@@ -19,6 +19,8 @@ Route::group(['prefix' => 'lotteries','namespace'=>'Game\Lottery'], function () 
     Route::match(['post', 'options'], 'availableIssues', ['as' => $namePrefix . 'availableIssues', 'uses' => $controller . 'availableIssues']);
     //获取下注历史接口
     Route::match(['post', 'options'], 'projectHistory', ['as' => $namePrefix . 'projectHistory', 'uses' => $controller . 'projectHistory']);
+    //获取追号历史接口
+    Route::match(['post', 'options'], 'tracesHistory', ['as' => $namePrefix . 'tracesHistory', 'uses' => $controller . 'tracesHistory']);
     //游戏投注接口
     Route::match(['post', 'options'], 'bet', ['as' => $namePrefix . 'bet', 'uses' => $controller . 'bet']);
 
