@@ -34,20 +34,18 @@ class LotteriesBetRequest extends BaseFormRequest
             'trace_issues.*' => 'required|integer|between:1,1000',
 //            'trace_issues' => ['required', 'regex:/^\{(\d{9,15}\:(true|false)\,?)+\}$/'],
             //{20180405001:true,20180405001:false,20180405001:true}
-
             'balls.*.method_id' => 'required|exists:lottery_methods,method_id',
             'balls.*.method_name' => 'required',//中文
             'balls.*.codes' => ['required', 'regex:/^(?!\|)(?!.*\|$)((?!\&)(?!.*\&$)(?!.*?\&\&)[0-9&]{1,19}\|?){1,5}$/'],
             //0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9
             'balls.*.count' => 'required|integer',
             'balls.*.times' => 'required|integer',
-            'balls.*.cost' => 'required|regex:/^\d+(\.\d{1,2})?$/',//float
-            'balls.*.mode' => 'required|regex:/^\d+(\.\d{1,2})?$/',//float
+            'balls.*.cost' => 'required|regex:/^\d+(\.\d{1,3})?$/',//float
+            'balls.*.mode' => 'required|regex:/^\d+(\.\d{1,3})?$/',//float
             'balls.*.prize_group' => 'required|integer',
             'balls.*.price' => 'required|integer|in:1,2',
-
             'trace_win_stop' => 'required|integer',
-            'total_cost' => 'required|regex:/^\d+(\.\d{1,2})?$/',//float
+            'total_cost' => 'required|regex:/^\d+(\.\d{1,3})?$/',//float
             'from' => 'integer',
             'is_trace' => 'required|integer|in:0,1',
         ];
