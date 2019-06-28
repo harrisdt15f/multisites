@@ -7,12 +7,14 @@ use App\Http\Requests\Frontend\Game\Lottery\LotteriesAvailableIssuesRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesBetRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesIssueHistoryRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesProjectHistoryRequest;
+use App\Http\Requests\Frontend\Game\Lottery\LotteriesTracesHistoryRequest;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesAvailableIssuesAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesBetAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesIssueHistoryAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryInfoAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryListAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesProjectHistoryAction;
+use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesTracesHistoryAction;
 use App\Models\Game\Lottery\LotteryIssue;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -77,6 +79,20 @@ class LotteriesController extends FrontendApiMainController
     public function projectHistory(
         LotteriesProjectHistoryRequest $request,
         LotteriesProjectHistoryAction $action
+    ): JsonResponse{
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
+    }
+
+    /**
+     * 游戏-追号历史
+     * @param  LotteriesProjectHistoryRequest  $request
+     * @param  LotteriesProjectHistoryAction  $action
+     * @return JsonResponse
+     */
+    public function tracesHistory(
+        LotteriesTracesHistoryRequest $request,
+        LotteriesTracesHistoryAction $action
     ): JsonResponse{
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);

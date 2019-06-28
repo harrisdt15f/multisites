@@ -2,15 +2,15 @@
 
 /**
  * @Author: LingPh
- * @Date:   2019-06-19 11:20:30
+ * @Date:   2019-06-28 16:03:31
  * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-28 15:56:55
+ * @Last Modified time: 2019-06-28 16:04:14
  */
 namespace App\Http\Requests\Frontend\Game\Lottery;
 
 use App\Http\Requests\BaseFormRequest;
 
-class LotteriesProjectHistoryRequest extends BaseFormRequest
+class LotteriesTracesHistoryRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

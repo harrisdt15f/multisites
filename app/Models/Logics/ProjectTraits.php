@@ -24,8 +24,8 @@ trait ProjectTraits
         if (isset($condition['en_name'])) {
             $query->where('en_name', '=', $condition['en_name']);
         }
-        $currentPage = isset($condition['page_index']) ? (int)$condition['page_index'] : 1;
-        $pageSize = isset($condition['page_size']) ? (int)$condition['page_size'] : 15;
+        $currentPage = isset($condition['page_index']) ? (int) $condition['page_index'] : 1;
+        $pageSize = isset($condition['page_size']) ? (int) $condition['page_size'] : 15;
         $offset = ($currentPage - 1) * $pageSize;
 
         $total = $query->count();
@@ -35,64 +35,71 @@ trait ProjectTraits
             'data' => $menus,
             'total' => $total,
             'currentPage' => $currentPage,
-            'totalPage' => (int)ceil($total / $pageSize)
+            'totalPage' => (int) ceil($total / $pageSize),
         ];
     }
 
     /**
      * 获取投注页需要的注单数据
      * @param $lotterySign
-     * @param  int  $start
      * @param  int  $count
-     * @return array
+     * @param  null $beginTime
+     * @param  null $endTime
+     * @return object
      */
-    public static function getGamePageList($lotterySign, $start = 0, $count = 10): array
+    public static function getGamePageList($lotterySign, $count = 10, $beginTime = null, $endTime = null): object
     {
-        if ($count > 100) {
-            $count = 100;
-        }
         $projectData = [];
-        $where = $lotterySign === '*' ? ['lottery_sign' => ['!=', null]] : [];
-        $projectList = self::orderBy('id', 'desc')->where(static function ($query) use ($lotterySign) {
-            if ($lotterySign !== '*') {
-                $query->where('lottery_sign', '=', $lotterySign);
-            }
-        })->skip($start)->take($count)->get();
-        foreach ($projectList as $item) {
-            $projectData[] = [
-                'id' => $item->id,
-                'lottery_name' => $item->lottery_sign,
-                'method_name' => $item->method_name,
-                'issue' => $item->issue,
-                'open_codes' => $item->open_number,
-                'bet_codes' => $item->bet_number,
-                'total_cost' => $item->total_cost,
-                'single_price' => $item->price,
-                'bonus' => $item->bonus,
-                'prize_group' => $item->bet_prize_group,
-                'status' => $item->status,
-            ];
+        $projectEloq = self::orderBy('id', 'desc');
+        if ($lotterySign !== '*') {
+            $projectEloq->where('lottery_sign', '=', $lotterySign);
         }
-        $traceData = [];
-        $traceList = LotteryTrace::orderBy('id', 'desc')->where('lottery_sign', '=',
-            $lotterySign)->skip($start)->take($count)->get();
-        foreach ($traceList as $item) {
-            $traceData[] = [
-                'id' => $item->id,
-                'lottery_name' => $item->lottery_sign,
-                'method_name' => $item->method_name,
-                'start_issue' => $item->start_issue,
-                'process' => $item->issue_process,
-                'total_cost' => $item->total_price,
-                'total_price' => $item->total_prize,
-                'is_win_stop' => $item->win_stop,
-                'status' => $item->status,
-            ];
+        if ($beginTime !== null && $endTime !== null) {
+            $projectEloq->whereBetween('created_at', [$beginTime, $endTime]);
         }
-        return [
-            'project' => $projectData,
-            'trace' => $traceData,
-        ];
+        $projectList = $projectEloq->select(
+            'id',
+            'lottery_sign as lottery_name',
+            'issue',
+            'open_number as open_codes',
+            'bet_number as bet_codes',
+            'total_cost',
+            'price as single_price',
+            'bonus',
+            'bet_prize_group as prize_group',
+            'status'
+        )->paginate($count);
+        return $projectList;
+    }
+
+    /**
+     * 追号列表
+     * @param $lotterySign
+     * @param  int  $count
+     * @param  null $beginTime
+     * @param  null $endTime
+     * @return object
+     */
+    public static function getGameTracesList($lotterySign, $count = 10, $beginTime = null, $endTime = null): object
+    {
+        $traceEloq = LotteryTrace::orderBy('id', 'desc');
+        if ($lotterySign !== '*') {
+            $traceEloq->where('lottery_sign', '=', $lotterySign);
+        }
+        if ($beginTime !== null && $endTime !== null) {
+            $traceEloq->whereBetween('created_at', [$beginTime, $endTime]);
+        }
+        $traceList = $traceEloq->select(
+            'id',
+            'lottery_sign as lottery_name',
+            'method_name as method_name',
+            'start_issue',
+            'issue_process as process',
+            'total_price',
+            'win_stop as is_win_stop',
+            'status'
+        )->paginate($count);
+        return $traceList;
     }
 
     /**
@@ -106,7 +113,7 @@ trait ProjectTraits
      */
     public static function addProject($user, $lottery, $currentIssue, $data, $traceData, $inputDatas): array
     {
-        $from = $inputDatas['from'] ?? 1;//手机端 还是 pc 端
+        $from = $inputDatas['from'] ?? 1; //手机端 还是 pc 端
         $returnData = [];
         foreach ($data as $_item) {
             $projectData = [
@@ -235,7 +242,7 @@ trait ProjectTraits
             $iCount = current($aPrizeOfBasicMethod);
             $PrizeEloq = LotteryMethodsWaysLevel::where([
                 ['basic_method_id', '=', $iBasicMethodId],
-                ['level', '=', $iLevel]
+                ['level', '=', $iLevel],
             ])->first();
             if ($iCount > 0) {
                 $bonus = $this->bet_prize_group * $PrizeEloq->prize / 1800;
@@ -252,7 +259,7 @@ trait ProjectTraits
                     'bonus' => $totalBonus,
                     'is_win' => 1,
                     'time_count' => now()->timestamp,
-                    'status' => self::STATUS_WON
+                    'status' => self::STATUS_WON,
                 ];
                 try {
                     DB::beginTransaction();
@@ -289,7 +296,7 @@ trait ProjectTraits
                 'open_number' => $openNumber,
                 'winning_number' => $sWnNumber,
                 'time_count' => now()->timestamp,
-                'status' => self::STATUS_LOST
+                'status' => self::STATUS_LOST,
             ];
             $lockProject->update($data);
             if ($lockProject->save()) {
