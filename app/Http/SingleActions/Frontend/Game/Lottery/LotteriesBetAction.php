@@ -100,7 +100,7 @@ class LotteriesBetAction
             }
             // 单价花费
             $singleCost = $mode * $times * $item['price'] * $item['count'];
-            if ($singleCost !== $item['cost']) {
+            if ($singleCost != $item['cost']) {
                 return $contll->msgOut(false, [], '100306');
             }
             $_totalCost += $singleCost;
