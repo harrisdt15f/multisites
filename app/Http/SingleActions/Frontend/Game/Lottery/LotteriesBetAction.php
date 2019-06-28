@@ -127,12 +127,6 @@ class LotteriesBetAction
         if ($_totalCost !== (int)$inputDatas['total_cost']) {
             return $contll->msgOut(false, [], '100307');
         }
-        // 投注期号
-        $arrTraceKeys = array_keys($inputDatas['trace_issues']);
-        $traceDataCollection = $lottery->checkTraceData($arrTraceKeys);
-        if (count($arrTraceKeys) !== $traceDataCollection->count()) {
-            return $contll->msgOut(false, [], '100309');
-        }
         // 获取当前奖期 @todo 判断过期 还是其他期
         $currentIssue = LotteryIssue::getCurrentIssue($lottery->en_name);
         if (!$currentIssue) {
@@ -151,6 +145,12 @@ class LotteriesBetAction
             return $contll->msgOut(false, [], '100313');
         }
         if ((int)$inputDatas['is_trace'] === 1 && count($inputDatas['trace_issues']) > 1) {
+            // 投注追号期号
+            $arrTraceKeys = array_keys($inputDatas['trace_issues']);
+            $traceDataCollection = $lottery->checkTraceData($arrTraceKeys);
+            if (count($arrTraceKeys) !== $traceDataCollection->count()) {
+                return $contll->msgOut(false, [], '100309');
+            }
             $traceData = array_slice($inputDatas['trace_issues'], 1, null, true);
         } else {
             $traceData = [];
