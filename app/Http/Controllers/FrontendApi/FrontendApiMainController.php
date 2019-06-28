@@ -54,15 +54,15 @@ class FrontendApiMainController extends Controller
     }
 
     /**
-     * @param  bool  $success
-     * @param  array  $data
+     * @param  bool    $success
+     * @param  array   $data
      * @param  string  $code
      * @param  string  $message
-     * @param  null  $key
-     * @param  null  $value
+     * @param  null    $placeholder
+     * @param  null    $substituted
      * @return JsonResponse
      */
-    public function msgOut($success = false, $data = [], $code = '', $message = '', $key = null, $value = null): JsonResponse
+    public function msgOut($success = false, $data = [], $code = '', $message = '', $placeholder = null, $substituted = null): JsonResponse
     {
         $defaultSuccessCode = '200';
         $defaultErrorCode = '404';
@@ -71,10 +71,10 @@ class FrontendApiMainController extends Controller
         } else {
             $code = $code == '' ? $defaultErrorCode : $code;
         }
-        if ($key === null || $value === null) {
+        if ($placeholder === null || $substituted === null) {
             $message = $message == '' ? __('frontend-codes-map.' . $code) : $message;
         } else {
-            $message = $message == '' ? __('frontend-codes-map.' . $code, [$key => $value]) : $message;
+            $message = $message == '' ? __('frontend-codes-map.' . $code, [$placeholder => $substituted]) : $message;
         }
         $datas = [
             'success' => $success,
