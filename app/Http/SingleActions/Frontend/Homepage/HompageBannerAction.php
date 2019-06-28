@@ -36,7 +36,7 @@ class HompageBannerAction
         if (Cache::has('homepageBanner')) {
             $datas = Cache::get('homepageBanner');
         } else {
-            $status = $contll->eloqM::select('status')->where('en_name', 'banner')->first();
+            $status = $contll->model::select('status')->where('en_name', 'banner')->first();
             if ($status->status !== 1) {
                 return $contll->msgOut(false, [], '400', $contll->offMsg);
             }
