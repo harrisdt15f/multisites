@@ -116,4 +116,9 @@ class LotteryIssue extends BaseModel
     {
         return $this->hasMany(Project::class, 'issue', 'issue');
     }
+
+    public function tracelists(): HasMany
+    {
+        return $this->hasMany(LotteryTraceList::class, 'issue', 'issue');
+    }
 }

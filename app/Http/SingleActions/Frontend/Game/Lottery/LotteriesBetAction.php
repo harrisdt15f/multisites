@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-27 18:03:02
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-27 18:07:21
- */
 namespace App\Http\SingleActions\Frontend\Game\Lottery;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
@@ -14,6 +8,7 @@ use App\Lib\Logic\AccountChange;
 use App\Models\Game\Lottery\LotteryIssue;
 use App\Models\Game\Lottery\LotteryList;
 use App\Models\Project;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -26,6 +21,7 @@ class LotteriesBetAction
      * @param  FrontendApiMainController  $contll
      * @param  $inputDatas
      * @return JsonResponse
+     * @throws Exception
      */
     public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
     {
@@ -55,9 +51,9 @@ class LotteriesBetAction
             if ($oMethod->supportExpand) {
                 $position = [];
                 if (isset($item['position'])) {
-                    $position = (array) $item['position'];
+                    $position = (array)$item['position'];
                 }
-                if (!$oMethod->checkPos($position) || 1 != 2) {
+                if (!$oMethod->checkPos($position)) {
                     return $contll->msgOut(false, [], '100300', '', 'methodName', $oMethod->name);
                 }
                 $expands = $oMethod->expand($item['codes'], $position);
@@ -84,7 +80,7 @@ class LotteriesBetAction
                 return $contll->msgOut(false, [], '100301', '', 'mode', $mode);
             }
             // 奖金组 - 游戏
-            $prizeGroup = (int) $item['prize_group'];
+            $prizeGroup = (int)$item['prize_group'];
             if (!$lottery->isValidPrizeGroup($prizeGroup)) {
                 return $contll->msgOut(false, [], '100302', '', 'prizeGroup', $prizeGroup);
             }
@@ -98,7 +94,7 @@ class LotteriesBetAction
                 return $contll->msgOut(false, [], '100304', '', 'methodId', $methodId);
             }
             // 倍数
-            $times = (int) $item['times'];
+            $times = (int)$item['times'];
             if (!$lottery->isValidTimes($times)) {
                 return $contll->msgOut(false, [], '100305', '', 'times', $times);
             }
@@ -119,7 +115,7 @@ class LotteriesBetAction
                 'code' => $ball,
             ];
         }
-        if ((int) $inputDatas['is_trace'] === 1) {
+        if ((int)$inputDatas['is_trace'] === 1) {
             $i = 0;
             foreach ($inputDatas['trace_issues'] as $traceMultiple) {
                 if ($i++ < 1) {
@@ -128,17 +124,13 @@ class LotteriesBetAction
                 $_totalCost += $traceMultiple * $singleCost;
             }
         }
-        if ($_totalCost !== (int) $inputDatas['total_cost']) {
+        if ($_totalCost !== (int)$inputDatas['total_cost']) {
             return $contll->msgOut(false, [], '100307');
         }
         // 投注期号
-        $traceData = array_keys($inputDatas['trace_issues']);
-        // 检测追号奖期
-        if (!$traceData || !is_array($traceData)) {
-            return $contll->msgOut(false, [], '100308');
-        }
-        $traceDataCollection = $lottery->checkTraceData($traceData);
-        if (count($traceData) !== $traceDataCollection->count()) {
+        $arrTraceKeys = array_keys($inputDatas['trace_issues']);
+        $traceDataCollection = $lottery->checkTraceData($arrTraceKeys);
+        if (count($arrTraceKeys) !== $traceDataCollection->count()) {
             return $contll->msgOut(false, [], '100309');
         }
         // 获取当前奖期 @todo 判断过期 还是其他期
@@ -150,29 +142,22 @@ class LotteriesBetAction
         /*if ($currentIssue->issue != $traceData[0]) {
         return $this->msgOut(false, [], '', '对不起, 奖期已过期!');
         }*/
-        $accountLocker = new AccountLocker($usr->id);
-        if (!$accountLocker->getLock()) {
-            return $contll->msgOut(false, [], '100311');
+        if ($usr->account()->exists()) {
+            $account = $usr->account;
+            if ($account->balance < $_totalCost) {
+                return $contll->msgOut(false, [], '100312');
+            }
+        } else {
+            return $contll->msgOut(false, [], '100313');
         }
-        $account = $usr->account()->first();
-        if ($account->balance < $_totalCost) {
-//不知道 $totalcost * 10000 所以去掉了
-            $accountLocker->release();
-            return $contll->msgOut(false, [], '100312');
+        if ((int)$inputDatas['is_trace'] === 1 && count($inputDatas['trace_issues']) > 1) {
+            $traceData = array_slice($inputDatas['trace_issues'], 1, null, true);
+        } else {
+            $traceData = [];
         }
         DB::beginTransaction();
         try {
-            if ((int) $inputDatas['is_trace'] === 1 && count($inputDatas['trace_issues']) > 1) {
-                $traceData = array_slice($inputDatas['trace_issues'], 1, null, true);
-            } else {
-                $traceData = [];
-            }
-            $from = $inputDatas['from'] ?? 1; //手机端 还是 pc 端
-            $data = Project::addProject($usr, $lottery, $currentIssue, $betDetail, $traceData, $from);
-            // 帐变
-            $accountChange = new AccountChange();
-            $accountChange->setReportMode(AccountChange::MODE_REPORT_AFTER);
-            $accountChange->setChangeMode(AccountChange::MODE_CHANGE_AFTER);
+            $data = Project::addProject($usr, $lottery, $currentIssue, $betDetail, $traceData, $inputDatas);
             foreach ($data['project'] as $item) {
                 $params = [
                     'user_id' => $usr->id,
@@ -182,22 +167,18 @@ class LotteriesBetAction
                     'project_id' => $item['id'],
                     'issue' => $currentIssue->issue,
                 ];
-                $res = $accountChange->doChange($account, 'bet_cost', $params);
+                $res = $account->operateAccount($params, 'bet_cost');
                 if ($res !== true) {
                     DB::rollBack();
-                    $accountLocker->release();
-                    return $contll->msgOut(false, [], '', '对不起, ' . $res);
+                    return $contll->msgOut(false, [], '', $res);
                 }
             }
-            $accountChange->triggerSave();
             DB::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
-            $accountLocker->release();
-            Log::info('投注-异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine()); //Clog::userBet
-            return $contll->msgOut(false, [], '', '对不起, ' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine());
+            Log::info('投注-异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine()); //Clog::userBet
+            return $contll->msgOut(false, [], '', '对不起, '.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine());
         }
-        $accountLocker->release();
         return $contll->msgOut(true, $data);
     }
 }
