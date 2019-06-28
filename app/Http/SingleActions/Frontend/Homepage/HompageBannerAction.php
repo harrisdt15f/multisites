@@ -10,6 +10,7 @@ namespace App\Http\SingleActions\Frontend\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Models\Admin\Homepage\FrontendPageBanner;
+use App\Models\DeveloperUsage\Frontend\FrontendAllocatedModel;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 
@@ -36,7 +37,7 @@ class HompageBannerAction
         if (Cache::has('homepageBanner')) {
             $datas = Cache::get('homepageBanner');
         } else {
-            $status = $contll->model::select('status')->where('en_name', 'banner')->first();
+            $status = FrontendAllocatedModel::select('status')->where('en_name', 'banner')->first();
             if ($status->status !== 1) {
                 return $contll->msgOut(false, [], '400', $contll->offMsg);
             }
