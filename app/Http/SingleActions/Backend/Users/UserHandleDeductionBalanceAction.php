@@ -11,9 +11,9 @@ namespace App\Http\SingleActions\Backend\Users;
 use App\Http\Controllers\backendApi\BackEndApiMainController;
 use App\Lib\Common\AccountChange;
 use App\Models\User\FrontendUser;
-use App\Models\User\Fund\FrontendUserAccountReport;
 use App\Models\User\Fund\FrontendUserAccountType;
 use App\Models\User\Fund\FrontendUsersAccount;
+use App\Models\User\Fund\FrontendUsersAccountsReport;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -58,7 +58,7 @@ class UserHandleDeductionBalanceAction
             }
             //添加帐变记录
             $userEloq = $this->model::select('id', 'sign', 'top_id', 'parent_id', 'rid', 'username')->where('id', $inputDatas['user_id'])->first();
-            $accountChangeReportEloq = new FrontendUserAccountReport();
+            $accountChangeReportEloq = new FrontendUsersAccountsReport();
             $accountChangeObj = new AccountChange();
             $accountChangeObj->addData($accountChangeReportEloq, $userEloq, $inputDatas['amount'], $userAccountsEloq->balance, $newBalance, $accountChangeTypeEloq);
             DB::commit();

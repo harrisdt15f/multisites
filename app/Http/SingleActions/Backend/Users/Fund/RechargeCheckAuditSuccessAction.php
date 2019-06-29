@@ -13,9 +13,9 @@ use App\Lib\Common\AccountChange;
 use App\Models\BackendAdminAuditFlowList;
 use App\Models\User\FrontendUser;
 use App\Models\User\Fund\BackendAdminRechargehumanLog;
-use App\Models\User\Fund\FrontendUserAccountReport;
 use App\Models\User\Fund\FrontendUserAccountType;
 use App\Models\User\Fund\FrontendUsersAccount;
+use App\Models\User\Fund\FrontendUsersAccountsReport;
 use App\Models\User\UsersRechargeHistorie;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -79,7 +79,7 @@ class RechargeCheckAuditSuccessAction
                 return $contll->msgOut(false, [], '100902');
             }
             //用户帐变表
-            $accountChangeReportEloq = new FrontendUserAccountReport();
+            $accountChangeReportEloq = new FrontendUsersAccountsReport();
             $accountChangeObj = new AccountChange();
             $accountChangeObj->addData($accountChangeReportEloq, $userData, $rechargeLog['amount'], $UserAccounts->balance, $balance, $accountChangeTypeEloq);
             //发送站内消息提醒管理员

@@ -2,7 +2,7 @@
 namespace App\Lib\Logic;
 
 use Illuminate\Support\Facades\Log;
-use App\Models\User\Fund\FrontendUserAccountReport;
+use App\Models\User\Fund\FrontendUsersAccountsReport;
 use App\Models\User\Fund\FrontendUserAccountType;
 use App\Models\User\FrontendUser;
 use Illuminate\Support\Facades\DB;
@@ -334,7 +334,7 @@ class AccountChange
     public function triggerSave() {
         // 报表保存
         if ($this->reports) {
-            $ret = FrontendUserAccountReport::insert( $this->reports );
+            $ret = FrontendUsersAccountsReport::insert( $this->reports );
             if(!$ret) {
                 return false;
             }
@@ -410,7 +410,7 @@ class AccountChange
         if ($this->reportMode == self::MODE_REPORT_AFTER) {
             $this->reports[] = $report;
         } else {
-            $ret = FrontendUserAccountReport::insert( $report );
+            $ret = FrontendUsersAccountsReport::insert( $report );
             if(!$ret) {
                 return false;
             }

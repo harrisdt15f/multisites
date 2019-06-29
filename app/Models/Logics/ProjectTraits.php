@@ -61,6 +61,7 @@ trait ProjectTraits
             'id',
             'username',
             'lottery_sign as lottery_name',
+            'method_name',
             'issue',
             'open_number as open_codes',
             'bet_number as bet_codes',

@@ -20,9 +20,9 @@ use App\Models\BackendAdminAuditFlowList;
 use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
 use App\Models\User\FrontendUser;
 use App\Models\User\Fund\BackendAdminRechargehumanLog;
-use App\Models\User\Fund\FrontendUserAccountReport;
 use App\Models\User\Fund\FrontendUserAccountType;
 use App\Models\User\Fund\FrontendUsersAccount;
+use App\Models\User\Fund\FrontendUsersAccountsReport;
 use App\Models\User\UsersRechargeHistorie;
 use App\Models\User\UsersRechargeLog;
 use Exception;
@@ -79,7 +79,7 @@ class ArtificialRechargeRechargeAction
                     return $contll->msgOut(false, [], '101102');
                 }
                 //用户帐变表
-                $accountChangeReportEloq = new FrontendUserAccountReport();
+                $accountChangeReportEloq = new FrontendUsersAccountsReport();
                 $accountChangeObj = new AccountChange();
                 $userEloq = FrontendUser::find($inputDatas['id']);
                 $accountChangeObj->addData($accountChangeReportEloq, $userEloq->toArray(), $inputDatas['amount'], $UserAccounts->balance, $balance, $accountChangeTypeEloq);
