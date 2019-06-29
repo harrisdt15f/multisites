@@ -29,6 +29,6 @@ class FrontendAuthLogoutAction
         $this->limiter()->clear($throtleKey);
         $contll->currentAuth->logout();
         $contll->currentAuth->invalidate();
-        return $contll->msgOut(true, []); //'Successfully logged out'
+        return $contll->msgOut(true); //'Successfully logged out'
     }
 }

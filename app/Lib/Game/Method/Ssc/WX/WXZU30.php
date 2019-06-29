@@ -108,7 +108,7 @@ class WXZU30 extends Base
         $aCodes = explode('|', $sCodes);
 
         $aP1 = $this->getCombination(explode('&', $aCodes[0]), 2);
-        $aP1 = $this->getRepeat($aP1,2);
+        $aP1 = $this->getRepeat($aP1);
         $aP2 = $this->getCombination(explode('&', $aCodes[1]), 1);
 
         $tmp=[];

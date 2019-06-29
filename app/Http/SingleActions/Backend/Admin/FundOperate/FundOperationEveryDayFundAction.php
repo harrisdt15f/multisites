@@ -24,7 +24,7 @@ class FundOperationEveryDayFundAction
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
         $sysConfiguresEloq = SystemConfiguration::where('sign', 'admin_recharge_daily_limit')->first();
-        if (is_null($sysConfiguresEloq)) {
+        if ($sysConfiguresEloq === null) {
             return $contll->msgOut(false, [], '101301');
         }
         try {

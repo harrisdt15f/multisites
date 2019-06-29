@@ -43,7 +43,7 @@ class RechargeCheckAuditFailureAction
             return $contll->msgOut(false, [], '100900');
         }
         $adminFundData = BackendAdminRechargePocessAmount::where('admin_id', $rechargeLog->admin_id)->first();
-        if (is_null($adminFundData)) {
+        if ($adminFundData === null) {
             return $contll->msgOut(false, [], '100903');
         }
         $newFund = $adminFundData->fund + $rechargeLog->amount;

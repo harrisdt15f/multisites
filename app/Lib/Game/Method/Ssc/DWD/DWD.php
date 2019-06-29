@@ -27,7 +27,9 @@ class DWD extends Base
     public function regexp($sCodes)
     {
         $regexp = '/^(([0-9]&){0,9}[0-9])$/';
-        if(!preg_match($regexp,$sCodes)) return false;
+        if(!preg_match($regexp,$sCodes)) {
+            return false;
+        }
 
         $filterArr = self::$filterArr;
 
@@ -37,7 +39,9 @@ class DWD extends Base
             $temp = explode('&',$codes);
             if(count($temp) != count(array_filter(array_unique($temp),function($v) use($filterArr) {
                     return isset($filterArr[$v]);
-                }))) return false;
+                }))) {
+                return false;
+            }
 
             if(count($temp)==0){
                 return false;

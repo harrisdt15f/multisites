@@ -26,7 +26,7 @@ class ZX5_S extends Base
     {
         if (strpos($codes, 'base64:') !== false) {
             $ex = explode('base64:', $codes);
-            $codes = $this->_parse64($ex[1], 5);
+            $codes = $this->_parse64($ex[1]);
             if (is_array($codes)) {
                 $codes = implode(',', $codes);
             }

@@ -41,10 +41,7 @@ class PCDDDXDS extends Base
 
     public function regexp($sCode)
     {
-        if ($sCode != 'b') {
-            return false;
-        }
-        return true;
+        return $sCode == 'b';
     }
 
     public function count($sCodes)

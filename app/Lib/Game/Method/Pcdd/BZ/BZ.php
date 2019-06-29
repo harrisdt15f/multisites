@@ -17,10 +17,7 @@ class BZ extends Base
 
     public function regexp($sCodes)
     {
-        if ($sCodes !== 'bz') {
-            return false;
-        }
-        return true;
+        return $sCodes === 'bz';
     }
 
     public function count($sCodes)
@@ -37,9 +34,6 @@ class BZ extends Base
     public function assertLevel($levelId, $sCodes, Array $numbers)
     {
         $openCodeArr = array_flip($numbers);
-        if ($openCodeArr[0] == $openCodeArr[1] && $openCodeArr[1] == $openCodeArr[2]) {
-            return true;
-        }
-        return false;
+        return $openCodeArr[0] == $openCodeArr[1] && $openCodeArr[1] == $openCodeArr[2];
     }
 }

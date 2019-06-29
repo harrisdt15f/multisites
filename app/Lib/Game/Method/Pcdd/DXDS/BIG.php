@@ -16,10 +16,7 @@ class BIG extends Base
 
     public function regexp($sCode)
     {
-        if ($sCode != 'b') {
-            return false;
-        }
-        return true;
+        return $sCode == 'b';
     }
 
     public function count($sCodes)

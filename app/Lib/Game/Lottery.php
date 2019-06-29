@@ -59,14 +59,14 @@ class Lottery
         foreach ($lotteries as $lottery) {
             // 检测游戏状态
             if ($lottery->status !== 1) {
-                throw new \Exception("彩种:{$lottery->cn_name}, 游戏未开启!");
+                throw new \RuntimeException("彩种:{$lottery->cn_name}, 游戏未开启!");
             }
             $series = $lottery->series_id;
             // 获取玩法
             if (empty(self::$_methods[$series])) {
                 $methods = include __DIR__ . "/config/method_{$series}.php";
                 if (!$methods) {
-                    throw new \Exception("彩种:{$lottery->cn_name}, 玩法 - 不存在(get all lotteries)!");
+                    throw new \RuntimeException("彩种:{$lottery->cn_name}, 玩法 - 不存在(get all lotteries)!");
                 }
                 self::$_methods[$series] = $methods;
             }
@@ -134,9 +134,6 @@ class Lottery
     public static function getMethodConfig($seriesSign, $methodSign)
     {
         $allConfig = self::getAllMethodConfig($seriesSign);
-        if (isset($allConfig[$methodSign])) {
-            return $allConfig[$methodSign];
-        }
-        return [];
+        return $allConfig[$methodSign] ?? [];
     }
 }

@@ -51,7 +51,7 @@ abstract class BaseFormRequest extends FormRequest
             'message' => $validator->errors()->first(),
         ];
         throw new HttpResponseException(
-            response()->json($datas, 200)
+            response()->json($datas)
         );
     }
 

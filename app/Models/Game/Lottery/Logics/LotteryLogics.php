@@ -406,23 +406,17 @@ trait LotteryLogics
                     return false;
                 }
             }
-            if (count($codeArr) != 5) {
-                return false;
-            }
-            return true;
+            return !(count($codeArr) != 5);
         }
         // 乐透彩票
-        if (in_array($series, ['115'])) {
+        if ($series == '115') {
             $_code = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11'];
             foreach ($codeArr as $c) {
                 if (!in_array($c, $_code)) {
                     return false;
                 }
             }
-            if (count($codeArr) != 5) {
-                return false;
-            }
-            return true;
+            return !(count($codeArr) != 5);
         }
         // pk10
         if ($series == 'pk10') {
@@ -432,37 +426,28 @@ trait LotteryLogics
                     return false;
                 }
             }
-            if (count($codeArr) != 10) {
-                return false;
-            }
-            return true;
+            return !(count($codeArr) != 10);
         }
 
         // 快三
-        if (in_array($series, ['jskl3'])) {
+        if ($series == 'jskl3') {
             $_code = [1, 2, 3, 4, 5, 6];
             foreach ($codeArr as $c) {
                 if (!in_array($c, $_code)) {
                     return false;
                 }
             }
-            if (count($codeArr) != 3) {
-                return false;
-            }
-            return true;
+            return count($codeArr) == 3;
         }
         // 六合彩
-        if (in_array($series, ['lhc'])) {
+        if ($series == 'lhc') {
             $_code = [1, 2, 3, 4, 5, 6];
             foreach ($codeArr as $c) {
                 if (!in_array($c, $_code)) {
                     return false;
                 }
             }
-            if (count($codeArr) != 3) {
-                return false;
-            }
-            return true;
+            return count($codeArr) == 3;
         }
         return false;
     }

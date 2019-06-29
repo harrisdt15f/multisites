@@ -26,7 +26,9 @@ class DWD_S extends Base
     public function regexp($sCodes)
     {
         $regexp = '/^(([0-9]&){0,9}[0-9])$/';
-        if(!preg_match($regexp,$sCodes)) return false;
+        if(!preg_match($regexp,$sCodes)) {
+            return false;
+        }
 
         $filterArr = self::$filterArr;
 

@@ -16,10 +16,7 @@ class EVEN extends Base
 
     public function regexp($sCode)
     {
-        if ($sCode != 'e') {
-            return false;
-        }
-        return true;
+        return $sCode == 'e';
     }
 
     public function count($sCodes)

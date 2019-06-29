@@ -16,10 +16,7 @@ class ODD extends Base
 
     public function regexp($sCode)
     {
-        if ($sCode != 'o') {
-            return false;
-        }
-        return true;
+        return $sCode == 'o';
     }
 
     public function count($sCodes)

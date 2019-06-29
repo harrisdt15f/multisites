@@ -23,7 +23,7 @@ class BackendAuthAllUserAction
     {
         try {
             $data = $contll->currentPlatformEloq->partnerAdminUsers;
-            if (is_null($data)) {
+            if ($data === null) {
                 $result = Arr::wrap($data);
             } else {
                 $result = $data->toArray();

@@ -36,13 +36,13 @@ class HompageIcoAction
             $data = Cache::get('homepageIco');
         } else {
             $icoEloq = $this->model::select('value', 'status')->where('en_name', 'frontend.ico')->first();
-            if (is_null($icoEloq)) {
+            if ($icoEloq === null) {
                 //#######################################################
                 return $contll->msgOut(false, [], '400', '前台Ico模块不存在');
             }
             if ($icoEloq->status !== 1) {
                 return $contll->msgOut(false, [], '400', $contll->offMsg);
-            };
+            }
             $data = $icoEloq->value;
             Cache::forever('homepageIco', $data);
         }

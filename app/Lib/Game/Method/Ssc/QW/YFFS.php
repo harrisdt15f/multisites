@@ -32,11 +32,7 @@ class YFFS extends Base
             return isset($filterArr[$v]);
         }));
 
-        if($iNums==0){
-            return false;
-        }
-
-        return true;
+        return !($iNums == 0);
     }
 
     public function count($sCodes)

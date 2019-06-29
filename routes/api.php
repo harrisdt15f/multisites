@@ -25,7 +25,7 @@ Route::group([
     $sRouteDir = base_path().'/routes/backend/';
     $aRouteFiles = glob($sRouteDir.'*.php');
     foreach ($aRouteFiles as $sRouteFile) {
-        include($sRouteFile);
+        include $sRouteFile;
     }
     unset($aRouteFiles);
 });
@@ -38,7 +38,7 @@ Route::group([
     $sRouteDir = base_path().'/routes/frontend/';
     $aRouteFiles = glob($sRouteDir.'*.php');
     foreach ($aRouteFiles as $sRouteFile) {
-        include($sRouteFile);
+        include $sRouteFile;
     }
     unset($aRouteFiles);
 });

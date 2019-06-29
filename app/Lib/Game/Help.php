@@ -10,7 +10,7 @@ class Help {
      */
     static function getMethodConfig($seriesId) {
 
-        $config = require_once(__DIR__ . "/config/method_{$seriesId}.php");
+        $config = require __DIR__ . "/config/method_{$seriesId}.php";
         return $config;
     }
 }

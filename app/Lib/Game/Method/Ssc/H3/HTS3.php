@@ -77,9 +77,9 @@ class HTS3 extends Base
         $result = [];
 
         //豹子?
-        $result[] = intval(count(array_count_values($numbers)) == 1);
+        $result[] = intval(count(array_unique($numbers)) == 1);
         //对子?
-        $result[] = intval(count(array_count_values($numbers)) == 2);
+        $result[] = intval(count(array_unique($numbers)) == 2);
         //顺子?
         sort($numbers);
         $result[] = intval(count(array_count_values($numbers)) == 3 && (abs($numbers[0] - $numbers[1]) == 1 && abs($numbers[1] - $numbers[2]) == 1));

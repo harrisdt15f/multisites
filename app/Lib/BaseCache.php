@@ -51,11 +51,7 @@ trait BaseCache
      */
     public static function _getCacheConfig($key) {
         $cacheConfig = config('web.main.cache');
-        if (isset($cacheConfig[$key])) {
-            return $cacheConfig[$key];
-        } else {
-            return $cacheConfig['common'];
-        }
+        return $cacheConfig[$key] ?? $cacheConfig['common'];
     }
 
     /**

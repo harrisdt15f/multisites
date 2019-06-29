@@ -15,10 +15,7 @@ class SMALL_ODD extends Base
 
     public function regexp($sCode)
     {
-        if ($sCode != 'so') {
-            return false;
-        }
-        return true;
+        return !($sCode != 'so');
     }
 
     public function count($sCodes)

@@ -33,7 +33,7 @@ class PopularMethodsDetailAction
      */
     public function execute(BackEndApiMainController $contll): JsonResponse
     {
-        $methodEloqs = $this->model::with('method')->orderBy('sort', 'asc')->get();
+        $methodEloqs = $this->model::with('method')->orderBy('sort')->get();
         $datas = [];
         foreach ($methodEloqs as $method) {
             $data = [

@@ -28,7 +28,9 @@ class DTYS extends Base
     {
         // 去重
         $regexp = '/^(([1-6]&){0,5}[1-6])$/';
-        if(!preg_match($regexp, $sCodes)) return false;
+        if(!preg_match($regexp, $sCodes)) {
+            return false;
+        }
 
         $filterArr = self::$filterArr;
 
@@ -36,7 +38,9 @@ class DTYS extends Base
         $temp = explode('&', $sCodes);
         if(count($temp) != count(array_filter(array_unique($temp),function($v) use($filterArr) {
                 return isset($filterArr[$v]);
-            }))) return false;
+            }))) {
+            return false;
+        }
 
         if(count($temp)==0){
             return false;
@@ -83,7 +87,9 @@ class DTYS extends Base
         $i      = 0;
         $temp   = [];
         foreach ($aCodes as $code) {
-            if(isset($temp[$code])) continue;
+            if(isset($temp[$code])) {
+                continue;
+            }
             if (in_array($code, $numbers)) {
                 $temp[$code]=1;
                 $i++;

@@ -65,8 +65,8 @@ class PKQZX2 extends Base
         }
 
         if (count($aNums[0]) > 0 && count($aNums[1]) > 0) {
-            for ($i = 0; $i < count($aNums[0]); $i++) {
-                for ($j = 0; $j < count($aNums[1]); $j++) {
+            for ($i = 0, $iMax = count($aNums[0]); $i < $iMax; $i++) {
+                for ($j = 0, $jMax = count($aNums[1]); $j < $jMax; $j++) {
                     if ($aNums[0][$i] != $aNums[1][$j]) {
                         $iNums++;
                     }

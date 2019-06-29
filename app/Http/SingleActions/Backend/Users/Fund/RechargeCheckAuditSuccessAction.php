@@ -47,12 +47,12 @@ class RechargeCheckAuditSuccessAction
             return $contll->msgOut(false, [], '100900');
         }
         $auditFlow = BackendAdminAuditFlowList::where('id', $rechargeLog->audit_flow_id)->first();
-        if (is_null($auditFlow)) {
+        if ($auditFlow === null) {
             return $contll->msgOut(false, [], '100904');
         }
         //检查是否存在 人工充值 的帐变类型表
         $accountChangeTypeEloq = AccountChangeType::where('sign', 'artificial_recharge')->first();
-        if (is_null($accountChangeTypeEloq)) {
+        if ($accountChangeTypeEloq === null) {
             return $contll->msgOut(false, [], '100901');
         }
         DB::beginTransaction();

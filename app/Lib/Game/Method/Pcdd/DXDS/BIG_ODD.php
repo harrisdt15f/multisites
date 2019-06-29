@@ -15,10 +15,7 @@ class BIG_ODD extends Base
 
     public function regexp($sCode)
     {
-        if ($sCode != 'bo') {
-            return false;
-        }
-        return true;
+        return $sCode === 'bo';
     }
 
     public function count($sCodes)
