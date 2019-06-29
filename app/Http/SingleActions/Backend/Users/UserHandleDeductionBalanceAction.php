@@ -11,9 +11,9 @@ namespace App\Http\SingleActions\Backend\Users;
 use App\Http\Controllers\backendApi\BackEndApiMainController;
 use App\Lib\Common\AccountChange;
 use App\Models\User\FrontendUser;
-use App\Models\User\Fund\FrontendUserAccountType;
 use App\Models\User\Fund\FrontendUsersAccount;
 use App\Models\User\Fund\FrontendUsersAccountsReport;
+use App\Models\User\Fund\FrontendUsersAccountsType;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -39,7 +39,7 @@ class UserHandleDeductionBalanceAction
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
         //人工扣款的帐变类型表
-        $accountChangeTypeEloq = FrontendUserAccountType::select('name', 'sign')->where('sign', 'artificial_deduction')->first();
+        $accountChangeTypeEloq = FrontendUsersAccountsType::select('name', 'sign')->where('sign', 'artificial_deduction')->first();
         if ($accountChangeTypeEloq === null) {
             return $contll->msgOut(false, [], '100103');
         }

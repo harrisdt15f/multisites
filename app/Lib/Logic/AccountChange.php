@@ -3,7 +3,7 @@ namespace App\Lib\Logic;
 
 use Illuminate\Support\Facades\Log;
 use App\Models\User\Fund\FrontendUsersAccountsReport;
-use App\Models\User\Fund\FrontendUserAccountType;
+use App\Models\User\Fund\FrontendUsersAccountsType;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -73,7 +73,7 @@ class AccountChange
     public function doChange($account, $typeSign, $params)
     {
         $user = $account->user;
-        $typeConfig = FrontendUserAccountType::getTypeBySign($typeSign);
+        $typeConfig = FrontendUsersAccountsType::getTypeBySign($typeSign);
 
         //　1. 获取帐变配置
         if (empty($typeConfig)) {

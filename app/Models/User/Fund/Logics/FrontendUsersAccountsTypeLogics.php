@@ -9,7 +9,7 @@ use App\Lib\BaseCache;
  * Date: 5/31/2019
  * Time: 7:59 PM
  */
-trait FrontendUserAccountTypeLogics
+trait FrontendUsersAccountsTypeLogics
 {
     use BaseCache;
 

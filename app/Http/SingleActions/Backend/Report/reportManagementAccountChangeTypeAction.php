@@ -9,7 +9,7 @@
 namespace App\Http\SingleActions\Backend\Report;
 
 use App\Http\Controllers\backendApi\BackEndApiMainController;
-use App\Models\User\Fund\FrontendUserAccountType;
+use App\Models\User\Fund\FrontendUsersAccountsType;
 use Illuminate\Http\JsonResponse;
 
 class reportManagementAccountChangeTypeAction
@@ -21,7 +21,7 @@ class reportManagementAccountChangeTypeAction
      */
     public function execute(BackEndApiMainController $contll): JsonResponse
     {
-        $datas = FrontendUserAccountType::select('name', 'sign')->get()->toArray();
+        $datas = FrontendUsersAccountsType::select('name', 'sign')->get()->toArray();
         return $contll->msgOut(true, $datas);
     }
 }

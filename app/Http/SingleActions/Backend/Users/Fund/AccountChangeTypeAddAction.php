@@ -9,7 +9,7 @@
 namespace App\Http\SingleActions\Backend\Users\Fund;
 
 use App\Http\Controllers\backendApi\BackEndApiMainController;
-use App\Models\User\Fund\FrontendUserAccountType;
+use App\Models\User\Fund\FrontendUsersAccountsType;
 use Exception;
 use Illuminate\Http\JsonResponse;
 
@@ -18,11 +18,11 @@ class AccountChangeTypeAddAction
     protected $model;
 
     /**
-     * @param  FrontendUserAccountType  $frontendUserAccountType
+     * @param  FrontendUsersAccountsType  $frontendUsersAccountsType
      */
-    public function __construct(FrontendUserAccountType $frontendUserAccountType)
+    public function __construct(FrontendUsersAccountsType $frontendUsersAccountsType)
     {
-        $this->model = $frontendUserAccountType;
+        $this->model = $frontendUsersAccountsType;
     }
 
     /**

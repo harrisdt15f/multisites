@@ -3,11 +3,11 @@
 namespace App\Models\User\Fund;
 
 use App\Models\BaseModel;
-use App\Models\User\Fund\Logics\FrontendUserAccountTypeLogics;
+use App\Models\User\Fund\Logics\FrontendUsersAccountsTypeLogics;
 
-class FrontendUserAccountType extends BaseModel
+class FrontendUsersAccountsType extends BaseModel
 {
-    use FrontendUserAccountTypeLogics;
+    use FrontendUsersAccountsTypeLogics;
 
     protected $fillable = [
         'name',

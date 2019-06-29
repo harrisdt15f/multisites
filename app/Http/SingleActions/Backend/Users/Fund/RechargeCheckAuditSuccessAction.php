@@ -13,9 +13,9 @@ use App\Lib\Common\AccountChange;
 use App\Models\BackendAdminAuditFlowList;
 use App\Models\User\FrontendUser;
 use App\Models\User\Fund\BackendAdminRechargehumanLog;
-use App\Models\User\Fund\FrontendUserAccountType;
 use App\Models\User\Fund\FrontendUsersAccount;
 use App\Models\User\Fund\FrontendUsersAccountsReport;
+use App\Models\User\Fund\FrontendUsersAccountsType;
 use App\Models\User\UsersRechargeHistorie;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -51,7 +51,7 @@ class RechargeCheckAuditSuccessAction
             return $contll->msgOut(false, [], '100904');
         }
         //检查是否存在 人工充值 的帐变类型表
-        $accountChangeTypeEloq = FrontendUserAccountType::where('sign', 'artificial_recharge')->first();
+        $accountChangeTypeEloq = FrontendUsersAccountsType::where('sign', 'artificial_recharge')->first();
         if (is_null($accountChangeTypeEloq)) {
             return $contll->msgOut(false, [], '100901');
         }

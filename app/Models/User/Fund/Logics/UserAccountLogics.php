@@ -5,7 +5,7 @@ namespace App\Models\User\Fund\Logics;
 use App\Lib\Clog;
 use App\Lib\Locker\AccountLocker;
 use App\Lib\Logic\AccountChange;
-use App\Models\Account\FrontendUserAccountType;
+use App\Models\Account\FrontendUsersAccountsType;
 use App\Models\Project;
 use App\Models\User\FrontendUsersAccount;
 use Exception;
@@ -70,7 +70,7 @@ trait UserAccountLogics
     public function doChange($typeSign, $params)
     {
         $user = $this->user();
-        $typeConfig = FrontendUserAccountType::getTypeBySign($typeSign);
+        $typeConfig = FrontendUsersAccountsType::getTypeBySign($typeSign);
         //　1. 获取帐变配置
         if (empty($typeConfig)) {
             Clog::account("error-{$user->id}-{$typeSign}不存在!");

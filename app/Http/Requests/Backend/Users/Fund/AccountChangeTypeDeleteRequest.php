@@ -30,7 +30,7 @@ class AccountChangeTypeDeleteRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|numeric|exists:frontend_user_account_types,id',
+            'id' => 'required|numeric|exists:frontend_users_accounts_types',
         ];
     }
 

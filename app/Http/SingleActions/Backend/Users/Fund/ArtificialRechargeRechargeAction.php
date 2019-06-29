@@ -20,9 +20,9 @@ use App\Models\BackendAdminAuditFlowList;
 use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
 use App\Models\User\FrontendUser;
 use App\Models\User\Fund\BackendAdminRechargehumanLog;
-use App\Models\User\Fund\FrontendUserAccountType;
 use App\Models\User\Fund\FrontendUsersAccount;
 use App\Models\User\Fund\FrontendUsersAccountsReport;
+use App\Models\User\Fund\FrontendUsersAccountsType;
 use App\Models\User\UsersRechargeHistorie;
 use App\Models\User\UsersRechargeLog;
 use Exception;
@@ -64,7 +64,7 @@ class ArtificialRechargeRechargeAction
                 $this->sendMessage();
             } else {
                 //超管操作不需审核 直接给用户充值
-                $accountChangeTypeEloq = FrontendUserAccountType::where('sign', 'artificial_recharge')->first();
+                $accountChangeTypeEloq = FrontendUsersAccountsType::where('sign', 'artificial_recharge')->first();
                 if ($accountChangeTypeEloq === null) {
                     return $contll->msgOut(false, [], '100901');
                 }
