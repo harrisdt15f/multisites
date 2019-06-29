@@ -46,7 +46,7 @@ class ArtificialRechargeRechargeAction
             if ($contll->currentPartnerAccessGroup->role !== '*') {
                 //扣除管理员额度
                 $adminFundData = BackendAdminRechargePocessAmount::where('admin_id', $partnerAdmin->id)->first();
-                if (is_null($adminFundData)) {
+                if ($adminFundData === null) {
                     return $contll->msgOut(false, [], '101100');
                 }
                 $adminOperationFund = $adminFundData->fund;
@@ -85,8 +85,8 @@ class ArtificialRechargeRechargeAction
                 $accountChangeObj->addData($accountChangeReportEloq, $userEloq->toArray(), $inputDatas['amount'], $UserAccounts->balance, $balance, $accountChangeTypeEloq);
             }
             //添加人工充值明细表
-            $auditFlowID = isset($auditFlowID) ? $auditFlowID : null;
-            $newFund = isset($newFund) ? $newFund : null;
+            $auditFlowID = $auditFlowID ?? null;
+            $newFund = $newFund ?? null;
             $this->insertFundLog($partnerAdmin, $userEloq, $auditFlowID, $inputDatas['amount'], $newFund, $contll->currentPartnerAccessGroup->role);
             //用户 users_recharge_histories 表
             $deposit_mode = UsersRechargeHistorie::ARTIFICIAL;
@@ -254,7 +254,7 @@ class ArtificialRechargeRechargeAction
      */
     public function createOrder(): string
     {
-        return date('Ymd') . substr(time(), -4) . mt_rand(100000, 999999) . substr(uniqid(time()), -7);
+        return date('Ymd') . substr(time(), -4) . random_int(100000, 999999) . substr(uniqid(time(), true), -7);
     }
 
     /**

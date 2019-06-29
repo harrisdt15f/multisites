@@ -30,7 +30,7 @@ trait LotteryBasicMethodLogics
         $sWnNumber = '';
         switch ($this->series_code) {
             case 'ssc':
-                $sWnNumber = substr($sFullWinningNumber, intval($iOffset), $this->digital_count);
+                $sWnNumber = substr($sFullWinningNumber, (int)$iOffset, $this->digital_count);
                 break;
         }
         return $this->getWinningNumber($sWnNumber);
@@ -71,7 +71,7 @@ trait LotteryBasicMethodLogics
             case 'bsde'://getWnNumberBsde 返回大小单双中奖号码
                 $validNums = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];//@todo 有可能需要参考一下之前的 series 的 validnum
                 $minBigNumber = (int)(count($validNums) / 2);
-                $aDigitals = str_split($sWinningNumber, 1);
+                $aDigitals = str_split($sWinningNumber);
                 $aWnNumbers = [];
                 foreach ($aDigitals as $i => $iDigital) {
                     $sNumberOfPosition = (int)($iDigital >= $minBigNumber); // 大小
@@ -81,7 +81,7 @@ trait LotteryBasicMethodLogics
                 $result = implode('|', $aWnNumbers);
                 break;
             case 'combin'://检查组选单式号码是否合法 getWnNumberCombin checkCombinValid
-                $aDigitals = str_split($sWinningNumber, 1);
+                $aDigitals = str_split($sWinningNumber);
                 $aDigitalCount = array_count_values($aDigitals);
                 $iMaxRepeatCount = max($aDigitalCount);
                 $iMinRepeatCount = min($aDigitalCount);
@@ -110,7 +110,7 @@ trait LotteryBasicMethodLogics
                 $result = $aWnNumber ?: false;
                 break;
             case 'equal'://返回直选中奖号码 getWnNumberEqual
-                if (!is_null($this->span)) {
+                if ($this->span !== null) {
                     $aDigitals = str_split($sWinningNumber);
                     $iSpan = max($aDigitals) - min($aDigitals);
                     if ($iSpan == $this->span) {
@@ -133,7 +133,7 @@ trait LotteryBasicMethodLogics
                 $aDigitals = str_split($sWinningNumber);
                 $aWnNumbers = [];
                 foreach ($aDigitals as $i => $iDigital) {
-                    $aWnNumbers[] = $i < $this->special_count ? intval($iDigital > 4) : $iDigital;
+                    $aWnNumbers[] = $i < $this->special_count ? (int)($iDigital > 4) : $iDigital;
                 }
                 $result = implode($aWnNumbers);
                 break;

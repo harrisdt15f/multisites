@@ -15,10 +15,7 @@ class SMALL_EVEN extends Base
 
     public function regexp($sCode)
     {
-        if ($sCode != 'se') {
-            return false;
-        }
-        return true;
+        return !($sCode != 'se');
     }
 
     public function count($sCodes)

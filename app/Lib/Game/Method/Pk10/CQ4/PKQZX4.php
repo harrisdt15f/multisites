@@ -63,16 +63,16 @@ class PKQZX4 extends Base
     {
         $iNums = 0;
         $aNums = [];
-        $aCode = explode("|", $sCodes);
+        $aCode = explode('|', $sCodes);
         foreach ($aCode as $sCode) {
-            $aNums[] = explode("&", $sCode);
+            $aNums[] = explode('&', $sCode);
         }
 
         if (count($aNums[0]) > 0 && count($aNums[1]) > 0 && count($aNums[2]) > 0 && count($aNums[3]) > 0) {
-            for ($i = 0; $i < count($aNums[0]); $i++) {
-                for ($j = 0; $j < count($aNums[1]); $j++) {
-                    for ($k = 0; $k < count($aNums[2]); $k++) {
-                        for ($y = 0; $y < count($aNums[3]); $y++) {
+            for ($i = 0, $iMax = count($aNums[0]); $i < $iMax; $i++) {
+                for ($j = 0, $jMax = count($aNums[1]); $j < $jMax; $j++) {
+                    for ($k = 0, $kMax = count($aNums[2]); $k < $kMax; $k++) {
+                        for ($y = 0, $yMax = count($aNums[3]); $y < $yMax; $y++) {
                             if ($aNums[0][$i] != $aNums[1][$j] && $aNums[0][$i] != $aNums[2][$k] && $aNums[0][$i] != $aNums[3][$y] &&
                                 $aNums[1][$j] != $aNums[2][$k] && $aNums[1][$j] != $aNums[3][$y] &&
                                 $aNums[2][$k] != $aNums[3][$y]

@@ -70,7 +70,7 @@ class SXZU6 extends Base
         $aCodes = explode('&', $sCodes);
 
         $aP1 = $this->getCombination($aCodes, 2);
-        $aP1 = $this->getRepeat($aP1, 2);
+        $aP1 = $this->getRepeat($aP1);
 
         foreach ($aP1 as $v1) {
             if ($str == $this->strOrder(str_replace(' ', '', $v1)) ) {

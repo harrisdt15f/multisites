@@ -48,12 +48,12 @@ trait AccountChangeReportLogics
 
         // start time
         if (isset($c['start_time']) && $c['start_time']) {
-            $query->where('process_time', ">=", strtotime($c['start_time']));
+            $query->where('process_time', '>=', strtotime($c['start_time']));
         }
 
         // end time
         if (isset($c['end_time']) && $c['end_time']) {
-            $query->where('process_time', "<=", strtotime($c['end_time']));
+            $query->where('process_time', '<=', strtotime($c['end_time']));
         }
 
         $currentPage = isset($c['page_index']) ? (int) $c['page_index'] : 1;

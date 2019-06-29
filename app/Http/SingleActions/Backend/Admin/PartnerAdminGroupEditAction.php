@@ -57,7 +57,7 @@ class PartnerAdminGroupEditAction
                 $fundOperationDatas = [];
                 if ($isManualRecharge === true) {
                     //如果之前没有就需要添加到 backend_admin_recharge_pocess_amounts 表里面 如果之前有表示已添加
-                    if (is_null($fundOperatinEloq)) {
+                    if ($fundOperatinEloq === null) {
                         $fundOperationData = [
                             'group_id' => $datas->id,
                             'group_name' => $datas->group_name,

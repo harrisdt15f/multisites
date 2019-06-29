@@ -66,9 +66,9 @@ class LTQ3ZX3 extends Base
         }
 
         if (count($aNums[0]) > 0 && count($aNums[1]) > 0 && count($aNums[2]) > 0) {
-            for ($i = 0; $i < count($aNums[0]); $i++) {
-                for ($j = 0; $j < count($aNums[1]); $j++) {
-                    for ($k = 0; $k < count($aNums[2]); $k++) {
+            for ($i = 0, $iMax = count($aNums[0]); $i < $iMax; $i++) {
+                for ($j = 0, $jMax = count($aNums[1]); $j < $jMax; $j++) {
+                    for ($k = 0, $kMax = count($aNums[2]); $k < $kMax; $k++) {
                         if ($aNums[0][$i] != $aNums[1][$j] && $aNums[0][$i] != $aNums[2][$k] && $aNums[1][$j] != $aNums[2][$k]) {
                             $iNums++;
                         }

@@ -52,7 +52,7 @@ abstract class Base
     // 魔术方法
     public function __get($name)
     {
-        return isset($this->config[$name]) ? $this->config[$name] : null;
+        return $this->config[$name] ?? null;
     }
 
     public function __isset($name)
@@ -169,18 +169,18 @@ abstract class Base
         $m = $n = 0;
         $last = (int) $arr[0];
         $start = $last;
-        for ($i = 1; $i < count($arr); $i++) {
+        for ($i = 1, $iMax = count($arr); $i < $iMax; $i++) {
             $current = (int) $arr[$i];
             if ($current == $last + 1) {
                 $m++;
             } else {
                 $n = $current - $last;
                 if ($m > 0) {
-                    $chartData[] = "m" . $m;
+                    $chartData[] = 'm'. $m;
                 }
 
                 if ($n > 0) {
-                    $chartData[] = "n" . $n;
+                    $chartData[] = 'n'. $n;
                 }
 
                 $m = 0;
@@ -188,7 +188,7 @@ abstract class Base
             $last = $current;
         }
         if ($m > 0) {
-            $chartData[] = "m" . $m;
+            $chartData[] = 'm'. $m;
         }
 
         $string = 's' . $start . implode('', $chartData);
@@ -289,7 +289,7 @@ abstract class Base
         if (!$force && !$this->lottery->selfopen) {
             if (!$this->lock || !$this->lottery->lock) {
                 // 不要求封锁
-                return "";
+                return '';
             }
         }
 
@@ -357,7 +357,7 @@ abstract class Base
             return false;
         }
 
-        $this->id = $this->id . '@' . $pos;
+        $this->id .= $pos.'@';
         $this->pos = $pos;
 
         //改变配置
@@ -706,7 +706,7 @@ abstract class Base
     public function getRepeat($aCode, $iRepeats = 2)
     {
         $result = [];
-        for ($ii = 0; $ii < count($aCode); $ii++) {
+        for ($ii = 0, $iiMax = count($aCode); $ii < $iiMax; $ii++) {
             $tCode = explode(' ', $aCode[$ii]);
             $result[$ii] = '';
             for ($iii = 0; $iii < $iRepeats; $iii++) {

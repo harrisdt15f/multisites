@@ -46,7 +46,9 @@ trait rx_expands_normal {
 
     public function expand($sCodes,$pos=null)
     {
-        if(!$pos || empty($pos)) return [];
+        if(!$pos || empty($pos)) {
+            return [];
+        }
 
         //对pos按wqbsg做排序
         $pos=array_keys(array_intersect_key($this->positionsTpl, array_flip($pos)));
@@ -109,7 +111,9 @@ trait rx_expands_zx {
         $pos=[];
         $codes=[];
         foreach($aCodes as $index=>$code){
-            if(trim($code)==='') continue;
+            if(trim($code)==='') {
+                continue;
+            }
             switch($index){
                 case 0:
                     $pos[]='w';
@@ -134,7 +138,9 @@ trait rx_expands_zx {
             }
         }
 
-        if(empty($pos)) return [];
+        if(empty($pos)) {
+            return [];
+        }
 
         $aP1 = $this->getCombination($pos,$this->expands['num']);
 
@@ -169,7 +175,7 @@ trait expands_dwd {
         foreach($numbers as $pos=>$code){
             $tmp=[];
             foreach($arr as $_code){
-                $tmp[]=intval($code==$_code);
+                $tmp[]= (int)($code == $_code);
             }
             $result[]=$tmp;
         }
@@ -183,7 +189,7 @@ trait expands_dwd {
         $positions=array('w'=>'','q'=>'','b'=>'','s'=>'','g'=>'');
         if(!$this->pos){
             //集合
-            $pos=(array) array_rand($positions,rand(1,count($positions)));
+            $pos=(array) array_rand($positions,random_int(1,count($positions)));
         }else{
             $pos=str_split($this->pos);
         }
@@ -201,7 +207,9 @@ trait expands_dwd {
         $result=[];
         $aCodes=explode('|',$sCodes);
         foreach($aCodes as $index=>$code){
-            if(trim($code)==='') continue;
+            if(trim($code)==='') {
+                continue;
+            }
             switch($index){
                 case 0:
                     $methodid=$this->id."@w";
@@ -221,7 +229,9 @@ trait expands_dwd {
                 default:
                     $methodid="";
             }
-            if(!$methodid) continue;
+            if(!$methodid) {
+                continue;
+            }
 
             $result[]=array(
                 'methodid'=>$methodid,
@@ -264,7 +274,7 @@ trait expands_dwd3 {
         $positions=array('b'=>'','s'=>'','g'=>'');
         if(!$this->pos){
             //集合
-            $pos=(array) array_rand($positions,rand(1,count($positions)));
+            $pos=(array) array_rand($positions,random_int(1,count($positions)));
         }else{
             $pos=str_split($this->pos);
         }
@@ -282,7 +292,9 @@ trait expands_dwd3 {
         $result=[];
         $aCodes=explode('|',$sCodes);
         foreach($aCodes as $index=>$code){
-            if(trim($code)==='') continue;
+            if(trim($code)==='') {
+                continue;
+            }
             switch($index){
                 case 0:
                     $methodid=$this->id."@b";
@@ -296,7 +308,9 @@ trait expands_dwd3 {
                 default:
                     $methodid="";
             }
-            if(!$methodid) continue;
+            if(!$methodid) {
+                continue;
+            }
 
             $result[]=array(
                 'methodid'=>$methodid,

@@ -29,7 +29,7 @@ class EBTH extends Base
         }
 
         $temp=explode('&',$sCodes);
-        if(count($temp) != count(array_count_values($temp))){
+        if(count($temp) != count(array_unique($temp))){
             return 0;
         }
 
@@ -44,7 +44,9 @@ class EBTH extends Base
             return false;
         }
 
-        if($nums != count($aCode)) return false;
+        if($nums != count($aCode)) {
+            return false;
+        }
 
         return true;
     }
@@ -89,7 +91,7 @@ class EBTH extends Base
         $arrs = $this->getCombination(explode('&',$sCodes), 2);
         foreach ($arrs as $str) {
             $t=explode(' ',$str);
-            if(isset($temp[$t[0]]) && isset($temp[$t[1]])){
+            if(isset($temp[$t[0]], $temp[$t[1]])){
                 $i++;
             }
         }

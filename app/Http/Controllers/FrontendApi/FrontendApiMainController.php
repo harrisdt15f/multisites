@@ -15,7 +15,7 @@ class FrontendApiMainController extends Controller
     protected $inputs;
     public $partnerUser; //当前的用户
     protected $currentOptRoute; //目前路由
-    public $currentPlatformEloq = null; //当前商户存在的平台
+    public $currentPlatformEloq; //当前商户存在的平台
     public $eloqM = ''; // 当前的eloquent
     //当前的route name;
     protected $log_uuid; //当前的logId

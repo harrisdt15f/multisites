@@ -78,10 +78,7 @@ class WXZU120 extends Base
     // 是否忽略计算奖金
     public function openIgnore($openCodeArr) {
         $_codeArr = array_unique($openCodeArr);
-        if (count($_codeArr) == count($openCodeArr)) {
-            return false;
-        }
-        return true;
+        return count($_codeArr) != count($openCodeArr);
     }
 
     //检查封锁

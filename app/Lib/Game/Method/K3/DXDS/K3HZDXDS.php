@@ -54,12 +54,7 @@ class K3HZDXDS extends Base
                 return isset($filterArr[$v]);
             }))) return false;
 
-        if(count($temp)==0){
-            return false;
-        }
-
-
-        return true;
+        return !(count($temp) == 0);
     }
 
     public function count($sCodes)

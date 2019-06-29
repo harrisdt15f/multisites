@@ -15,10 +15,7 @@ class BIG_EVEN extends Base
 
     public function regexp($sCode)
     {
-        if ($sCode != 'be') {
-            return false;
-        }
-        return true;
+        return $sCode == 'be';
     }
 
     public function count($sCodes)

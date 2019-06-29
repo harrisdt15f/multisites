@@ -9,7 +9,6 @@ use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
 use App\Models\SystemPlatform;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Input;
@@ -23,8 +22,8 @@ class BackEndApiMainController extends Controller
     public $partnerAdmin; //当前的商户用户
     protected $currentOptRoute; //目前路由
     protected $fullMenuLists; //所有的菜单
-    public $currentPlatformEloq = null; //当前商户存在的平台
-    public $currentPartnerAccessGroup = null; //当前商户的权限组
+    public $currentPlatformEloq; //当前商户存在的平台
+    public $currentPartnerAccessGroup; //当前商户的权限组
     protected $partnerMenulists; //目前所有的菜单为前端展示用的
     protected $eloqM = ''; // 当前的eloquent
     protected $currentRouteName; //当前的route name;

@@ -24,7 +24,7 @@ class HandleLogGetAddressAction
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
         $addressIpELoq = SystemAddressIp::where('ip', $inputDatas['ip'])->first();
-        if (is_null($addressIpELoq)) {
+        if ($addressIpELoq === null) {
             $ipAddressCla = new IpAddress();
             $addressIpELoq = $ipAddressCla->getAddress($inputDatas['ip']);
         }

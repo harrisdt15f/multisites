@@ -120,7 +120,9 @@ class H2DXDS extends Base
         $temp = [];
         foreach ($aTemp1 as $v1) {
             foreach ($aTemp2 as $v2) {
-                if(isset($temp[$v1.'-'.$v2])) continue;
+                if(isset($temp[$v1.'-'.$v2])) {
+                    continue;
+                }
                 if (in_array($v1, $arr[0]) && in_array($v2, $arr[1])) {
                     $temp[$v1.'-'.$v2]=1;
                     $i++;

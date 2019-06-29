@@ -4,7 +4,7 @@ namespace App\Lib\Game\Method;
 // pk10 定位单胆
 trait BasePk10DWD
 {
-    public $positionsTpl = array('1' => '冠军', '2' => '亚军', '3' => '季军', '4' => '第四名', '5' => '第五名');
+    public $positionsTpl = ['1' => '冠军', '2' => '亚军', '3' => '季军', '4' => '第四名', '5' => '第五名'];
     public $supportExpand = true;
 
     public function bingoCode(array $numbers)

@@ -93,7 +93,7 @@ class LTDDS extends Base
             }
         }
 
-        $d = $d . '';
+        $d .= '';
 
         if ($levelId == '1') {
             //0

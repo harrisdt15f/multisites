@@ -10,15 +10,12 @@ class SUPER_BIG extends Base
     // 供测试用 生成随机投注
     public function randomCodes()
     {
-        return ["sb"];
+        return ['sb'];
     }
 
     public function regexp($sCode)
     {
-        if ($sCode != 'sb') {
-            return false;
-        }
-        return true;
+        return !($sCode != 'sb');
     }
 
     public function count($sCodes)

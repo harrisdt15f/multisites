@@ -89,7 +89,7 @@ class Handler extends ExceptionHandler
             } else {
                 $result = ['message' => $msg];
             }
-            return response()->json($result, 200);
+            return response()->json($result);
         } else {
             return redirect()->guest($exception->redirectTo() ?? route('login'));
         }

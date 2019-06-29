@@ -21,10 +21,7 @@ class RED_B extends Base
 
     public function regexp($sCode)
     {
-        if ($sCode == 'red') {
-            return true;
-        }
-        return false;
+        return $sCode == 'red';
     }
 
     public function count($sCodes)

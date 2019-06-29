@@ -224,7 +224,7 @@ trait UserAccountLogics
         $updated_at = date('Y-m-d H:i:s');
         $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}' and `balance`>='{$money}'") > 0;
         if ($ret) {
-            $this->balance = $this->balance - $money;
+            $this->balance -= $money;
         }
         return $ret;
     }

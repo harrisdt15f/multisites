@@ -88,7 +88,7 @@ class DigitalNumber
             if (!in_array(self::getShape($sCode), $aShape)) {
                 return false;
             }
-            $a = str_split($sCode, 1);
+            $a = str_split($sCode);
             sort($a);
             $sCode = implode($a);
         }
@@ -108,7 +108,7 @@ class DigitalNumber
             return '';
         }
 
-        $aWei = str_split($sNumber, 1);
+        $aWei = str_split($sNumber);
         !$bUnique or $aWei = array_unique($aWei);
         sort($aWei);
         return implode($aWei);

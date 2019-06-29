@@ -37,7 +37,7 @@ class HompageNoticeAction
             $datas = Cache::get('homepageNotice');
         } else {
             $noticeEloq = $this->model::select('show_num', 'status')->where('en_name', 'notice')->first();
-            if (is_null($noticeEloq)) {
+            if ($noticeEloq === null) {
                 //#######################################################
                 return $contll->msgOut(false, [], '400', '前台公告模块不存在');
             }

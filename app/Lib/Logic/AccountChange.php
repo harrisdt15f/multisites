@@ -229,7 +229,7 @@ class AccountChange
             $updated_at = date('Y-m-d H:i:s');
             $ret= DB::update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}' and `balance`>='{$money}'") > 0 ;
             if($ret){
-                $account->balance = $account->balance - $money;
+                $account->balance -= $money;
             }
             return $ret;
         }

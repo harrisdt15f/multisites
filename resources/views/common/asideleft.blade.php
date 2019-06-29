@@ -34,8 +34,8 @@ inner;
             if (array_key_exists('child', $value)) {
                 foreach ($value['child'] as $_value) {
                     $tempInnerItems = $tempInnerItems === '' ? $innerItems : $tempInnerItems . $innerItems;
-                    $tempInnerItems = str_replace('~plabel~', $value['label'], $tempInnerItems);
-                    $tempInnerItems = str_replace('~ilabel~', $_value['label'], $tempInnerItems);
+                    $tempInnerItems = str_replace(array('~plabel~', '~ilabel~'),
+                        array($value['label'], $_value['label']), $tempInnerItems);
                     $tempInnerItems = $_value['route'] === '#' ? str_replace('~iroute~', '#', $tempInnerItems) : str_replace('~iroute~', $_value['route'], $tempInnerItems);
                 }
             }

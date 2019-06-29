@@ -58,7 +58,7 @@ class Math
         $temp_firstelement = $arr[0];
         unset($arr[0]);
         $arr = array_values($arr);
-        $temp_list1 = self::getCombinationToString($arr, ($m - 1));
+        $temp_list1 = self::getCombinationToString($arr, $m - 1);
         foreach ($temp_list1 as $s) {
             $s = $temp_firstelement.','.$s;
             $result[] = $s;

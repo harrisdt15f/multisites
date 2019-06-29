@@ -66,7 +66,9 @@ class BDW53 extends Base
         $aCodes = explode("&", $sCodes);
         $i = 0;
         foreach ($aCodes as $code) {
-            if(isset($temp[$code])) continue;
+            if(isset($temp[$code])) {
+                continue;
+            }
             $temp[$code]=1;
             if (in_array($code, $numbers)) {
                 $i++;

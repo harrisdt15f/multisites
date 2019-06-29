@@ -22,10 +22,7 @@ class BLUE_B extends Base
     // 蓝色
     public function regexp($sCode)
     {
-        if ($sCode == 'blue') {
-            return true;
-        }
-        return false;
+        return $sCode == 'blue';
     }
 
     public function count($sCodes)

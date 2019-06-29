@@ -16,10 +16,7 @@ class SMALL extends Base
 
     public function regexp($sCode)
     {
-        if ($sCode != 's') {
-            return false;
-        }
-        return true;
+        return !($sCode != 's');
     }
 
     public function count($sCodes)

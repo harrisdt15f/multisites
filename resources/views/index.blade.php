@@ -36,7 +36,7 @@ block;
             if (array_key_exists('child', $value)) {
                 $j = 1;
                 foreach ($value['child'] as $_key => $_value) {
-                    $size = sizeof($value['child']);
+                    $size = count($value['child']);
                     if ($j >= $size) {
                         $tempBlock = str_replace('~i-label~', $_value['label'] . '<br>', $tempBlock);
                     } else {
@@ -44,7 +44,7 @@ block;
                     }
                     $j++;
                 }
-                if ($i >= sizeof($menulists) - 1) {
+                if ($i >= count($menulists) - 1) {
                     $html = str_replace('~block~', $tempBlock, $html);
                 } else {
                     if ($i >=3) {

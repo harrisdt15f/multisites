@@ -25,7 +25,7 @@ class BDW41 extends Base
 
     public function regexp($sCodes)
     {
-        if (!preg_match("/^(([0-9]&){0,9}[0-9])$/", $sCodes)) {
+        if (!preg_match('/^(([0-9]&){0,9}[0-9])$/', $sCodes)) {
             return false;
         }
 
@@ -56,7 +56,7 @@ class BDW41 extends Base
         $result=[];
         $arr=array_keys(self::$filterArr);
         foreach($arr as $v){
-            $result[]=intval(isset($numbers[$v]));
+            $result[]= (int)isset($numbers[$v]);
         }
         return [$result];
     }
@@ -70,7 +70,9 @@ class BDW41 extends Base
         $aCodes = explode("&", $sCodes);
         $i = 0;
         foreach ($aCodes as $code) {
-            if(isset($temp[$code])) continue;
+            if(isset($temp[$code])) {
+                continue;
+            }
             $temp[$code]=1;
             if (isset($nums[$code]) && $nums[$code]>=1) {
                 $i++;
