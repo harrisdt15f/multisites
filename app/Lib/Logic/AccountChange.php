@@ -4,7 +4,6 @@ namespace App\Lib\Logic;
 use Illuminate\Support\Facades\Log;
 use App\Models\User\Fund\FrontendUsersAccountsReport;
 use App\Models\User\Fund\FrontendUserAccountType;
-use App\Models\User\FrontendUser;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -14,33 +13,35 @@ use Illuminate\Support\Facades\DB;
  */
 class AccountChange
 {
-    public const FROZEN_STATUS_OUT         = 1;
-    public const FROZEN_STATUS_BACK        = 2;
-    public const FROZEN_STATUS_TO_PLAYER   = 3;
-    public const FROZEN_STATUS_TO_SYSTEM   = 4;
-    public const FROZEN_STATUS_BONUS       = 5;
+    public const FROZEN_STATUS_OUT = 1;
+    public const FROZEN_STATUS_BACK = 2;
+    public const FROZEN_STATUS_TO_PLAYER = 3;
+    public const FROZEN_STATUS_TO_SYSTEM = 4;
+    public const FROZEN_STATUS_BONUS = 5;
 
-    public const MODE_CHANGE_AFTER         = 2;
-    public const MODE_CHANGE_NOW           = 1;
+    public const MODE_CHANGE_AFTER = 2;
+    public const MODE_CHANGE_NOW = 1;
 
-    public const MODE_REPORT_AFTER         = 2;
-    public const MODE_REPORT_NOW           = 1;
+    public const MODE_REPORT_AFTER = 2;
+    public const MODE_REPORT_NOW = 1;
 
-    public  $reportMode             = 1;
-    public  $changeMode             = 1;
+    public $reportMode = 1;
+    public $changeMode = 1;
 
-    public  $changes                = [];
-    public  $reports                = [];
+    public $changes = [];
+    public $reports = [];
 
-    public  $accounts               = [];
+    public $accounts = [];
 
     // 设置报表保存模式
-    function setReportMode($mode) {
+    function setReportMode($mode)
+    {
         $this->reportMode = $mode;
     }
 
     // 设置帐变保存模式
-    function setChangeMode($mode) {
+    function setChangeMode($mode)
+    {
         $this->changeMode = $mode;
     }
 
@@ -56,8 +57,8 @@ class AccountChange
         try {
             $this->accounts[$account->user_id] = $account;
             return $this->doChange($account, $type, $params);
-        }catch (\Exception $e){
-            Log::channel('account')->error('error-'. $e->getMessage() .'|'. $e->getLine() .'|'. $e->getFile());
+        } catch (\Exception $e) {
+            Log::channel('account')->error('error-'.$e->getMessage().'|'.$e->getLine().'|'.$e->getFile());
             return $e->getMessage();
         }
     }
@@ -71,7 +72,7 @@ class AccountChange
      */
     public function doChange($account, $typeSign, $params)
     {
-        $user       = $account->user()->first();
+        $user = $account->user;
         $typeConfig = FrontendUserAccountType::getTypeBySign($typeSign);
 
         //　1. 获取帐变配置
@@ -95,59 +96,38 @@ class AccountChange
         if ($amount == 0) {
             return true;
         }
-        // 4. 关联用户是否存在
-        $relatedUser = null;
-        if (isset($params['related_id'])) {
-            $relatedUser = FrontendUser::findByCache($params['related_id']);
-            if (!$relatedUser) {
-                return '对不起, 无效的关联用户!';
-            }
-        }
         // 冻结类型 1 冻结自己金额 2 冻结退还　3 冻结给玩家　4 冻结给系统　5 中奖
         // 资金增减. 需要检测对应
-        if ( $typeConfig['frozen_type'] == 5) {
-            if (!$relatedUser) {
-                return '对不起, 必须存在关联用户!';
-            }
-            $relatedAccount = $relatedUser->account()->first();
-            $frozen         = $relatedAccount->frozen;
-            if ($frozen < $amount) {
-                return '对不起, 相关用户可用冻结金额不足!';
-            }
-        }
         // 保存记录
         $report = [
-            'sign'          => $user->sign,
-            'user_id'       => $user->id,
-            'top_id'        => $user->top_id,
-            'parent_id'     => $user->parent_id,
-            'rid'           => $user->rid,
-            'username'      => $user->username,
-            'is_tester'     => $user->is_tester,
-
-            'type_sign'         => $typeConfig['sign'],
-            'type_name'         => $typeConfig['name'],
-
-            'project_id'        => $params['project_id'] ?? 0,
-            'lottery_id'        => $params['lottery_id'] ?? 0,
-            'method_id'         => $params['method_id'] ?? 0,
-            'issue'             => $params['issue'] ?? 0,
-            'from_id'           => $params['from_id'] ?? 0,
-            'from_admin_id'     => $params['from_admin_id'] ?? 0,
-            'to_id'             => $params['to_id'] ?? 0,
-            'activity_sign'     => $params['activity_sign'] ?? 0,
-            'desc'              => $params['desc'] ?? 0,
-
-            'frozen_type'       => $typeConfig['frozen_type'],
-            'day'               => date('Ymd'),
-            'amount'            => $amount,
-            'process_time'      => time(),
-            'created_at'        => date('Y-m-d H:i:s'),
+            'activity_sign' => $params['activity_sign'] ?? 0,
+            'amount' => $amount,
+            'created_at' => date('Y-m-d H:i:s'),
+            'day' => date('Ymd'),
+            'desc' => $params['desc'] ?? 0,
+            'from_admin_id' => $params['from_admin_id'] ?? 0,
+            'from_id' => $params['from_id'] ?? 0,
+            'frozen_type' => $typeConfig['frozen_type'],
+            'is_tester' => $user->is_tester,
+            'issue' => $params['issue'] ?? 0,
+            'lottery_id' => $params['lottery_id'] ?? 0,
+            'method_id' => $params['method_id'] ?? 0,
+            'parent_id' => $user->parent_id,
+            'process_time' => time(),
+            'project_id' => $params['project_id'] ?? 0,
+            'rid' => $user->rid,
+            'sign' => $user->sign,
+            'to_id' => $params['to_id'] ?? 0,
+            'top_id' => $user->top_id,
+            'type_name' => $typeConfig['name'],
+            'type_sign' => $typeConfig['sign'],
+            'user_id' => $user->id,
+            'username' => $user->username,
         ];
-        $beforeBalance      = $account->balance;
-        $beforeFrozen       = $account->frozen;
+        $beforeBalance = $account->balance;
+        $beforeFrozen = $account->frozen;
         // 根据冻结类型处理
-        switch($typeConfig['frozen_type']) {
+        switch ($typeConfig['frozen_type']) {
             case self::FROZEN_STATUS_OUT:
                 $ret = $this->frozen($account, $amount);
                 break;
@@ -159,7 +139,7 @@ class AccountChange
                 $ret = $this->unFrozenToPlayer($account, $amount);
                 break;
             default:
-                if ($typeConfig['in_out'] == 1) {
+                if ($typeConfig['in_out'] === 1) {
                     $ret = $this->add($account, $amount);
                 } else {
                     $ret = $this->cost($account, $amount);
@@ -168,13 +148,13 @@ class AccountChange
         if ($ret !== true) {
             return "对不起, 账户异常({$ret})!";
         }
-        $balance    = $account->balance;
-        $frozen     = $account->frozen;
-        $report['before_balance']   = $beforeBalance;
-        $report['balance']          = $balance;
-        $report['frozen_balance']   = $frozen;
-        $report['before_frozen_balance']    = $beforeFrozen;
-        $change['updated_at']       = date('Y-m-d H:i:s');
+        $balance = $account->balance;
+        $frozen = $account->frozen;
+        $report['before_balance'] = $beforeBalance;
+        $report['balance'] = $balance;
+        $report['frozen_balance'] = $frozen;
+        $report['before_frozen_balance'] = $beforeFrozen;
+        $change['updated_at'] = date('Y-m-d H:i:s');
         $this->saveReportData($report);
         return true;
     }
@@ -198,8 +178,8 @@ class AccountChange
         } else {
             $updated_at = date('Y-m-d H:i:s');
             $sql = "update `frontend_users_accounts` set `balance`=`balance`+'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}'";
-            $ret= DB::update($sql) > 0 ;
-            if($ret){
+            $ret = DB::update($sql) > 0;
+            if ($ret) {
                 $account->balance += $money;
             }
             return $ret;
@@ -227,8 +207,8 @@ class AccountChange
             return true;
         } else {
             $updated_at = date('Y-m-d H:i:s');
-            $ret= DB::update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}' and `balance`>='{$money}'") > 0 ;
-            if($ret){
+            $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}' and `balance`>='{$money}'") > 0;
+            if ($ret) {
                 $account->balance -= $money;
             }
             return $ret;
@@ -331,7 +311,8 @@ class AccountChange
      * 存储
      * @return bool
      */
-    public function triggerSave() {
+    public function triggerSave()
+    {
         // 报表保存
         if ($this->reports) {
             $ret = FrontendUsersAccountsReport::insert( $this->reports );
@@ -343,8 +324,8 @@ class AccountChange
         // 帐变保存
         if ($this->changes) {
             foreach ($this->changes as $userId => $_data) {
-                $balanceAdd     = 0;
-                $frozenAdd      = 0;
+                $balanceAdd = 0;
+                $frozenAdd = 0;
 
                 foreach ($_data as $_key => $amount) {
                     switch ($_key) {
@@ -356,14 +337,14 @@ class AccountChange
                             break;
                         case 'frozen':
                             $balanceAdd -= $amount;
-                            $frozenAdd  += $amount;
+                            $frozenAdd += $amount;
                             break;
                         case 'unfrozen':
                             $balanceAdd += $amount;
-                            $frozenAdd  -= $amount;
+                            $frozenAdd -= $amount;
                             break;
                         case 'unFrozenToPlayer':
-                            $frozenAdd  -= $amount;
+                            $frozenAdd -= $amount;
                             break;
                         default :
                             break;
@@ -376,16 +357,20 @@ class AccountChange
                 // 冻结金额
                 if ($frozenAdd > 0) {
                     $sql .= " `frozen`=`frozen` + '{$frozenAdd}',";
-                } else if ($frozenAdd < 0) {
-                    $frozenAdd  = abs($frozenAdd);
-                    $sql .= " `frozen`=`frozen` - '{$frozenAdd}',";
+                } else {
+                    if ($frozenAdd < 0) {
+                        $frozenAdd = abs($frozenAdd);
+                        $sql .= " `frozen`=`frozen` - '{$frozenAdd}',";
+                    }
                 }
                 // 资金
                 if ($balanceAdd > 0) {
                     $sql .= " `balance`=`balance` + '{$balanceAdd}',";
-                } else if ($balanceAdd < 0) {
-                    $balanceAdd = abs($balanceAdd);
-                    $sql .= " `balance`=`balance` - '{$balanceAdd}',";
+                } else {
+                    if ($balanceAdd < 0) {
+                        $balanceAdd = abs($balanceAdd);
+                        $sql .= " `balance`=`balance` - '{$balanceAdd}',";
+                    }
                 }
                 // 更新时间
                 $updated_at = date('Y-m-d H:i:s');
@@ -395,7 +380,7 @@ class AccountChange
                     return false;
                 }
             }
-            $this->changes  = [];
+            $this->changes = [];
             $this->accounts = [];
         }
         return true;
@@ -406,7 +391,8 @@ class AccountChange
      * @param $report
      * @return bool
      */
-    public function saveReportData($report) {
+    public function saveReportData($report)
+    {
         if ($this->reportMode == self::MODE_REPORT_AFTER) {
             $this->reports[] = $report;
         } else {
