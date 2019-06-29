@@ -59,6 +59,7 @@ trait ProjectTraits
         }
         $projectList = $projectEloq->select(
             'id',
+            'username',
             'lottery_sign as lottery_name',
             'issue',
             'open_number as open_codes',
