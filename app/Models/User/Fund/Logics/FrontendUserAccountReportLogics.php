@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
  * Date: 5/31/2019
  * Time: 7:54 PM
  */
-trait AccountChangeReportLogics
+trait FrontendUserAccountReportLogics
 {
 
     public static function getList($c)

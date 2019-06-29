@@ -5,7 +5,7 @@ namespace App\Models\User\Fund\Logics;
 use App\Lib\Clog;
 use App\Lib\Locker\AccountLocker;
 use App\Lib\Logic\AccountChange;
-use App\Models\Account\AccountChangeType;
+use App\Models\Account\FrontendUserAccountType;
 use App\Models\Project;
 use App\Models\User\FrontendUsersAccount;
 use Exception;
@@ -45,7 +45,7 @@ trait UserAccountLogics
             'data' => $data,
             'total' => $total,
             'currentPage' => $currentPage,
-            'totalPage' => (int)ceil($total / $pageSize),
+            'totalPage' => (int) ceil($total / $pageSize),
         ];
     }
 
@@ -61,7 +61,7 @@ trait UserAccountLogics
         try {
             return $this->doChange($type, $params);
         } catch (\Exception $e) {
-            Clog::account('error-'.$e->getMessage().'|'.$e->getLine().'|'.$e->getFile());
+            Clog::account('error-' . $e->getMessage() . '|' . $e->getLine() . '|' . $e->getFile());
             return $e->getMessage();
         }
     }
@@ -70,7 +70,7 @@ trait UserAccountLogics
     public function doChange($typeSign, $params)
     {
         $user = $this->user();
-        $typeConfig = AccountChangeType::getTypeBySign($typeSign);
+        $typeConfig = FrontendUserAccountType::getTypeBySign($typeSign);
         //　1. 获取帐变配置
         if (empty($typeConfig)) {
             Clog::account("error-{$user->id}-{$typeSign}不存在!");
@@ -278,15 +278,15 @@ trait UserAccountLogics
             $res = $accountChange->doChange($this, $type, $params);
             if ($res !== true) {
                 $accountLocker->release();
-                return '对不起, '.$res;
+                return '对不起, ' . $res;
             }
             $accountChange->triggerSave();
             $accountLocker->release();
             return true;
         } catch (Exception $e) {
             $accountLocker->release();
-            Log::info('投注-异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine()); //Clog::userBet
-            return '对不起, '.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine();
+            Log::info('投注-异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine()); //Clog::userBet
+            return '对不起, ' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine();
         }
     }
 }

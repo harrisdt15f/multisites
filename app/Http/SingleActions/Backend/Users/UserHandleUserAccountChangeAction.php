@@ -10,7 +10,7 @@ namespace App\Http\SingleActions\Backend\Users;
 
 use App\Http\Controllers\backendApi\BackEndApiMainController;
 use App\Models\User\FrontendUser;
-use App\Models\User\Fund\AccountChangeReport;
+use App\Models\User\Fund\FrontendUserAccountReport;
 use Illuminate\Http\JsonResponse;
 
 class UserHandleUserAccountChangeAction
@@ -23,7 +23,7 @@ class UserHandleUserAccountChangeAction
      */
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
-        $datas = AccountChangeReport::select('username', 'type_name', 'type_sign', 'amount', 'before_balance', 'balance', 'created_at')->with('changeType')->where('user_id', $inputDatas['user_id'])->whereBetween('created_at', [$inputDatas['start_time'], $inputDatas['end_time']])->get()->toArray();
+        $datas = FrontendUserAccountReport::select('username', 'type_name', 'type_sign', 'amount', 'before_balance', 'balance', 'created_at')->with('changeType')->where('user_id', $inputDatas['user_id'])->whereBetween('created_at', [$inputDatas['start_time'], $inputDatas['end_time']])->get()->toArray();
         foreach ($datas as $key => $report) {
             $datas[$key]['in_out'] = $report['change_type']['in_out'];
             unset($datas[$key]['type_sign'], $datas[$key]['change_type']);

@@ -9,7 +9,7 @@
 namespace App\Http\SingleActions\Backend\Report;
 
 use App\Http\Controllers\backendApi\BackEndApiMainController;
-use App\Models\User\Fund\AccountChangeReport;
+use App\Models\User\Fund\FrontendUserAccountReport;
 use Illuminate\Http\JsonResponse;
 
 class reportManagementUserAccountChangeAction
@@ -21,7 +21,7 @@ class reportManagementUserAccountChangeAction
      */
     public function execute(BackEndApiMainController $contll): JsonResponse
     {
-        $accountChangeEloq = new AccountChangeReport();
+        $accountChangeEloq = new FrontendUserAccountReport();
         $searchAbleFields = ['username', 'type_sign', 'is_for_agent'];
         $fixedJoin = 1;
         $withTable = 'changeType';

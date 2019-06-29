@@ -178,7 +178,12 @@ class LotteriesController extends BackEndApiMainController
         return $action->execute($this);
     }
 
-    //添加彩种
+    /**
+     * 添加彩种
+     * @param LotteriesAddRequest $request
+     * @param LotteriesAddAction  $action
+     * @return JsonResponse
+     */
     public function add(LotteriesAddRequest $request, LotteriesAddAction $action): JsonResponse
     {
         $inputDatas = $request->validated();

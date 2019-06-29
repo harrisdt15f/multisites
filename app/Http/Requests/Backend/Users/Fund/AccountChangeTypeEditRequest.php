@@ -30,7 +30,7 @@ class AccountChangeTypeEditRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|numeric|exists:account_change_types,id',
+            'id' => 'required|numeric|exists:frontend_user_account_types,id',
             'name' => 'required|string',
             'sign' => 'required|string',
             'in_out' => 'required|numeric|in:0,1',

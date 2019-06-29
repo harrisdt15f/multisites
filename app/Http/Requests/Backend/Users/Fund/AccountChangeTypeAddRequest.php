@@ -31,7 +31,7 @@ class AccountChangeTypeAddRequest extends BaseFormRequest
     {
         return [
             'name' => 'required|string',
-            'sign' => 'required|string|unique:account_change_types,sign',
+            'sign' => 'required|string|unique:frontend_user_account_types,sign',
             'in_out' => 'required|numeric|in:0,1',
         ];
     }

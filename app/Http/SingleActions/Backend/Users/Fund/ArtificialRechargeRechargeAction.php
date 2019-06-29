@@ -19,9 +19,9 @@ use App\Models\Admin\Message\BackendSystemNoticeList;
 use App\Models\BackendAdminAuditFlowList;
 use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
 use App\Models\User\FrontendUser;
-use App\Models\User\Fund\AccountChangeReport;
-use App\Models\User\Fund\AccountChangeType;
 use App\Models\User\Fund\BackendAdminRechargehumanLog;
+use App\Models\User\Fund\FrontendUserAccountReport;
+use App\Models\User\Fund\FrontendUserAccountType;
 use App\Models\User\Fund\FrontendUsersAccount;
 use App\Models\User\UsersRechargeHistorie;
 use App\Models\User\UsersRechargeLog;
@@ -64,7 +64,7 @@ class ArtificialRechargeRechargeAction
                 $this->sendMessage();
             } else {
                 //超管操作不需审核 直接给用户充值
-                $accountChangeTypeEloq = AccountChangeType::where('sign', 'artificial_recharge')->first();
+                $accountChangeTypeEloq = FrontendUserAccountType::where('sign', 'artificial_recharge')->first();
                 if ($accountChangeTypeEloq === null) {
                     return $contll->msgOut(false, [], '100901');
                 }
@@ -79,7 +79,7 @@ class ArtificialRechargeRechargeAction
                     return $contll->msgOut(false, [], '101102');
                 }
                 //用户帐变表
-                $accountChangeReportEloq = new AccountChangeReport();
+                $accountChangeReportEloq = new FrontendUserAccountReport();
                 $accountChangeObj = new AccountChange();
                 $userEloq = FrontendUser::find($inputDatas['id']);
                 $accountChangeObj->addData($accountChangeReportEloq, $userEloq->toArray(), $inputDatas['amount'], $UserAccounts->balance, $balance, $accountChangeTypeEloq);

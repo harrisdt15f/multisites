@@ -2,8 +2,8 @@
 namespace App\Lib\Logic;
 
 use Illuminate\Support\Facades\Log;
-use App\Models\User\Fund\AccountChangeReport;
-use App\Models\User\Fund\AccountChangeType;
+use App\Models\User\Fund\FrontendUserAccountReport;
+use App\Models\User\Fund\FrontendUserAccountType;
 use App\Models\User\FrontendUser;
 use Illuminate\Support\Facades\DB;
 
@@ -72,7 +72,7 @@ class AccountChange
     public function doChange($account, $typeSign, $params)
     {
         $user       = $account->user()->first();
-        $typeConfig = AccountChangeType::getTypeBySign($typeSign);
+        $typeConfig = FrontendUserAccountType::getTypeBySign($typeSign);
 
         //　1. 获取帐变配置
         if (empty($typeConfig)) {
@@ -334,7 +334,7 @@ class AccountChange
     public function triggerSave() {
         // 报表保存
         if ($this->reports) {
-            $ret = AccountChangeReport::insert( $this->reports );
+            $ret = FrontendUserAccountReport::insert( $this->reports );
             if(!$ret) {
                 return false;
             }
@@ -410,7 +410,7 @@ class AccountChange
         if ($this->reportMode == self::MODE_REPORT_AFTER) {
             $this->reports[] = $report;
         } else {
-            $ret = AccountChangeReport::insert( $report );
+            $ret = FrontendUserAccountReport::insert( $report );
             if(!$ret) {
                 return false;
             }

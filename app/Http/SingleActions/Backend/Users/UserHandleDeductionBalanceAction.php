@@ -11,8 +11,8 @@ namespace App\Http\SingleActions\Backend\Users;
 use App\Http\Controllers\backendApi\BackEndApiMainController;
 use App\Lib\Common\AccountChange;
 use App\Models\User\FrontendUser;
-use App\Models\User\Fund\AccountChangeReport;
-use App\Models\User\Fund\AccountChangeType;
+use App\Models\User\Fund\FrontendUserAccountReport;
+use App\Models\User\Fund\FrontendUserAccountType;
 use App\Models\User\Fund\FrontendUsersAccount;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -39,7 +39,7 @@ class UserHandleDeductionBalanceAction
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
         //人工扣款的帐变类型表
-        $accountChangeTypeEloq = AccountChangeType::select('name', 'sign')->where('sign', 'artificial_deduction')->first();
+        $accountChangeTypeEloq = FrontendUserAccountType::select('name', 'sign')->where('sign', 'artificial_deduction')->first();
         if ($accountChangeTypeEloq === null) {
             return $contll->msgOut(false, [], '100103');
         }
@@ -58,7 +58,7 @@ class UserHandleDeductionBalanceAction
             }
             //添加帐变记录
             $userEloq = $this->model::select('id', 'sign', 'top_id', 'parent_id', 'rid', 'username')->where('id', $inputDatas['user_id'])->first();
-            $accountChangeReportEloq = new AccountChangeReport();
+            $accountChangeReportEloq = new FrontendUserAccountReport();
             $accountChangeObj = new AccountChange();
             $accountChangeObj->addData($accountChangeReportEloq, $userEloq, $inputDatas['amount'], $userAccountsEloq->balance, $newBalance, $accountChangeTypeEloq);
             DB::commit();
