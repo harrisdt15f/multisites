@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BackendApi\Game\Lottery;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
+use App\Http\Requests\Backend\Game\Lottery\LotteriesAddRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesEditMethodRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesGenerateIssueRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesInputCodeRequest;
@@ -11,6 +12,7 @@ use App\Http\Requests\Backend\Game\Lottery\LotteriesLotteriesSwitchRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesMethodGroupSwitchRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesMethodRowSwitchRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesMethodSwitchRequest;
+use App\Http\SingleActions\Backend\Game\Lottery\LotteriesAddAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesEditMethodAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesGenerateIssueAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesInputCodeAction;
@@ -174,5 +176,12 @@ class LotteriesController extends BackEndApiMainController
     public function lotteriesCodeLength(LotteriesLotteriesCodeLengthAction $action): JsonResponse
     {
         return $action->execute($this);
+    }
+
+    //添加彩种
+    public function add(LotteriesAddRequest $request, LotteriesAddAction $action): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
     }
 }
