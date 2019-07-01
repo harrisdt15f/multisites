@@ -4,7 +4,9 @@ namespace App\Http\Controllers\BackendApi\Game\Lottery;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesAddRequest;
+use App\Http\Requests\Backend\Game\Lottery\LotteriesDeleteRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesEditMethodRequest;
+use App\Http\Requests\Backend\Game\Lottery\LotteriesEditRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesGenerateIssueRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesInputCodeRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesListsRequest;
@@ -13,6 +15,8 @@ use App\Http\Requests\Backend\Game\Lottery\LotteriesMethodGroupSwitchRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesMethodRowSwitchRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesMethodSwitchRequest;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesAddAction;
+use App\Http\SingleActions\Backend\Game\Lottery\LotteriesDeleteAction;
+use App\Http\SingleActions\Backend\Game\Lottery\LotteriesEditAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesEditMethodAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesGenerateIssueAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesInputCodeAction;
@@ -180,11 +184,35 @@ class LotteriesController extends BackEndApiMainController
 
     /**
      * 添加彩种
-     * @param LotteriesAddRequest $request
-     * @param LotteriesAddAction  $action
-     * @return JsonResponse
+     * @param   LotteriesAddRequest $request
+     * @param   LotteriesAddAction  $action
+     * @return  JsonResponse
      */
     public function add(LotteriesAddRequest $request, LotteriesAddAction $action): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
+    }
+
+    /**
+     * 编辑彩种
+     * @param  LotteriesEditRequest $request
+     * @param  LotteriesEditAction  $action
+     * @return JsonResponse
+     */
+    public function edit(LotteriesEditRequest $request, LotteriesEditAction $action): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
+    }
+
+    /**
+     * 删除彩种
+     * @param  LotteriesDeleteRequest $request
+     * @param  LotteriesDeleteAction  $action
+     * @return JsonResponse
+     */
+    public function delete(LotteriesDeleteRequest $request, LotteriesDeleteAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);

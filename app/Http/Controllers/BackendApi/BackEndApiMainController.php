@@ -138,9 +138,9 @@ class BackEndApiMainController extends Controller
             $code = $code == '' ? $defaultErrorCode : $code;
         }
         if ($placeholder === null || $substituted === null) {
-            $message = $message == '' ? __('frontend-codes-map.' . $code) : $message;
+            $message = $message == '' ? __('codes-map.' . $code) : $message;
         } else {
-            $message = $message == '' ? __('frontend-codes-map.' . $code, [$placeholder => $substituted]) : $message;
+            $message = $message == '' ? __('codes-map.' . $code, [$placeholder => $substituted]) : $message;
         }
         $datas = [
             'success' => $success,
