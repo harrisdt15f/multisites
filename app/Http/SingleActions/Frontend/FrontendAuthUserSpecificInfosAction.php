@@ -9,7 +9,6 @@
 namespace App\Http\SingleActions\Frontend;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Models\User\FrontendUsersSpecificInfo;
 use Illuminate\Http\JsonResponse;
 
 class FrontendAuthUserSpecificInfosAction
@@ -21,7 +20,15 @@ class FrontendAuthUserSpecificInfosAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        $usersSpecificInfoEloq = FrontendUsersSpecificInfo::where('user_id', $contll->partnerUser->id)->first();
+        $usersSpecificInfoEloq = $contll->partnerUser->specific;
+        $data = [
+            'nickname' => null,
+            'realname' => null,
+            'mobile' => null,
+            'email' => null,
+            'zip_code' => null,
+            'address' => null,
+        ];
         if ($usersSpecificInfoEloq !== null) {
             $data = [
                 'nickname' => $usersSpecificInfoEloq->nickname,
@@ -31,8 +38,6 @@ class FrontendAuthUserSpecificInfosAction
                 'zip_code' => $usersSpecificInfoEloq->zip_code,
                 'address' => $usersSpecificInfoEloq->address,
             ];
-        } else {
-            $data = false;
         }
 
         return $contll->msgOut(true, $data);

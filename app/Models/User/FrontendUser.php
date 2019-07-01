@@ -81,4 +81,10 @@ class FrontendUser extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(FrontendUsersPrivacyFlow::class, 'user_id', 'id')->orderBy('created_at', 'desc');
     }
+
+    //用户个人资料
+    public function specific()
+    {
+        return $this->hasOne(FrontendUsersSpecificInfo::class, 'id', 'user_specific_id');
+    }
 }
