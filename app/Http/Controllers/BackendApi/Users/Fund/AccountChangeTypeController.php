@@ -10,6 +10,7 @@ use App\Http\SingleActions\Backend\Users\Fund\AccountChangeTypeAddAction;
 use App\Http\SingleActions\Backend\Users\Fund\AccountChangeTypeDeleteAction;
 use App\Http\SingleActions\Backend\Users\Fund\AccountChangeTypeDetailAction;
 use App\Http\SingleActions\Backend\Users\Fund\AccountChangeTypeEditAction;
+use App\Http\SingleActions\Backend\Users\Fund\AccountChangeTypeParamListAction;
 use Illuminate\Http\JsonResponse;
 
 class AccountChangeTypeController extends BackEndApiMainController
@@ -58,5 +59,15 @@ class AccountChangeTypeController extends BackEndApiMainController
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
+    }
+
+    /**
+     * 操作帐变类型时需要的字段列表
+     * @param  AccountChangeTypeParamListAction $action
+     * @return JsonResponse
+     */
+    public function paramList(AccountChangeTypeParamListAction $action): JsonResponse
+    {
+        return $action->execute($this);
     }
 }
