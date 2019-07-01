@@ -16,8 +16,14 @@ use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryListAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesProjectHistoryAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesTracesHistoryAction;
 use App\Models\Game\Lottery\LotteryIssue;
+use App\Models\Project;
+use App\Models\User\Fund\FrontendUsersAccountsType;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class LotteriesController extends FrontendApiMainController
 {
@@ -51,7 +57,7 @@ class LotteriesController extends FrontendApiMainController
     public function issueHistory(
         LotteriesIssueHistoryRequest $request,
         LotteriesIssueHistoryAction $action
-    ): JsonResponse{
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -65,7 +71,7 @@ class LotteriesController extends FrontendApiMainController
     public function availableIssues(
         LotteriesAvailableIssuesRequest $request,
         LotteriesAvailableIssuesAction $action
-    ): JsonResponse{
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -79,7 +85,7 @@ class LotteriesController extends FrontendApiMainController
     public function projectHistory(
         LotteriesProjectHistoryRequest $request,
         LotteriesProjectHistoryAction $action
-    ): JsonResponse{
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -93,7 +99,7 @@ class LotteriesController extends FrontendApiMainController
     public function tracesHistory(
         LotteriesTracesHistoryRequest $request,
         LotteriesTracesHistoryAction $action
-    ): JsonResponse{
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }

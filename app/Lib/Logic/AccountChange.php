@@ -1,10 +1,13 @@
 <?php
+
 namespace App\Lib\Logic;
 
+use App\Models\User\Fund\FrontendUsersAccount;
 use Illuminate\Support\Facades\Log;
 use App\Models\User\Fund\FrontendUsersAccountsReport;
 use App\Models\User\Fund\FrontendUsersAccountsType;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * 帐变主逻辑
@@ -18,6 +21,7 @@ class AccountChange
     public const FROZEN_STATUS_TO_PLAYER = 3;
     public const FROZEN_STATUS_TO_SYSTEM = 4;
     public const FROZEN_STATUS_BONUS = 5;
+    public const FROZEN_STATUS_LOTTERY_WIN = 6;
 
     public const MODE_CHANGE_AFTER = 2;
     public const MODE_CHANGE_NOW = 1;
@@ -74,26 +78,17 @@ class AccountChange
     {
         $user = $account->user;
         $typeConfig = FrontendUsersAccountsType::getTypeBySign($typeSign);
-
         //　1. 获取帐变配置
-        if (empty($typeConfig)) {
-            Log::channel('account')->error("error-{$user->id}-{$typeSign}不存在!");
-            return "对不起, {$typeSign}不存在!";
-        }
+        $paramsValidator = FrontendUsersAccountsType::getParamToTransmit($typeSign);
         // 2. 参数检测
-        foreach ($typeConfig as $key => $value) {
-            if (in_array($key, ['id', 'name', 'sign', 'in_out', 'frozen_type'])) {
-                continue;
-            }
-            if ($value == 1) {
-                if (!isset($params[$key])) {
-                    return "对不起, 参数{$key}没有传递!";
-                }
-            }
+        $validator = Validator::make($params, $paramsValidator);
+        if ($validator->fails()) {
+            return 'doChange'.$validator->errors()->first();
         }
         // 3. 检测金额
         $amount = abs($params['amount']);
-        if ($amount == 0) {
+        $frozen_release = abs($params['frozen_release']);
+        if (($amount == 0) && !isset($params['frozen_release']) && $params['frozen_release'] < 1) {
             return true;
         }
         // 冻结类型 1 冻结自己金额 2 冻结退还　3 冻结给玩家　4 冻结给系统　5 中奖
@@ -138,6 +133,9 @@ class AccountChange
             case self::FROZEN_STATUS_TO_SYSTEM:
                 $ret = $this->unFrozenToPlayer($account, $amount);
                 break;
+            case self::FROZEN_STATUS_LOTTERY_WIN:
+                $ret = $this->addLotteryWin($account, $amount,$frozen_release);
+                break;
             default:
                 if ($typeConfig['in_out'] === 1) {
                     $ret = $this->add($account, $amount);
@@ -160,8 +158,9 @@ class AccountChange
     }
 
     // 资金增加
-    public function add($account, $money)
+    public function add(FrontendUsersAccount &$account, $money)
     {
+        $account = $account->fresh();
         if ($this->changeMode == self::MODE_CHANGE_AFTER) {
             if (isset($this->changes[$account->user_id])) {
                 if (isset($this->changes[$account->user_id]['add'])) {
@@ -176,14 +175,35 @@ class AccountChange
             $account->balance += $money;
             return true;
         } else {
-            $updated_at = date('Y-m-d H:i:s');
-            $sql = "update `frontend_users_accounts` set `balance`=`balance`+'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}'";
-            $ret = DB::update($sql) > 0;
-            if ($ret) {
-                $account->balance += $money;
+            $account->balance += $money;
+            if ($account->save()) {
+                $ret = true;
+            } else {
+                $ret = false;
             }
             return $ret;
         }
+    }
+
+
+    /**
+     * 资金增加
+     * @param  FrontendUsersAccount  $account
+     * @param $money
+     * @param $frozen_release
+     * @return bool
+     */
+    public function addLotteryWin(FrontendUsersAccount &$account, $money,$frozen_release): bool
+    {
+        $account = $account->fresh();
+        $account->balance += $money;
+        $account->frozen -= $frozen_release;
+        if ($account->save()) {
+            $ret = true;
+        } else {
+            $ret = false;
+        }
+        return $ret;
     }
 
     // 消耗资金
@@ -315,8 +335,8 @@ class AccountChange
     {
         // 报表保存
         if ($this->reports) {
-            $ret = FrontendUsersAccountsReport::insert( $this->reports );
-            if(!$ret) {
+            $ret = FrontendUsersAccountsReport::insert($this->reports);
+            if (!$ret) {
                 return false;
             }
             $this->reports = [];
@@ -396,8 +416,8 @@ class AccountChange
         if ($this->reportMode == self::MODE_REPORT_AFTER) {
             $this->reports[] = $report;
         } else {
-            $ret = FrontendUsersAccountsReport::insert( $report );
-            if(!$ret) {
+            $ret = FrontendUsersAccountsReport::insert($report);
+            if (!$ret) {
                 return false;
             }
         }

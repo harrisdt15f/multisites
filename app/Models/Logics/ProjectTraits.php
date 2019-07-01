@@ -8,6 +8,7 @@ use App\Models\LotteryTrace;
 use App\Models\Project;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
 
 trait ProjectTraits
@@ -24,8 +25,8 @@ trait ProjectTraits
         if (isset($condition['en_name'])) {
             $query->where('en_name', '=', $condition['en_name']);
         }
-        $currentPage = isset($condition['page_index']) ? (int) $condition['page_index'] : 1;
-        $pageSize = isset($condition['page_size']) ? (int) $condition['page_size'] : 15;
+        $currentPage = isset($condition['page_index']) ? (int)$condition['page_index'] : 1;
+        $pageSize = isset($condition['page_size']) ? (int)$condition['page_size'] : 15;
         $offset = ($currentPage - 1) * $pageSize;
 
         $total = $query->count();
@@ -35,7 +36,7 @@ trait ProjectTraits
             'data' => $menus,
             'total' => $total,
             'currentPage' => $currentPage,
-            'totalPage' => (int) ceil($total / $pageSize),
+            'totalPage' => (int)ceil($total / $pageSize),
         ];
     }
 
@@ -43,13 +44,12 @@ trait ProjectTraits
      * 获取投注页需要的注单数据
      * @param $lotterySign
      * @param  int  $count
-     * @param  null $beginTime
-     * @param  null $endTime
+     * @param  null  $beginTime
+     * @param  null  $endTime
      * @return object
      */
     public static function getGamePageList($lotterySign, $count = 10, $beginTime = null, $endTime = null): object
     {
-        $projectData = [];
         $projectEloq = self::orderBy('id', 'desc');
         if ($lotterySign !== '*') {
             $projectEloq->where('lottery_sign', '=', $lotterySign);
@@ -78,8 +78,8 @@ trait ProjectTraits
      * 追号列表
      * @param $lotterySign
      * @param  int  $count
-     * @param  null $beginTime
-     * @param  null $endTime
+     * @param  null  $beginTime
+     * @param  null  $endTime
      * @return object
      */
     public static function getGameTracesList($lotterySign, $count = 10, $beginTime = null, $endTime = null): object
@@ -268,6 +268,7 @@ trait ProjectTraits
                     $lockProject = $this->lockForUpdate()->find($this->id);
                     $lockProject->update($data);
                     DB::commit();
+                    $this->sendMoney();
                     $win = 1;
                 } catch (Exception $e) {
                     Log::channel('issues')->info($e->getMessage());
@@ -303,15 +304,45 @@ trait ProjectTraits
             $lockProject->update($data);
             if ($lockProject->save()) {
                 DB::commit();
+                $this->sendMoney();
             } else {
                 $strError = json_encode($lockProject->errors(), JSON_PRETTY_PRINT);
                 Log::channel('issues')->info($strError);
             }
         } catch (Exception $e) {
             Log::channel('issues')->info($e->getMessage());
-            return false;
             DB::rollBack();
+            return false;
         }
         return true;
+    }
+
+    public function sendMoney(): void
+    {
+        $this->fresh();
+        $params = [
+            'amount' => $this->bonus,
+            'frozen_release' => $this->total_cost,
+            'user_id' => $this->user_id,
+            'project_id' => $this->id,
+            'lottery_id' => $this->lottery_sign,
+            'method_id' => $this->method_sign,
+            'issue' => $this->issue,
+        ];
+        $account = $this->account;
+        DB::beginTransaction();
+        try {
+            $res = $account->operateAccount($params, 'game_bonus');
+            if ($res !== true) {
+                DB::rollBack();
+                Log::info($res);
+            } else {
+                DB::commit();
+                Log::info('Finished Send Money');
+            }
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::info('投注-异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine()); //Clog::userBet
+        }
     }
 }
