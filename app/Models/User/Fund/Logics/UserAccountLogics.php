@@ -151,7 +151,6 @@ trait UserAccountLogics
                     Clog::account("error-{$user->id}-{$amount}-{$this->frozen}-冻结金额不足!");
                     return '对不起, 用户冻结金额不足!';
                 }
-
                 $ret = $this->unFrozenToPlayer($amount);
                 break;
             default:
@@ -273,14 +272,14 @@ trait UserAccountLogics
         try {
             // 帐变
             $accountChange = new AccountChange();
-            $accountChange->setReportMode(AccountChange::MODE_REPORT_AFTER);
-            $accountChange->setChangeMode(AccountChange::MODE_CHANGE_AFTER);
+            $accountChange->setReportMode(AccountChange::MODE_REPORT_NOW);
+            $accountChange->setChangeMode(AccountChange::MODE_CHANGE_NOW);
             $res = $accountChange->doChange($this, $type, $params);
             if ($res !== true) {
                 $accountLocker->release();
                 return '对不起, ' . $res;
             }
-            $accountChange->triggerSave();
+//            $accountChange->triggerSave();
             $accountLocker->release();
             return true;
         } catch (Exception $e) {

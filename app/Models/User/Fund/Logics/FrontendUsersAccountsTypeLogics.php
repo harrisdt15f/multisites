@@ -1,7 +1,10 @@
 <?php
+
 namespace App\Models\User\Fund\Logics;
 
 use App\Lib\BaseCache;
+use App\Models\User\Fund\FrontendUsersAccountsType;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Created by PhpStorm.
@@ -17,14 +20,19 @@ trait FrontendUsersAccountsTypeLogics
     {
         $query = self::orderBy('id', 'desc');
 
-        $currentPage = isset($c['page_index']) ? (int) $c['page_index'] : 1;
-        $pageSize = isset($c['page_size']) ? (int) $c['page_size'] : 15;
+        $currentPage = isset($c['page_index']) ? (int)$c['page_index'] : 1;
+        $pageSize = isset($c['page_size']) ? (int)$c['page_size'] : 15;
         $offset = ($currentPage - 1) * $pageSize;
 
         $total = $query->count();
         $data = $query->skip($offset)->take($pageSize)->get();
 
-        return ['data' => $data, 'total' => $total, 'currentPage' => $currentPage, 'totalPage' => (int) ceil($total / $pageSize)];
+        return [
+            'data' => $data,
+            'total' => $total,
+            'currentPage' => $currentPage,
+            'totalPage' => (int)ceil($total / $pageSize)
+        ];
     }
 
     // 保存
@@ -85,6 +93,24 @@ trait FrontendUsersAccountsTypeLogics
             $data[$item->sign] = $item->toArray();
         }
         return $data;
+    }
+
+    /**
+     * @param  string  $sType
+     * @return array
+     */
+    public static function getParamToTransmit($sType = ''): array
+    {
+        $accTypeParams = DB::table('frontend_users_accounts_types as fuat')
+            ->leftJoin('frontend_users_accounts_types_params as fuatp', static function ($join) {
+                $join->whereRaw('find_in_set(fuatp.id, fuat.param)');
+            })->select('fuat.*', DB::raw('GROUP_CONCAT(fuatp.param) as param'))
+            ->where('sign', $sType)
+            ->groupBy(DB::raw('fuat.id'))->pluck('param');
+        $params = explode(',', $accTypeParams[0]);
+        $paramsFlipped = array_flip($params);
+        $finalParams = array_fill_keys(array_keys($paramsFlipped), 'required');
+        return $finalParams;
     }
 
 }

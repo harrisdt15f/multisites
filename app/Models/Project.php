@@ -5,7 +5,10 @@ namespace App\Models;
 use App\Models\Game\Lottery\LotteryIssue;
 use App\Models\Game\Lottery\LotteryTraceList;
 use App\Models\Logics\ProjectTraits;
+use App\Models\User\FrontendUser;
+use App\Models\User\Fund\FrontendUsersAccount;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class Project extends BaseModel
 {
@@ -26,6 +29,21 @@ class Project extends BaseModel
     public function tracelist(): HasOne
     {
         return $this->hasOne(LotteryTraceList::class, 'project_id', 'id');
+    }
+
+    /**
+     * left to right relationship
+     *  related ya chi de table
+     * through gya kan ne table
+     * id lo chi de table ga id
+     * user_id  lo chi de table ne chake ya me id
+     * user_id let shi table ne chake ya me id
+     * id  let shi table ne gya kan ne table ne chake ya me id
+     * @return HasOneThrough
+     */
+    public function account(): HasOneThrough
+    {
+        return $this->hasOneThrough(FrontendUsersAccount::class,FrontendUser::class,'id','user_id','user_id','id');
     }
 
 }
