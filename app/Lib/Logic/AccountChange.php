@@ -104,7 +104,6 @@ class AccountChange
             'activity_sign' => $params['activity_sign'] ?? 0,
             'amount' => $amount,
             'created_at' => date('Y-m-d H:i:s'),
-            'day' => date('Ymd'),
             'desc' => $params['desc'] ?? 0,
             'from_admin_id' => $params['from_admin_id'] ?? 0,
             'from_id' => $params['from_id'] ?? 0,
