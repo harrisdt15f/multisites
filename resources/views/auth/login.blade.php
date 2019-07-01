@@ -39,7 +39,7 @@
                     <div class="m-login__head">
                         <h3 class="m-login__title">春秋包网平台</h3>
                     </div>
-                    <form class="m-login__form m-form" method="POST" action="{{ route('login') }}">
+                    <form class="m-login__form m-form" method="POST" action="{{ route('web-blade.login') }}">
                         @csrf
                         <div class="form-group m-form__group">
 {{--                            aria-invalid="true"--}}
