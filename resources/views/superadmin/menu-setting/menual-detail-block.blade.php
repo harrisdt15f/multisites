@@ -43,7 +43,7 @@ $treejson = json_encode($arrTree, JSON_UNESCAPED_UNICODE);
         <br>
         <button type="submit" class="btn btn-primary btn-block" id="detail-submit" disabled="disabled">提交</button>
     </div>
-    <form id="detail-menu-form" method="POST" action="{{ route('menu.changeParent') }}">
+    <form id="detail-menu-form" method="POST" action="{{ route('web-blade.menu.changeParent') }}">
         @csrf
         <input type="hidden" name="dragResult" value="" id="dragResult">
     </form>

@@ -42,7 +42,7 @@ $treejson = json_encode($arrTree, JSON_UNESCAPED_UNICODE);
             <br>
             <button type="button" class="btn btn-primary btn-block" id="delete-submit" disabled="disabled">提交</button>
         </div>
-        <form id="delete-menu-form" method="POST" action="{{ route('menu.delete') }}">
+        <form id="delete-menu-form" method="POST" action="{{ route('web-blade.menu.delete') }}">
             @csrf
             <input type="hidden" value="" name="toDelete" id="toDelete">
         </form>

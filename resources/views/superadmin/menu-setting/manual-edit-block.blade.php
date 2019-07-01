@@ -13,7 +13,7 @@
         </div>
     </div>
     <!--begin::Form-->
-    <form class="m-form m-form--fit m-form--label-align-right" id="edit-menu-form" method="POST" action="{{ route('menu.edit') }}">
+    <form class="m-form m-form--fit m-form--label-align-right" id="edit-menu-form" method="POST" action="{{ route('web-blade.menu.edit') }}">
         @csrf
         <div class="m-portlet__body">
             <div class="form-group m-form__group">
