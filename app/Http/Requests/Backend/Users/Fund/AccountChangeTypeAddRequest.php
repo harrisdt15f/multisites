@@ -33,6 +33,10 @@ class AccountChangeTypeAddRequest extends BaseFormRequest
             'name' => 'required|string',
             'sign' => 'required|string|unique:frontend_users_accounts_types',
             'in_out' => 'required|numeric|in:0,1',
+            'param' => 'required|array',
+            'param.*' => 'exists:frontend_users_accounts_types_params,id',
+            'frozen_type' => 'required|numeric|in:0,1',
+            'activity_sign' => 'required|numeric|in:0,1',
         ];
     }
 

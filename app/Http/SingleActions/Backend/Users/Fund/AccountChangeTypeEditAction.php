@@ -37,15 +37,15 @@ class AccountChangeTypeEditAction
         if ($isExistSign === true) {
             return $contll->msgout(false, [], '101200');
         }
-        try {
-            $pastEloq = $this->model::find($inputDatas['id']);
-            $contll->editAssignment($pastEloq, $inputDatas);
-            $pastEloq->save();
-            return $contll->msgout(true);
-        } catch (Exception $e) {
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $contll->msgOut(false, [], $sqlState, $msg);
+        $editData = $inputDatas;
+        $param = implode(',', $inputDatas['param']);
+        $editData['param'] = $param;
+        $pastEloq = $this->model::find($inputDatas['id']);
+        $contll->editAssignment($pastEloq, $editData);
+        $pastEloq->save();
+        if ($pastEloq->errors()->messages()) {
+            return $contll->msgOut(false, [], '400', $pastEloq->errors()->messages());
         }
+        return $contll->msgout(true);
     }
 }

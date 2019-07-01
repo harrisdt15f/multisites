@@ -33,15 +33,15 @@ class AccountChangeTypeAddAction
      */
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
-        try {
-            $eloqM = new $this->model;
-            $eloqM->fill($inputDatas);
-            $eloqM->save();
-            return $contll->msgout(true);
-        } catch (Exception $e) {
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $contll->msgOut(false, [], $sqlState, $msg);
+        $param = implode(',', $inputDatas['param']);
+        $addData = $inputDatas;
+        $addData['param'] = $param;
+        $accountsTypeEloq = new $this->model;
+        $accountsTypeEloq->fill($addData); //$inputDatas
+        $accountsTypeEloq->save();
+        if ($accountsTypeEloq->errors()->messages()) {
+            return $contll->msgOut(false, [], '400', $accountsTypeEloq->errors()->messages());
         }
+        return $contll->msgout(true);
     }
 }
