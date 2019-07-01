@@ -87,9 +87,15 @@ class AccountChange
         }
         // 3. 检测金额
         $amount = abs($params['amount']);
-        $frozen_release = abs($params['frozen_release']);
-        if (($amount == 0) && !isset($params['frozen_release']) && $params['frozen_release'] < 1) {
-            return true;
+        if (isset($params['frozen_release'])) {
+            $frozen_release = abs($params['frozen_release']);
+            if (($amount == 0) && $params['frozen_release'] < 1) {
+                return true;
+            }
+        } else {
+            if ($amount == 0) {
+                return true;
+            }
         }
         // 冻结类型 1 冻结自己金额 2 冻结退还　3 冻结给玩家　4 冻结给系统　5 中奖
         // 资金增减. 需要检测对应
@@ -134,7 +140,7 @@ class AccountChange
                 $ret = $this->unFrozenToPlayer($account, $amount);
                 break;
             case self::FROZEN_STATUS_LOTTERY_WIN:
-                $ret = $this->addLotteryWin($account, $amount,$frozen_release);
+                $ret = $this->addLotteryWin($account, $amount, $frozen_release);
                 break;
             default:
                 if ($typeConfig['in_out'] === 1) {
@@ -193,7 +199,7 @@ class AccountChange
      * @param $frozen_release
      * @return bool
      */
-    public function addLotteryWin(FrontendUsersAccount &$account, $money,$frozen_release): bool
+    public function addLotteryWin(FrontendUsersAccount &$account, $money, $frozen_release): bool
     {
         $account = $account->fresh();
         $account->balance += $money;
@@ -235,35 +241,27 @@ class AccountChange
         }
     }
 
-    // 冻结资金
-    public function frozen($account, $money)
+
+    /**
+     * 冻结资金
+     * @param  FrontendUsersAccount  $account
+     * @param $money
+     * @return bool|string
+     */
+    public function frozen(FrontendUsersAccount &$account, $money)
     {
+        $account = $account->fresh();
         if ($money > $account->balance) {
             return '对不起, 用户余额不足!';
         }
-        if ($this->changeMode == self::MODE_CHANGE_AFTER) {
-            if (isset($this->changes[$account->user_id])) {
-                if (isset($this->changes[$account->user_id]['frozen'])) {
-                    $this->changes[$account->user_id]['frozen'] += $money;
-                } else {
-                    $this->changes[$account->user_id]['frozen'] = $money;
-                }
-            } else {
-                $this->changes[$account->user_id] = [];
-                $this->changes[$account->user_id]['frozen'] = $money;
-            }
-            $account->balance -= $money;
-            $account->frozen += $money;
-            return true;
+        $account->balance -= $money;
+        $account->frozen += $money;
+        if ($account->save()) {
+            $ret = true;
         } else {
-            $updated_at = date('Y-m-d H:i:s');
-            $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}', `frozen`=`frozen`+ '{$money}'  , `updated_at`='$updated_at' where `user_id` ='{$account->user_id}' and `balance`>='{$money}'") > 0;
-            if ($ret) {
-                $account->balance -= $money;
-                $account->frozen += $money;
-            }
-            return $ret;
+            $ret = false;
         }
+        return $ret;
     }
 
     // 解冻
