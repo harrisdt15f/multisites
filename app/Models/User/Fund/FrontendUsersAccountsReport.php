@@ -3,6 +3,7 @@
 namespace App\Models\User\Fund;
 
 use App\Models\BaseModel;
+use App\Models\Game\Lottery\LotteryMethod;
 use App\Models\User\Fund\Logics\FrontendUsersAccountsReportLogics;
 
 class FrontendUsersAccountsReport extends BaseModel
@@ -16,6 +17,12 @@ class FrontendUsersAccountsReport extends BaseModel
     public function changeType()
     {
         $data = $this->hasOne(FrontendUsersAccountsType::class, 'sign', 'type_sign')->select('sign', 'in_out');
+        return $data;
+    }
+
+    public function gameMethods()
+    {
+        $data = $this->hasOne(LotteryMethod::class, 'method_id', 'method_id')->select('method_name','method_id', 'lottery_name');
         return $data;
     }
 }
