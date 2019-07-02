@@ -30,7 +30,7 @@ class UserFundAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        $data = FrontendUsersAccountsReport::with('gameMethods')->get([
+        $data = FrontendUsersAccountsReport::with(['gameMethods:method_id,lottery_name,method_name'])->get([
             'issue',
             'process_time',
             'type_name',
