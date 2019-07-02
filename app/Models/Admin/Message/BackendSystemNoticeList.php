@@ -18,7 +18,5 @@ class BackendSystemNoticeList extends BaseModel
 	public const AUDIT = 2;
 	public const FUND = 3;
 
-    protected $fillable = [
-        'type', 'message', 'created_at', 'updated_at',
-    ];
+    protected $guarded = ['id'];
 }

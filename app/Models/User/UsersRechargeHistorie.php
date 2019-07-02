@@ -16,7 +16,5 @@ class UsersRechargeHistorie extends BaseModel
     const AUDITSUCCESS = 11; //审核成功
     const AUDITFAILURE = 12; //审核失败
 
-    protected $fillable = [
-        'user_id', 'user_name', 'is_tester', 'top_agent', 'channel', 'payment_id', 'amount', 'company_order_num', 'third_party_order_num', 'deposit_mode', 'real_amount', 'fee', 'audit_flow_id', 'status', 'updated_at', 'created_at',
-    ];
+    protected $guarded = ['id'];
 }

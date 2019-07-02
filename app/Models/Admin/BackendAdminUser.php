@@ -18,9 +18,7 @@ class BackendAdminUser extends Authenticatable implements JWTSubject
      *
      * @var array
      */
-    protected $fillable = [
-        'name', 'email', 'password', 'email_verified_at', 'rmember_token', 'is_test', 'group_id', 'status', 'platform_id', 'super_id',
-    ];
+    protected $guarded = ['id'];
 
     /**
      * The attributes that should be hidden for arrays.

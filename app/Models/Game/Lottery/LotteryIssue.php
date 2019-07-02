@@ -76,35 +76,8 @@ class LotteryIssue extends BaseModel
     public const TRACE_PRJ_PROCESSING = 1;
     public const TRACE_PRJ_PARTIAL = 2;
     public const TRACE_PRJ_FINISHED = 4;
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'lottery_id',
-        'lottery_name',
-        'issue',
-        'issue_rule_id',
-        'begin_time',
-        'end_time',
-        'official_open_time',
-        'allow_encode_time',
-        'official_code',
-        'status_encode',
-        'status_calculated',
-        'status_prize',
-        'status_commission',
-        'status_trace',
-        'encode_time',
-        'calculated_time',
-        'prize_time',
-        'commission_time',
-        'trace_time',
-        'encode_id',
-        'encode_username',
-        'day',
-    ];
+    
+    protected $guarded = ['id'];
 
     public function lottery()
     {

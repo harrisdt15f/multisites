@@ -9,24 +9,7 @@ class FrontendUsersAccountsType extends BaseModel
 {
     use FrontendUsersAccountsTypeLogics;
 
-    protected $fillable = [
-        'name',
-        'sign',
-        'in_out',
-        'param',
-        'amount',
-        'user_id',
-        'project_id',
-        'lottery_id',
-        'method_id',
-        'issue',
-        'from_id',
-        'from_admin_id',
-        'to_id',
-        'frozen_type',
-        'activity_sign',
-        'admin_id',
-    ];
+    protected $guarded = ['id'];
 
     public static $rules = [
         'name' => 'required|min:2|max:32',

@@ -15,7 +15,5 @@ class LotteryMethodsWaysLevel extends BaseModel
 {
     use MethodLevelLogics;
 
-    protected $fillable = [
-        'method_id', 'level', 'position', 'count', 'prize', 'created_at', 'updated_at',
-    ];
+    protected $guarded = ['id'];
 }

@@ -11,23 +11,8 @@ class LotteryMethod extends BaseModel
 
     public const OPEN = 1;
     public const CLOSE = 0;
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'series_id',
-        'lottery_name',
-        'lottery_id',
-        'method_id',
-        'method_name',
-        'method_group',
-        'method_row, group_sort',
-        'tab_sort',
-        'method_sort',
-        'status',
-    ];
+    
+    protected $guarded = ['id'];
 
     public function methodRows()
     {

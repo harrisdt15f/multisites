@@ -10,18 +10,7 @@ class SystemConfiguration extends BaseModel
 {
     use SysConfiguresTraits;
 
-    protected $fillable = [
-        'parent_id',
-        'pid',
-        'sign',
-        'name',
-        'description',
-        'value',
-        'add_admin_id',
-        'last_update_admin_id',
-        'status',
-        'display',
-    ];
+    protected $guarded = ['id'];
 
     public function childs(): HasMany
     {

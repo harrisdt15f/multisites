@@ -16,9 +16,7 @@ class BackendAdminRechargehumanLog extends BaseModel
     public const AUDITSUCCESS = 1; //审核通过
     public const AUDITFAILURE = 2; //审核驳回
 
-    protected $fillable = [
-        'type', 'in_out', 'super_admin_id', 'super_admin_name', 'admin_id', 'admin_name', 'user_id', 'user_name', 'amount', 'comment', 'audit_flow_id', 'status', 'updated_at', 'created_at',
-    ];
+    protected $guarded = ['id'];
 
     public function auditFlow()
     {

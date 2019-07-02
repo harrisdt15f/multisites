@@ -16,14 +16,7 @@ use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryListAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesProjectHistoryAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesTracesHistoryAction;
 use App\Models\Game\Lottery\LotteryIssue;
-use App\Models\Project;
-use App\Models\User\Fund\FrontendUsersAccountsType;
-use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
 
 class LotteriesController extends FrontendApiMainController
 {
