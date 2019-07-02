@@ -10,17 +10,7 @@ class FrontendUsersAccount extends Ardent
 {
     use UserAccountLogics;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'user_id',
-        'balance',
-        'frozen',
-        'status',
-    ];
+    protected $guarded = ['id'];
 
     public const FROZEN_STATUS_OUT = 1;
     public const FROZEN_STATUS_BACK = 2;

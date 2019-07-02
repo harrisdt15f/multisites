@@ -12,7 +12,5 @@ use App\Models\BaseModel;
 
 class SystemAddressIp extends BaseModel
 {
-    protected $fillable = [
-        'ip', 'country', 'region', 'city', 'county', 'created_at', 'updated_at',
-    ];
+    protected $guarded = ['id'];
 }

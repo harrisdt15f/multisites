@@ -7,9 +7,8 @@ use App\Models\BaseModel;
 
 class BackendAdminAccessGroup extends BaseModel
 {
-    protected $fillable = [
-        'group_name', 'role', 'status',
-    ];
+    protected $guarded = ['id'];
+    
     public function getTableColumns()
     {
         return $this

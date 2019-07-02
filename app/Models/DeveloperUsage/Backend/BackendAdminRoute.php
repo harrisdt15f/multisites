@@ -7,9 +7,8 @@ use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
 
 class BackendAdminRoute extends BaseModel
 {
-    protected $fillable = [
-        'route_name', 'controller', 'method', 'menu_group_id', 'title', 'description', 'created_at', 'updated_at',
-    ];
+    protected $guarded = ['id'];
+    
     public function menu()
     {
         return $this->belongsTo(BackendSystemMenu::class, 'menu_group_id', 'id');

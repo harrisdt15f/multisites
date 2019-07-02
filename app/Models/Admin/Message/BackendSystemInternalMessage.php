@@ -14,11 +14,9 @@ use App\Models\BaseModel;
 
 class BackendSystemInternalMessage extends BaseModel
 {
-    protected $casts = array('created_at' => 'created_at', 'updated_at' => 'updated_at');
+    protected $guarded = ['id'];
 
-    protected $fillable = [
-        'operate_admin_id', 'receive_admin_id', 'receive_group_id', 'message_id', 'status', 'created_at', 'updated_at',
-    ];
+    protected $casts = array('created_at' => 'created_at', 'updated_at' => 'updated_at');
 
     public function noticeMessage()
     {

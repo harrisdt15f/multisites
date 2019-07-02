@@ -6,7 +6,5 @@ use App\Models\BaseModel;
 
 class BackendAdminRechargePocessAmount extends BaseModel
 {
-    protected $fillable = [
-        'admin_id', 'fund',
-    ];
+    protected $guarded = ['id'];
 }

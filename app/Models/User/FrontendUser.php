@@ -17,14 +17,7 @@ class FrontendUser extends Authenticatable implements JWTSubject
     const TYPE_AGENT = 2;
     const TYPE_USER = 3;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'username', 'top_id', 'parent_id', 'rid', 'sign', 'account_id', 'type', 'vip_level', 'is_tester', 'frozen_type', 'nickname', 'password', 'fund_password', 'prize_group', 'remember_token', 'level_deep', 'register_ip', 'last_login_ip', 'register_time', 'last_login_time', 'user_specific_id', 'status',
-    ];
+    protected $guarded = ['id'];
 
     /**
      * The attributes that should be hidden for arrays.
