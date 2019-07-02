@@ -268,7 +268,7 @@ trait ProjectTraits
                     $lockProject = $this->lockForUpdate()->find($this->id);
                     $lockProject->update($data);
                     DB::commit();
-                    $this->sendMoney();
+                    $lockProject->sendMoney();
                     $win = 1;
                 } catch (Exception $e) {
                     Log::channel('issues')->info($e->getMessage());
@@ -304,7 +304,7 @@ trait ProjectTraits
             $lockProject->update($data);
             if ($lockProject->save()) {
                 DB::commit();
-                $this->sendMoney();
+                $lockProject->sendMoney();
             } else {
                 $strError = json_encode($lockProject->errors(), JSON_PRETTY_PRINT);
                 Log::channel('issues')->info($strError);
@@ -319,7 +319,6 @@ trait ProjectTraits
 
     public function sendMoney(): void
     {
-        $this->fresh();
         $params = [
             'amount' => $this->bonus,
             'frozen_release' => $this->total_cost,
@@ -334,15 +333,28 @@ trait ProjectTraits
         try {
             $res = $account->operateAccount($params, 'game_bonus');
             if ($res !== true) {
-                DB::rollBack();
                 Log::info($res);
             } else {
-                DB::commit();
-                Log::info('Finished Send Money');
+                $oProject = self::find($this->id);
+                $oProject->status = Project::STATUS_PRIZE_SENT;
+                $oProject->time_prize = now()->timestamp;
+                $oProject->save();
+                if (!empty($this->errors()->first())) {
+                    $res = false;
+                    Log::info('更新状态出错'.json_encode($this->errors()->first(), JSON_PRETTY_PRINT));
+                } else {
+                    $res = true;
+                    Log::info('Finished Send Money');
+                }
             }
         } catch (Exception $e) {
-            DB::rollBack();
+            $res = false;
             Log::info('投注-异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine()); //Clog::userBet
+        }
+        if ($res === true) {
+            DB::commit();
+        } else {
+            DB::rollBack();
         }
     }
 }

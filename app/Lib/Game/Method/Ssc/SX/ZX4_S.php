@@ -48,7 +48,7 @@ class ZX4_S extends Base
         $data['code'] = explode('|', $sCodes);
         $validator = Validator::make($data, [
             'code' => 'required|array|max:100000',//只能十万万个号码能传过来
-            'code.*' => ['regex:/^((?!\&)(?!.*\&$)(?!.*?\&\&)[\d&]{1,9}?)$'],//1&2&3&4 ....
+            'code.*' => ['regex:/^((?!\&)(?!.*\&$)(?!.*?\&\&)[\d&]{1,9}?)$/'],//1&2&3&4 ....
         ]);
         if ($validator->fails()) {
             return false;

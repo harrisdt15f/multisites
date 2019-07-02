@@ -36,7 +36,8 @@ class LotteriesBetRequest extends BaseFormRequest
             //{20180405001:true,20180405001:false,20180405001:true}
             'balls.*.method_id' => 'required|exists:lottery_methods,method_id',
             'balls.*.method_name' => 'required',//中文
-            'balls.*.codes' => ['required', 'regex:/^(?!\|)(?!.*\|$)((?!\&)(?!.*\&$)(?!.*?\&\&)[0-9&]{1,19}\|?){1,5}$/'],
+            'balls.*.codes' => ['required', 'regex:/^((?!\&)(?!.*\&$)(?!.*?\&\&)[0-9&]{0,19}\|?){1,5}$/'],
+            //支持定位胆 ||6||
             //0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9
             'balls.*.count' => 'required|integer',
             'balls.*.times' => 'required|integer',
