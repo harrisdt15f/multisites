@@ -38,7 +38,7 @@ class HompageActivityAction
         } else {
             $activityEloq = $this->model::select('show_num', 'status')->where('en_name', 'activity')->first();
             if ($activityEloq->status !== 1) {
-                return $contll->msgOut(false, [], '400', $contll->offMsg);
+                return $contll->msgOut(false, [], '100400');
             }
             $data = FrontendActivityContent::select('id', 'title', 'content', 'thumbnail_path', 'redirect_url')->where('status', 1)->orderBy('sort', 'asc')->limit($activityEloq->show_num)->get()->toArray();
             Cache::forever('homepageActivity', $data);

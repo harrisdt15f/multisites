@@ -36,7 +36,7 @@ class HomepageRankingAction
         } else {
             $status = FrontendAllocatedModel::select('status')->where('en_name', 'winning.ranking')->first();
             if ($status->status !== 1) {
-                return $contll->msgOut(false, [], '400', $contll->offMsg);
+                return $contll->msgOut(false, [], '100400');
             }
             $rankingE = $this->model::select('username', 'bonus')->where('bonus','>', '0')->orderBy('bonus','DESC')->limit(100)->get()->toArray();
             Cache::forever('homepageRanking', $rankingE);

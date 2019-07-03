@@ -37,7 +37,7 @@ class HompageQrCodeAction
         } else {
             $data = $this->model::select('value', 'status')->where('en_name', 'qr.code')->first()->toArray();
             if ($data['status'] !== 1) {
-                return $contll->msgOut(false, [], '400', $contll->offMsg);
+                return $contll->msgOut(false, [], '100400');
             }
             unset($data['status']);
             Cache::forever('homepageQrCode', $data);

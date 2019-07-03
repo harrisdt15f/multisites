@@ -39,10 +39,10 @@ class HompageNoticeAction
             $noticeEloq = $this->model::select('show_num', 'status')->where('en_name', 'notice')->first();
             if ($noticeEloq === null) {
                 //#######################################################
-                return $contll->msgOut(false, [], '400', '前台公告模块不存在');
+                return $contll->msgOut(false, [], '100400');
             }
             if ($noticeEloq->status !== 1) {
-                return $contll->msgOut(false, [], '400', $contll->offMsg);
+                return $contll->msgOut(false, [], '100400');
             }
             $eloqM = new FrontendMessageNotice();
             $contll->inputs['extra_where']['method'] = 'where';

@@ -18,8 +18,6 @@ use Illuminate\Http\JsonResponse;
 
 class HomepageController extends FrontendApiMainController
 {
-    public $offMsg = '当前模块为关闭状态';
-
     /**
      * 需要展示的前台模块
      * @param  HomepageShowHomepageModelAction $action

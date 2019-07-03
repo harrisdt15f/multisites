@@ -39,7 +39,7 @@ class HompagePopularLotteriesAction
         } else {
             $lotteriesEloq = $this->model::select('show_num', 'status')->where('en_name', 'popularLotteries.one')->first();
             if ($lotteriesEloq->status !== 1) {
-                return $contll->msgOut(false, [], '400', $contll->offMsg);
+                return $contll->msgOut(false, [], '100400');
             }
             $dataEloq = FrontendLotteryRedirectBetList::select('id', 'lotteries_id', 'pic_path')->with(['lotteries' => function ($query) {
                 $query->select('id', 'day_issue', 'en_name');
