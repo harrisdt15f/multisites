@@ -8,7 +8,6 @@ use App\Http\Requests\Frontend\FrontendAuthResetSpecificInfosRequest;
 use App\Http\Requests\Frontend\FrontendAuthResetUserPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthSelfResetPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthSetFundPasswordRequest;
-use App\Http\Requests\Frontend\FrontendAuthUpdatePAdmPasswordRequest;
 use App\Http\SingleActions\Frontend\FrontendAuthLoginAction;
 use App\Http\SingleActions\Frontend\FrontendAuthLogoutAction;
 use App\Http\SingleActions\Frontend\FrontendAuthResetSpecificInfosAction;
@@ -20,16 +19,12 @@ use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 
 class FrontendAuthController extends FrontendApiMainController
 {
-
-    public $successStatus = 200;
-
     public $eloqM = 'User\FrontendUser';
 
     public function username()

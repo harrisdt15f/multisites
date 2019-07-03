@@ -17,11 +17,9 @@ use App\Http\SingleActions\Backend\BackendAuthUpdatePAdmPasswordAction;
 use App\Http\SingleActions\Backend\BackendAuthUpdateUserGroupAction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class BackendAuthController extends BackEndApiMainController
 {
-    public $successStatus = '200';
 
     /**
      * Login user and create token
