@@ -1,13 +1,8 @@
 <?php
-/**
- * @Author: Fish
- * @Date:   2019/7/3 18:42
- */
-
 namespace App\Http\SingleActions\Frontend\User\Help;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Models\User\FrontendUsersHelpCenter;
+use App\Models\User\Supports\FrontendUsersHelpCenter;
 use Illuminate\Http\JsonResponse;
 
 class UserHelpCenterAction
@@ -28,8 +23,7 @@ class UserHelpCenterAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        $data = $this->model::select('id','pid','menu')->get()->toArray();
-        $menu = $this->model->toTree($data);
+        $menu = $this->model->getHelpCenterData();
         return $contll->msgOut(true, $menu);
     }
 }
