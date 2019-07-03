@@ -38,10 +38,10 @@ class HompageLogoAction
             $logoEloq = $this->model::select('value', 'status')->where('en_name', 'logo')->first();
             if (is_null($logoEloq)) {
                 //#######################################################
-                return $contll->msgOut(false, [], '400', 'logo配置不存在');
+                return $contll->msgOut(false, [], '100400');
             }
             if ($logoEloq->status !== 1) {
-                return $contll->msgOut(false, [], '400', $contll->offMsg);
+                return $contll->msgOut(false, [], '100400');
             }
             $data['value'] = $logoEloq->value;
             Cache::forever('homepageLogo', $data);

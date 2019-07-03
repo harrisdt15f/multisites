@@ -31,22 +31,26 @@ class HompageNoticeAction
      * @param  FrontendApiMainController  $contll
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll): JsonResponse
+    public function execute(FrontendApiMainController $contll,$input): JsonResponse
     {
         if (Cache::has('homepageNotice')) {
-            $datas = Cache::get('homepageNotice');
+            $data = Cache::get('homepageNotice');
         } else {
             $noticeEloq = $this->model::select('show_num', 'status')->where('en_name', 'notice')->first();
             if ($noticeEloq === null) {
                 //#######################################################
-                return $contll->msgOut(false, [], '400', '前台公告模块不存在');
+                return $contll->msgOut(false, [], '100400');
             }
             if ($noticeEloq->status !== 1) {
-                return $contll->msgOut(false, [], '400', $contll->offMsg);
+                return $contll->msgOut(false, [], '100400');
             }
-            $datas = FrontendMessageNotice::select('id', 'title')->where('status', 1)->orderBy('sort', 'asc')->limit($noticeEloq->show_num)->get();
-            Cache::forever('homepageNotice', $datas);
+            $eloqM = new FrontendMessageNotice();
+            $contll->inputs['extra_where']['method'] = 'where';
+            $contll->inputs['extra_where']['key'] = 'type';
+            $contll->inputs['extra_where']['value'] = $input;
+            $data = $contll->generateSearchQuery($eloqM, $searchAbleFields = null);
+            Cache::forever('homepageNotice', $data);
         }
-        return $contll->msgOut(true, $datas);
+        return $contll->msgOut(true, $data);
     }
 }
