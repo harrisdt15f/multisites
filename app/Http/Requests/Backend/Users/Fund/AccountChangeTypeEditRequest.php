@@ -34,7 +34,7 @@ class AccountChangeTypeEditRequest extends BaseFormRequest
             'name' => 'required|string',
             'sign' => 'required|string',
             'in_out' => 'required|numeric|in:0,1',
-            'param' => 'required|array',
+            'param' => 'array',
             'param.*' => 'exists:frontend_users_accounts_types_params,id',
             'frozen_type' => 'required|numeric|in:0,1', //冻结类型
             'activity_sign' => 'required|numeric|in:0,1', //活动相关
