@@ -30,14 +30,14 @@ class UserFundAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        $data = FrontendUsersAccountsReport::with('gameMethods')->get([
-            'issue',
-            'process_time',
-            'type_name',
-            'amount',
-            'balance',
-            'method_id'
-        ]);
+        $eloqM = new FrontendUsersAccountsReport();
+        $fixedJoin = 1; //number of joining tables
+        $withTable = 'gameMethods';
+        $searchAbleFields = ['issue', 'process_time','type_name','amount','balance','method_id'];
+        $withSearchAbleFields = ['method_id','lottery_name','method_name'];
+        $orderFields = 'id';
+        $orderFlow = 'asc';
+        $data = $contll->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields, $orderFields, $orderFlow);
         return $contll->msgOut(true, $data);
     }
 }

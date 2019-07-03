@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\FrontendApi\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
+use App\Http\Requests\Frontend\Homepage\FrontendAuthNoticeRequest;
 use App\Http\SingleActions\Frontend\Homepage\HomepageShowHomepageModelAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageActivityAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageBannerAction;
@@ -12,12 +13,11 @@ use App\Http\SingleActions\Frontend\Homepage\HompageNoticeAction;
 use App\Http\SingleActions\Frontend\Homepage\HompagePopularLotteriesAction;
 use App\Http\SingleActions\Frontend\Homepage\HompagePopularMethodsAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageQrCodeAction;
+use App\Http\SingleActions\Frontend\Homepage\HomepageRankingAction;
 use Illuminate\Http\JsonResponse;
 
 class HomepageController extends FrontendApiMainController
 {
-    public $offMsg = '当前模块为关闭状态';
-
     /**
      * 需要展示的前台模块
      * @param  HomepageShowHomepageModelAction $action
@@ -90,12 +90,14 @@ class HomepageController extends FrontendApiMainController
 
     /**
      * 首页公告列表
+     * @param  FrontendAuthNoticeRequest  $request
      * @param  HompageNoticeAction $action
      * @return JsonResponse
      */
-    public function notice(HompageNoticeAction $action): JsonResponse
+    public function notice(FrontendAuthNoticeRequest $request, HompageNoticeAction $action): JsonResponse
     {
-        return $action->execute($this);
+        $input = $request->validated();
+        return $action->execute($this,$input);
     }
 
     /**
@@ -104,6 +106,16 @@ class HomepageController extends FrontendApiMainController
      * @return JsonResponse
      */
     public function ico(HompageIcoAction $action): JsonResponse
+    {
+        return $action->execute($this);
+    }
+
+    /**
+     * 首页中奖排行榜
+     * @param  HomepageRankingAction $action
+     * @return JsonResponse
+     */
+    public function ranking(HomepageRankingAction $action): JsonResponse
     {
         return $action->execute($this);
     }

@@ -5,6 +5,7 @@ namespace App\Models\User\Fund;
 use App\Models\BaseModel;
 use App\Models\Game\Lottery\LotteryMethod;
 use App\Models\User\Fund\Logics\FrontendUsersAccountsReportLogics;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class FrontendUsersAccountsReport extends BaseModel
 {
@@ -18,9 +19,11 @@ class FrontendUsersAccountsReport extends BaseModel
         return $data;
     }
 
-    public function gameMethods()
+    /**
+     * @return HasOne
+     */
+    public function gameMethods(): HasOne
     {
-        $data = $this->hasOne(LotteryMethod::class, 'method_id', 'method_id')->select('method_name','method_id', 'lottery_name');
-        return $data;
+        return $this->hasOne(LotteryMethod::class, 'method_id', 'method_id');
     }
 }

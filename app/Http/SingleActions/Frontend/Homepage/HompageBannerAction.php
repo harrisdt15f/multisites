@@ -39,7 +39,7 @@ class HompageBannerAction
         } else {
             $status = FrontendAllocatedModel::select('status')->where('en_name', 'banner')->first();
             if ($status->status !== 1) {
-                return $contll->msgOut(false, [], '400', $contll->offMsg);
+                return $contll->msgOut(false, [], '100400');
             }
             $datas = $this->model::select('id', 'title', 'pic_path', 'content', 'type', 'redirect_url',
                 'activity_id')
