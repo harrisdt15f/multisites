@@ -183,7 +183,7 @@ trait IssueEncodeLogics
         //get current issues
         $currentIssue = LotteryIssue::getCurrentIssue($oLottery->en_name);
         //then check if there have tracelists or not
-        if ($currentIssue->tracelists()->exists()) {
+        if ($currentIssue !== null && $currentIssue->tracelists()->exists()) {
             //select with criterias
             $oTraceListEloq = $currentIssue->tracelists()->where('lottery_sign',
                 $oLottery->en_name)->get();
@@ -234,7 +234,8 @@ trait IssueEncodeLogics
                     }
                 }
             }
-
+        } else {
+            Log::channel('issues')->info('no issue or no tracelists');
         }
     }
 
