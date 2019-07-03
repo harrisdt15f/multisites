@@ -8,7 +8,6 @@ use App\Http\Requests\Frontend\FrontendAuthResetSpecificInfosRequest;
 use App\Http\Requests\Frontend\FrontendAuthResetUserPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthSelfResetPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthSetFundPasswordRequest;
-use App\Http\Requests\Frontend\FrontendAuthUpdatePAdmPasswordRequest;
 use App\Http\SingleActions\Frontend\FrontendAuthLoginAction;
 use App\Http\SingleActions\Frontend\FrontendAuthLogoutAction;
 use App\Http\SingleActions\Frontend\FrontendAuthResetSpecificInfosAction;
