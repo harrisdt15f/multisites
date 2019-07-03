@@ -36,4 +36,8 @@ Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], function 
     Route::match(['get', 'options'], 'lotteries-code-length', ['as' => $namePrefix . 'lotteries-code-length', 'uses' => $controller . 'lotteriesCodeLength']);
     //添加彩种
     Route::match(['post', 'options'], 'add', ['as' => $namePrefix . 'add', 'uses' => $controller . 'add']);
+    //编辑彩种
+    Route::match(['post', 'options'], 'edit', ['as' => $namePrefix . 'edit', 'uses' => $controller . 'edit']);
+    //删除彩种
+    Route::match(['post', 'options'], 'delete', ['as' => $namePrefix . 'delete', 'uses' => $controller . 'delete']);
 });

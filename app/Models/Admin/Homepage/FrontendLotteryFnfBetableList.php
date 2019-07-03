@@ -13,9 +13,7 @@ use App\Models\BaseModel;
 
 class FrontendLotteryFnfBetableList extends BaseModel
 {
-    protected $fillable = [
-        'lotteries_id', 'method_id', 'sort', 'created_at', 'updated_at',
-    ];
+    protected $guarded = ['id'];
 
     public function method()
     {

@@ -97,8 +97,9 @@ class LotteriesBetAction
                 return $contll->msgOut(false, [], '100305', '', 'times', $times);
             }
             // 单价花费
-            $singleCost = $mode * $times * $item['price'] * $item['count'];
-            if ($singleCost != $item['cost']) { //因为前端有多种传送 所以不能用三等
+            $singleCost = (float)$mode * $times * $item['price'] * $item['count'];
+            $float = (float)$item['cost'];
+            if (pack('f', $singleCost) !== pack('f', $float)) { //因为前端有多种传送 所以不能用三等
                 return $contll->msgOut(false, [], '100306');
             }
             $_totalCost += $singleCost;
@@ -122,7 +123,9 @@ class LotteriesBetAction
                 $_totalCost += $traceMultiple * $singleCost;
             }
         }
-        if ($_totalCost != $inputDatas['total_cost']) {//因为前端有多种传送 所以不能用三等
+        $fTotalCost = (float)$_totalCost;
+        $fInputTotalCost = (float)$inputDatas['total_cost'];
+        if (pack('f', $fTotalCost) !== pack('f', $fInputTotalCost)) {//因为前端有多种传送 所以不能用三等
             return $contll->msgOut(false, [], '100307');
         }
         // 获取当前奖期 @todo 判断过期 还是其他期

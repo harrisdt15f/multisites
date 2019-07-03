@@ -7,9 +7,7 @@ use App\Models\BaseModel;
 
 class BackendAdminAuditPasswordsList extends BaseModel
 {
-    protected $fillable = [
-        'type', 'user_id', 'audit_data', 'status', 'audit_flow_id',
-    ];
+    protected $guarded = ['id'];
 
     public function auditFlow()
     {

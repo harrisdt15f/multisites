@@ -9,9 +9,7 @@ class FrontendAllocatedModel extends BaseModel
 {
     use FrontendModelTraits;
 
-    protected $fillable = [
-        'label', 'en_name', 'pid', 'type', 'level', 'updated_at', 'created_at',
-    ];
+    protected $guarded = ['id'];
 
     public function childs()
     {
