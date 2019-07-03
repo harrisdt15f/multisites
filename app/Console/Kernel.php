@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
         Commands\DeleteCachePicControl::class,
         Commands\AllocationRechargeFundControl::class,
         Commands\GenerateIssueControl::class,
+        Commands\ZxyfcInputCodeControl::class,
     ];
 
     /**
@@ -39,6 +40,8 @@ class Kernel extends ConsoleKernel
             Cache::forever('generateIssueTime', $generateIssueTime);
         }
         $schedule->command('GenerateIssue')->daily()->at($generateIssueTime);
+        //中兴一分彩自动开奖
+        $schedule->command('ZxyfcInputCode')->everyMinute();
     }
 
     /**
