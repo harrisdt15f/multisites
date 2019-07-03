@@ -8,7 +8,6 @@
 namespace App\Http\SingleActions\Frontend\User\Fund;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Models\Admin\BackendAdminUser;
 use App\Models\User\Fund\FrontendUsersAccountsReport;
 use Illuminate\Http\JsonResponse;
 
