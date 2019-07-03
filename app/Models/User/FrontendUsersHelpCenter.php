@@ -14,6 +14,7 @@ class FrontendUsersHelpCenter extends BaseModel
     protected $guarded = ['id'];
 
     /**
+     * 帮助中心生成菜单树
      * @param $data
      * @return array
      */
@@ -21,10 +22,8 @@ class FrontendUsersHelpCenter extends BaseModel
     {
         $list = array_column($data, null, 'id');
         foreach ($list as $key => $val) {
-            if ($val['pid']) {
-                if(isset($list[$val['pid']])){
-                    $list[$val['pid']]['children'][] = &$list[$key];
-                }
+            if(isset($list[$val['pid']])){
+                $list[$val['pid']]['children'][] = &$list[$key];
             }
         }
         foreach($list as $key=>$val){
