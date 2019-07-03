@@ -247,7 +247,7 @@ trait ProjectTraits
             if ($iCount > 0) {
                 $bonus = $this->bet_prize_group * $PrizeEloq->prize / 1800;
                 $bonus *= $this->mode * $this->times * $iCount;
-                if ($this->price === 1) {
+                if (pack('f', $this->price) === pack('f', 1.0)) {
                     $bonus /= 2;
                 }
                 $totalBonus += $bonus;

@@ -16,6 +16,7 @@ use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryListAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesProjectHistoryAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesTracesHistoryAction;
 use App\Models\Game\Lottery\LotteryIssue;
+use Exception;
 use Illuminate\Http\JsonResponse;
 
 class LotteriesController extends FrontendApiMainController
@@ -112,6 +113,6 @@ class LotteriesController extends FrontendApiMainController
 
     public function setWinPrize()
     {
-        LotteryIssue::calculateEncodedNumber('zx1fc', '1907011306');
+        LotteryIssue::calculateEncodedNumber('zx1fc', '1907020997');
     }
 }

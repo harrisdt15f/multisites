@@ -39,53 +39,59 @@ trait IssueEncodeLogics
                     Log::channel('issues')->info('Winning Number Canceled, Set To Finished');
                 } else {
                     if ($oIssue->projects()->exists()) {
-                        $oProjects = $oIssue->projects;
-                        $aWnNumberOfMethods = self::getWnNumberOfSeriesMethods($oLottery,
-                            $oIssue->official_code); //wn_number
-                        if ($oLottery->basicways()->exists()) {
-                            $oBasicWays = $oLottery->basicways;
-                            foreach ($oBasicWays as $oBasicWay) {
-                                $oSeriesWays = $oBasicWay->seriesWays->where('series_code',
-                                    $oLottery->series_id)->where('lottery_method_id', '!=', null);
-                                foreach ($oSeriesWays as $oSeriesWay) {
-                                    $oSeriesWay->setWinningNumber($aWnNumberOfMethods);
-                                    $oProjectsToCalculate = $oProjects->where('status',
-                                        Project::STATUS_NORMAL)->where('method_sign', $oSeriesWay->lottery_method_id);
-                                    if ($oProjectsToCalculate->count() >= 1) {
-                                        //不中奖的时候
-                                        if ($oSeriesWay->WinningNumber === false) {
-                                            foreach ($oProjectsToCalculate as $project) {
-                                                $project->setFail($oIssue->official_code);
-                                                self::startTrace($oLottery, $project);
-                                            }
-                                        } else { //中奖的时候
-                                            $sWnNumber = current($oSeriesWay->WinningNumber);
-                                            if ($oSeriesWay->basicWay()->exists()) {
-                                                $oBasicWay = $oSeriesWay->basicWay;
+                        if ($oIssue->official_code !== null) {
+                            $oProjects = $oIssue->projects;
+                            $aWnNumberOfMethods = self::getWnNumberOfSeriesMethods($oLottery,
+                                $oIssue->official_code); //wn_number
+                            if ($oLottery->basicways()->exists()) {
+                                $oBasicWays = $oLottery->basicways;
+                                foreach ($oBasicWays as $oBasicWay) {
+                                    $oSeriesWays = $oBasicWay->seriesWays->where('series_code',
+                                        $oLottery->series_id)->where('lottery_method_id', '!=', null);
+                                    foreach ($oSeriesWays as $oSeriesWay) {
+                                        $oSeriesWay->setWinningNumber($aWnNumberOfMethods);
+                                        $oProjectsToCalculate = $oProjects->where('status',
+                                            Project::STATUS_NORMAL)->where('method_sign',
+                                            $oSeriesWay->lottery_method_id);
+                                        if ($oProjectsToCalculate->count() >= 1) {
+                                            //不中奖的时候
+                                            if ($oSeriesWay->WinningNumber === false) {
                                                 foreach ($oProjectsToCalculate as $project) {
-                                                    $aPrized = $oBasicWay->checkPrize($oSeriesWay, $project->bet_number,
-                                                        $sPostion = null);
-                                                    $strlog = 'aPrized is '.json_encode($aPrized, JSON_PRETTY_PRINT);
-                                                    Log::channel('issues')->info($strlog);
-                                                    $win = 0;
-                                                    $result = $project->setWon($oIssue->official_code, $sWnNumber,
-                                                        $aPrized, $win);//@todo Trace
-                                                    if ($result !== true) {
-                                                        Log::channel('issues')->info($result);
-                                                    }
+                                                    $project->setFail($oIssue->official_code);
                                                     self::startTrace($oLottery, $project);
                                                 }
-                                            } else {
-                                                Log::channel('issues')->info('no basic way');
+                                            } else { //中奖的时候
+                                                $sWnNumber = current($oSeriesWay->WinningNumber);
+                                                if ($oSeriesWay->basicWay()->exists()) {
+                                                    $oBasicWay = $oSeriesWay->basicWay;
+                                                    foreach ($oProjectsToCalculate as $project) {
+                                                        $aPrized = $oBasicWay->checkPrize($oSeriesWay,
+                                                            $project->bet_number,
+                                                            $sPostion = null);
+                                                        $strlog = 'aPrized is '.json_encode($aPrized,
+                                                                JSON_PRETTY_PRINT);
+                                                        Log::channel('issues')->info($strlog);
+                                                        $win = 0;
+                                                        $result = $project->setWon($oIssue->official_code, $sWnNumber,
+                                                            $aPrized, $win);//@todo Trace
+                                                        if ($result !== true) {
+                                                            Log::channel('issues')->info($result);
+                                                        }
+                                                        self::startTrace($oLottery, $project);
+                                                    }
+                                                } else {
+                                                    Log::channel('issues')->info('no basic way');
+                                                }
                                             }
+                                        } else {
+                                            Log::channel('issues')->info('Dont have projects');
                                         }
-                                    } else {
-                                        Log::channel('issues')->info('Dont have projects');
                                     }
                                 }
                             }
+                        } else {
+                            Log::channel('issues')->info('there has no issue code');
                         }
-
                     } else {
                         Log::channel('issues')->info('no Project');
                     }
