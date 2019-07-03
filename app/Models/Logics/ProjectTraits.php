@@ -46,9 +46,8 @@ trait ProjectTraits
      * @param  int  $count
      * @param  null  $beginTime
      * @param  null  $endTime
-     * @return object
      */
-    public static function getGamePageList($lotterySign, $count = 10, $beginTime = null, $endTime = null): object
+    public static function getGamePageList($lotterySign, $count = 10, $beginTime = null, $endTime = null)
     {
         $projectEloq = self::orderBy('id', 'desc');
         if ($lotterySign !== '*') {
@@ -80,9 +79,8 @@ trait ProjectTraits
      * @param  int  $count
      * @param  null  $beginTime
      * @param  null  $endTime
-     * @return object
      */
-    public static function getGameTracesList($lotterySign, $count = 10, $beginTime = null, $endTime = null): object
+    public static function getGameTracesList($lotterySign, $count = 10, $beginTime = null, $endTime = null)
     {
         $traceEloq = LotteryTrace::orderBy('id', 'desc');
         if ($lotterySign !== '*') {
