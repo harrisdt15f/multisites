@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\FrontendApi\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
+use App\Http\Requests\Frontend\Homepage\FrontendAuthNoticeRequest;
 use App\Http\SingleActions\Frontend\Homepage\HomepageShowHomepageModelAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageActivityAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageBannerAction;
@@ -90,12 +91,14 @@ class HomepageController extends FrontendApiMainController
 
     /**
      * 首页公告列表
+     * @param  FrontendAuthNoticeRequest  $request
      * @param  HompageNoticeAction $action
      * @return JsonResponse
      */
-    public function notice(HompageNoticeAction $action): JsonResponse
+    public function notice(FrontendAuthNoticeRequest $request, HompageNoticeAction $action): JsonResponse
     {
-        return $action->execute($this);
+        $input = $request->validated();
+        return $action->execute($this,$input);
     }
 
     /**

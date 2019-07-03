@@ -31,7 +31,7 @@ class HompageNoticeAction
      * @param  FrontendApiMainController  $contll
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll): JsonResponse
+    public function execute(FrontendApiMainController $contll,$input): JsonResponse
     {
         if (Cache::has('homepageNotice')) {
             $data = Cache::get('homepageNotice');
@@ -45,6 +45,9 @@ class HompageNoticeAction
                 return $contll->msgOut(false, [], '400', $contll->offMsg);
             }
             $eloqM = new FrontendMessageNotice();
+            $contll->inputs['extra_where']['method'] = 'where';
+            $contll->inputs['extra_where']['key'] = 'type';
+            $contll->inputs['extra_where']['value'] = $input;
             $data = $contll->generateSearchQuery($eloqM, $searchAbleFields = null);
             Cache::forever('homepageNotice', $data);
         }
