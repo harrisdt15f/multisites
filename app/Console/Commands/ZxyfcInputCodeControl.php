@@ -42,11 +42,15 @@ class ZxyfcInputCodeControl extends Command
             ['lottery_id', 'zx1fc'],
             ['end_time', '<', time()],
         ])->orderBy('end_time', 'desc')->first();
-        $code = mt_rand(0, 9) . mt_rand(0, 9) . mt_rand(0, 9) . mt_rand(0, 9) . mt_rand(0, 9);
-        $lotteryIssue->status_encode = LotteryIssue::ENCODED;
-        $lotteryIssue->encode_time = time();
-        $lotteryIssue->official_code = $code;
-        $lotteryIssue->save();
-        dispatch(new IssueEncoder($lotteryIssue->toArray()))->onQueue('issues');
+        if ($lotteryIssue !== null) {
+            $code = mt_rand(0, 9) . mt_rand(0, 9) . mt_rand(0, 9) . mt_rand(0, 9) . mt_rand(0, 9);
+            $lotteryIssue->status_encode = LotteryIssue::ENCODED;
+            $lotteryIssue->encode_time = time();
+            $lotteryIssue->official_code = $code;
+            if ($lotteryIssue->save()) {
+                dispatch(new IssueEncoder($lotteryIssue->toArray()))->onQueue('issues');
+            }
+        }
+
     }
 }
