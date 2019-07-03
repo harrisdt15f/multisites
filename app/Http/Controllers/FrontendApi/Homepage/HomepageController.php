@@ -13,6 +13,7 @@ use App\Http\SingleActions\Frontend\Homepage\HompageNoticeAction;
 use App\Http\SingleActions\Frontend\Homepage\HompagePopularLotteriesAction;
 use App\Http\SingleActions\Frontend\Homepage\HompagePopularMethodsAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageQrCodeAction;
+use App\Http\SingleActions\Frontend\Homepage\HomepageRankingAction;
 use Illuminate\Http\JsonResponse;
 
 class HomepageController extends FrontendApiMainController
@@ -107,6 +108,16 @@ class HomepageController extends FrontendApiMainController
      * @return JsonResponse
      */
     public function ico(HompageIcoAction $action): JsonResponse
+    {
+        return $action->execute($this);
+    }
+
+    /**
+     * 首页中奖排行榜
+     * @param  HomepageRankingAction $action
+     * @return JsonResponse
+     */
+    public function ranking(HomepageRankingAction $action): JsonResponse
     {
         return $action->execute($this);
     }
