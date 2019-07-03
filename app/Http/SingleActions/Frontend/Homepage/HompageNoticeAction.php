@@ -34,7 +34,7 @@ class HompageNoticeAction
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
         if (Cache::has('homepageNotice')) {
-            $datas = Cache::get('homepageNotice');
+            $data = Cache::get('homepageNotice');
         } else {
             $noticeEloq = $this->model::select('show_num', 'status')->where('en_name', 'notice')->first();
             if ($noticeEloq === null) {
@@ -44,9 +44,10 @@ class HompageNoticeAction
             if ($noticeEloq->status !== 1) {
                 return $contll->msgOut(false, [], '400', $contll->offMsg);
             }
-            $datas = FrontendMessageNotice::select('id', 'title')->where('status', 1)->orderBy('sort', 'asc')->limit($noticeEloq->show_num)->get();
-            Cache::forever('homepageNotice', $datas);
+            $eloqM = new FrontendMessageNotice();
+            $data = $contll->generateSearchQuery($eloqM, $searchAbleFields = null);
+            Cache::forever('homepageNotice', $data);
         }
-        return $contll->msgOut(true, $datas);
+        return $contll->msgOut(true, $data);
     }
 }
