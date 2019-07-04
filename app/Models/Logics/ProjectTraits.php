@@ -232,10 +232,9 @@ trait ProjectTraits
      * @param $openNumber
      * @param $sWnNumber
      * @param $aPrized
-     * @param  int  $win
      * @return bool|string
      */
-    public function setWon($openNumber, $sWnNumber, $aPrized, &$win = 0)
+    public function setWon($openNumber, $sWnNumber, $aPrized)
     {
         $totalBonus = 0;
         foreach ($aPrized as $iBasicMethodId => $aPrizeOfBasicMethod) {
@@ -268,7 +267,6 @@ trait ProjectTraits
                     $lockProject->update($data);
                     DB::commit();
                     $lockProject->sendMoney();
-                    $win = 1;
                 } catch (Exception $e) {
                     Log::channel('issues')->info($e->getMessage());
                     DB::rollBack();
