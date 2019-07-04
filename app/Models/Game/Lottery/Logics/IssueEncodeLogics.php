@@ -71,9 +71,8 @@ trait IssueEncodeLogics
                                                         $strlog = 'aPrized is '.json_encode($aPrized,
                                                                 JSON_PRETTY_PRINT);
                                                         Log::channel('issues')->info($strlog);
-                                                        $win = 0;
                                                         $result = $project->setWon($oIssue->official_code, $sWnNumber,
-                                                            $aPrized, $win);//@todo Trace
+                                                            $aPrized);//@todo Trace
                                                         if ($result !== true) {
                                                             Log::channel('issues')->info($result);
                                                         }
