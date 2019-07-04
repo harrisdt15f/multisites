@@ -59,7 +59,6 @@ trait ProjectTraits
             'id',
             'username',
             'lottery_sign as lottery_name',
-            'method_group',
             'method_name',
             'issue',
             'open_number as open_codes',
@@ -91,7 +90,6 @@ trait ProjectTraits
         $traceList = $traceEloq->select(
             'id',
             'lottery_sign as lottery_name',
-            'method_group',
             'method_name',
             'start_issue',
             'issue_process as process',
