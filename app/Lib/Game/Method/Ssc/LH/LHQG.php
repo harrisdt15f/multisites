@@ -1,6 +1,7 @@
 <?php namespace App\Lib\Game\Method\Ssc\LH;
 
 use App\Lib\Game\Method\Ssc\Base;
+use Illuminate\Support\Facades\Validator;
 
 class LHQG extends Base
 {
@@ -22,10 +23,14 @@ class LHQG extends Base
 
     public function regexp($sCodes)
     {
-        $aCodes = explode('&', $sCodes);
-        foreach ($aCodes as $code) {
-
+        $data['code'] = $sCodes;
+        $validator = Validator::make($data, [
+            'code' => ['regex:/^((?!\&)(?!.*\&$)(?!.*?\&\&)(?!.*?\d\d)[0-2&]{1,5})$/'],//0&1&2 龙虎和
+        ]);
+        if ($validator->fails()) {
+            return false;
         }
+        return true;
     }
 
     public function count($sCodes)
