@@ -97,6 +97,7 @@ trait ProjectTraits
             'issue_process as process',
             'total_price',
             'win_stop as is_win_stop',
+            'finished_bonus',
             'status'
         )->paginate($count);
         return $traceList;
