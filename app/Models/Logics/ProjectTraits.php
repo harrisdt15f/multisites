@@ -25,8 +25,8 @@ trait ProjectTraits
         if (isset($condition['en_name'])) {
             $query->where('en_name', '=', $condition['en_name']);
         }
-        $currentPage = isset($condition['page_index']) ? (int)$condition['page_index'] : 1;
-        $pageSize = isset($condition['page_size']) ? (int)$condition['page_size'] : 15;
+        $currentPage = isset($condition['page_index']) ? (int) $condition['page_index'] : 1;
+        $pageSize = isset($condition['page_size']) ? (int) $condition['page_size'] : 15;
         $offset = ($currentPage - 1) * $pageSize;
 
         $total = $query->count();
@@ -36,20 +36,19 @@ trait ProjectTraits
             'data' => $menus,
             'total' => $total,
             'currentPage' => $currentPage,
-            'totalPage' => (int)ceil($total / $pageSize),
+            'totalPage' => (int) ceil($total / $pageSize),
         ];
     }
 
     /**
      * 获取投注页需要的注单数据
-     * @param $lotterySign
-     * @param  int  $count
-     * @param  null  $beginTime
-     * @param  null  $endTime
+     * @param  int   $userId
+     * @param        $lotterySign
+     * @param  int   $count
      */
-    public static function getGamePageList($lotterySign, $count = 10, $beginTime = null, $endTime = null)
+    public static function getGamePageList($userId, $lotterySign, $count = 10, $beginTime = null, $endTime = null)
     {
-        $projectEloq = self::orderBy('id', 'desc');
+        $projectEloq = self::where('user_id', $userId)->orderBy('id', 'desc');
         if ($lotterySign !== '*') {
             $projectEloq->where('lottery_sign', '=', $lotterySign);
         }
@@ -60,6 +59,7 @@ trait ProjectTraits
             'id',
             'username',
             'lottery_sign as lottery_name',
+            'method_group',
             'method_name',
             'issue',
             'open_number as open_codes',
@@ -75,14 +75,13 @@ trait ProjectTraits
 
     /**
      * 追号列表
-     * @param $lotterySign
-     * @param  int  $count
-     * @param  null  $beginTime
-     * @param  null  $endTime
+     * @param  int   $userId
+     * @param        $lotterySign
+     * @param  int   $count
      */
-    public static function getGameTracesList($lotterySign, $count = 10, $beginTime = null, $endTime = null)
+    public static function getGameTracesList($userId, $lotterySign, $count = 10, $beginTime = null, $endTime = null)
     {
-        $traceEloq = LotteryTrace::orderBy('id', 'desc');
+        $traceEloq = LotteryTrace::where('user_id', $userId)->orderBy('id', 'desc');
         if ($lotterySign !== '*') {
             $traceEloq->where('lottery_sign', '=', $lotterySign);
         }
@@ -92,11 +91,13 @@ trait ProjectTraits
         $traceList = $traceEloq->select(
             'id',
             'lottery_sign as lottery_name',
-            'method_name as method_name',
+            'method_group',
+            'method_name',
             'start_issue',
             'issue_process as process',
             'total_price',
             'win_stop as is_win_stop',
+            'finished_bonus',
             'status'
         )->paginate($count);
         return $traceList;
@@ -338,7 +339,7 @@ trait ProjectTraits
                     $oProject->save();
                     if (!empty($this->errors()->first())) {
                         $res = false;
-                        Log::info('更新状态出错'.json_encode($this->errors()->first(), JSON_PRETTY_PRINT));
+                        Log::info('更新状态出错' . json_encode($this->errors()->first(), JSON_PRETTY_PRINT));
                     } else {
                         $res = true;
                         Log::info('Finished Send Money with bonus');
@@ -350,7 +351,7 @@ trait ProjectTraits
             }
         } catch (Exception $e) {
             $res = false;
-            Log::info('投注-异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine()); //Clog::userBet
+            Log::info('投注-异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine()); //Clog::userBet
         }
         if ($res === true) {
             DB::commit();

@@ -26,7 +26,7 @@ class LotteriesProjectHistoryAction
         $count = $inputDatas['count']; //10
         $beginTime = $inputDatas['begin_time'] ?? null;
         $endTime = $inputDatas['end_time'] ?? null;
-        $data = Project::getGamePageList($lotterySign, $count, $beginTime, $endTime);
+        $data = Project::getGamePageList($contll->partnerUser->id, $lotterySign, $count, $beginTime, $endTime);
         return $contll->msgOut(true, $data);
     }
 }

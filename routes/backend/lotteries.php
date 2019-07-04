@@ -40,4 +40,6 @@ Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], function 
     Route::match(['post', 'options'], 'edit', ['as' => $namePrefix . 'edit', 'uses' => $controller . 'edit']);
     //删除彩种
     Route::match(['post', 'options'], 'delete', ['as' => $namePrefix . 'delete', 'uses' => $controller . 'delete']);
+    //奖期重新派奖
+    Route::match(['post', 'options'], 'calculate-encode-again', ['as' => $namePrefix . 'calculate-encode-again', 'uses' => $controller . 'CalculateEncodeAgain']);
 });
