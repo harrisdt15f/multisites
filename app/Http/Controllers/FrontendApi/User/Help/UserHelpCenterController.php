@@ -6,11 +6,9 @@
 
 namespace App\Http\Controllers\FrontendApi\User\Help;
 
-
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Http\SingleActions\Frontend\User\Help\UserHelpCenterAction;
 use Illuminate\Http\JsonResponse;
-
 
 class UserHelpCenterController extends FrontendApiMainController
 {
