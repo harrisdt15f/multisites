@@ -50,6 +50,11 @@ class Kernel extends HttpKernel
             'bindings',
             'cors',
         ],
+        'mobile-api' => [
+            'throttle:300,1',
+            'bindings',
+            'cors',
+        ],
         'api' => [
             'throttle:300,1',
             'bindings',
