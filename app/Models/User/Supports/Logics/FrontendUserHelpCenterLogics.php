@@ -8,7 +8,6 @@
 
 namespace App\Models\User\Supports\Logics;
 
-
 trait FrontendUserHelpCenterLogics
 {
     /**
