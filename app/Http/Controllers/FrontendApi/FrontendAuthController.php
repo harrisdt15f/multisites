@@ -19,16 +19,12 @@ use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 
 class FrontendAuthController extends FrontendApiMainController
 {
-
-    public $successStatus = 200;
-
     public $eloqM = 'User\FrontendUser';
 
     public function username()
