@@ -105,7 +105,6 @@ class LotteriesBetAction
             $_totalCost += $singleCost;
             $betDetail[] = [
                 'method_id' => $methodId,
-                'method_group' => $method['method_group'],
                 'method_name' => $method['method_name'],
                 'mode' => $mode,
                 'prize_group' => $prizeGroup,
