@@ -42,3 +42,16 @@ Route::group([
     }
     unset($aRouteFiles);
 });
+
+Route::group([
+    'middleware' => ['mobile-api'],
+    'namespace' => 'MobileApi',
+    'prefix' => 'mobile-api',
+], function () {
+    $sRouteDir = base_path().'/routes/mobile/';
+    $aRouteFiles = glob($sRouteDir.'*.php');
+    foreach ($aRouteFiles as $sRouteFile) {
+        include $sRouteFile;
+    }
+    unset($aRouteFiles);
+});

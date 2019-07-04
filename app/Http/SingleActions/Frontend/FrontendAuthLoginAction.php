@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-27 16:12:22
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-27 16:28:12
- */
 namespace App\Http\SingleActions\Frontend;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
@@ -15,11 +9,13 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class FrontendAuthLoginAction
 {
     use AuthenticatesUsers;
+
     /**
      * Login user and create token
      * @param  FrontendApiMainController  $contll
@@ -28,6 +24,7 @@ class FrontendAuthLoginAction
      */
     public function execute(FrontendApiMainController $contll, $request): JsonResponse
     {
+        $this->userAgent = $contll->userAgent;
         $request->validate([
             'username' => 'required|string|alpha_dash',
             'password' => 'required|string',
@@ -76,5 +73,18 @@ class FrontendAuthLoginAction
             'expires_at' => $expireAt,
         ];
         return $contll->msgOut(true, $data);
+    }
+
+    protected function throttleKey(Request $request): ?string
+    {
+        if ($this->userAgent->isDesktop()) {
+            return Str::lower($request->input($this->username())).'|Desktop|'.$request->ip();
+        } else {
+            return Str::lower($request->input($this->username())).'|'.$this->userAgent->device().'|'.$request->ip();
+        }
+    }
+    protected function username(): string
+    {
+        return 'username';
     }
 }
