@@ -25,7 +25,7 @@ class LHWQ extends Base
     {
         $data['code'] = $sCodes;
         $validator = Validator::make($data, [
-            'code' => ['regex:/^((?!\&)(?!.*\&$)(?!.*?\&\&)[0-2&]{1,5}?)$/'],//0&1&2 龙虎和
+            'code' => ['regex:/^((?!\&)(?!.*\&$)(?!.*?\&\&)(?!.*?\d\d)[0-2&]{1,5})$/'],//0&1&2 龙虎和
         ]);
         if ($validator->fails()) {
             return false;
