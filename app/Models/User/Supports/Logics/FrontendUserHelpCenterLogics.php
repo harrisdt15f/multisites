@@ -12,6 +12,7 @@ trait FrontendUserHelpCenterLogics
 {
     /**
      * 获取用户帮助中心数据
+     * @param $status
      * @return array
      */
     public function getHelpCenterData($status = ''): array
