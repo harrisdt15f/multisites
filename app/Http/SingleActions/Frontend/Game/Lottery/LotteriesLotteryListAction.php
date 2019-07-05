@@ -17,10 +17,6 @@ class LotteriesLotteryListAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        $maxMultiples = SystemConfiguration::where('sign', 'max_multiples')->value('value');
-        if ($maxMultiples === null) {
-            $maxMultiples = $this->createMaxMultiplesConfig();
-        }
         $lotteries = LotteryList::with(['issueRule:lottery_id,begin_time,end_time'])
             ->where('status', 1)->get([
                 'cn_name as name',
@@ -56,22 +52,8 @@ class LotteriesLotteryListAction
                 'day_issue' => $lottery->day_issue,
                 'begin_time' => $lottery->issueRule['begin_time'],
                 'end_time' => $lottery->issueRule['end_time'],
-                'maxMultiples' => $maxMultiples,
             ];
         }
         return $contll->msgOut(true, $data);
-    }
-
-    public function createMaxMultiplesConfig()
-    {
-        $configurationsRelated = new configurationsRelated();
-        $parentId = systemConfiguration::where('sign', 'system')->value('id');
-        if ($parentId === null) {
-            $systemELoq = $configurationsRelated->create(0, 'system', '系统相关', '所有系统相关配置都保存此', null, 1, 1);
-            $parentId = $systemELoq->id;
-        }
-        $maxMultiplesEloq = $configurationsRelated->create($parentId, 'max_multiples', '投注最大倍数', '玩家投注时可选择的最大倍数', 10000,
-            1, 1);
-        return $maxMultiplesEloq->value;
     }
 }
