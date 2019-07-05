@@ -1,11 +1,17 @@
 <?php
-namespace App\Http\SingleActions\Frontend\User\Help;
+/**
+ * @Author: Fish
+ * @Date:   2019/7/4 16:02
+ */
 
-use App\Http\Controllers\FrontendApi\FrontendApiMainController;
+namespace App\Http\SingleActions\Backend\Admin\Help;
+
+
+use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Models\User\Supports\FrontendUsersHelpCenter;
 use Illuminate\Http\JsonResponse;
 
-class UserHelpCenterAction
+class HelpCenterDetailAction
 {
     protected $model;
 
@@ -16,14 +22,15 @@ class UserHelpCenterAction
     {
         $this->model = $frontendUsersHelpCenter;
     }
+
     /**
-     * 帮助中心菜单
-     * @param  FrontendApiMainController $contll
+     * 帮助中心列表
+     * @param  BackEndApiMainController  $contll
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll): JsonResponse
+    public function execute(BackEndApiMainController $contll): JsonResponse
     {
-        $menu   = $this->model->getHelpCenterData(1);
+        $menu = $this->model->getHelpCenterData();
         return $contll->msgOut(true, $menu);
     }
 }

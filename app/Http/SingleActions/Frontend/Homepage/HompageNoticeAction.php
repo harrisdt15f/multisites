@@ -48,7 +48,7 @@ class HompageNoticeAction
             $contll->inputs['extra_where']['method'] = 'where';
             $contll->inputs['extra_where']['key'] = 'type';
             $contll->inputs['extra_where']['value'] = $input;
-            $data = $contll->generateSearchQuery($eloqM, $searchAbleFields = null);
+            $data = $contll->generateSearchQuery($eloqM, $searchAbleFields = null, $fixedJoin = 0, $withTable = null, $withSearchAbleFields = null, $orderFields = 'sort', $orderFlow = 'asc');
             Cache::forever('homepageNotice', $data);
         }
         return $contll->msgOut(true, $data);
