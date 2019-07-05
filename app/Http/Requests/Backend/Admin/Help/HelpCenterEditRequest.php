@@ -32,6 +32,7 @@ class HelpCenterEditRequest  extends BaseFormRequest
             'id'        => 'required|numeric|exists:frontend_users_help_centers,id',
             'pid'       => 'required|numeric',
             'menu'      => 'required|string|max:32',
+            'status'    => 'required|numeric',
             'content'   => 'nullable',
         ];
     }

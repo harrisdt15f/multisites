@@ -16,7 +16,7 @@ trait FrontendUserHelpCenterLogics
      */
     public function getHelpCenterData(): array
     {
-        return $this->select('id','pid','menu')->with('children:id,pid,menu,content')->where('pid',0)->get()->toArray();
+        return $this->select('id','pid','menu','status')->with('children:id,pid,menu,content,status')->where('pid',0)->where('status','1')->get()->toArray();
     }
 
 }

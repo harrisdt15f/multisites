@@ -30,6 +30,7 @@ class HelpCenterAddRequest extends BaseFormRequest
         return [
             'pid'           => 'required|numeric',
             'menu'          => 'required|string|max:32',
+            'status'        => 'required|numeric',
             'content'       => 'nullable',
         ];
     }
