@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\FrontendApi;
+namespace App\Http\Controllers\MobileApi;
 
-use App\Http\Requests\Frontend\FrontendAuthRegisterRequest;
+use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Http\Requests\Frontend\FrontendAuthResetFundPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthResetSpecificInfosRequest;
 use App\Http\Requests\Frontend\FrontendAuthResetUserPasswordRequest;
@@ -14,18 +14,20 @@ use App\Http\SingleActions\Frontend\FrontendAuthResetSpecificInfosAction;
 use App\Http\SingleActions\Frontend\FrontendAuthSetFundPasswordAction;
 use App\Http\SingleActions\Frontend\FrontendAuthUserDetailAction;
 use App\Http\SingleActions\Frontend\FrontendAuthUserSpecificInfosAction;
-use App\Models\Admin\BackendAdminAccessGroup;
-use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 
-class FrontendAuthController extends FrontendApiMainController
+class MobileAuthController extends FrontendApiMainController
 {
     public $eloqM = 'User\FrontendUser';
+
+    public function username()
+    {
+        return 'username';
+    }
 
     /**
      * Login user and create token
@@ -90,36 +92,6 @@ class FrontendAuthController extends FrontendApiMainController
                 return $this->msgOut(false, [], $sqlState, $msg);
             }
         }
-    }
-
-    /**
-     * Register api
-     * @param  FrontendAuthRegisterRequest $request
-     * @return JsonResponse
-     */
-    public function register(FrontendAuthRegisterRequest $request): JsonResponse
-    {
-        $inputDatas = $request->validated();
-        $group = BackendAdminAccessGroup::find($inputDatas['group_id']);
-        $role = $group->role == '*' ? Arr::wrap($group->role) : Arr::wrap(json_decode($group->role, true));
-        $isManualRecharge = false;
-        $FundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
-        $isManualRecharge = in_array($FundOperation['id'], $role, true);
-        $input = $inputDatas;
-        $input['password'] = bcrypt($input['password']);
-        $input['platform_id'] = $this->currentPlatformEloq->platform_id;
-        $user = BackendAdminUser::create($input);
-        if ($isManualRecharge === true) {
-            $insertData = ['admin_id' => $user->id];
-            $FundOperationEloq = new BackendAdminRechargePocessAmount();
-            $FundOperationEloq->fill($insertData);
-            $FundOperationEloq->save();
-        }
-        $credentials = request(['email', 'password']);
-        $token = $this->currentAuth->attempt($credentials);
-        $success['token'] = $token;
-        $success['name'] = $user->name;
-        return $this->msgOut(true, $success);
     }
 
     /**

@@ -26,7 +26,7 @@ class LotteriesTracesHistoryAction
         $count = $inputDatas['count']; //10
         $beginTime = $inputDatas['begin_time'] ?? null;
         $endTime = $inputDatas['end_time'] ?? null;
-        $data = Project::getGameTracesList($lotterySign, $count, $beginTime, $endTime);
+        $data = Project::getGameTracesList($contll->partnerUser->id, $lotterySign, $count, $beginTime, $endTime);
         return $contll->msgOut(true, $data);
     }
 }

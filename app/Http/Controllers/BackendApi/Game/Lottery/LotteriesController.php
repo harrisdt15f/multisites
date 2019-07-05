@@ -4,6 +4,7 @@ namespace App\Http\Controllers\BackendApi\Game\Lottery;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesAddRequest;
+use App\Http\Requests\Backend\Game\Lottery\LotteriesCalculateEncodeAgainRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesDeleteRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesEditMethodRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesEditRequest;
@@ -15,6 +16,7 @@ use App\Http\Requests\Backend\Game\Lottery\LotteriesMethodGroupSwitchRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesMethodRowSwitchRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesMethodSwitchRequest;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesAddAction;
+use App\Http\SingleActions\Backend\Game\Lottery\LotteriesCalculateEncodeAgainAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesDeleteAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesEditAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesEditMethodAction;
@@ -180,6 +182,13 @@ class LotteriesController extends BackEndApiMainController
     public function lotteriesCodeLength(LotteriesLotteriesCodeLengthAction $action): JsonResponse
     {
         return $action->execute($this);
+    }
+
+    //奖期重新派奖
+    public function CalculateEncodeAgain(LotteriesCalculateEncodeAgainRequest $request, LotteriesCalculateEncodeAgainAction $action)
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
     }
 
     /**
