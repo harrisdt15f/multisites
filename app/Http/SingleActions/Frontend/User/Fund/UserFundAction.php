@@ -30,7 +30,11 @@ class UserFundAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
+        $user = $contll->currentAuth->user();
         $eloqM = new FrontendUsersAccountsReport();
+        $contll->inputs['extra_where']['method'] = 'where';
+        $contll->inputs['extra_where']['key'] = 'user_id';
+        $contll->inputs['extra_where']['value'] = $user->id;
         $fixedJoin = 1; //number of joining tables
         $withTable = 'gameMethods';
         $searchAbleFields = ['issue', 'process_time','type_name','amount','balance','method_id'];
