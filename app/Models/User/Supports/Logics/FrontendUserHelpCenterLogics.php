@@ -14,9 +14,12 @@ trait FrontendUserHelpCenterLogics
      * 获取用户帮助中心数据
      * @return array
      */
-    public function getHelpCenterData(): array
+    public function getHelpCenterData($status = ''): array
     {
-        return $this->select('id','pid','menu','status')->with('children:id,pid,menu,content,status')->where('pid',0)->where('status','1')->get()->toArray();
+        if ($status != '') {
+            return $this->select('id','pid','menu','status')->with('children:id,pid,menu,content,status')->where('pid',0)->where('status',1)->get()->toArray();
+        }
+        return $this->select('id','pid','menu','status')->with('children:id,pid,menu,content,status')->where('pid',0)->get()->toArray();
     }
 
 }

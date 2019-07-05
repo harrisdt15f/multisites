@@ -23,7 +23,7 @@ class UserHelpCenterAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        $menu = $this->model->getHelpCenterData();
+        $menu   = $this->model->getHelpCenterData(1);
         return $contll->msgOut(true, $menu);
     }
 }
