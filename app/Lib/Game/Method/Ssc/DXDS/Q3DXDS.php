@@ -1,6 +1,7 @@
 <?php namespace App\Lib\Game\Method\Ssc\DXDS;
 
 use App\Lib\Game\Method\Ssc\Base;
+use Illuminate\Support\Facades\Validator;
 
 // 3位大小单双
 class Q3DXDS extends Base
@@ -54,24 +55,13 @@ class Q3DXDS extends Base
 
     public function regexp($sCodes)
     {
-        $regexp = '/^(([bsad]&){0,3}[bsad])\|(([bsad]&){0,3}[bsad])\|(([bsad]&){0,3}[bsad])$/';
-
-        if(!preg_match($regexp,$sCodes)) return false;
-
-        $filterArr = self::$dxds;
-
-        $sCodes = explode("|", $sCodes);
-        foreach($sCodes as $codes){
-            $temp = explode('&',$codes);
-            if(count($temp) != count(array_filter(array_unique($temp),function($v) use($filterArr) {
-                    return isset($filterArr[$v]);
-                }))) return false;
-
-            if(count($temp)==0){
-                return false;
-            }
+        $data['code'] = $sCodes;
+        $validator = Validator::make($data, [
+            'code' => ['regex:/^((?!\|)(?!.*\|$)(?!.*?\|\|)(?!.*?\&\|)(?!\&)(?!.*\&$)(?!.*?\&\&)(?!.*?\d\d)[0-3&]{0,19}\|?){1,3}$/'],//0&1&2&3|0&1&2&3 大小单双
+        ]);
+        if ($validator->fails()) {
+            return false;
         }
-
         return true;
     }
 

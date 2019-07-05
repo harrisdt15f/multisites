@@ -20,20 +20,21 @@ class LotteriesAddAction
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
         DB::beginTransaction();
-        try {
-            $lotteryEloq = new LotteryList();
-            $lotteryEloq->fill($inputDatas['lottery']);
-            $lotteryEloq->save();
-            $issueRuleELoq = new LotteryIssueRule();
-            $issueRuleELoq->fill($inputDatas['issue_rule']);
-            $issueRuleELoq->save();
-            DB::commit();
-            return $contll->msgOut(true);
-        } catch (Exception $e) {
+        $lotteryEloq = new LotteryList();
+        $lotteryEloq->fill($inputDatas['lottery']);
+        $lotteryEloq->save();
+        if ($lotteryEloq->errors()->messages()) {
             DB::rollback();
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $contll->msgOut(false, [], $sqlState, $msg);
+            return $contll->msgOut(false, [], '400', $lotteryEloq->errors()->messages());
         }
+        $issueRuleELoq = new LotteryIssueRule();
+        $issueRuleELoq->fill($inputDatas['issue_rule']);
+        $issueRuleELoq->save();
+        if ($issueRuleELoq->errors()->messages()) {
+            DB::rollback();
+            return $contll->msgOut(false, [], '400', $issueRuleELoq->errors()->messages());
+        }
+        DB::commit();
+        return $contll->msgOut(true);
     }
 }
