@@ -15,12 +15,15 @@ trait FrontendUserHelpCenterLogics
      * @param $status
      * @return array
      */
-    public function getHelpCenterData($status = ''): array
+    public function getHelpCenterData($status = 0): array
     {
-        if ($status != '') {
-            return $this->select('id','pid','menu','status')->with('children:id,pid,menu,content,status')->where('pid',0)->where('status',1)->get()->toArray();
+        $query = $this->select('id','pid','menu','status')->with('children:id,pid,menu,content,status')->where('pid',0);
+        if ($status === 1) {
+            return $query->with(['children' => function($query) {
+                $query->where('status',1);
+            }])->where('status',1)->get()->toArray();
         }
-        return $this->select('id','pid','menu','status')->with('children:id,pid,menu,content,status')->where('pid',0)->get()->toArray();
+        return $query->get()->toArray();
     }
 
 }
