@@ -11,7 +11,6 @@ Route::match(['post', 'options'], 'login', ['as' => 'mobile-api.login', 'uses' =
 Route::group(['prefix' => 'user'], function () {
     $namePrefix = 'mobile-api.MobileAuthController.';
     $controller = 'MobileAuthController@';
-    //创建总代
     Route::match(['post', 'options'], 'detail', ['as' => $namePrefix . 'userDetail', 'uses' => $controller . 'userDetail']);
     Route::match(['get', 'options'], 'logout', ['as' => $namePrefix . 'logout', 'uses' => $controller . 'logout']);
     //用户修改登录密码
