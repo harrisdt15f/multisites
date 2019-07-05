@@ -23,6 +23,7 @@ class UserFundAction
     {
         $this->model = $frontendUsersAccountsReport;
     }
+
     /**
      * 用户账变列表
      * @param  FrontendApiMainController  $contll
