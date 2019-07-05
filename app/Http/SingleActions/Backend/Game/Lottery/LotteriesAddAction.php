@@ -24,6 +24,7 @@ class LotteriesAddAction
         $lotteryEloq->fill($inputDatas['lottery']);
         $lotteryEloq->save();
         if ($lotteryEloq->errors()->messages()) {
+            DB::rollback();
             return $contll->msgOut(false, [], '400', $lotteryEloq->errors()->messages());
         }
         $issueRuleELoq = new LotteryIssueRule();
