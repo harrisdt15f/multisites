@@ -46,8 +46,8 @@ trait IssueEncodeLogics
                             if ($oLottery->basicways()->exists()) {
                                 $oBasicWays = $oLottery->basicways;
                                 foreach ($oBasicWays as $oBasicWay) {
-                                    $oSeriesWays = $oBasicWay->seriesWays->where('series_code',
-                                        $oLottery->series_id)->where('lottery_method_id', '!=', null);
+                                    $oSeriesWays = $oBasicWay->seriesWays()->where('series_code',
+                                        $oLottery->series_id)->where('lottery_method_id', '!=', null)->get();
                                     foreach ($oSeriesWays as $oSeriesWay) {
                                         $oSeriesWay->setWinningNumber($aWnNumberOfMethods);
                                         $oProjectsToCalculate = $oProjects->where('status',
