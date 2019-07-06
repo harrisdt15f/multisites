@@ -30,7 +30,7 @@ class UserRechargeListAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        $user = $contll->currentAuth->user();
+        $user = $contll->partnerUser;
         $eloqM = new UsersRechargeHistorie();
         $contll->inputs['extra_where']['method'] = 'where';
         $contll->inputs['extra_where']['key'] = 'user_id';
