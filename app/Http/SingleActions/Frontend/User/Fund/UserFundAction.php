@@ -31,7 +31,7 @@ class UserFundAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        $user = $contll->currentAuth->user();
+        $user = $contll->partnerUser;
         $eloqM = new FrontendUsersAccountsReport();
         $contll->inputs['extra_where']['method'] = 'where';
         $contll->inputs['extra_where']['key'] = 'user_id';
