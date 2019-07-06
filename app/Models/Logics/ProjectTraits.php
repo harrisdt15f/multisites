@@ -57,18 +57,20 @@ trait ProjectTraits
         }
         $projectList = $projectEloq->select(
             'id',
-            'username',
             'lottery_sign as lottery_name',
             'method_sign',
             'method_name',
             'issue',
             'open_number as open_codes',
             'bet_number as bet_codes',
+            'mode',
+            'times',
             'total_cost',
             'price as single_price',
             'bonus',
             'bet_prize_group as prize_group',
-            'status'
+            'status',
+            'created_at as bet_time',
         )->paginate($count);
         return $projectList;
     }
@@ -92,12 +94,16 @@ trait ProjectTraits
             'id',
             'lottery_sign as lottery_name',
             'method_name',
+            'mode',
             'start_issue',
             'issue_process as process',
+            'bet_number',
             'total_price',
             'win_stop as is_win_stop',
             'finished_bonus',
-            'status'
+            'status',
+            'bet_prize_group',
+            'created_at as bet_time',
         )->paginate($count);
         return $traceList;
     }
