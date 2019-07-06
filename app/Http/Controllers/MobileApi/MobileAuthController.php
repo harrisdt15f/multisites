@@ -14,10 +14,8 @@ use App\Http\SingleActions\Frontend\FrontendAuthResetSpecificInfosAction;
 use App\Http\SingleActions\Frontend\FrontendAuthSetFundPasswordAction;
 use App\Http\SingleActions\Frontend\FrontendAuthUserDetailAction;
 use App\Http\SingleActions\Frontend\FrontendAuthUserSpecificInfosAction;
-use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 
 class MobileAuthController extends FrontendApiMainController
@@ -60,38 +58,6 @@ class MobileAuthController extends FrontendApiMainController
     {
         $token = $this->currentAuth->refresh();
         return $token;
-    }
-
-    /**
-     * change partner user Password
-     * @param  FrontendAuthSelfResetPasswordRequest $request
-     * @return JsonResponse
-     */
-    public function selfResetPassword(FrontendAuthSelfResetPasswordRequest $request)
-    {
-        $inputDatas = $request->validated();
-        if (!Hash::check($inputDatas['old_password'], $this->partnerUser->password)) {
-            return $this->msgOut(false, [], '100003');
-        } else {
-            $token = $this->refresh();
-            $this->partnerUser->password = Hash::make($inputDatas['password']);
-            $this->partnerUser->remember_token = $token;
-            try {
-                $this->partnerUser->save();
-                $expireInMinute = $this->currentAuth->factory()->getTTL();
-                $expireAt = Carbon::now()->addMinutes($expireInMinute)->format('Y-m-d H:i:s');
-                $data = [
-                    'access_token' => $token,
-                    'token_type' => 'Bearer',
-                    'expires_at' => $expireAt,
-                ];
-                return $this->msgOut(true, $data);
-            } catch (Exception $e) {
-                $errorObj = $e->getPrevious()->getPrevious();
-                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-                return $this->msgOut(false, [], $sqlState, $msg);
-            }
-        }
     }
 
     /**

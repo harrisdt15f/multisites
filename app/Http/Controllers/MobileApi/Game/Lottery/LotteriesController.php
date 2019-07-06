@@ -110,9 +110,4 @@ class LotteriesController extends FrontendApiMainController
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
-
-    public function setWinPrize()
-    {
-        LotteryIssue::calculateEncodedNumber('zx1fc', '1907020997');
-    }
 }
