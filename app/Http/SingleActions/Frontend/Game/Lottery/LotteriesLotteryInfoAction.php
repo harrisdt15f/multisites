@@ -44,6 +44,7 @@ class LotteriesLotteryInfoAction
                     $rowData[$method->method_group][$method->method_row][] = [
                         'method_name' => $method->method_name,
                         'method_id' => $method->method_id,
+                        'method_group' => $method->method_group,
                     ];
                 }
                 $groupData = [];
