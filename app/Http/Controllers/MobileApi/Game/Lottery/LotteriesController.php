@@ -15,8 +15,6 @@ use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryInfoAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryListAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesProjectHistoryAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesTracesHistoryAction;
-use App\Models\Game\Lottery\LotteryIssue;
-use Exception;
 use Illuminate\Http\JsonResponse;
 
 class LotteriesController extends FrontendApiMainController
