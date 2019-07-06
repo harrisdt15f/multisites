@@ -30,12 +30,12 @@ class FrontendAuthResetSpecificInfosRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'nickname' => 'required|string', //称昵
-            'realname' => 'required|string', //真实姓名
-            'mobile' => ['required', 'regex:/^0?(13[0-9]|15[012356789]|18[0-9]|14[57])[0-9]{8}$/'], //手机号码
-            'email' => 'required|email', //邮箱
-            'zip_code' => ['required', 'regex:/^\d{6}$/'], //邮编
-            'address' => 'required|string', //地址
+            'nickname' => 'string', //称昵
+            'realname' => 'string', //真实姓名
+            'mobile' => ['regex:/^0?(13[0-9]|15[012356789]|18[0-9]|14[57])[0-9]{8}$/'], //手机号码
+            'email' => 'email', //邮箱
+            'zip_code' => ['regex:/^\d{6}$/'], //邮编
+            'address' => 'string', //地址
         ];
     }
 
