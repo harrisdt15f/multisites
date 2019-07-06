@@ -40,11 +40,15 @@ trait ProjectTraits
         ];
     }
 
+
     /**
      * 获取投注页需要的注单数据
-     * @param  int  $userId
-     * @param        $lotterySign
+     * @param $userId
+     * @param $lotterySign
      * @param  int  $count
+     * @param  null  $beginTime
+     * @param  null  $endTime
+     * @return mixed
      */
     public static function getGamePageList($userId, $lotterySign, $count = 10, $beginTime = null, $endTime = null)
     {
@@ -71,16 +75,19 @@ trait ProjectTraits
             'bonus',
             'bet_prize_group as prize_group',
             'status',
-            'created_at as bet_time',
+            'created_at as bet_time'
         )->paginate($count);
         return $projectList;
     }
 
     /**
      * 追号列表
-     * @param  int  $userId
-     * @param        $lotterySign
+     * @param $userId
+     * @param $lotterySign
      * @param  int  $count
+     * @param  null  $beginTime
+     * @param  null  $endTime
+     * @return mixed
      */
     public static function getGameTracesList($userId, $lotterySign, $count = 10, $beginTime = null, $endTime = null)
     {
@@ -105,7 +112,7 @@ trait ProjectTraits
             'finished_bonus',
             'status',
             'bet_prize_group',
-            'created_at as bet_time',
+            'created_at as bet_time'
         )->paginate($count);
         return $traceList;
     }
