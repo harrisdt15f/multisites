@@ -22,18 +22,45 @@ trait LotteryBasicWayLogics
      */
     public function checkPrize(LotterySeriesWay $oSeriesWay, $sBetNumber, $sPosition = null): array
     {
-        $sBetNumber = str_replace('&', '', $sBetNumber);
         $aPrized = [];
         foreach ($oSeriesWay->WinningNumber as $iSeriesMethodId => $sWnNumber) {
             $oSeriesMethod = LotterySeriesMethod::find($iSeriesMethodId);
             $oBasicMethod = $oSeriesMethod->basicMethod;
             $oBasicMethod->sPosition = $sPosition;
             $prizeLevel = $oBasicMethod->prizeLevel;
+            $sBetNumber = $this->formatBetNumber($sBetNumber, $oSeriesMethod, $oSeriesWay, $sWnNumber);
             $iCount = $oBasicMethod->getPrizeCount($oSeriesWay, $this, $sWnNumber, $sBetNumber);
-                $iLevel = $prizeLevel->level;
-                $aPrized[$oSeriesMethod->basic_method_id][$iLevel] = $iCount;
+            $iLevel = $prizeLevel->level;
+            $aPrized[$oSeriesMethod->basic_method_id][$iLevel] = $iCount;
         }
         return $aPrized;
+    }
+
+    public function formatBetNumber($sBetNumber, $oSeriesMethod, $oSeriesWay, $sWnNumber)
+    {
+        $sBetNumber = str_replace('&', '', $sBetNumber);
+        $sSplitChar = '|';
+        switch ($this->function) {
+            case 'MultiOne':
+            case 'LottoMultiOne':
+                $aBetNumbers = explode($sSplitChar, $sBetNumber);
+                $iOffset = $oSeriesMethod->offset >= 0 ? $oSeriesMethod->offset : $oSeriesMethod->offset + $oSeriesWay->digital_count;
+                $sBetNumberFinal = $aBetNumbers[$iOffset];
+                break;
+            case 'MultiSequencing':
+                $iWidthOfWnNumber = strlen($sWnNumber);
+                $aBetNumbers = explode($sSplitChar, $sBetNumber);
+                foreach ($aBetNumbers as $i => $tmp) {
+                    if ($i < $oSeriesWay->digital_count - $iWidthOfWnNumber) {
+                        unset($aBetNumbers[$i]);
+                    }
+                }
+                $sBetNumberFinal = implode($sSplitChar, $aBetNumbers);
+                break;
+            default:
+                $sBetNumberFinal = $sBetNumber;
+        }
+        return $sBetNumberFinal;
     }
 
 
