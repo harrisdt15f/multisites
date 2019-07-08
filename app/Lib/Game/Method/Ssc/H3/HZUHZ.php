@@ -1,13 +1,41 @@
 <?php namespace App\Lib\Game\Method\Ssc\H3;
 
 use App\Lib\Game\Method\Ssc\Base;
+use Illuminate\Support\Facades\Validator;
 
 // 前3 组选和值
 class HZUHZ extends Base
 {
     //1&2&3&4&5&6
     public $all_count = 210;
-    public static $filterArr = array(1 => 1, 2 => 2, 3 => 2, 4 => 4, 5 => 5, 6 => 6, 7 => 8, 8 => 10, 9 => 11, 10 => 13, 11 => 14, 12 => 14, 13 => 15, 14 => 15, 15 => 14, 16 => 14, 17 => 13, 18 => 11, 19 => 10, 20 => 8, 21 => 6, 22 => 5, 23 => 4, 24 => 2, 25 => 2, 26 => 1);
+    public static $filterArr = array(
+        1 => 1,
+        2 => 2,
+        3 => 2,
+        4 => 4,
+        5 => 5,
+        6 => 6,
+        7 => 8,
+        8 => 10,
+        9 => 11,
+        10 => 13,
+        11 => 14,
+        12 => 14,
+        13 => 15,
+        14 => 15,
+        15 => 14,
+        16 => 14,
+        17 => 13,
+        18 => 11,
+        19 => 10,
+        20 => 8,
+        21 => 6,
+        22 => 5,
+        23 => 4,
+        24 => 2,
+        25 => 2,
+        26 => 1
+    );
 
     //供测试用 生成随机投注
     public function randomCodes()
@@ -23,20 +51,17 @@ class HZUHZ extends Base
 
     public function regexp($sCodes)
     {
-        //去重
-        $t = explode("&", $sCodes);
-        $temp = array_unique($t);
-        $arr = self::$filterArr;
-
-        $temp = array_filter($temp, function ($v) use ($arr) {
-            return isset($arr[$v]);
-        });
-
-        if (count($temp) == 0) {
+//        \b(0?[1-9]|1[0-9]|2[0-5])\b
+//    (0?[1-9]|1[0-9]|2[0-5])
+        $data['code'] = $sCodes;
+        $validator = Validator::make($data, [
+            'code' => ['regex:/^(?!\|)(?!.*\|$)(?!.*?\|\|)(?!.*?0\d)(0?[\d\|]|1[\d]|2[0-7]){1,73}$/'],
+            //0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27 直选和值
+        ]);
+        if ($validator->fails()) {
             return false;
         }
-
-        return count($temp) == count($t);
+        return true;
     }
 
     public function count($sCodes)
@@ -54,7 +79,9 @@ class HZUHZ extends Base
     public function bingoCode(Array $numbers)
     {
         //豹子号
-        if (count(array_count_values($numbers)) == 1) return [];
+        if (count(array_count_values($numbers)) == 1) {
+            return [];
+        }
 
         $val = array_sum($numbers);
         $arr = array_keys(self::$filterArr);
