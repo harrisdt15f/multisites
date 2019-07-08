@@ -372,8 +372,8 @@ class BackEndApiMainController extends Controller
      */
     public function publicUploadImg($input, $platform_id, $platform_name): string
     {
-        if ($input['folder_name'] === null) {
-            $folderName = date('YmdHis');
+        if (!isset($input['folder_name'])) {
+            $folderName = date('Ymd');
         } else {
             $folderName = $input['folder_name'];
         }

@@ -30,7 +30,7 @@ class SystemRequest extends BaseFormRequest
     {
         return [
             'pic'          => 'required|image',
-            'folder_name'  => 'nullable',
+            'folder_name'  => 'string',
         ];
     }
 }
