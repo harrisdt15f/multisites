@@ -9,6 +9,7 @@
 namespace App\Http\Requests\Frontend\Game\Lottery;
 
 use App\Http\Requests\BaseFormRequest;
+use App\Rules\Frontend\Lottery\Bet\MethodCountsRule;
 
 class LotteriesBetRequest extends BaseFormRequest
 {
@@ -40,7 +41,11 @@ class LotteriesBetRequest extends BaseFormRequest
             'balls.*.codes' => ['required', 'regex:/^((?!\&)(?!.*\&$)(?!.*?\&\&)[0-9&]{0,19}\|?){1,5}$/'],
             //支持定位胆 ||6||
             //0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9
-            'balls.*.count' => 'required|integer',
+            'balls.*.count' => [
+                'required',
+                'integer',
+                new MethodCountsRule($this->get('balls'))
+            ],
             'balls.*.times' => 'required|integer',
             'balls.*.cost' => 'required|regex:/^\d+(\.\d{1,3})?$/',//float
             'balls.*.mode' => 'required|regex:/^\d+(\.\d{1,3})?$/',//float
