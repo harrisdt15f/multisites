@@ -1,6 +1,7 @@
 <?php namespace App\Lib\Game\Method\Ssc\Q3;
 
 use App\Lib\Game\Method\Ssc\Base;
+use Illuminate\Support\Facades\Validator;
 
 // 前 3 直选和值
 class QZXHZ extends Base
@@ -23,20 +24,16 @@ class QZXHZ extends Base
 
     public function regexp($sCodes)
     {
-        //去重
-        $t = explode("&", $sCodes);
-        $temp = array_unique($t);
-        $arr = self::$filterArr;
-
-        $temp = array_filter($temp, function ($v) use ($arr) {
-            return isset($arr[$v]);
-        });
-
-        if (count($temp) == 0) {
+        //\b(0?[1-9]|1[0-9]|2[0-5])\b
+        $data['code'] = $sCodes;
+        $validator = Validator::make($data, [
+            'code' => ['regex:/^(?!\|)(?!.*\|$)(?!.*?\|\|)(?!.*?0\d)(0?[\d\|]|1[\d]|2[0-7]){1,73}$/'],
+            //0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27 前三直选和值
+        ]);
+        if ($validator->fails()) {
             return false;
         }
-
-        return count($temp) == count($t);
+        return true;
     }
 
     public function count($sCodes)
