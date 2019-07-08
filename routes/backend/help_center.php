@@ -16,6 +16,4 @@ Route::group(['prefix' => 'help', 'namespace' => 'Admin\Help'], function () {
     Route::match(['post', 'options'], 'edit', ['as' => $namePrefix . 'edit', 'uses' => $controller . 'edit']);
     //删除
     Route::match(['post', 'options'], 'delete', ['as' => $namePrefix . 'delete', 'uses' => $controller . 'delete']);
-    //图片
-    Route::match(['post', 'options'], 'upload', ['as' => $namePrefix . 'upload', 'uses' => $controller . 'uploadPic']);
 });

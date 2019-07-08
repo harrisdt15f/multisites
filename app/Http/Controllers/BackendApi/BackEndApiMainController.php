@@ -370,8 +370,13 @@ class BackEndApiMainController extends Controller
      * @param $platform_name
      * @return JsonResponse|string
      */
-    public function publicUploadImg($input, $folderName, $platform_id, $platform_name): string
+    public function publicUploadImg($input, $platform_id, $platform_name): string
     {
+        if ($input['folder_name'] === null) {
+            $folderName = date('YmdHis');
+        } else {
+            $folderName = $input['folder_name'];
+        }
         //接收文件信息
         $imageObj = new ImageArrange();
         $path = $imageObj->depositPath($folderName, $platform_id, $platform_name);
