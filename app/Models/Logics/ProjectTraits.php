@@ -25,8 +25,8 @@ trait ProjectTraits
         if (isset($condition['en_name'])) {
             $query->where('en_name', '=', $condition['en_name']);
         }
-        $currentPage = isset($condition['page_index']) ? (int) $condition['page_index'] : 1;
-        $pageSize = isset($condition['page_size']) ? (int) $condition['page_size'] : 15;
+        $currentPage = isset($condition['page_index']) ? (int)$condition['page_index'] : 1;
+        $pageSize = isset($condition['page_size']) ? (int)$condition['page_size'] : 15;
         $offset = ($currentPage - 1) * $pageSize;
 
         $total = $query->count();
@@ -36,15 +36,19 @@ trait ProjectTraits
             'data' => $menus,
             'total' => $total,
             'currentPage' => $currentPage,
-            'totalPage' => (int) ceil($total / $pageSize),
+            'totalPage' => (int)ceil($total / $pageSize),
         ];
     }
 
+
     /**
      * 获取投注页需要的注单数据
-     * @param  int   $userId
-     * @param        $lotterySign
-     * @param  int   $count
+     * @param $userId
+     * @param $lotterySign
+     * @param  int  $count
+     * @param  null  $beginTime
+     * @param  null  $endTime
+     * @return mixed
      */
     public static function getGamePageList($userId, $lotterySign, $count = 10, $beginTime = null, $endTime = null)
     {
@@ -71,16 +75,19 @@ trait ProjectTraits
             'bonus',
             'bet_prize_group as prize_group',
             'status',
-            'created_at as bet_time',
+            'created_at as bet_time'
         )->paginate($count);
         return $projectList;
     }
 
     /**
      * 追号列表
-     * @param  int   $userId
-     * @param        $lotterySign
-     * @param  int   $count
+     * @param $userId
+     * @param $lotterySign
+     * @param  int  $count
+     * @param  null  $beginTime
+     * @param  null  $endTime
+     * @return mixed
      */
     public static function getGameTracesList($userId, $lotterySign, $count = 10, $beginTime = null, $endTime = null)
     {
@@ -105,7 +112,7 @@ trait ProjectTraits
             'finished_bonus',
             'status',
             'bet_prize_group',
-            'created_at as bet_time',
+            'created_at as bet_time'
         )->paginate($count);
         return $traceList;
     }
@@ -264,7 +271,7 @@ trait ProjectTraits
                 $data = [
                     'basic_method_id' => $iBasicMethodId,
                     'open_number' => $openNumber,
-                    'winning_number' => $sWnNumber,
+                    'winning_number' => $this->formatWiningNumber($sWnNumber),
                     'level' => $iLevel,
                     'bonus' => $totalBonus,
                     'is_win' => 1,
@@ -349,7 +356,7 @@ trait ProjectTraits
                     $oProject->save();
                     if (!empty($this->errors()->first())) {
                         $res = false;
-                        Log::info('更新状态出错' . json_encode($this->errors()->first(), JSON_PRETTY_PRINT));
+                        Log::info('更新状态出错'.json_encode($this->errors()->first(), JSON_PRETTY_PRINT));
                     } else {
                         $res = true;
                         Log::info('Finished Send Money with bonus');
@@ -361,12 +368,21 @@ trait ProjectTraits
             }
         } catch (Exception $e) {
             $res = false;
-            Log::info('投注-异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine()); //Clog::userBet
+            Log::info('投注-异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine()); //Clog::userBet
         }
         if ($res === true) {
             DB::commit();
         } else {
             DB::rollBack();
         }
+    }
+
+    /**
+     * @param $sWnNumber
+     * @return string
+     */
+    public function formatWiningNumber($sWnNumber): string
+    {
+        return is_array($sWnNumber) ? implode('', $sWnNumber) : $sWnNumber;
     }
 }

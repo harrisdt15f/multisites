@@ -1,6 +1,7 @@
 <?php namespace App\Lib\Game\Method\Ssc\Z3;
 
 use App\Lib\Game\Method\Ssc\Base;
+use Illuminate\Support\Facades\Validator;
 
 //3星特殊
 class ZTS3 extends Base
@@ -52,19 +53,14 @@ class ZTS3 extends Base
 
     public function regexp($sCodes)
     {
-        $t = explode("&",$sCodes);
-
-        $bds = self::$bds;
-
-        $temp = array_filter(array_unique($t),function($v) use($bds) {
-            return isset($bds[$v]);
-        });
-
-        if(count($temp)==0){
+        $data['code'] = $sCodes;
+        $validator = Validator::make($data, [
+            'code' => ['regex:/^((?!\&)(?!.*\&$)(?!.*?\&\&)[0-2&]{1,5}?)$/'],//0&1&2 豹子|顺子|对子
+        ]);
+        if ($validator->fails()) {
             return false;
         }
-
-        return count($temp) == count($t);
+        return true;
     }
 
     public function count($sCodes)
