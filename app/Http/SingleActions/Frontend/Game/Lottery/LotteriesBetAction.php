@@ -114,14 +114,14 @@ class LotteriesBetAction
                 'total_price' => $singleCost,
                 'code' => $ball,
             ];
-        }
-        if ((int)$inputDatas['is_trace'] === 1) {
-            $i = 0;
-            foreach ($inputDatas['trace_issues'] as $traceMultiple) {
-                if ($i++ < 1) {
-                    continue;
+            if ((int)$inputDatas['is_trace'] === 1) {
+                $i = 0;
+                foreach ($inputDatas['trace_issues'] as $traceMultiple) {
+                    if ($i++ < 1) {
+                        continue;
+                    }
+                    $_totalCost += $traceMultiple * $singleCost;
                 }
-                $_totalCost += $traceMultiple * $singleCost;
             }
         }
         $fTotalCost = (float)$_totalCost;
