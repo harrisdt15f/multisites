@@ -75,8 +75,6 @@ class HelpCenterController extends BackEndApiMainController
     {
         $input      = $request->validated();
         $picPath    = $this->publicUploadImg($input,'help_center', $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
-        dd($picPath);
         return $picPath;
-
     }
 }
