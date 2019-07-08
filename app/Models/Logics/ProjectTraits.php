@@ -25,8 +25,8 @@ trait ProjectTraits
         if (isset($condition['en_name'])) {
             $query->where('en_name', '=', $condition['en_name']);
         }
-        $currentPage = isset($condition['page_index']) ? (int)$condition['page_index'] : 1;
-        $pageSize = isset($condition['page_size']) ? (int)$condition['page_size'] : 15;
+        $currentPage = isset($condition['page_index']) ? (int) $condition['page_index'] : 1;
+        $pageSize = isset($condition['page_size']) ? (int) $condition['page_size'] : 15;
         $offset = ($currentPage - 1) * $pageSize;
 
         $total = $query->count();
@@ -36,10 +36,9 @@ trait ProjectTraits
             'data' => $menus,
             'total' => $total,
             'currentPage' => $currentPage,
-            'totalPage' => (int)ceil($total / $pageSize),
+            'totalPage' => (int) ceil($total / $pageSize),
         ];
     }
-
 
     /**
      * 获取投注页需要的注单数据
@@ -61,6 +60,7 @@ trait ProjectTraits
         }
         $projectList = $projectEloq->select(
             'id',
+            'username',
             'lottery_sign as lottery_name',
             'method_group',
             'method_sign',
@@ -356,7 +356,7 @@ trait ProjectTraits
                     $oProject->save();
                     if (!empty($this->errors()->first())) {
                         $res = false;
-                        Log::info('更新状态出错'.json_encode($this->errors()->first(), JSON_PRETTY_PRINT));
+                        Log::info('更新状态出错' . json_encode($this->errors()->first(), JSON_PRETTY_PRINT));
                     } else {
                         $res = true;
                         Log::info('Finished Send Money with bonus');
@@ -368,7 +368,7 @@ trait ProjectTraits
             }
         } catch (Exception $e) {
             $res = false;
-            Log::info('投注-异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine()); //Clog::userBet
+            Log::info('投注-异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine()); //Clog::userBet
         }
         if ($res === true) {
             DB::commit();
