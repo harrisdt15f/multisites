@@ -1,15 +1,15 @@
 <?php
 /**
  * @Author: Fish
- * @Date:   2019/7/8 11:45
+ * @Date:   2019/7/8 17:51
  */
 
-namespace App\Http\Requests\Backend\Admin\Help;
+namespace App\Http\Requests\Backend\System;
 
 
 use App\Http\Requests\BaseFormRequest;
 
-class HelpCenterUploadPicRequest extends BaseFormRequest
+class SystemRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,7 +29,8 @@ class HelpCenterUploadPicRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'pic'   => 'required|image',
+            'pic'          => 'required|image',
+            'folder_name'  => 'nullable',
         ];
     }
 }

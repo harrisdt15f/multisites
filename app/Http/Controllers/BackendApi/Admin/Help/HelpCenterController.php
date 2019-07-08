@@ -65,16 +65,4 @@ class HelpCenterController extends BackEndApiMainController
         return $action->execute($this, $input);
 
     }
-
-    /**
-     * 图片上传
-     * @param  HelpCenterUploadPicRequest $request
-     * @return JsonResponse
-     */
-    public function uploadPic(HelpCenterUploadPicRequest $request): string
-    {
-        $input      = $request->validated();
-        $picPath    = $this->publicUploadImg($input,'help_center', $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
-        return $picPath;
-    }
 }
