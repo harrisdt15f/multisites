@@ -10,6 +10,7 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Admin\Help\HelpCenterAddRequest;
 use App\Http\Requests\Backend\Admin\Help\HelpCenterDeleteRequest;
 use App\Http\Requests\Backend\Admin\Help\HelpCenterEditRequest;
+use App\Http\Requests\Backend\Admin\Help\HelpCenterUploadPicRequest;
 use App\Http\SingleActions\Backend\Admin\Help\HelpCenterAddAction;
 use App\Http\SingleActions\Backend\Admin\Help\HelpCenterDeleteAction;
 use App\Http\SingleActions\Backend\Admin\Help\HelpCenterDetailAction;
@@ -63,5 +64,17 @@ class HelpCenterController extends BackEndApiMainController
         $input = $request->validated();
         return $action->execute($this, $input);
 
+    }
+
+    /**
+     * 图片上传
+     * @param  HelpCenterUploadPicRequest $request
+     * @return JsonResponse
+     */
+    public function uploadPic(HelpCenterUploadPicRequest $request): string
+    {
+        $input      = $request->validated();
+        $picPath    = $this->publicUploadImg($input,'help_center', $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
+        return $picPath;
     }
 }
