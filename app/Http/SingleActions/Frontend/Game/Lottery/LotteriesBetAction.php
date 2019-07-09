@@ -28,7 +28,6 @@ class LotteriesBetAction
         $lottery = LotteryList::getLottery($lotterySign);
         $betDetail = [];
         $_totalCost = 0;
-        $singleCost = 0;
         // 初次解析
         $_balls = [];
         foreach ($inputDatas['balls'] as $item) {
@@ -43,9 +42,16 @@ class LotteriesBetAction
                 return $contll->msgOut(false, [], '400', $validator->errors()->first());
             }
             $oMethod = $method['object']; // 玩法 - 对象
+            // 模式
+            $mode = (float)$item['mode'];
+            // 奖金组 - 游戏
+            $prizeGroup = (int)$item['prize_group'];
+            // 倍数
+            $times = (int)$item['times'];
             // 转换格式
             $project['codes'] = $oMethod->resolve($oMethod->parse64($item['codes']));
-
+            $string = 'method_id'.$methodId.'before'.$item['codes'].'after'.$project['codes'];
+            Log::info($string);
             if ($oMethod->supportExpand) {
                 $position = [];
                 if (isset($item['position'])) {
@@ -60,25 +66,9 @@ class LotteriesBetAction
                     $item['codes'] = $expand['codes'];
                     $item['count'] = $expand['count'];
                     $item['cost'] = $item['mode'] * $item['times'] * $item['price'];
-                    $_balls[] = $item;
                 }
-            } else {
-                $_balls[] = $item;
             }
-        }
-        $inputDatas['balls'] = $_balls;
-        foreach ($inputDatas['balls'] as $item) {
-            $methodId = $item['method_id'];
-            $method = $lottery->getMethod($methodId);
-            $oMethod = $method['object'];
-            // 模式
-            $mode = $item['mode'];
-            $modes = config('game.main.modes_array');
-            if (!in_array($mode, $modes)) {
-                return $contll->msgOut(false, [], '100301', '', 'mode', $mode);
-            }
-            // 奖金组 - 游戏
-            $prizeGroup = (int)$item['prize_group'];
+            //######################################
             if (!$lottery->isValidPrizeGroup($prizeGroup)) {
                 return $contll->msgOut(false, [], '100302', '', 'prizeGroup', $prizeGroup);
             }
@@ -87,43 +77,42 @@ class LotteriesBetAction
                 return $contll->msgOut(false, [], '100303', '', 'prizeGroup', $prizeGroup);
             }
             // 投注号码
-            $ball = $item['codes'];
-            if (!$oMethod->regexp($ball)) {
+            if (!$oMethod->regexp($item['codes'])) {
                 return $contll->msgOut(false, [], '100304', '', 'methodId', $methodId);
             }
-            // 倍数
-            $times = (int)$item['times'];
             if (!$lottery->isValidTimes($times)) {
                 return $contll->msgOut(false, [], '100305', '', 'times', $times);
             }
             // 单价花费
-            $singleCost = (float)$mode * $times * $item['price'] * $item['count'];
+            $singleCost = $mode * $times * $item['price'] * $item['count'];
+            $_totalCost += $singleCost;
             $float = (float)$item['cost'];
             if (pack('f', $singleCost) !== pack('f', $float)) { //因为前端有多种传送 所以不能用三等
                 return $contll->msgOut(false, [], '100306');
             }
-            $_totalCost += $singleCost;
             $betDetail[] = [
                 'method_id' => $methodId,
-                'method_group'=>$item['method_group'],
+                'method_group' => $item['method_group'],
                 'method_name' => $method['method_name'],
                 'mode' => $mode,
                 'prize_group' => $prizeGroup,
                 'times' => $times,
                 'price' => $item['price'],
                 'total_price' => $singleCost,
-                'code' => $ball,
+                'code' => $item['codes'],
             ];
-        }
-        if ((int)$inputDatas['is_trace'] === 1) {
-            $i = 0;
-            foreach ($inputDatas['trace_issues'] as $traceMultiple) {
-                if ($i++ < 1) {
-                    continue;
+            if ((int)$inputDatas['is_trace'] === 1) {
+                $i = 0;
+                foreach ($inputDatas['trace_issues'] as $traceMultiple) {
+                    if ($i++ < 1) {
+                        continue;
+                    }
+                    $_totalCost += $traceMultiple * $singleCost;
                 }
-                $_totalCost += $traceMultiple * $singleCost;
             }
+            //######################################
         }
+        $inputDatas['balls'] = $_balls;
         $fTotalCost = (float)$_totalCost;
         $fInputTotalCost = (float)$inputDatas['total_cost'];
         if (pack('f', $fTotalCost) !== pack('f', $fInputTotalCost)) {//因为前端有多种传送 所以不能用三等

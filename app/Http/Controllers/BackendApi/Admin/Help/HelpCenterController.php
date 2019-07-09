@@ -10,6 +10,7 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Admin\Help\HelpCenterAddRequest;
 use App\Http\Requests\Backend\Admin\Help\HelpCenterDeleteRequest;
 use App\Http\Requests\Backend\Admin\Help\HelpCenterEditRequest;
+use App\Http\Requests\Backend\Admin\Help\HelpCenterUploadPicRequest;
 use App\Http\SingleActions\Backend\Admin\Help\HelpCenterAddAction;
 use App\Http\SingleActions\Backend\Admin\Help\HelpCenterDeleteAction;
 use App\Http\SingleActions\Backend\Admin\Help\HelpCenterDetailAction;

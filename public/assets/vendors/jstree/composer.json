@@ -16,8 +16,12 @@
 		}
 	],
 	"require": {
-		"components/jquery": ">=1.9.1"
-	},
+		"components/jquery": "^1.9.1"
+	}
+  ,
+  "require-dev": {
+    "roave/security-advisories": "dev-master"
+  },
 	"suggest": {
 		"robloach/component-installer": "Allows installation of Components via Composer"
 	},
