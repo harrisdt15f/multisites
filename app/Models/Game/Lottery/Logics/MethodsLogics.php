@@ -24,7 +24,7 @@ trait MethodsLogics
      */
     public static function getMethodValidationData($methodId)
     {
-        $validation = self::where('method_id',$methodId)->with(['methodLayout:validation_id,rule_id,display_code'])->get();
+        $validationEloq = self::where('method_id',$methodId)->with(['methodLayout:validation_id,rule_id,display_code'])->get();
         // 获取所有的投注按钮
         $rule = LotteryMethodsNumberButtonRule::select('id','type','value')->get()->toArray();
         $rules = array_column($rule,null,'id');
@@ -32,15 +32,15 @@ trait MethodsLogics
         $name = LotteryMethodsLayoutDisplay::select('display_name','display_code')->get()->toArray();
         $names = array_column($name, null, 'display_code');
         // 循环取出对应值
-        foreach ($validation as $k => $v) {
-            if (!empty($v->button_id)) {
-                $v->button_id = $rules[$v->button_id]['value'];
+        foreach ($validationEloq as $item) {
+            if (!empty($item->button_id)) {
+                $item->button_id = $rules[$item->button_id]['value'];
             }
-            foreach ($v->methodLayout as $key => $val) {
-                $val->rule_id = $rules[$val->rule_id]['value'];
-                $val->display_code = $names[$val->display_code]['display_name'];
+            foreach ($item->methodLayout as $_item) {
+                $_item->rule_id = $rules[$_item->rule_id]['value'];
+                $_item->display_code = $names[$_item->display_code]['display_name'];
             }
         }
-        return $validation;
+        return $validationEloq;
     }
 }
