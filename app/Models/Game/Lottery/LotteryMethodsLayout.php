@@ -26,7 +26,7 @@ class LotteryMethodsLayout extends BaseModel
         return $this->hasOne(LotteryMethodsNumberButtonRule::class, 'id', 'rule_id');
     }
 
-    public function layoutDisplay()
+    public function layoutDisplay(): HasOne
     {
         return $this->hasOne(LotteryMethodsLayoutDisplay::class, 'display_code', 'display_code');
     }
