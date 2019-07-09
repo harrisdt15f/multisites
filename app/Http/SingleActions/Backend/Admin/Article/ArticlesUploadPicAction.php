@@ -42,6 +42,8 @@ class ArticlesUploadPicAction
         if ($pic['success'] === false) {
             return $contll->msgOut(false, [], '400', $pic['msg']);
         }
+        //设置图片过期时间6小时
+        $pic['expire_time'] = Carbon::now()->addHours(6)->timestamp;
         $hourToStore = 24 * 2;
         $expiresAt = Carbon::now()->addHours($hourToStore);
         if (Cache::has('CachePic')) {

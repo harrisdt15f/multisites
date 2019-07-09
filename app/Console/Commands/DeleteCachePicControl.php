@@ -34,7 +34,7 @@ class DeleteCachePicControl extends Command
         if (Cache::has('CachePic')) {
             $cachePic = Cache::get('CachePic');
             foreach ($cachePic as $key => $pic) {
-                if ($pic['expire_time'] < time()) {
+                if (!isset($pic['expire_time']) || $pic['expire_time'] < time()) {
                     $path = 'public/' . $pic['path'];
                     if (file_exists($path)) {
                         if (!is_writable(dirname($path))) {
@@ -51,6 +51,7 @@ class DeleteCachePicControl extends Command
                             }
                         }
                     } else {
+                        unset($cachePic[$key]);
                         Log::info($path . '图片文件不存在');
                     }
                 }
