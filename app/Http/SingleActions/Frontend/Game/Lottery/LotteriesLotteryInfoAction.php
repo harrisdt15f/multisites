@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-25 10:26:38
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-25 10:30:42
- */
 namespace App\Http\SingleActions\Frontend\Game\Lottery;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
@@ -35,54 +29,42 @@ class LotteriesLotteryInfoAction
                 // 获取所有玩法
                 $methods = LotteryMethod::getMethodConfig($lottery->en_name);
                 $methodData = [];
-
                 $groupName = config('game.method.group_name');
                 $rowName = config('game.method.row_name');
-
-                $rowData = [];
-                foreach ($methods as $index => $method) {
-                    $rowData[$method->method_group][$method->method_row][] = [
-                        'method_name' => $method->method_name,
-                        'method_id' => $method->method_id,
-                        'method_group' => $method->method_group,
-                    ];
-                }
                 $groupData = [];
                 $hasRow = [];
-                foreach ($methods as $index => $method) {
+                foreach ($methods as $index => $methodItem) {
                     // 行
-                    if (!isset($groupData[$method->method_group])) {
-                        $groupData[$method->method_group] = [];
+                    if (!isset($groupData[$methodItem->method_group])) {
+                        $groupData[$methodItem->method_group] = [];
                     }
-
-                    if (!isset($hasRow[$method->method_group]) || !in_array($method->method_row,
-                        $hasRow[$method->method_group])) {
-                        $groupData[$method->method_group][] = [
-                            'name' => $rowName[$method->method_row],
-                            'sign' => $method->method_row,
-                            'methods' => $rowData[$method->method_group][$method->method_row],
+                    if (!isset($hasRow[$methodItem->method_group]) || !in_array($methodItem->method_row,
+                            $hasRow[$methodItem->method_group])) {
+                        $groupData[$methodItem->method_group][] = [
+                            'name' => $rowName[$methodItem->method_row],
+                            'sign' => $methodItem->method_row,
+                            'methods' => $methodItem->getMethodRuleDatas(),// 获取详细玩法规则
                         ];
-                        $hasRow[$method->method_group][] = $method->method_row;
+                        $hasRow[$methodItem->method_group][] = $methodItem->method_row;
                     }
                 }
-
                 // 组
                 $defaultGroup = '';
                 $defaultMethod = '';
                 $hasGroup = [];
-                foreach ($methods as $index => $method) {
+                foreach ($methods as $index => $methodItem) {
                     if ($index == 0) {
-                        $defaultGroup = $method->method_group;
-                        $defaultMethod = $method->method_id;
+                        $defaultGroup = $methodItem->method_group;
+                        $defaultMethod = $methodItem->method_id;
                     }
                     // 组
-                    if (!in_array($method->method_group, $hasGroup)) {
+                    if (!in_array($methodItem->method_group, $hasGroup)) {
                         $methodData[] = [
-                            'name' => $groupName[$lottery->series_id][$method->method_group],
-                            'sign' => $method->method_group,
-                            'rows' => $groupData[$method->method_group],
+                            'name' => $groupName[$lottery->series_id][$methodItem->method_group],
+                            'sign' => $methodItem->method_group,
+                            'rows' => $groupData[$methodItem->method_group],
                         ];
-                        $hasGroup[] = $method->method_group;
+                        $hasGroup[] = $methodItem->method_group;
                     }
                 }
                 $cacheData[$lottery->en_name] = [
