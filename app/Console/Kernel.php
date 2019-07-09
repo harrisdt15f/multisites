@@ -41,7 +41,7 @@ class Kernel extends ConsoleKernel
         }
         $schedule->command('GenerateIssue')->daily()->at($generateIssueTime);
         //中兴一分彩自动开奖
-//        $schedule->command('ZxyfcInputCode')->everyMinute();
+        $schedule->command('ZxyfcInputCode')->everyMinute();
     }
 
     /**
