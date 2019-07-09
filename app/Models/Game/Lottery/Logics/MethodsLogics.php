@@ -2,7 +2,6 @@
 
 namespace App\Models\Game\Lottery\Logics;
 
-use App\Models\Game\Lottery\LotteryMethodsNumberButtonRule;
 
 /**
  * Created by PhpStorm.
