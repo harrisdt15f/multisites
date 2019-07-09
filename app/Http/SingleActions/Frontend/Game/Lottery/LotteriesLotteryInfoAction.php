@@ -24,6 +24,8 @@ class LotteriesLotteryInfoAction
         if (Cache::has($redisKey)) {
             $cacheData = Cache::get($redisKey);
         } else {
+            $defaultGroup = '';
+            $defaultMethod = '';
             foreach ($lotteries as $lottery) {
                 $lottery->valid_modes = $lottery->getFormatMode();
                 // 获取所有玩法
@@ -47,17 +49,13 @@ class LotteriesLotteryInfoAction
                         ];
                         $hasRow[$methodItem->method_group][] = $methodItem->method_row;
                     }
-                }
-                // 组
-                $defaultGroup = '';
-                $defaultMethod = '';
-                $hasGroup = [];
-                foreach ($methods as $index => $methodItem) {
+                    //###################
+                    // 组
+                    $hasGroup = [];
                     if ($index == 0) {
                         $defaultGroup = $methodItem->method_group;
                         $defaultMethod = $methodItem->method_id;
                     }
-                    // 组
                     if (!in_array($methodItem->method_group, $hasGroup)) {
                         $methodData[] = [
                             'name' => $groupName[$lottery->series_id][$methodItem->method_group],
@@ -66,6 +64,7 @@ class LotteriesLotteryInfoAction
                         ];
                         $hasGroup[] = $methodItem->method_group;
                     }
+                    //##################
                 }
                 $cacheData[$lottery->en_name] = [
                     'lottery' => $lottery,
