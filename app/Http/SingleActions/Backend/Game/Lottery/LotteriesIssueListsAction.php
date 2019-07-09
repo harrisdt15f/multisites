@@ -62,6 +62,9 @@ class LotteriesIssueListsAction
                 //选定彩种并展示已过期的期数
                 if (isset($contll->inputs['lottery_id'], $contll->inputs['previous_number'])) {
                     $lotteryEloq = LotteryList::where('en_name', $contll->inputs['lottery_id'])->first();
+                    if ($lotteryEloq === null) {
+                        return $contll->msgOut(false, [], '101700');
+                    }
                     $issueSeconds = $lotteryEloq->issueRule->issue_seconds;
                     $timeToSubstract = $issueSeconds * $contll->inputs['previous_number'];
                 }
