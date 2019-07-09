@@ -11,6 +11,7 @@ namespace App\Http\SingleActions\Frontend\Game\Lottery;
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Models\Game\Lottery\LotteryList;
 use App\Models\Game\Lottery\LotteryMethod;
+use App\Models\Game\Lottery\LotteryMethodsValidation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -41,11 +42,20 @@ class LotteriesLotteryInfoAction
 
                 $rowData = [];
                 foreach ($methods as $index => $method) {
-                    $rowData[$method->method_group][$method->method_row][] = [
-                        'method_name' => $method->method_name,
-                        'method_id' => $method->method_id,
-                        'method_group' => $method->method_group,
-                    ];
+                    // 获取详细玩法规则
+                    $validation = LotteryMethodsValidation::getMethodValidationData($method->method_id);
+                    foreach ($validation as $key => $item) {
+                        $rowData[$method->method_group][$method->method_row][] = [
+                            'method_name' => $method->method_name,
+                            'method_id' => $method->method_id,
+                            'method_group' => $method->method_group,
+                            'method_describe' => $item->describe,
+                            'method_example' => $item->example,
+                            'method_helper' => $item->helper,
+                            'method_button' => $item->button_id,
+                            'method_layout' => $item->methodLayout
+                        ];
+                    }
                 }
                 $groupData = [];
                 $hasRow = [];
