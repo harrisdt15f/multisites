@@ -8,15 +8,15 @@ namespace App\Models\Game\Lottery;
 
 
 use App\Models\BaseModel;
-use App\Models\Game\Lottery\Logics\MethodsLogics;
+use App\Models\Game\Lottery\Logics\LotteryMethodsValidationLogics;
 
 class LotteryMethodsValidation extends BaseModel
 {
-    use MethodsLogics;
+    use LotteryMethodsValidationLogics;
 
     protected $guarded = ['id'];
 
-    public function methodLayout()
+    public function methodsLayout()
     {
         return $this->hasMany(LotteryMethodsLayout::class,'validation_id','id');
     }
