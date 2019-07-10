@@ -31,11 +31,11 @@ class LotteriesInputCodeRequest extends BaseFormRequest
      */
     public function rules(): array
     {
-        $lottery_id = $this->get('lottery_id');
-        $lenght = LotteryList::where('en_name', $lottery_id)->value('code_length');
+        // $lottery_id = $this->get('lottery_id');
+        // $lenght = LotteryList::where('en_name', $lottery_id)->value('code_length');
         $rules = [
             'lottery_id' => 'required|string|exists:lottery_lists,en_name',
-            'code' => 'required|string|size:' . $lenght,
+            'code' => 'required|string', //|size:' . $lenght,
             'issue' => 'required|integer',
         ];
         return $rules;
