@@ -28,7 +28,8 @@ class HompageNoticeAction
 
     /**
      * 首页公告列表
-     * @param  FrontendApiMainController  $contll
+     * @param FrontendApiMainController $contll
+     * @param $input
      * @return JsonResponse
      */
     public function execute(FrontendApiMainController $contll,$input): JsonResponse
@@ -45,10 +46,13 @@ class HompageNoticeAction
                 return $contll->msgOut(false, [], '100400');
             }
             $eloqM = new FrontendMessageNotice();
-            $contll->inputs['extra_where']['method'] = 'where';
-            $contll->inputs['extra_where']['key'] = 'type';
-            $contll->inputs['extra_where']['value'] = $input;
-            $data = $contll->generateSearchQuery($eloqM, $searchAbleFields = null, $fixedJoin = 0, $withTable = null, $withSearchAbleFields = null, $orderFields = 'sort', $orderFlow = 'asc');
+            $searchAbleFields = [
+                'type',
+                'status'
+            ];
+            $contll->inputs['status'] = 1;
+            $contll->inputs['type'] = $input;
+            $data = $contll->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin = 0, $withTable = null, $withSearchAbleFields = null, $orderFields = 'sort', $orderFlow = 'asc');
             Cache::forever('homepageNotice', $data);
         }
         return $contll->msgOut(true, $data);

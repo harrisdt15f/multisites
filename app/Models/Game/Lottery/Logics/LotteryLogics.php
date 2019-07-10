@@ -168,7 +168,7 @@ trait LotteryLogics
         if (self::_hasCache($key)) {
             return self::_getCacheData($key);
         } else {
-            return self::getAllLotteries();
+            $lotteries = self::getAllLotteries();
             self::_saveCacheData($key, $lotteries);
             return $lotteries;
         }

@@ -21,8 +21,8 @@ class SystemController extends BackEndApiMainController
      */
     public function uploadPic(SystemRequest $request): string
     {
-        $input      = $request->validated();
-        $picPath    = $this->publicUploadImg($input, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
-        return $picPath;
+        $input = $request->validated();
+        $picPath['path'] = $this->publicUploadImg($input, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
+        return $this->msgOut(true, $picPath);
     }
 }
