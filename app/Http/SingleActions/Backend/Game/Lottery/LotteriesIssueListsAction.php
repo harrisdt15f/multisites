@@ -58,7 +58,7 @@ class LotteriesIssueListsAction
             if (isset($contll->inputs['begin_time'], $contll->inputs['end_time'])) {
                 $timeCondtions = '[["end_time",">=",' . $contll->inputs['begin_time'] . '],["end_time","<=",' . $contll->inputs['end_time'] . ']]';
             } else {
-                $timeToSubstract = 1200; // 秒
+                $timeToSubstract = 0; // 秒
                 //选定彩种并展示已过期的期数
                 if (isset($contll->inputs['lottery_id'], $contll->inputs['previous_number'])) {
                     $lotteryEloq = LotteryList::where('en_name', $contll->inputs['lottery_id'])->first();
