@@ -311,7 +311,7 @@ trait ProjectTraits
             $data = [
                 'basic_method_id' => $iBasicMethodId,
                 'open_number' => $openNumber,
-                'winning_number' => $sWnNumber,
+                'winning_number' => $this->formatWiningNumber($sWnNumber),
                 'time_count' => now()->timestamp,
                 'status' => self::STATUS_LOST,
             ];
