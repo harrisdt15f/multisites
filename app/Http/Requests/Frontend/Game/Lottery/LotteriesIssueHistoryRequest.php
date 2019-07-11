@@ -31,7 +31,7 @@ class LotteriesIssueHistoryRequest extends BaseFormRequest
     {
         return [
             'lottery_sign' => 'required|string|min:4|max:10|exists:lottery_lists,en_name',
-            'count' => 'integer',
+            'count' => 'required|integer',
         ];
     }
 
