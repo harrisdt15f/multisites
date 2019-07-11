@@ -18,7 +18,7 @@ class LotteriesCalculateEncodeAgainAction
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
         $lotteryIssueEloq = LotteryIssue::find($inputDatas['id']);
-        dispatch(new IssueEncoder($lotteryIssueEloq->toArray()))->onQueue('issues');
+        dispatch(new IssueEncoder($lotteryIssueEloq->toArray()))->onQueue('open_numbers');
         return $contll->msgOut(true);
     }
 }

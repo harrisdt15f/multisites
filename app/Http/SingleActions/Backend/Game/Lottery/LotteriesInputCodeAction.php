@@ -44,7 +44,7 @@ class LotteriesInputCodeAction
             $issueEloq->encode_name = $contll->partnerAdmin->name;
             $issueEloq->save();
             if (!empty($issueEloq->toArray())) {
-                dispatch(new IssueEncoder($issueEloq->toArray()))->onQueue('issues');
+                dispatch(new IssueEncoder($issueEloq->toArray()))->onQueue('open_numbers');
             }
             return $contll->msgOut(true);
         } catch (Exception $e) {
