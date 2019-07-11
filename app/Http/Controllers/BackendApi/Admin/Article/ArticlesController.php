@@ -126,7 +126,7 @@ class ArticlesController extends BackEndApiMainController
     public function insertAuditFlow($apply_note): int
     {
         $auditFlow = new AuditFlow();
-        return $auditFlow->insertAuditFlow($apply_note);
+        return $auditFlow->insertAuditFlow($this->partnerAdmin->id, $this->partnerAdmin->name, $apply_note);
     }
 
     /**

@@ -18,12 +18,12 @@ class AuditFlow
      * @param   string $apply_note [备注]
      * @return  int
      */
-    public function insertAuditFlow($apply_note): int
+    public function insertAuditFlow($id, $name, $apply_note): int
     {
         $flowDatas = [
-            'admin_id' => $contll->partnerAdmin->id,
+            'admin_id' => $id,
             'apply_note' => $apply_note,
-            'admin_name' => $contll->partnerAdmin->name,
+            'admin_name' => $name,
         ];
         $flowConfigure = new BackendAdminAuditFlowList;
         $flowConfigure->fill($flowDatas);

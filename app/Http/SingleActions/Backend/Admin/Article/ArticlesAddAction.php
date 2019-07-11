@@ -42,7 +42,7 @@ class ArticlesAddAction
             //插入 BackendAdminMessageArticle 文章表
             $addDatas = $inputDatas;
             $addDatas['audit_flow_id'] = $auditFlowId;
-            unset($addDatas['pic_name']);
+            unset($addDatas['pic_name'], $addDatas['apply_note']);
             $maxSort = $this->model::select('sort')->max('sort');
             $sort = ++$maxSort;
             $addDatas['sort'] = $sort;
@@ -64,7 +64,7 @@ class ArticlesAddAction
             DB::commit();
             return $contll->msgOut(true);
         } catch (Exception $e) {
-            DB::bollback();
+            DB::rollback();
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
             return $contll->msgOut(false, [], $sqlState, $msg);
