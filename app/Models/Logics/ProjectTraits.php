@@ -380,7 +380,7 @@ trait ProjectTraits
      * @param $sWnNumber
      * @return string|null
      */
-    public function formatWiningNumber($sWnNumber = null)
+    public function formatWiningNumber($sWnNumber = null): ?string
     {
         return is_array($sWnNumber) ? implode('', $sWnNumber) : $sWnNumber;
     }
