@@ -30,7 +30,7 @@ trait MethodsLogics
             $methodHelper = $methodValidationRule->helper;
         }
         $methoudLayoutEloq = $this->methodLayout()->get();
-        $result = [
+        $result[] = [
             'method_name' => $this->method_name,
             'method_id' => $this->method_id,
             'method_group' => $this->method_group,
