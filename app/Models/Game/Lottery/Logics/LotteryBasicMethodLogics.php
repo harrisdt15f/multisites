@@ -329,9 +329,39 @@ trait LotteryBasicMethodLogics
                  */
                 $result = (int)preg_match("/$sWnNumber/", $sBetNumber);
                 break;
+            case 'prizeTwoStarBigSmallTsbs':
+                $aBetNumber = str_split($sBetNumber);
+                $intersect = array_intersect([0,1], $aBetNumber);
+                $aBetNumber = array_unique($intersect);
+                $iWnDigital = $this->getTsbslWinNumber($oSeriesWay->area_position, $sWnNumber);
+                $result = (int) (in_array($iWnDigital, $aBetNumber));
+                break;
             default:
                 $result = 0;
         }
         return $result;
+    }
+
+    /**
+     * 返回二星大小的中奖号码
+     * @param $areaPosition
+     * @param $sWnNumber
+     * @return int
+     */
+    private function getTsbslWinNumber($areaPosition, $sWnNumber): ?int
+    {
+        $aWnNumber = str_split($sWnNumber);
+        $aPosition = str_split($areaPosition);
+        $aWnDigital = [];
+        foreach ($aPosition as $iPosition) {
+            $aWnDigital[] = $aWnNumber[$iPosition];
+        }
+        if($aWnDigital[0] > $aWnDigital[1]){
+            return 0; //龙
+        }elseif($aWnDigital[0] < $aWnDigital[1]){
+            return 1; //虎
+        }elseif($aWnDigital[0] === $aWnDigital[1]){
+            return 2; //和
+        }
     }
 }
