@@ -25,8 +25,6 @@ use Illuminate\Http\JsonResponse;
 
 class ArticlesController extends BackEndApiMainController
 {
-    public $folderName = 'articles';
-
     /**
      * 文章列表
      * @param   ArticlesDetailAction $action

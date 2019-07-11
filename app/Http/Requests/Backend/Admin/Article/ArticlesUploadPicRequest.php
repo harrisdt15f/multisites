@@ -30,6 +30,7 @@ class ArticlesUploadPicRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
+            'folder_name' => 'required|alpha_dash',
             'pic' => 'required|image',
         ];
     }

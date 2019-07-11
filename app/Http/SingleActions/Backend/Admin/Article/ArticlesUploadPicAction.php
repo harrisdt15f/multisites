@@ -36,7 +36,8 @@ class ArticlesUploadPicAction
     {
         $imageObj = new ImageArrange();
         $file = $inputDatas['pic'];
-        $depositPath = $imageObj->depositPath($contll->folderName, $contll->currentPlatformEloq->platform_id, $contll->currentPlatformEloq->platform_name);
+        $folderName = $inputDatas['folder_name'];
+        $depositPath = $imageObj->depositPath($folderName, $contll->currentPlatformEloq->platform_id, $contll->currentPlatformEloq->platform_name);
         //进行上传
         $pic = $imageObj->uploadImg($file, $depositPath);
         if ($pic['success'] === false) {
@@ -48,10 +49,8 @@ class ArticlesUploadPicAction
         $expiresAt = Carbon::now()->addHours($hourToStore);
         if (Cache::has('CachePic')) {
             $cachePic = Cache::get('CachePic');
-            $cachePic[$pic['name']] = $pic;
-        } else {
-            $cachePic[$pic['name']] = $pic;
         }
+        $cachePic[$pic['name']] = $pic;
         Cache::put('CachePic', $cachePic, $expiresAt);
         return $contll->msgOut(true, $pic);
     }
