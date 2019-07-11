@@ -6,7 +6,6 @@
 
 namespace App\Http\Controllers\BackendApi\System;
 
-
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Admin\Help\HelpCenterUploadPicRequest;
 use App\Http\Requests\Backend\System\SystemRequest;
@@ -19,7 +18,7 @@ class SystemController extends BackEndApiMainController
      * @param  SystemRequest $request
      * @return JsonResponse
      */
-    public function uploadPic(SystemRequest $request): string
+    public function uploadPic(SystemRequest $request): JsonResponse
     {
         $input = $request->validated();
         $picPath['path'] = $this->publicUploadImg($input, $this->currentPlatformEloq->platform_id, $this->currentPlatformEloq->platform_name);
