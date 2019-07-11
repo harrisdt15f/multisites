@@ -280,10 +280,10 @@ trait ProjectTraits
                 ];
                 try {
                     DB::beginTransaction();
-                    $lockProject = $this->lockForUpdate()->find($this->id);
-                    $lockProject->update($data);
+//                    $lockProject = $this->lockForUpdate()->find($this->id);
+                    $this->update($data);
                     DB::commit();
-                    $lockProject->sendMoney();
+                    $this->sendMoney();
                 } catch (Exception $e) {
                     Log::channel('issues')->info($e->getMessage());
                     DB::rollBack();
@@ -306,8 +306,8 @@ trait ProjectTraits
     {
         try {
             DB::beginTransaction();
-            $lockProject = $this->lockForUpdate()->find($this->id);
-            $this->status = $lockProject->status = self::STATUS_LOST;
+//            $lockProject = $this->lockForUpdate()->find($this->id);
+            $this->status = self::STATUS_LOST;
             $data = [
                 'basic_method_id' => $iBasicMethodId,
                 'open_number' => $openNumber,
@@ -315,12 +315,11 @@ trait ProjectTraits
                 'time_count' => now()->timestamp,
                 'status' => self::STATUS_LOST,
             ];
-            $lockProject->update($data);
-            if ($lockProject->save()) {
+            if ($this->update($data)) {
                 DB::commit();
-                $lockProject->sendMoney();
+                $this->sendMoney();
             } else {
-                $strError = json_encode($lockProject->errors(), JSON_PRETTY_PRINT);
+                $strError = json_encode($this->errors()->first(), JSON_PRETTY_PRINT);
                 Log::channel('issues')->info($strError);
             }
         } catch (Exception $e) {
