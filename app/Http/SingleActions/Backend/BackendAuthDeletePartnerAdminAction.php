@@ -1,16 +1,12 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-26 18:32:53
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-26 19:35:00
- */
 namespace App\Http\SingleActions\Backend;
 
 use App\Http\Controllers\backendApi\BackEndApiMainController;
 use App\Models\Admin\BackendAdminUser;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
+use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class BackendAuthDeletePartnerAdminAction
@@ -42,7 +38,7 @@ class BackendAuthDeletePartnerAdminAction
                 try {
                     JWTAuth::setToken($targetUserEloq->remember_token);
                     JWTAuth::invalidate();
-                } catch (Exception $e) {
+                } catch (JWTException $e) {
                     Log::info($e->getMessage());
                 }
             }

@@ -40,7 +40,7 @@ trait IssueEncodeLogics
                 } else {
                     if ($oIssue->projects()->exists()) {
                         if ($oIssue->official_code !== null) {
-                            $oProjects = $oIssue->projects;
+                            $oProjects = $oIssue->projects->fresh();
                             $aWnNumberOfMethods = self::getWnNumberOfSeriesMethods($oLottery,
                                 $oIssue->official_code); //wn_number
                             if ($oLottery->basicways()->exists()) {

@@ -48,7 +48,7 @@ class ZxyfcInputCodeControl extends Command
             $lotteryIssue->encode_time = time();
             $lotteryIssue->official_code = $code;
             if ($lotteryIssue->save()) {
-                dispatch(new IssueEncoder($lotteryIssue->toArray()))->onQueue('issues');
+                dispatch(new IssueEncoder($lotteryIssue->toArray()))->onQueue('open_numbers');
             }
         }
 
