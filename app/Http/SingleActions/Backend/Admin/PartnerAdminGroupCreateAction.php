@@ -16,6 +16,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class PartnerAdminGroupCreateAction
 {
@@ -37,6 +38,7 @@ class PartnerAdminGroupCreateAction
      */
     public function execute(BackEndApiMainController $contll, $inputDatas): JsonResponse
     {
+        DB::beginTransaction();
         try {
             $data['platform_id'] = $contll->currentPlatformEloq->platform_id;
             $data['group_name'] = $inputDatas['group_name'];
@@ -59,7 +61,9 @@ class PartnerAdminGroupCreateAction
                 $fundOperationGroup->fill($fundOperationData);
                 $fundOperationGroup->save();
             }
+            DB::commit();
         } catch (Exception $e) {
+            DB::rollback();
             $errorObj = $e->getPrevious()->getPrevious();
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
             return $contll->msgOut(false, [], $sqlState, $msg);
