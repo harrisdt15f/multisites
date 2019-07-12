@@ -15,6 +15,7 @@ use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryInfoAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryListAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesProjectHistoryAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesTracesHistoryAction;
+use App\Http\SingleActions\Mobile\Game\Lottery\LotterieslotteryCenterAction;
 use Illuminate\Http\JsonResponse;
 
 class LotteriesController extends FrontendApiMainController
@@ -107,5 +108,15 @@ class LotteriesController extends FrontendApiMainController
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
+    }
+
+    /**
+     * 开奖中心
+     * @param   LotterieslotteryCenterAction $action
+     * @return  JsonResponse
+     */
+    public function lotteryCenter(LotterieslotteryCenterAction $action): JsonResponse
+    {
+        return $action->execute($this);
     }
 }

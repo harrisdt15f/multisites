@@ -5,6 +5,7 @@ namespace App\Models\Game\Lottery;
 use App\Models\BaseModel;
 use App\Models\Game\Lottery\Logics\LotteryIssueGenerate;
 use App\Models\Game\Lottery\Logics\LotteryLogics;
+use App\Models\Game\Lottery\LotteryIssue;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -51,5 +52,10 @@ class LotteryList extends BaseModel
     public function basicways(): HasMany
     {
         return $this->hasMany(LotteryBasicWay::class, 'lottery_type', 'lottery_type');
+    }
+
+    public function oneIssues(): hasOne
+    {
+        return $this->hasOne(LotteryIssue::class, 'lottery_id', 'en_name');
     }
 }
