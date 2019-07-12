@@ -47,11 +47,11 @@ class ArticlesUploadPicAction
         $pic['expire_time'] = Carbon::now()->addHours(6)->timestamp;
         $hourToStore = 24 * 2;
         $expiresAt = Carbon::now()->addHours($hourToStore);
-        if (Cache::has('CachePic')) {
-            $cachePic = Cache::get('CachePic');
+        if (Cache::has('cache_pic')) {
+            $cachePic = Cache::get('cache_pic');
         }
         $cachePic[$pic['name']] = $pic;
-        Cache::put('CachePic', $cachePic, $expiresAt);
+        Cache::put('cache_pic', $cachePic, $expiresAt);
         return $contll->msgOut(true, $pic);
     }
 }

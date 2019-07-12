@@ -30,8 +30,8 @@ class CacheRelated
      */
     public function deleteCachePic(array $picNames): void
     {
-        if (Cache::has('CachePic')) {
-            $cachePic = Cache::get('CachePic');
+        if (Cache::has('cache_pic')) {
+            $cachePic = Cache::get('cache_pic');
             foreach ($picNames as $picName) {
                 if (array_key_exists($picName, $cachePic)) {
                     unset($cachePic[$picName]);
@@ -39,7 +39,7 @@ class CacheRelated
             }
             $hourToStore = 24 * 2;
             $expiresAt = Carbon::now()->addHours($hourToStore);
-            Cache::put('CachePic', $cachePic, $expiresAt);
+            Cache::put('cache_pic', $cachePic, $expiresAt);
         }
     }
 }
