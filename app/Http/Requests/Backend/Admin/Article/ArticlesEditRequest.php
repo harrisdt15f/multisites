@@ -38,8 +38,8 @@ class ArticlesEditRequest extends BaseFormRequest
             'search_text' => 'required|string',
             'is_for_agent' => 'required|in:0,1',
             'apply_note' => 'required|string',
-            'pic_name' => 'required|array',
-            'pic_path' => 'required|array',
+            'pic_name' => 'array',
+            'pic_path' => 'array',
         ];
     }
 
