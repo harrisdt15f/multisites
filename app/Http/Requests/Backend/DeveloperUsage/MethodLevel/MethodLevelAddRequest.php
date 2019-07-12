@@ -31,6 +31,7 @@ class MethodLevelAddRequest extends BaseFormRequest
     {
         return [
             'method_id' => 'required|string|exists:lottery_methods,method_id',
+            'series_id' => 'required|exists:lottery_series,series_name',
             'level' => 'required|numeric|between:1,10',
             'position' => 'required|string',
             'count' => 'required|numeric',

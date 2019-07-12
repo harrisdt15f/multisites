@@ -36,6 +36,7 @@ class MethodLevelAddAction
         //检查玩法等级
         $isExistMethodLevel = $this->model::where([
             ['method_id', $inputDatas['method_id']],
+            ['series_id', $inputDatas['series_id']],
             ['level', $inputDatas['level']],
         ])->exists();
         if ($isExistMethodLevel === true) {
