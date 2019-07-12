@@ -8,8 +8,10 @@
 
 namespace App\Models\Game\Lottery\Logics;
 
+use App\Models\Game\Lottery\LotteryBasicMethod;
 use App\Models\Game\Lottery\LotterySeriesMethod;
 use App\Models\Game\Lottery\LotterySeriesWay;
+use Illuminate\Support\Facades\Log;
 
 trait LotteryBasicWayLogics
 {
@@ -26,14 +28,37 @@ trait LotteryBasicWayLogics
         foreach ($oSeriesWay->WinningNumber as $iSeriesMethodId => $sWnNumber) {
             $oSeriesMethod = LotterySeriesMethod::find($iSeriesMethodId);
             $oBasicMethod = $oSeriesMethod->basicMethod;
-            $oBasicMethod->sPosition = $sPosition;
-            $prizeLevel = $oBasicMethod->prizeLevel;
-            $sBetNumber = $this->formatBetNumber($sBetNumber, $oSeriesMethod, $oSeriesWay, $sWnNumber);
-            $iCount = $oBasicMethod->getPrizeCount($oSeriesWay, $this, $sWnNumber, $sBetNumber);
-            $iLevel = $prizeLevel->level;
+            $this->sPosition = $sPosition;
+//            $oBasicMethod->sPosition = $sPosition;
+            $sBetNumberFinal = $this->formatBetNumber($sBetNumber, $oSeriesMethod, $oSeriesWay, $sWnNumber);
+            $iCount = $oBasicMethod->getPrizeCount($oSeriesWay, $this, $sWnNumber, $sBetNumberFinal);
+            $iLevel = $this->getPrizeLevel($oSeriesWay, $oBasicMethod);
             $aPrized[$oSeriesMethod->basic_method_id][$iLevel] = $iCount;
         }
         return $aPrized;
+    }
+
+    /**
+     * @param  LotterySeriesWay  $oSeriesWay
+     * @param  LotteryBasicMethod  $oBasicMethod
+     * @return mixed
+     */
+    public function getPrizeLevel(LotterySeriesWay $oSeriesWay, LotteryBasicMethod $oBasicMethod)
+    {
+        $arrWhere = [
+            ['method_id', '=', $oSeriesWay->lottery_method_id],
+            ['series_id', '=', $oSeriesWay->series_code],
+        ];
+        if ($this->sPosition !== null) {
+            $arrWhere[] = ['position', '=', (string)$this->sPosition];
+        }
+        $prizeLevelQuery = $oBasicMethod->prizeLevel()->where($arrWhere);
+        $prizeLevel = $prizeLevelQuery->first();
+        if ($prizeLevel === null) {
+            $errorString = 'PrizeLevel Query Null'.json_encode($oSeriesWay).'whereDatas are '.json_encode($arrWhere).'Query is'.$prizeLevelQuery->toSql();
+            Log::channel('issues')->error($errorString);
+        }
+        return $prizeLevel->level;
     }
 
     public function formatBetNumber($sBetNumber, $oSeriesMethod, $oSeriesWay, $sWnNumber)
@@ -45,6 +70,7 @@ trait LotteryBasicWayLogics
             case 'LottoMultiOne':
                 $aBetNumbers = explode($sSplitChar, $sBetNumber);
                 $iOffset = $oSeriesMethod->offset >= 0 ? $oSeriesMethod->offset : $oSeriesMethod->offset + $oSeriesWay->digital_count;
+                $this->sPosition = $iOffset;
                 $sBetNumberFinal = $aBetNumbers[$iOffset];
                 break;
             case 'MultiSequencing':

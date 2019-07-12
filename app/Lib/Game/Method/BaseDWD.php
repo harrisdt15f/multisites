@@ -6,7 +6,7 @@ trait BaseDWD
 {
     public $positionsTpl = array('w' => '万', 'q' => '千', 'b' => '百', 's' => '十', 'g' => '个');
 
-    public $supportExpand = true;
+    public $supportExpand = false;
 
     public function bingoCode(array $numbers)
     {
