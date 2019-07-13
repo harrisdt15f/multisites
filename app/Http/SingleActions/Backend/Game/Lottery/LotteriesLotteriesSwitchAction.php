@@ -36,6 +36,7 @@ class LotteriesLotteriesSwitchAction
         try {
             $lotteriesEloq->status = $inputDatas['status'];
             $lotteriesEloq->save();
+            $lotteriesEloq->lotteryInfoCache(); //更新首页lotteryInfo缓存
             //清理彩种玩法缓存
             $contll->clearMethodCache();
             return $contll->msgOut(true);

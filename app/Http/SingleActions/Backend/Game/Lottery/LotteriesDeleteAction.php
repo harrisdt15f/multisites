@@ -31,6 +31,7 @@ class LotteriesDeleteAction
             return $contll->msgOut(false, [], '400', $issueRuleEloq->errors()->messages());
         }
         DB::commit();
+        $lotteryEloq->lotteryInfoCache(); //更新首页lotteryInfo缓存
         return $contll->msgOut(true);
 
     }
