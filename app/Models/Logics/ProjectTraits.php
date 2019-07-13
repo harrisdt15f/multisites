@@ -150,25 +150,42 @@ trait ProjectTraits
     public function setWon($openNumber, $sWnNumber, $aPrized)
     {
         $totalBonus = 0;
+        $totalCount = 0;
+        $totalLevel = 0;
+        $finalLevel = 0;
         foreach ($aPrized as $iBasicMethodId => $aPrizeOfBasicMethod) {
-            $iLevel = key($aPrizeOfBasicMethod);
-            $iCount = current($aPrizeOfBasicMethod);
-            $PrizeEloq = LotteryMethodsWaysLevel::where([
-                ['basic_method_id', '=', $iBasicMethodId],
-                ['level', '=', $iLevel],
-            ])->first();
-            if ($iCount > 0) {
-                $bonus = $this->bet_prize_group * $PrizeEloq->prize / 1800;
-                $bonus *= $this->mode * $this->times * $iCount;
-                if (pack('f', $this->price) === pack('f', 1.0)) {
-                    $bonus /= 2;
+            foreach ($aPrizeOfBasicMethod as $iLevel => $iCount) {
+                $totalCount += $iCount;
+                $PrizeEloq = LotteryMethodsWaysLevel::where([
+                    ['basic_method_id', '=', $iBasicMethodId],
+                    ['level', '=', $iLevel],
+                    ['method_id', '=', $this->method_sign]
+                ])->first();
+                if ($PrizeEloq !== null) {
+                    if ($iCount > 0) {
+                        $bonus = $this->bet_prize_group * $PrizeEloq->prize / 1800;
+                        $bonus *= $this->mode * $this->times * $iCount;
+                        if (pack('f', $this->price) === pack('f', 1.0)) {
+                            $bonus /= 2;
+                        }
+                        $totalBonus += $bonus;
+                        $finalLevel = $iLevel;
+                        $totalLevel++;
+                    } else {
+                        $errorString = 'There have no Count:'.$iBasicMethodId.' level:'.$iLevel.' Count:'.$iCount;
+                        Log::channel('issues')->info($errorString);
+                    }
+                } else {
+                    $errorString = 'There have no prize for  Basic MethodId'.$iBasicMethodId.'leveldata'.json_encode($aPrizeOfBasicMethod);
+                    Log::channel('issues')->error($errorString);
                 }
-                $totalBonus += $bonus;
+            }
+            if ($totalCount > 0) {
                 $data = [
                     'basic_method_id' => $iBasicMethodId,
                     'open_number' => $openNumber,
                     'winning_number' => $this->formatWiningNumber($sWnNumber),
-                    'level' => $iLevel,
+                    'level' => $finalLevel,//@todo may be with string to concact
                     'bonus' => $totalBonus,
                     'is_win' => 1,
                     'time_count' => now()->timestamp,
@@ -177,7 +194,7 @@ trait ProjectTraits
                 try {
                     DB::beginTransaction();
 //                    $lockProject = $this->lockForUpdate()->find($this->id);
-                    $this->update($data);
+                    $this->update($data);//@todo maybe only a time update
                     DB::commit();
                     $this->sendMoney();
                 } catch (Exception $e) {
