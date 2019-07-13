@@ -22,11 +22,9 @@ class LotteriesProjectHistoryAction
      */
     public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
     {
-        $lotterySign = $inputDatas['lottery_sign'] ?? '*';
-        $count = $inputDatas['count']; //10
-        $beginTime = $inputDatas['begin_time'] ?? null;
-        $endTime = $inputDatas['end_time'] ?? null;
-        $data = Project::getGamePageList($contll->partnerUser->id, $lotterySign, $count, $beginTime, $endTime);
+        $eloqM = new Project();
+        $searchAbleFields = ['lottery_sign'];
+        $data = $contll->generateSearchQuery($eloqM, $searchAbleFields);
         return $contll->msgOut(true, $data);
     }
 }

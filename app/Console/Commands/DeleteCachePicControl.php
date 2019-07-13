@@ -31,8 +31,8 @@ class DeleteCachePicControl extends Command
     public function handle()
     {
         Log::info('开始定时删除没上传活动的图片');
-        if (Cache::has('CachePic')) {
-            $cachePic = Cache::get('CachePic');
+        if (Cache::has('cache_pic')) {
+            $cachePic = Cache::get('cache_pic');
             foreach ($cachePic as $key => $pic) {
                 if (!isset($pic['expire_time']) || $pic['expire_time'] < time()) {
                     $path = 'public/' . $pic['path'];
@@ -58,7 +58,7 @@ class DeleteCachePicControl extends Command
             }
             $hourToStore = 24 * 2;
             $expiresAt = Carbon::now()->addHours($hourToStore);
-            Cache::put('CachePic', $cachePic, $expiresAt);
+            Cache::put('cache_pic', $cachePic, $expiresAt);
         }
     }
 }

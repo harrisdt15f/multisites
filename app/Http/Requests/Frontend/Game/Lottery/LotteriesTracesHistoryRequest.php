@@ -30,10 +30,8 @@ class LotteriesTracesHistoryRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'count' => 'required|integer|min:10|max:100',
+            'page_size' => 'integer|min:10|max:100',
             'lottery_sign' => 'string|min:4|max:10|exists:lottery_lists,en_name',
-            'begin_time' => 'date',
-            'end_time' => 'date',
         ];
     }
 
