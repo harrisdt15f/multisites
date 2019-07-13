@@ -9,7 +9,7 @@
 namespace App\Http\SingleActions\Frontend\Game\Lottery;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Models\Project;
+use App\Models\LotteryTrace;
 use Illuminate\Http\JsonResponse;
 
 class LotteriesTracesHistoryAction
@@ -22,11 +22,14 @@ class LotteriesTracesHistoryAction
      */
     public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
     {
-        $lotterySign = $inputDatas['lottery_sign'] ?? '*';
-        $count = $inputDatas['count']; //10
-        $beginTime = $inputDatas['begin_time'] ?? null;
-        $endTime = $inputDatas['end_time'] ?? null;
-        $data = Project::getGameTracesList($contll->partnerUser->id, $lotterySign, $count, $beginTime, $endTime);
+        $eloqM = new LotteryTrace();
+        $searchAbleFields = ['lottery_sign'];
+        $fixedJoin = 1;
+        $withTable = 'traceLists';
+        $withSearchAbleFields = [];
+        $orderFields = 'id';
+        $orderFlow = 'desc';
+        $data = $contll->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields, $orderFields, $orderFlow);
         return $contll->msgOut(true, $data);
     }
 }
