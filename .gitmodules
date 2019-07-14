@@ -1,3 +1,0 @@
-[submodule "app/Http/SingleActions/Frontend"]
-	path = app/Http/SingleActions/Frontend
-	url = ssh://git@9170ttt.com:2289/lottery_frontend_php/frontendsingleaction.git
