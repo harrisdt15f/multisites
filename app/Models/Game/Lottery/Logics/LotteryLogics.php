@@ -527,11 +527,11 @@ trait LotteryLogics
                 'defaultGroup' => $defaultGroup,
                 'defaultMethod' => $defaultMethod,
             ];
-            $hourToStore = 24;
-            $expiresAt = Carbon::now()->addHours($hourToStore);
-            $frontendLotteryInfoCache = 'frontend.lottery.lotteryInfo';
-            Cache::put($frontendLotteryInfoCache, $cacheData, $expiresAt);
-            return $cacheData;
         }
+        $hourToStore = 24;
+        $expiresAt = Carbon::now()->addHours($hourToStore);
+        $frontendLotteryInfoCache = 'frontend.lottery.lotteryInfo';
+        Cache::put($frontendLotteryInfoCache, $cacheData, $expiresAt);
+        return $cacheData;
     }
 }
