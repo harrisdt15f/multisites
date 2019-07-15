@@ -21,6 +21,4 @@ public/uploaded_files/
 
 composer\.lock
 
-\.gitmodules
-
 app/Http/SingleActions/Backend
