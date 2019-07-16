@@ -1,6 +1,6 @@
 [submodule "app/Http/SingleActions/Backend"]
 	path = app/Http/SingleActions/Backend
-	url = http://9170ttt.com:8989/lottery_backend_php/backendsingleaction.git
+	url = ssh://git@9170ttt.com:2289/lottery_backend_php/backendsingleaction.git
 [submodule "app/Http/SingleActions/Frontend"]
 	path = app/Http/SingleActions/Frontend
-	url = http://9170ttt.com:8989/lottery_frontend_php/frontendsingleaction.git
+	url = ssh://git@9170ttt.com:2289/lottery_frontend_php/frontendsingleaction.git
