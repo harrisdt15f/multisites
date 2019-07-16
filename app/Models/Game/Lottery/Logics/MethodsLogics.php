@@ -2,7 +2,7 @@
 
 namespace App\Models\Game\Lottery\Logics;
 
-
+use App\Models\Game\Lottery\LotteryMethodsStandard;
 /**
  * Created by PhpStorm.
  * author: Harris
@@ -38,7 +38,7 @@ trait MethodsLogics
             'method_example' => $methodExample,
             'method_helper' => $methodHelper,
             'method_button' => $method_button,
-            'method_layout' => $this->retrieveMethodLayout($methoudLayoutEloq)
+            'method_layout' => $this->retrieveMethodLayout($methoudLayoutEloq),
         ];
         return $result;
     }
@@ -47,12 +47,46 @@ trait MethodsLogics
     {
         $result = [];
         foreach ($methoudLayoutEloq as $item) {
-            $result [] = [
+            $result[] = [
                 'validation_id' => $item->id,
                 'rule_id' => $item->formattedNumberRule,
                 'display_code' => $item->formattedDisplayCode,
             ];
         }
         return $result;
+    }
+
+    /**
+     * 克隆彩种的玩法
+     * @param  $lotteryEloq
+     * @return array
+     */
+    public function cloneLotteryMethods($lotteryEloq): array
+    {
+        $examplesEloq = LotteryMethodsStandard::where('series_id', $lotteryEloq->series_id)->get();
+        foreach ($examplesEloq as $exampleEloq) {
+            $data = [
+                'series_id' => $lotteryEloq->series_id,
+                'lottery_name' => $lotteryEloq->cn_name,
+                'lottery_id' => $lotteryEloq->en_name,
+                'method_id' => $exampleEloq->method_id,
+                'method_name' => $exampleEloq->method_name,
+                'method_group' => $exampleEloq->method_group,
+                'method_row' => $exampleEloq->method_row,
+                'group_sort' => $exampleEloq->group_sort,
+                'row_sort' => $exampleEloq->row_sort,
+                'method_sort' => $exampleEloq->method_sort,
+                'show' => $exampleEloq->show,
+                'status' => $exampleEloq->status,
+                'total' => $exampleEloq->total,
+            ];
+            $lotteryMethodEloq = new self();
+            $lotteryMethodEloq->fill($data);
+            $lotteryMethodEloq->save();
+            if ($lotteryMethodEloq->errors()->messages()) {
+                return ['success' => false, 'message' => $lotteryMethodEloq->errors()->messages()];
+            }
+        }
+        return ['success' => true];
     }
 }
