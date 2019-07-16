@@ -22,19 +22,17 @@ class LotterieslotteryCenterAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        $lotteriesEloq = LotteryList::select('en_name')->where('status', 1)->with(['oneIssues' => function ($query) {
-            $query->select('lottery_id', 'issue', 'official_code')
-                ->where('status_encode', 1)
-                ->orderBy('issue', 'desc');
-        }])->get();
+        $lotteriesEloq = LotteryList::select('en_name')->where('status', 1)->with('oneIssues')->get();
         $data = [];
         foreach ($lotteriesEloq as $lotteryEloq) {
             $issue = $lotteryEloq->oneIssues->issue ?? null;
             $officialCode = $lotteryEloq->oneIssues->official_code ?? null;
+            $encodeTime = $lotteryEloq->oneIssues->encode_time ?? null;
             $data[] = [
                 'lottery_id' => $lotteryEloq->en_name,
                 'issue' => $issue,
                 'official_code' => $officialCode,
+                'encode_time' => $encodeTime,
             ];
         }
         return $contll->msgOut(true, $data);

@@ -56,6 +56,6 @@ class LotteryList extends BaseModel
 
     public function oneIssues(): hasOne
     {
-        return $this->hasOne(LotteryIssue::class, 'lottery_id', 'en_name');
+        return $this->hasOne(LotteryIssue::class, 'lottery_id', 'en_name')->select('lottery_id', 'issue', 'official_code', 'encode_time')->where('status_encode', 1)->orderBy('issue', 'desc');
     }
 }
