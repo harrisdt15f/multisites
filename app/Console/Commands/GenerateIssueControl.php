@@ -47,8 +47,8 @@ class GenerateIssueControl extends Command
             Cache::forever('generateIssueTime', $generateIssueTime);
         }
         $timeNow = date('H:i');
-        Log::info('开始定时生成彩票奖期' . $generateIssueTime);
         if ($generateIssueTime == $timeNow) {
+            Log::info('开始定时生成彩票奖期');
             $lotteries = LotteryList::where('status', 1)->where('en_name', '!=', 'hklhc')->pluck('en_name');
             $data = [
                 'start_time' => date('Y-m-d'),
