@@ -2,10 +2,8 @@
 
 namespace App\Console;
 
-use App\Models\Admin\SystemConfiguration;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use Illuminate\Support\Facades\Cache;
 
 class Kernel extends ConsoleKernel
 {
@@ -32,14 +30,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('DeleteCachePic')->daily()->at('03:00');
         $schedule->command('AllocationRechargeFund')->daily()->at('00:00');
         //定时生成奖期
-        if (Cache::has('generateIssueTime')) {
-            $generateIssueTime = Cache::get('generateIssueTime');
-        } else {
-            $systemConfiguration = new SystemConfiguration();
-            $generateIssueTime = $systemConfiguration->getConfigValue('generate_issue_time');
-            Cache::forever('generateIssueTime', $generateIssueTime);
-        }
-        $schedule->command('GenerateIssue')->daily()->at($generateIssueTime);
+        $schedule->command('GenerateIssue')->everyMinute();
         //中兴一分彩自动开奖
         $schedule->command('ZxyfcInputCode')->everyMinute();
     }
