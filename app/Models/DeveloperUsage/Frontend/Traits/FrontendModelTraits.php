@@ -137,4 +137,50 @@ trait FrontendModelTraits
         $frontendModelEloq->save();
         return $frontendModelEloq;
     }
+
+    //生成 app端热门彩票 前台模块
+    public static function createMobilePopularLotteries()
+    {
+        $parentEloq = self::where('en_name', 'page.model')->first();
+        if ($parentEloq === null) {
+            $parentEloq = self::createPageModel();
+        }
+        $frontendModelEloq = new self;
+        $addData = [
+            'label' => 'app端热门彩种一',
+            'en_name' => 'mobile.popular.lotteries.one',
+            'pid' => $parentEloq->id,
+            'type' => 1,
+            'show_num' => 10,
+            'status' => 1,
+            'level' => ++$parentEloq->level,
+            'is_homepage_display' => 1,
+        ];
+        $frontendModelEloq->fill($addData);
+        $frontendModelEloq->save();
+        return $frontendModelEloq;
+    }
+
+    //生成 web端热门彩票 前台模块
+    public static function createPopularLotteries()
+    {
+        $parentEloq = self::where('en_name', 'page.model')->first();
+        if ($parentEloq === null) {
+            $parentEloq = self::createPageModel();
+        }
+        $frontendModelEloq = new self;
+        $addData = [
+            'label' => 'web端热门彩种一',
+            'en_name' => 'popularLotteries.one',
+            'pid' => $parentEloq->id,
+            'type' => 1,
+            'show_num' => 10,
+            'status' => 1,
+            'level' => ++$parentEloq->level,
+            'is_homepage_display' => 1,
+        ];
+        $frontendModelEloq->fill($addData);
+        $frontendModelEloq->save();
+        return $frontendModelEloq;
+    }
 }
