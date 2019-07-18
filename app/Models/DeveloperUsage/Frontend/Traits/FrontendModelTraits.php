@@ -75,7 +75,29 @@ trait FrontendModelTraits
         $frontendModelEloq->fill($addData);
         $frontendModelEloq->save();
         return $frontendModelEloq;
+    }
 
+    //生成 手机端开奖公告 前台模块
+    public static function createMobileLotteryNotice()
+    {
+        $parentEloq = self::where('en_name', 'page.model')->first();
+        if ($parentEloq === null) {
+            $parentEloq = self::createPageModel();
+        }
+        $frontendModelEloq = new self;
+        $addData = [
+            'label' => '手机端开奖公告',
+            'en_name' => 'mobile.lottery.notice',
+            'pid' => $parentEloq->id,
+            'type' => 1,
+            'show_num' => 4,
+            'status' => 1,
+            'level' => ++$parentEloq->level,
+            'is_homepage_display' => 1,
+        ];
+        $frontendModelEloq->fill($addData);
+        $frontendModelEloq->save();
+        return $frontendModelEloq;
     }
 
     //生成 主题板块 前台模块
