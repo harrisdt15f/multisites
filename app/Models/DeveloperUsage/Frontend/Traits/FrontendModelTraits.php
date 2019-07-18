@@ -49,7 +49,7 @@ trait FrontendModelTraits
      * @param  string $en_name 模块英文名
      * @return mixed
      */
-    public function getModelEloq($en_name)
+    public function getModuleEloq($en_name)
     {
         return self::where('en_name', $en_name)->first();
     }
@@ -61,7 +61,7 @@ trait FrontendModelTraits
         if ($parentEloq === null) {
             $parentEloq = self::createPageModel();
         }
-        $frontendModelEloq = new self;
+        $frontendModuleEloq = new self;
         $addData = [
             'label' => '开奖公告',
             'en_name' => 'lottery.notice',
@@ -72,9 +72,9 @@ trait FrontendModelTraits
             'level' => ++$parentEloq->level,
             'is_homepage_display' => 1,
         ];
-        $frontendModelEloq->fill($addData);
-        $frontendModelEloq->save();
-        return $frontendModelEloq;
+        $frontendModuleEloq->fill($addData);
+        $frontendModuleEloq->save();
+        return $frontendModuleEloq;
     }
 
     //生成 手机端开奖公告 前台模块
@@ -84,7 +84,7 @@ trait FrontendModelTraits
         if ($parentEloq === null) {
             $parentEloq = self::createPageModel();
         }
-        $frontendModelEloq = new self;
+        $frontendModuleEloq = new self;
         $addData = [
             'label' => '手机端开奖公告',
             'en_name' => 'mobile.lottery.notice',
@@ -95,9 +95,9 @@ trait FrontendModelTraits
             'level' => ++$parentEloq->level,
             'is_homepage_display' => 1,
         ];
-        $frontendModelEloq->fill($addData);
-        $frontendModelEloq->save();
-        return $frontendModelEloq;
+        $frontendModuleEloq->fill($addData);
+        $frontendModuleEloq->save();
+        return $frontendModuleEloq;
     }
 
     //生成 主题板块 前台模块
@@ -107,7 +107,7 @@ trait FrontendModelTraits
         if ($parentEloq === null) {
             $parentEloq = self::createHomepage();
         }
-        $frontendModelEloq = new self;
+        $frontendModuleEloq = new self;
         $addData = [
             'label' => '主题板块',
             'en_name' => 'page.model',
@@ -116,15 +116,15 @@ trait FrontendModelTraits
             'status' => 1,
             'level' => ++$parentEloq->level,
         ];
-        $frontendModelEloq->fill($addData);
-        $frontendModelEloq->save();
-        return $frontendModelEloq;
+        $frontendModuleEloq->fill($addData);
+        $frontendModuleEloq->save();
+        return $frontendModuleEloq;
     }
 
     //生成 首页 前台模块
     public static function createHomepage()
     {
-        $frontendModelEloq = new self;
+        $frontendModuleEloq = new self;
         $addData = [
             'label' => '首页',
             'en_name' => 'homepage',
@@ -133,9 +133,9 @@ trait FrontendModelTraits
             'status' => 1,
             'level' => 1,
         ];
-        $frontendModelEloq->fill($addData);
-        $frontendModelEloq->save();
-        return $frontendModelEloq;
+        $frontendModuleEloq->fill($addData);
+        $frontendModuleEloq->save();
+        return $frontendModuleEloq;
     }
 
     //生成 app端热门彩票 前台模块
@@ -145,7 +145,7 @@ trait FrontendModelTraits
         if ($parentEloq === null) {
             $parentEloq = self::createPageModel();
         }
-        $frontendModelEloq = new self;
+        $frontendModuleEloq = new self;
         $addData = [
             'label' => 'app端热门彩种一',
             'en_name' => 'mobile.popular.lotteries.one',
@@ -156,9 +156,9 @@ trait FrontendModelTraits
             'level' => ++$parentEloq->level,
             'is_homepage_display' => 1,
         ];
-        $frontendModelEloq->fill($addData);
-        $frontendModelEloq->save();
-        return $frontendModelEloq;
+        $frontendModuleEloq->fill($addData);
+        $frontendModuleEloq->save();
+        return $frontendModuleEloq;
     }
 
     //生成 web端热门彩票 前台模块
@@ -168,7 +168,7 @@ trait FrontendModelTraits
         if ($parentEloq === null) {
             $parentEloq = self::createPageModel();
         }
-        $frontendModelEloq = new self;
+        $frontendModuleEloq = new self;
         $addData = [
             'label' => 'web端热门彩种一',
             'en_name' => 'popularLotteries.one',
@@ -179,8 +179,8 @@ trait FrontendModelTraits
             'level' => ++$parentEloq->level,
             'is_homepage_display' => 1,
         ];
-        $frontendModelEloq->fill($addData);
-        $frontendModelEloq->save();
-        return $frontendModelEloq;
+        $frontendModuleEloq->fill($addData);
+        $frontendModuleEloq->save();
+        return $frontendModuleEloq;
     }
 }
