@@ -87,7 +87,9 @@ class HomepageController extends BackEndApiMainController
             'logo' => 'homepage_logo',
             'frontend.ico' => 'homepage_ico',
         ];
-        $cacheRelated = new CacheRelated();
-        $cacheRelated->delete($homepageCache[$key]);
+        if (isset($homepageCache[$key])) {
+            $cacheRelated = new CacheRelated();
+            $cacheRelated->delete($homepageCache[$key]);
+        }
     }
 }

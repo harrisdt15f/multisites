@@ -2,6 +2,7 @@
 
 namespace App\Models\DeveloperUsage\Frontend\Traits;
 
+use Illuminate\Support\Facades\Cache;
 /**
  * @Author: LingPh
  * @Date:   2019-05-29 17:38:37
@@ -52,6 +53,18 @@ trait FrontendModelTraits
     public function getModuleEloq($en_name)
     {
         return self::where('en_name', $en_name)->first();
+    }
+
+    //首页需要展示的模块缓存
+    public static function showModelCache()
+    {
+        $homepageModel = self::select('en_name', 'status')->where('is_homepage_display', 1)->get();
+        $data = [];
+        foreach ($homepageModel as $value) {
+            $data[$value->en_name] = $value->status;
+        }
+        Cache::forever('showModel', $data);
+        return $data;
     }
 
     //生成 开奖公告 前台模块
