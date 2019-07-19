@@ -9,6 +9,7 @@
 namespace App\Models\Game\Lottery\Logics;
 
 use App\Models\Game\Lottery\LotteryIssue;
+use App\Models\Game\Lottery\LotteryList;
 use App\Models\Game\Lottery\LotterySeriesMethod;
 use App\Models\Game\Lottery\LotteryTraceList;
 use App\Models\LotteryTrace;
@@ -101,13 +102,14 @@ trait IssueEncodeLogics
         }
     }
 
+
     /**
-     * @param $oLottery
+     * @param  LotteryList  $oLottery
      * @param $sFullWnNumber
      * @param  bool  $bNameKey
      * @return array
      */
-    public static function getWnNumberOfSeriesMethods($oLottery, $sFullWnNumber, $bNameKey = false): array
+    public static function getWnNumberOfSeriesMethods(LotteryList $oLottery, $sFullWnNumber, $bNameKey = false): array
     {
         $oSeriesMethods = LotterySeriesMethod::where('series_code', '=', $oLottery->series_id)->get();
         $aWnNumbers = array();
@@ -204,7 +206,7 @@ trait IssueEncodeLogics
                                 'series_id' => $oTraceList->series_id,
                                 'lottery_sign' => $oTraceList->lottery_sign,
                                 'method_sign' => $oTraceList->method_sign,
-                                'method_group'=> $oTraceList->method_group,
+                                'method_group' => $oTraceList->method_group,
                                 'method_name' => $oTraceList->method_name,
                                 'user_prize_group' => $oTraceList->user_prize_group,
                                 'bet_prize_group' => $oTraceList->bet_prize_group,
