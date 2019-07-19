@@ -4,16 +4,17 @@ namespace App\Http\Controllers\FrontendApi\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Http\Requests\Frontend\Homepage\FrontendAuthNoticeRequest;
+use App\Http\SingleActions\Frontend\Homepage\HomepageRankingAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageShowHomepageModelAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageActivityAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageBannerAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageIcoAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageLogoAction;
+use App\Http\SingleActions\Frontend\Homepage\HompageLotteryNoticeListAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageNoticeAction;
 use App\Http\SingleActions\Frontend\Homepage\HompagePopularLotteriesAction;
 use App\Http\SingleActions\Frontend\Homepage\HompagePopularMethodsAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageQrCodeAction;
-use App\Http\SingleActions\Frontend\Homepage\HomepageRankingAction;
 use Illuminate\Http\JsonResponse;
 
 class HomepageController extends FrontendApiMainController
@@ -97,7 +98,7 @@ class HomepageController extends FrontendApiMainController
     public function notice(FrontendAuthNoticeRequest $request, HompageNoticeAction $action): JsonResponse
     {
         $input = $request->validated();
-        return $action->execute($this,$input);
+        return $action->execute($this, $input);
     }
 
     /**
@@ -116,6 +117,16 @@ class HomepageController extends FrontendApiMainController
      * @return JsonResponse
      */
     public function ranking(HomepageRankingAction $action): JsonResponse
+    {
+        return $action->execute($this);
+    }
+
+    /**
+     * 开奖公告列表
+     * @param  HompageLotteryNoticeListAction $action
+     * @return JsonResponse
+     */
+    public function lotteryNoticeList(HompageLotteryNoticeListAction $action): JsonResponse
     {
         return $action->execute($this);
     }
