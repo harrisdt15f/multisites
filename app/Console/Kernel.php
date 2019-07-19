@@ -19,6 +19,7 @@ class Kernel extends ConsoleKernel
         Commands\AllocationRechargeFundControl::class,
         Commands\GenerateIssueControl::class,
         Commands\ZxyfcInputCodeControl::class,
+        Commands\UserProfitsControl::class,
     ];
 
     /**
@@ -42,6 +43,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('GenerateIssue')->daily()->at($generateIssueTime);
         //中兴一分彩自动开奖
         $schedule->command('ZxyfcInputCode')->everyMinute();
+
+        $schedule->command('UserProfits')->everyFiveMinutes();
     }
 
     /**
