@@ -10,9 +10,8 @@ trait FrontendLotteryRedirectBetListTraits
 {
     /**
      * 更新首页热门彩票缓存
-     * @return array
      */
-    public static function updatePopularLotteriesCache()
+    public static function updatePopularLotteriesCache(): void
     {
         self::webPopularLotteriesCache();
         self::mobilePopularLotteriesCache();

@@ -1,16 +1,10 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-14 12:03:35
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 12:07:06
- */
 namespace App\Http\Requests\Backend\Admin\Notice;
 
 use App\Http\Requests\BaseFormRequest;
 
-class NoticeTopRequest extends BaseFormRequest
+class NoticeDetailRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -30,7 +24,7 @@ class NoticeTopRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|exists:frontend_message_notices,id',
+            'type' => 'required|integer|in:1,2',
         ];
     }
 

@@ -88,10 +88,6 @@ return [
     //PopularLotteriesController
     '102000' => '该类型的热门彩票已存在',
     '102001' => '获取平台信息失败',
-    //NoticeController
-    '102100' => '标题已存在',
-    '102102' => '需要排序的公告不存在',
-    '102103' => '需要排序的sort相同',
     //MethodLevelController
     '102200' => '该玩法等级已存在',
 ];

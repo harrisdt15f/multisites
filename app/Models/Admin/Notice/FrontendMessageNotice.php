@@ -7,10 +7,8 @@ use App\Models\BaseModel;
 
 class FrontendMessageNotice extends BaseModel
 {
-    protected $guarded = ['id'];
+	public const UN_READ=0;//未读
+	public const READ=1;//已读
 
-    public function admin()
-    {
-        return $this->hasOne(BackendAdminUser::class, 'id', 'admin_id');
-    }
+    protected $guarded = ['id'];
 }
