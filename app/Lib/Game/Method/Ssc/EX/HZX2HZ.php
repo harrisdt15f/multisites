@@ -3,7 +3,7 @@
 use App\Lib\Game\Method\Ssc\Base;
 
 // 2星直选和值
-class HZXHZ2 extends Base
+class HZX2HZ extends Base
 {
     //1&2&3&4&5&6
     public $all_count =100;
