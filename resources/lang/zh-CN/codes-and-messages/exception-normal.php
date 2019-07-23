@@ -28,15 +28,10 @@ return [
     '100202' => '没有此组',
     '100203' => '获取平台信息失败',
     //ActivityInfosController
-    '100300' => '该活动名已存在',
     '100301' => '获取平台信息失败',
     //ArticlesController
-    '100500' => '文章名已存在',
     '100502' => '获取平台信息失败',
-    //PopularMethodsController
-    '100600' => '该热门彩种已存在',
     //ConfiguresController
-    '100700' => '该配置键名已存在',
     '100701' => '获取平台信息失败',
     '100702' => '生成奖期时间配置失败',
     //MenuController
@@ -55,8 +50,6 @@ return [
     '101100' => '您目前没有充值额度',
     '101101' => '您的充值额度不足',
     '101102' => '给用户添加金额时失败，请重新操作',
-    //AccountChangeTypeController
-    '101200' => 'sign已存在',
     //FundOperationController
     '101300' => '该管理员没有人工充值权限',
     '101301' => '请先添加 sign=admin_recharge_daily_limit 的管理员充值额度系统配置',
@@ -67,8 +60,6 @@ return [
     '101500' => '该路由已存在',
     '101501' => '该路由不存在',
     //FrontendAllocatedModel
-    '101600' => '模块名称已存在',
-    '101601' => '模块en_name已存在',
     '101603' => '不可在第3级的模块下添加下级',
     //LotteriesController
     '101700' => '彩种不存在',
@@ -79,7 +70,6 @@ return [
     '101705' => '彩票中文名称已存在',
     '101706' => '彩票英文名称已存在',
     //HomepageBannerController
-    '101800' => '轮播图标题已存在',
     '101801' => '图片上传失败',
     '101802' => '获取平台信息失败',
     //HomepageController
