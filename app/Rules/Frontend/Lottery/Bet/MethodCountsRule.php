@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 class MethodCountsRule implements Rule
 {
     protected $message = '注数不符合';
-    protected $method_id;
+    protected $balls;
 
     /**
      * Create a new rule instance.
@@ -18,7 +18,7 @@ class MethodCountsRule implements Rule
      */
     public function __construct($method_id)
     {
-        $this->method_id = $method_id;
+        $this->balls = $method_id;
     }
 
     /**
@@ -32,11 +32,11 @@ class MethodCountsRule implements Rule
     {
         preg_match('/\d+/', $attribute, $matches);
         try {
-            $methodId = $this->method_id[$matches[0]]['method_id'];
-            $count = $this->method_id[$matches[0]]['count'];
+            $methodId = $this->balls[$matches[0]]['method_id'];
+            $count = $this->balls[$matches[0]]['count'];
         } catch (\Exception $e) {
-            if (!empty($this->method_id)) {
-                $arrMethod = json_decode($this->method_id, true);
+            if (!empty($this->balls)) {
+                $arrMethod = json_decode($this->balls, true);
                 $methodId = $arrMethod[$matches[0]]['method_id'];
                 $count = $arrMethod[$matches[0]]['count'];
             } else {
