@@ -10,7 +10,7 @@ namespace App\Http\Requests\Frontend\Homepage;
 
 use App\Http\Requests\BaseFormRequest;
 
-class FrontendAuthNoticeRequest extends BaseFormRequest
+class HomepageNoticeRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

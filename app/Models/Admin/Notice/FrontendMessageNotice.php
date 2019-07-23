@@ -11,4 +11,12 @@ class FrontendMessageNotice extends BaseModel
 	public const READ=1;//已读
 
     protected $guarded = ['id'];
+
+    /**
+     * 公告|站内信 详情信息
+     */
+    public function messageContent()
+    {
+    	return $this->hasOne(FrontendMessageNoticesContent::class,'id','notices_content_id');
+    }
 }
