@@ -184,7 +184,7 @@ trait FrontendModelTraits
         $frontendModuleEloq = new self;
         $addData = [
             'label' => 'web端热门彩种一',
-            'en_name' => 'popularLotteries.one',
+            'en_name' => 'popular.lotteries.one',
             'pid' => $parentEloq->id,
             'type' => 1,
             'show_num' => 10,

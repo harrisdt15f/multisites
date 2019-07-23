@@ -13,7 +13,7 @@ trait FrontendLotteryRedirectBetListTraits
      */
     public static function updatePopularLotteriesCache(): void
     {
-        self::webPopularLotteriesCache();
+        // self::webPopularLotteriesCache();web热门彩票需要奖期结束时间信息   重构后取消缓存方式
         self::mobilePopularLotteriesCache();
     }
 
@@ -24,7 +24,7 @@ trait FrontendLotteryRedirectBetListTraits
     public static function webPopularLotteriesCache(): array
     {
         $cacheKey = 'popular_lotteries';
-        $lotteriesEloq = FrontendAllocatedModel::select('show_num', 'status')->where('en_name', 'popularLotteries.one')->first();
+        $lotteriesEloq = FrontendAllocatedModel::select('show_num', 'status')->where('en_name', 'popular.lotteries.one')->first();
         if ($lotteriesEloq === null) {
             $lotteriesEloq = FrontendAllocatedModel::createPopularLotteries();
         }
