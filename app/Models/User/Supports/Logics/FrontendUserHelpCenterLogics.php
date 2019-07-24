@@ -12,18 +12,14 @@ trait FrontendUserHelpCenterLogics
 {
     /**
      * 获取用户帮助中心数据
-     * @param $status
-     * @return array
+     * @return  array
      */
-    public function getHelpCenterData($status = 0): array
+    public function getHelpCenterData(): array
     {
-        $query = $this->select('id','pid','menu','status')->with('children:id,pid,menu,content,status')->where('pid',0);
-        if ($status === 1) {
-            return $query->with(['children' => function($query) {
-                $query->where('status',1);
-            }])->where('status',1)->get()->toArray();
+        $helpELoqs = $this->where('pid', 0)->get();
+        foreach ($helpELoqs as $key => $item) {
+            $helpELoqs[$key]['children'] = $item->children;
         }
-        return $query->get()->toArray();
+        return $helpELoqs->toArray();
     }
-
 }
