@@ -5,9 +5,11 @@ namespace App\Models\Game\Lottery;
 use App\Models\BaseModel;
 use App\Models\LotteryTrace;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
+use App\Models\Game\Lottery\Logics\LotteryTraceListLogics;
 class LotteryTraceList extends BaseModel
 {
+    use LotteryTraceListLogics;
+    
     protected $guarded = ['id'];
     public const STATUS_WAITING = 0;
     public const STATUS_RUNNING = 1;
