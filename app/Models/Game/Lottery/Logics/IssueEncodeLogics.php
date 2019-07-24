@@ -143,15 +143,15 @@ trait IssueEncodeLogics
             ++$first;
         }
         if ($oTrace !== null) {
-            if ($oProject->status >= 3 && $oTrace->win_stop === 1) {
+            if ($oProject->status >= Project::STATUS_WON && $oTrace->win_stop === 1) {
                 //Remaining TraceList to stop continuing
                 $oTraceListToUpdate = $oTrace->traceRunningLists();
                 $traceListStopData = [
-                    'status' => LotteryTraceList::STATUS_USER_STOPED,
+                    'status' => LotteryTraceList::STATUS_WIN_STOPED,
                 ];
                 $oTraceListToUpdate->update($traceListStopData);
                 //Update TraceDetail tables
-                $oTrace->status = LotteryTrace::STATUS_USER_CANCELED;
+                $oTrace->status = LotteryTrace::STATUS_WIN_STOPED;
                 $oTrace->canceled_issues = $oTraceListToUpdate->count();
                 $oTrace->canceled_amount = $oTraceListToUpdate->sum('total_price');
                 $oTrace->stop_issue = $oProject->issue;
@@ -164,7 +164,7 @@ trait IssueEncodeLogics
                     $oTraceListFromProject->status = LotteryTraceList::STATUS_FINISHED;
                     $oTraceListFromProject->save();
                 }
-            } elseif ($oProject->status >= 3 && $first < 1) {//不是第一次的时候
+            } elseif ($oProject->status > Project::STATUS_NORMAL && $first < 1) {//不是第一次的时候
                 ++$oTrace->finished_issues;
                 $oTrace->finished_amount += $oProject->total_cost;
                 $oTrace->finished_bonus += $oProject->bonus;
@@ -177,6 +177,8 @@ trait IssueEncodeLogics
                 {
                     $oTraceListFromProject = $oProject->tracelist;
                     $oTraceListFromProject->status = LotteryTraceList::STATUS_FINISHED;
+                    $oTraceListFromProject->project_id = $oProject->id;
+                    $oTraceListFromProject->project_serial_number = $oProject->serial_number;
                     $oTraceListFromProject->save();
                 }
             }
@@ -186,8 +188,11 @@ trait IssueEncodeLogics
         //then check if there have tracelists or not
         if ($currentIssue !== null && $currentIssue->tracelists()->exists()) {
             //select with criterias
-            $oTraceListEloq = $currentIssue->tracelists()->where('lottery_sign',
-                $oLottery->en_name)->get();
+            $oTraceListEloq = $currentIssue->tracelists()->where
+            ([
+                ['lottery_sign', '=', $oLottery->en_name],
+                ['status', '=', LotteryTraceList::STATUS_WAITING],
+            ])->get();
             //check if it is not empty then do other logics
             if (!empty($oTraceListEloq->toArray())) {
                 //loop ,select and then insert to project table and update the trace detail table
@@ -224,6 +229,7 @@ trait IssueEncodeLogics
                             ];
                             $projectId = Project::create($projectData)->id;
                             $oTraceList->project_id = $projectId;
+                            $oTraceList->status = LotteryTraceList::STATUS_RUNNING;
                             $oTraceList->save();
                             $TraceDetailUpdateData = [
                                 'now_issue' => $oTraceList->issue,

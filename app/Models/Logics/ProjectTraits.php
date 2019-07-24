@@ -11,6 +11,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Str;
 
 trait ProjectTraits
 {
@@ -24,24 +25,28 @@ trait ProjectTraits
      */
     public static function addProject($user, $lottery, $currentIssue, $data, $inputDatas): array
     {
-        $traceFirstMultiple=1;
-        $isTrace = (int)$inputDatas['is_trace'];
-        if ($isTrace === 1 && count($inputDatas['trace_issues']) > 1) {
-            // 投注追号期号
-            $arrTraceKeys = array_keys($inputDatas['trace_issues']);
-            $traceDataCollection = $lottery->checkTraceData($arrTraceKeys);
-            if (count($arrTraceKeys) !== $traceDataCollection->count()) {
-                return $arr['error'] = '100309';
+        $traceFirstMultiple = 1;
+        if (isset($inputDatas['is_trace'])) {
+            $isTrace = (int)$inputDatas['is_trace'];
+            if ($isTrace === 1 && count($inputDatas['trace_issues']) > 1) {
+                // 投注追号期号
+                $arrTraceKeys = array_keys($inputDatas['trace_issues']);
+                $traceDataCollection = $lottery->checkTraceData($arrTraceKeys);
+                if (count($arrTraceKeys) !== $traceDataCollection->count()) {
+                    return $arr['error'] = '100309';
+                }
+                $traceFirstMultiple = Arr::first($inputDatas['trace_issues']);
+                $traceData = array_slice($inputDatas['trace_issues'], 1, null, true);
             }
-            $traceFirstMultiple = Arr::first($inputDatas['trace_issues']);
-            $traceData = array_slice($inputDatas['trace_issues'], 1, null, true);
         } else {
+            $isTrace = 0;
             $traceData = [];
         }
         $from = $inputDatas['from'] ?? 1; //手机端 还是 pc 端
         $returnData = [];
         foreach ($data as $_item) {
             $projectData = [
+                'serial_number' => Str::orderedUuid()->getHex(),
                 'user_id' => $user->id,
                 'username' => $user->username,
                 'top_id' => $user->top_id,
@@ -103,7 +108,6 @@ trait ProjectTraits
                 'cancel_time' => 0,
                 'ip' => Request::ip(),
                 'proxy_ip' => json_encode(Request::ip()),
-                'day' => date('Ymd'),
                 'bet_from' => $from,
             ];
             // 保存追号主
@@ -136,7 +140,6 @@ trait ProjectTraits
                         'bet_prize_group' => $dataItem['prize_group'],
                         'ip' => Request::ip(),
                         'proxy_ip' => json_encode(Request::ip()),
-                        'day' => date('Ymd'),
                         'bet_from' => $from,
                     ];
                     $_item['total_price'] += $traceListData['total_price'];
@@ -161,8 +164,7 @@ trait ProjectTraits
      * @param $aPrized
      * @return bool|string
      */
-    public
-    function setWon(
+    public function setWon(
         $openNumber,
         $sWnNumber,
         $aPrized
@@ -233,8 +235,7 @@ trait ProjectTraits
      * @param $iBasicMethodId
      * @return bool
      */
-    public
-    function setFail(
+    public function setFail(
         $openNumber,
         $sWnNumber = null,
         $iBasicMethodId = null
@@ -265,8 +266,7 @@ trait ProjectTraits
         return true;
     }
 
-    public
-    function sendMoney(): void
+    public function sendMoney(): void
     {
         $params = [
             'amount' => $this->bonus,
@@ -316,8 +316,7 @@ trait ProjectTraits
      * @param $sWnNumber
      * @return string|null
      */
-    public
-    function formatWiningNumber(
+    public function formatWiningNumber(
         $sWnNumber = null
     ): ?string {
         return is_array($sWnNumber) ? implode('', $sWnNumber) : $sWnNumber;
