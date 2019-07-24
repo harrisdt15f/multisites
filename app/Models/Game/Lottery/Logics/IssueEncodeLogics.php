@@ -143,7 +143,7 @@ trait IssueEncodeLogics
             ++$first;
         }
         if ($oTrace !== null) {
-            if ($oProject->status >= 3 && $oTrace->win_stop === 1) {
+            if ($oProject->status >= Project::STATUS_WON && $oTrace->win_stop === 1) {
                 //Remaining TraceList to stop continuing
                 $oTraceListToUpdate = $oTrace->traceRunningLists();
                 $traceListStopData = [
@@ -164,7 +164,7 @@ trait IssueEncodeLogics
                     $oTraceListFromProject->status = LotteryTraceList::STATUS_FINISHED;
                     $oTraceListFromProject->save();
                 }
-            } elseif ($oProject->status >= 3 && $first < 1) {//不是第一次的时候
+            } elseif ($oProject->status > Project::STATUS_NORMAL && $first < 1) {//不是第一次的时候
                 ++$oTrace->finished_issues;
                 $oTrace->finished_amount += $oProject->total_cost;
                 $oTrace->finished_bonus += $oProject->bonus;
@@ -177,6 +177,8 @@ trait IssueEncodeLogics
                 {
                     $oTraceListFromProject = $oProject->tracelist;
                     $oTraceListFromProject->status = LotteryTraceList::STATUS_FINISHED;
+                    $oTraceListFromProject->project_id = $oProject->id;
+                    $oTraceListFromProject->project_serial_number = $oProject->serial_number;
                     $oTraceListFromProject->save();
                 }
             }
