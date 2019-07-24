@@ -199,7 +199,7 @@ trait IssueEncodeLogics
                 foreach ($oTraceListEloq as $oTraceList) {
                     if ($oTraceList->trace()->exists()) {
                         $oTrace = $oTraceList->trace;
-                        if ($oTraceList->status === LotteryTraceList::STATUS_RUNNING) {//停止了就不加追号了
+                        if ($oTraceList->status === LotteryTraceList::STATUS_WAITING) {//停止了就不加追号了
                             //添加到 project 表
                             $projectData = [
                                 'user_id' => $oTraceList->user_id,
