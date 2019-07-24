@@ -35,7 +35,7 @@ class BallsCodeRule implements Rule
                 $result = $this->checkValid($pattern, $value);
                 break;
             case 'lotto':
-                $pattern = '/^((?!\&)(?!.*\&$)(?!.*?\&\&)[0-9&]{0,19}\|?){1,10}$/';
+                $pattern = '/^(((?!\&)(?!.*\&$)(?!\|)(?!.*\|$)(?! )(?!.* $)(((0[1-9]|1[0-1])\&?)|((0[1-9]|1[0-1]) ?)){1,11})\|?)*$/';
                 $result = $this->checkValid($pattern, $value);
                 break;
             default:

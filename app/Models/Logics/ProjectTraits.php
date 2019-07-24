@@ -7,6 +7,7 @@ use App\Models\Game\Lottery\LotteryTraceList;
 use App\Models\LotteryTrace;
 use App\Models\Project;
 use Exception;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
@@ -18,12 +19,25 @@ trait ProjectTraits
      * @param $lottery
      * @param $currentIssue
      * @param $data
-     * @param $traceData
      * @param $inputDatas
      * @return array
      */
-    public static function addProject($user, $lottery, $currentIssue, $data, $traceData, $inputDatas): array
+    public static function addProject($user, $lottery, $currentIssue, $data, $inputDatas): array
     {
+        $traceFirstMultiple=1;
+        $isTrace = (int)$inputDatas['is_trace'];
+        if ($isTrace === 1 && count($inputDatas['trace_issues']) > 1) {
+            // 投注追号期号
+            $arrTraceKeys = array_keys($inputDatas['trace_issues']);
+            $traceDataCollection = $lottery->checkTraceData($arrTraceKeys);
+            if (count($arrTraceKeys) !== $traceDataCollection->count()) {
+                return $arr['error'] = '100309';
+            }
+            $traceFirstMultiple = Arr::first($inputDatas['trace_issues']);
+            $traceData = array_slice($inputDatas['trace_issues'], 1, null, true);
+        } else {
+            $traceData = [];
+        }
         $from = $inputDatas['from'] ?? 1; //手机端 还是 pc 端
         $returnData = [];
         foreach ($data as $_item) {
@@ -42,8 +56,8 @@ trait ProjectTraits
                 'user_prize_group' => $user->prize_group,
                 'bet_prize_group' => $_item['prize_group'],
                 'mode' => $_item['mode'],
-                'times' => $_item['times'],
-                'price' => $_item['price'],
+                'times' => $isTrace === 1 && count($inputDatas['trace_issues']) > 0 ? $_item['times'] * $traceFirstMultiple : $_item['times'],
+                'price' => $isTrace === 1 && count($inputDatas['trace_issues']) > 0 ? $_item['price'] * $traceFirstMultiple : $_item['price'],
                 'total_cost' => $_item['total_price'],
                 'bet_number' => $_item['code'],
                 'issue' => $currentIssue->issue,
@@ -53,90 +67,90 @@ trait ProjectTraits
                 'bet_from' => $from,
                 'time_bought' => time(),
             ];
-            $projectId = Project::create($projectData)->id;
-            if ($traceData) {
-                $traceMainData = [
-                    'user_id' => $user->id,
-                    'username' => $user->username,
-                    'top_id' => $user->top_id,
-                    'rid' => $user->rid,
-                    'parent_id' => $user->parent_id,
-                    'is_tester' => $user->is_tester,
-                    'series_id' => $lottery->series_id,
-                    'lottery_sign' => $lottery->en_name,
-                    'method_sign' => $_item['method_id'],
-                    'method_group' => $_item['method_group'],
-                    'method_name' => $_item['method_name'],
-                    'bet_number' => $_item['code'],
-                    'user_prize_group' => $user->prize_group,
-                    'bet_prize_group' => $_item['prize_group'],
-                    'mode' => $_item['mode'],
-                    'times' => $_item['times'],
-                    'single_price' => $_item['price'],
-                    'total_price' => $_item['total_price'],
-                    'win_stop' => $inputDatas['trace_win_stop'],
-                    'total_issues' => count($traceData),
-                    'finished_issues' => 0,
-                    'canceled_issues' => 0,
-                    'start_issue' => key($traceData),
-                    'now_issue' => '',
-                    'end_issue' => array_key_last($traceData),
-                    'stop_issue' => '',
-                    'issue_process' => json_encode($traceData),
-                    'add_time' => time(),
-                    'stop_time' => 0,
-                    'cancel_time' => 0,
-                    'ip' => Request::ip(),
-                    'proxy_ip' => json_encode(Request::ip()),
-                    'day' => date('Ymd'),
-                    'bet_from' => $from,
-                ];
-                // 保存追号主
-                $traceId = LotteryTrace::create($traceMainData)->id;
-                // 保存追号
-                $i = 1;
-                foreach ($traceData as $issue => $multiple) {
-                    foreach ($data as $dataItem) {
-                        $traceListData = [
-                            'user_id' => $user->id,
-                            'username' => $user->username,
-                            'top_id' => $user->top_id,
-                            'rid' => $user->rid,
-                            'trace_id' => $traceId,
-                            'order_queue' => $i,
-                            'parent_id' => $user->parent_id,
-                            'is_tester' => $user->is_tester,
-                            'series_id' => $lottery->series_id,
-                            'lottery_sign' => $lottery->en_name,
-                            'method_sign' => $dataItem['method_id'],
-                            'method_group' => $_item['method_group'],
-                            'method_name' => $dataItem['method_name'],
-                            'issue' => $issue,
-                            'bet_number' => $dataItem['code'],
-                            'mode' => $dataItem['mode'],
-                            'times' => $dataItem['times'] * $multiple,
-                            'single_price' => $dataItem['price'],
-                            'total_price' => $dataItem['total_price'] * $multiple,
-                            'user_prize_group' => $user->prize_group,
-                            'bet_prize_group' => $dataItem['prize_group'],
-                            'ip' => Request::ip(),
-                            'proxy_ip' => json_encode(Request::ip()),
-                            'day' => date('Ymd'),
-                            'bet_from' => $from,
-                        ];
-                        $_item['total_price'] += $traceListData['total_price'];
-                        LotteryTraceList::create($traceListData);
-                    }
-                    $i++;
-                }
-            }
-            $returnData['project'][] = [
-                'id' => $projectId,
-                'cost' => $_item['total_price'],
-                'lottery_id' => $lottery->en_name,
-                'method_id' => $_item['method_id'],
-            ];
         }
+        $projectId = Project::create($projectData)->id;
+        if ($traceData) {
+            $traceMainData = [
+                'user_id' => $user->id,
+                'username' => $user->username,
+                'top_id' => $user->top_id,
+                'rid' => $user->rid,
+                'parent_id' => $user->parent_id,
+                'is_tester' => $user->is_tester,
+                'series_id' => $lottery->series_id,
+                'lottery_sign' => $lottery->en_name,
+                'method_sign' => $_item['method_id'],
+                'method_group' => $_item['method_group'],
+                'method_name' => $_item['method_name'],
+                'bet_number' => $_item['code'],
+                'user_prize_group' => $user->prize_group,
+                'bet_prize_group' => $_item['prize_group'],
+                'mode' => $_item['mode'],
+                'times' => $_item['times'],
+                'single_price' => $_item['price'],
+                'total_price' => $_item['total_price'],
+                'win_stop' => $inputDatas['trace_win_stop'],
+                'total_issues' => count($traceData),
+                'finished_issues' => 0,
+                'canceled_issues' => 0,
+                'start_issue' => key($traceData),
+                'now_issue' => '',
+                'end_issue' => array_key_last($traceData),
+                'stop_issue' => '',
+                'issue_process' => json_encode($traceData),
+                'add_time' => time(),
+                'stop_time' => 0,
+                'cancel_time' => 0,
+                'ip' => Request::ip(),
+                'proxy_ip' => json_encode(Request::ip()),
+                'day' => date('Ymd'),
+                'bet_from' => $from,
+            ];
+            // 保存追号主
+            $traceId = LotteryTrace::create($traceMainData)->id;
+            // 保存追号
+            $i = 1;
+            foreach ($traceData as $issue => $multiple) {
+                foreach ($data as $dataItem) {
+                    $traceListData = [
+                        'user_id' => $user->id,
+                        'username' => $user->username,
+                        'top_id' => $user->top_id,
+                        'rid' => $user->rid,
+                        'trace_id' => $traceId,
+                        'order_queue' => $i,
+                        'parent_id' => $user->parent_id,
+                        'is_tester' => $user->is_tester,
+                        'series_id' => $lottery->series_id,
+                        'lottery_sign' => $lottery->en_name,
+                        'method_sign' => $dataItem['method_id'],
+                        'method_group' => $_item['method_group'],
+                        'method_name' => $dataItem['method_name'],
+                        'issue' => $issue,
+                        'bet_number' => $dataItem['code'],
+                        'mode' => $dataItem['mode'],
+                        'times' => $dataItem['times'] * $multiple,
+                        'single_price' => $dataItem['price'],
+                        'total_price' => $dataItem['total_price'] * $multiple,
+                        'user_prize_group' => $user->prize_group,
+                        'bet_prize_group' => $dataItem['prize_group'],
+                        'ip' => Request::ip(),
+                        'proxy_ip' => json_encode(Request::ip()),
+                        'day' => date('Ymd'),
+                        'bet_from' => $from,
+                    ];
+                    $_item['total_price'] += $traceListData['total_price'];
+                    LotteryTraceList::create($traceListData);
+                }
+                $i++;
+            }
+        }
+        $returnData['project'][] = [
+            'id' => $projectId,
+            'cost' => $_item['total_price'],
+            'lottery_id' => $lottery->en_name,
+            'method_id' => $_item['method_id'],
+        ];
         return $returnData;
     }
 
@@ -147,8 +161,12 @@ trait ProjectTraits
      * @param $aPrized
      * @return bool|string
      */
-    public function setWon($openNumber, $sWnNumber, $aPrized)
-    {
+    public
+    function setWon(
+        $openNumber,
+        $sWnNumber,
+        $aPrized
+    ) {
         $totalBonus = 0;
         $totalCount = 0;
         $totalLevel = 0;
@@ -215,8 +233,12 @@ trait ProjectTraits
      * @param $iBasicMethodId
      * @return bool
      */
-    public function setFail($openNumber, $sWnNumber = null, $iBasicMethodId = null): bool
-    {
+    public
+    function setFail(
+        $openNumber,
+        $sWnNumber = null,
+        $iBasicMethodId = null
+    ): bool {
         try {
             DB::beginTransaction();
 //            $lockProject = $this->lockForUpdate()->find($this->id);
@@ -243,7 +265,8 @@ trait ProjectTraits
         return true;
     }
 
-    public function sendMoney(): void
+    public
+    function sendMoney(): void
     {
         $params = [
             'amount' => $this->bonus,
@@ -268,7 +291,7 @@ trait ProjectTraits
                     $oProject->save();
                     if (!empty($this->errors()->first())) {
                         $res = false;
-                        Log::info('更新状态出错' . json_encode($this->errors()->first(), JSON_PRETTY_PRINT));
+                        Log::info('更新状态出错'.json_encode($this->errors()->first(), JSON_PRETTY_PRINT));
                     } else {
                         $res = true;
                         Log::info('Finished Send Money with bonus');
@@ -280,7 +303,7 @@ trait ProjectTraits
             }
         } catch (Exception $e) {
             $res = false;
-            Log::info('投注-异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine()); //Clog::userBet
+            Log::info('投注-异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine()); //Clog::userBet
         }
         if ($res === true) {
             DB::commit();
@@ -293,8 +316,10 @@ trait ProjectTraits
      * @param $sWnNumber
      * @return string|null
      */
-    public function formatWiningNumber($sWnNumber = null):  ? string
-    {
+    public
+    function formatWiningNumber(
+        $sWnNumber = null
+    ): ?string {
         return is_array($sWnNumber) ? implode('', $sWnNumber) : $sWnNumber;
     }
 }
