@@ -147,11 +147,11 @@ trait IssueEncodeLogics
                 //Remaining TraceList to stop continuing
                 $oTraceListToUpdate = $oTrace->traceRunningLists();
                 $traceListStopData = [
-                    'status' => LotteryTraceList::STATUS_USER_STOPED,
+                    'status' => LotteryTraceList::STATUS_WIN_STOPED,
                 ];
                 $oTraceListToUpdate->update($traceListStopData);
                 //Update TraceDetail tables
-                $oTrace->status = LotteryTrace::STATUS_USER_CANCELED;
+                $oTrace->status = LotteryTrace::STATUS_WIN_STOPED;
                 $oTrace->canceled_issues = $oTraceListToUpdate->count();
                 $oTrace->canceled_amount = $oTraceListToUpdate->sum('total_price');
                 $oTrace->stop_issue = $oProject->issue;
