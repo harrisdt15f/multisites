@@ -13,7 +13,7 @@ trait FrontendLotteryRedirectBetListTraits
      */
     public static function updatePopularLotteriesCache(): void
     {
-        // self::webPopularLotteriesCache();web热门彩票需要奖期结束时间信息   重构后取消缓存方式
+        self::webPopularLotteriesCache();
         self::mobilePopularLotteriesCache();
     }
 
