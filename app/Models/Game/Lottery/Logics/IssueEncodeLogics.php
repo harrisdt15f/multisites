@@ -188,8 +188,11 @@ trait IssueEncodeLogics
         //then check if there have tracelists or not
         if ($currentIssue !== null && $currentIssue->tracelists()->exists()) {
             //select with criterias
-            $oTraceListEloq = $currentIssue->tracelists()->where('lottery_sign',
-                $oLottery->en_name)->get();
+            $oTraceListEloq = $currentIssue->tracelists()->where
+            ([
+                ['lottery_sign', '=', $oLottery->en_name],
+                ['status', '=', LotteryTraceList::STATUS_WAITING],
+            ])->get();
             //check if it is not empty then do other logics
             if (!empty($oTraceListEloq->toArray())) {
                 //loop ,select and then insert to project table and update the trace detail table
@@ -226,6 +229,7 @@ trait IssueEncodeLogics
                             ];
                             $projectId = Project::create($projectData)->id;
                             $oTraceList->project_id = $projectId;
+                            $oTraceList->status = LotteryTraceList::STATUS_RUNNING;
                             $oTraceList->save();
                             $TraceDetailUpdateData = [
                                 'now_issue' => $oTraceList->issue,

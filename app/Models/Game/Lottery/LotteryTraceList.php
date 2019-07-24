@@ -9,12 +9,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class LotteryTraceList extends BaseModel
 {
     protected $guarded = ['id'];
-    public const STATUS_RUNNING = 0;
-    public const STATUS_FINISHED = 1;
-    public const STATUS_USER_STOPED = 2;
-    public const STATUS_ADMIN_STOPED = 3;
-    public const STATUS_SYSTEM_STOPED = 4;
-    public const STATUS_WIN_STOPED = 5;
+    public const STATUS_WAITING = 0;
+    public const STATUS_RUNNING = 1;
+    public const STATUS_FINISHED = 2;
+    public const STATUS_USER_STOPED = 3;
+    public const STATUS_ADMIN_STOPED = 4;
+    public const STATUS_SYSTEM_STOPED = 5;
+    public const STATUS_WIN_STOPED = 6;
 
     public function trace(): BelongsTo
     {
