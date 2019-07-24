@@ -47,8 +47,9 @@ class LotteriesAddRequest extends BaseFormRequest
             'lottery.positions' => 'required|string', //
             'lottery.min_prize_group' => 'required|integer', //最小奖金组
             'lottery.max_prize_group' => 'required|integer', //最大奖金组
-            'lottery.min_times' => 'required|integer', //
-            'lottery.max_times' => 'required|integer', //
+            'lottery.min_times' => 'required|integer', //下注最小倍数
+            'lottery.max_times' => 'required|integer', //下注最大倍数
+            'lottery.max_bonus' => 'required|numeric', //下注最大奖金
             'lottery.valid_modes' => 'required|string', //
             'lottery.status' => 'required|in:0,1', //状态：0关闭 1开启
             //issue_rule
