@@ -46,7 +46,7 @@ trait ProjectTraits
         $returnData = [];
         foreach ($data as $_item) {
             $projectData = [
-                'serial_number' => Str::orderedUuid()->getHex(),
+                'serial_number' => self::getProjectSerialNumber(),
                 'user_id' => $user->id,
                 'username' => $user->username,
                 'top_id' => $user->top_id,
@@ -320,5 +320,13 @@ trait ProjectTraits
         $sWnNumber = null
     ): ?string {
         return is_array($sWnNumber) ? implode('', $sWnNumber) : $sWnNumber;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getProjectSerialNumber(): string
+    {
+        return Str::orderedUuid()->getHex();
     }
 }

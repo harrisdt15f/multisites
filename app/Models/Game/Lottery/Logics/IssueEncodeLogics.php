@@ -192,7 +192,9 @@ trait IssueEncodeLogics
             ([
                 ['lottery_sign', '=', $oLottery->en_name],
                 ['status', '=', LotteryTraceList::STATUS_WAITING],
+                ['user_id','=',$oProject->user_id]
             ])->get();
+            Log::channel('trace')->info($oTraceListEloq->toJson());
             //check if it is not empty then do other logics
             if (!empty($oTraceListEloq->toArray())) {
                 //loop ,select and then insert to project table and update the trace detail table
@@ -202,6 +204,7 @@ trait IssueEncodeLogics
                         if ($oTraceList->status === LotteryTraceList::STATUS_WAITING) {//停止了就不加追号了
                             //添加到 project 表
                             $projectData = [
+                                'serial_number' => Project::getProjectSerialNumber(),
                                 'user_id' => $oTraceList->user_id,
                                 'username' => $oTraceList->username,
                                 'top_id' => $oTraceList->top_id,
