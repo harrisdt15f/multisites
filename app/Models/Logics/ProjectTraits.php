@@ -105,7 +105,6 @@ trait ProjectTraits
                 'issue_process' => json_encode($traceData),
                 'add_time' => time(),
                 'stop_time' => 0,
-                'cancel_time' => 0,
                 'ip' => Request::ip(),
                 'proxy_ip' => json_encode(Request::ip()),
                 'bet_from' => $from,
