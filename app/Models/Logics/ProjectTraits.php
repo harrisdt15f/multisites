@@ -35,7 +35,8 @@ trait ProjectTraits
                 $arrTraceKeys = array_keys($inputDatas['trace_issues']);
                 $traceDataCollection = $lottery->checkTraceData($arrTraceKeys);
                 if (count($arrTraceKeys) !== $traceDataCollection->count()) {
-                    return $arr['error'] = '100309';
+                    $arr['error'] = '100309';
+                    return $arr;
                 }
                 $traceFirstMultiple = Arr::first($inputDatas['trace_issues']);
                 $traceData = array_slice($inputDatas['trace_issues'], 1, null, true);
