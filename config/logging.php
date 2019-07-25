@@ -62,6 +62,12 @@ return [
             'level' => 'debug',
             'days' => 14,
         ],
+        'trace' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/trace.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
         'operate' => [
             'driver' => 'daily',
             'path' => storage_path('logs/operate.log'),
