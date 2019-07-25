@@ -24,7 +24,9 @@ class LotteriesStopTraceRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|exists:lottery_traces', //lottery_traces表id
+            'type' => 'required|integer|in:1,2', //1.停止所有追号  2.取消一期追号
+            'lottery_traces_id' => 'required_if:type,1|integer|exists:lottery_traces,id', //lottery_traces表id
+            'lottery_trace_lists_id' => 'required_if:type,2|integer|exists:lottery_trace_lists,id', //lottery_trace_lists表id
         ];
     }
 
