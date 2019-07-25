@@ -26,6 +26,8 @@ trait ProjectTraits
     public static function addProject($user, $lottery, $currentIssue, $data, $inputDatas): array
     {
         $traceFirstMultiple = 1;
+        $isTrace = 0;
+        $traceData = [];
         if (isset($inputDatas['is_trace'])) {
             $isTrace = (int)$inputDatas['is_trace'];
             if ($isTrace === 1 && count($inputDatas['trace_issues']) > 1) {
@@ -38,9 +40,6 @@ trait ProjectTraits
                 $traceFirstMultiple = Arr::first($inputDatas['trace_issues']);
                 $traceData = array_slice($inputDatas['trace_issues'], 1, null, true);
             }
-        } else {
-            $isTrace = 0;
-            $traceData = [];
         }
         $from = $inputDatas['from'] ?? 1; //手机端 还是 pc 端
         $returnData = [];
