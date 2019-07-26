@@ -52,6 +52,7 @@ class LotteriesAddRequest extends BaseFormRequest
             'lottery.max_bonus' => 'required|numeric', //下注最大奖金
             'lottery.valid_modes' => 'required|string', //下注模式 1元 2角 3分
             'lottery.status' => 'required|in:0,1', //状态：0关闭 1开启
+            'lottery.icon' => 'required|image|mimes:jpeg,png,jpg', //彩种图标
             //issue_rule
             'issue_rule' => 'required|array', //
             'issue_rule.lottery_id' => 'required|same:lottery.en_name', //英文名
@@ -67,6 +68,8 @@ class LotteriesAddRequest extends BaseFormRequest
             //cron
             'cron' => 'array',
             'cron.schedule' => 'required_if:lottery.auto_open,1|string', //定时表达式
+            'cron.command' => 'required_if:lottery.auto_open,1|string', //命令
+            'cron.param' => 'required_if:lottery.auto_open,1|string', //参数
             'cron.status' => 'required_if:lottery.auto_open,1|integer|in:0,1', //自动开奖状态：0关闭 1开启
         ];
     }

@@ -22,14 +22,14 @@ class LotterySchedule extends Command
      *
      * @var string
      */
-    protected $signature = 'LotterySchedule  {--lottery_sign=}';
+    protected $signature = 'LotterySchedule {lottery_sign}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = '自开彩种自动开奖 option --> lottery_sign';
+    protected $description = '自开彩种自动开奖 argument --> lottery_sign';
 
     /**
      * Execute the console command.
@@ -38,7 +38,7 @@ class LotterySchedule extends Command
      */
     public function handle()
     {
-        $lotterySign = $this->option('lottery_sign');
+        $lotterySign = $this->argument('lottery_sign');
         if ($lotterySign) {
             $lotteryIssueEloq = LotteryIssue::where([
                 ['lottery_id', $lotterySign],
@@ -67,6 +67,7 @@ class LotterySchedule extends Command
                 if ($lotteryIssueEloq->save()) {
                     dispatch(new IssueEncoder($lotteryIssueEloq->toArray()))->onQueue('open_numbers');
                 }
+                // Log::info($lotterySign . '======================' . $lotteryIssueEloq->issue . '开奖号码' . $openCodeStr);
             }
         }
     }

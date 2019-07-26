@@ -37,7 +37,7 @@ class Kernel extends ConsoleKernel
         $lotteryScheduleEloqs = CronJob::getOpenCronJob();
         foreach ($lotteryScheduleEloqs as $item) {
             $criterias = json_decode($item->param, true);
-            $schedule->command($item->command, $criterias)->cron($item->schedule);
+            $schedule->command($item->command, [$criterias])->cron($item->schedule);
         }
         $schedule->command('UserProfits')->everyFiveMinutes();
     }
