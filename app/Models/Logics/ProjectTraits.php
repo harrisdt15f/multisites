@@ -21,9 +21,10 @@ trait ProjectTraits
      * @param $currentIssue
      * @param $data
      * @param $inputDatas
+     * @param  int  $from  手机端 还是 pc 端
      * @return array
      */
-    public static function addProject($user, $lottery, $currentIssue, $data, $inputDatas): array
+    public static function addProject($user, $lottery, $currentIssue, $data, $inputDatas, $from = 1): array
     {
         $traceFirstMultiple = 1;
         $isTrace = 0;
@@ -35,13 +36,13 @@ trait ProjectTraits
                 $arrTraceKeys = array_keys($inputDatas['trace_issues']);
                 $traceDataCollection = $lottery->checkTraceData($arrTraceKeys);
                 if (count($arrTraceKeys) !== $traceDataCollection->count()) {
-                    return $arr['error'] = '100309';
+                    $arr['error'] = '100309';
+                    return $arr;
                 }
                 $traceFirstMultiple = Arr::first($inputDatas['trace_issues']);
                 $traceData = array_slice($inputDatas['trace_issues'], 1, null, true);
             }
         }
-        $from = $inputDatas['from'] ?? 1; //手机端 还是 pc 端
         $returnData = [];
         foreach ($data as $_item) {
             $projectData = [
