@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Models\Game\Lottery\CronJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -16,7 +17,7 @@ class Kernel extends ConsoleKernel
         Commands\DeleteCachePicControl::class,
         Commands\AllocationRechargeFundControl::class,
         Commands\GenerateIssueControl::class,
-        Commands\ZxyfcInputCodeControl::class,
+        Commands\LotterySchedule::class,
         Commands\UserProfitsControl::class,
     ];
 
@@ -32,9 +33,12 @@ class Kernel extends ConsoleKernel
         $schedule->command('AllocationRechargeFund')->daily()->at('00:00');
         //定时生成奖期
         $schedule->command('GenerateIssue')->everyMinute();
-        //中兴一分彩自动开奖
-        $schedule->command('ZxyfcInputCode')->everyMinute();
-
+        //自开彩种自动开奖 option --> lottery_sign
+        $lotteryScheduleEloqs = CronJob::getOpenCronJob();
+        foreach ($lotteryScheduleEloqs as $item) {
+            $criterias = json_decode($item->param, true);
+            $schedule->command($item->command, $criterias)->cron($item->schedule);
+        }
         $schedule->command('UserProfits')->everyFiveMinutes();
     }
 

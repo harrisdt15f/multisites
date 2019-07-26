@@ -9,6 +9,7 @@
 namespace App\Http\Requests\Backend\Game\Lottery;
 
 use App\Http\Requests\BaseFormRequest;
+use Illuminate\Validation\Rule;
 
 class LotteriesEditRequest extends BaseFormRequest
 {
@@ -34,8 +35,8 @@ class LotteriesEditRequest extends BaseFormRequest
             'lottery' => 'required|array', //
             'lottery.id' => 'required|exists:lottery_lists,id', //
             'lottery.lottery_type' => 'required|in:1,2', //1开奖号码可重复  2开奖号码不可重复
-            'lottery.cn_name' => 'required|string', //中文名
-            'lottery.en_name' => 'required|alpha_num', //英文名
+            'lottery.cn_name' => ['required', 'string', Rule::unique('lottery_lists', 'cn_name')->ignore($this->get('lottery')['id'])], //中文名
+            'lottery.en_name' => ['required', 'alpha_num', Rule::unique('lottery_lists', 'en_name')->ignore($this->get('lottery')['id'])], //英文名
             'lottery.series_id' => 'required|alpha_num', //彩种系列
             'lottery.is_fast' => 'required|in:0,1', //是否快彩
             'lottery.auto_open' => 'required|in:0,1', //是否自开彩
@@ -65,6 +66,8 @@ class LotteriesEditRequest extends BaseFormRequest
             'issue_rule.encode_time' => 'required|integer',
             'issue_rule.issue_count' => 'required|integer',
             'issue_rule.status' => 'required|same:lottery.status', //状态：0关闭 1开启
+            //cron
+            'cron' => 'required_if:lottery.auto_open,1|string', //定时表达式
         ];
     }
 
