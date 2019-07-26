@@ -9,7 +9,6 @@ class CronJob extends BaseModel
 {
 	use CronJobLogics;
 	
-	public const COMMAND = 'LotterySchedule';
 	public const STATUS_OPEN = 1;
 	public const STATUS_CLOSE = 0;
 
