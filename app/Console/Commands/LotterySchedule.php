@@ -11,6 +11,7 @@ namespace App\Console\Commands;
 
 use App\Jobs\Lottery\Encode\IssueEncoder;
 use App\Models\Game\Lottery\LotteryIssue;
+use App\Models\Game\Lottery\LotterySerie;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
@@ -22,14 +23,14 @@ class LotterySchedule extends Command
      *
      * @var string
      */
-    protected $signature = 'LotterySchedule  {--lottery_sign=}';
+    protected $signature = 'LotterySchedule {lottery_sign}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = '自开彩种自动开奖 option --> lottery_sign';
+    protected $description = '自开彩种自动开奖 argument --> lottery_sign';
 
     /**
      * Execute the console command.
@@ -38,7 +39,7 @@ class LotterySchedule extends Command
      */
     public function handle()
     {
-        $lotterySign = $this->option('lottery_sign');
+        $lotterySign = $this->argument('lottery_sign');
         if ($lotterySign) {
             $lotteryIssueEloq = LotteryIssue::where([
                 ['lottery_id', $lotterySign],
@@ -58,8 +59,9 @@ class LotterySchedule extends Command
                 } else {
                     return;
                 }
-                $lotteryEloq = $lotteryIssueEloq->lottery->load('serie');
-                $splitter = $lotteryEloq->serie->encode_splitter; //该彩种分割开奖号码的方式
+                $seriesList = LotterySerie::getList();
+                $serieArr = $seriesList[$lotteryIssueEloq->lottery->series_id]; //当前彩种的系列Arr
+                $splitter = $serieArr['encode_splitter']; //该彩种分割开奖号码的方式
                 $openCodeStr = implode($splitter, $openCodeArr); //开奖号码string
                 $lotteryIssueEloq->status_encode = LotteryIssue::ENCODED;
                 $lotteryIssueEloq->encode_time = time();
@@ -67,6 +69,7 @@ class LotterySchedule extends Command
                 if ($lotteryIssueEloq->save()) {
                     dispatch(new IssueEncoder($lotteryIssueEloq->toArray()))->onQueue('open_numbers');
                 }
+                Log::info($lotterySign . '======================' . $lotteryIssueEloq->issue . '开奖号码' . $openCodeStr);
             }
         }
     }
