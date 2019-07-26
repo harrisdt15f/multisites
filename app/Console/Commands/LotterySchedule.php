@@ -11,6 +11,7 @@ namespace App\Console\Commands;
 
 use App\Jobs\Lottery\Encode\IssueEncoder;
 use App\Models\Game\Lottery\LotteryIssue;
+use App\Models\Game\Lottery\LotterySerie;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
@@ -58,8 +59,9 @@ class LotterySchedule extends Command
                 } else {
                     return;
                 }
-                $lotteryEloq = $lotteryIssueEloq->lottery->load('serie');
-                $splitter = $lotteryEloq->serie->encode_splitter; //该彩种分割开奖号码的方式
+                $seriesList = LotterySerie::getList();
+                $serieArr = $seriesList[$lotteryIssueEloq->lottery->series_id]; //当前彩种的系列Arr
+                $splitter = $serieArr['encode_splitter']; //该彩种分割开奖号码的方式
                 $openCodeStr = implode($splitter, $openCodeArr); //开奖号码string
                 $lotteryIssueEloq->status_encode = LotteryIssue::ENCODED;
                 $lotteryIssueEloq->encode_time = time();
@@ -67,7 +69,7 @@ class LotterySchedule extends Command
                 if ($lotteryIssueEloq->save()) {
                     dispatch(new IssueEncoder($lotteryIssueEloq->toArray()))->onQueue('open_numbers');
                 }
-                // Log::info($lotterySign . '======================' . $lotteryIssueEloq->issue . '开奖号码' . $openCodeStr);
+                Log::info($lotterySign . '======================' . $lotteryIssueEloq->issue . '开奖号码' . $openCodeStr);
             }
         }
     }
