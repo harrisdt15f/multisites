@@ -26,7 +26,6 @@ class LotteryNoticeAddRequest extends BaseFormRequest
         return [
             'lotteries_id' => 'required|exists:lottery_lists,en_name|unique:frontend_lottery_notice_lists', //彩种标识
             'cn_name' => 'required|exists:lottery_lists,cn_name|unique:frontend_lottery_notice_lists', //彩种中文名
-            'icon' => 'required|image', //图标
             'status' => 'required|integer|in:0,1', //开启状态：0关闭 1开启
         ];
     }
