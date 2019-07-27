@@ -29,17 +29,15 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('DeleteCachePic')->daily()->at('03:00');
-        $schedule->command('AllocationRechargeFund')->daily()->at('00:00');
-        //定时生成奖期
-        $schedule->command('GenerateIssue')->everyMinute();
-        //自开彩种自动开奖 option --> lottery_sign
-        $lotteryScheduleEloqs = CronJob::getOpenCronJob();
-        foreach ($lotteryScheduleEloqs as $item) {
-            $criterias = json_decode($item->param, true);
-            $schedule->command($item->command, [$criterias])->cron($item->schedule);
+        $scheduleArr = CronJob::getOpenCronJob();
+        foreach ($scheduleArr as $scheduleItem) {
+            $criterias = json_decode($scheduleItem['param'], true);
+            if (empty($criterias)) {
+                $schedule->command($scheduleItem['command'])->cron($scheduleItem['schedule']);
+            } else {
+                $schedule->command($scheduleItem['command'], [$criterias])->cron($scheduleItem['schedule']);
+            }
         }
-        $schedule->command('UserProfits')->everyFiveMinutes();
     }
 
     /**
