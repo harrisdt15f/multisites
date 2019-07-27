@@ -26,6 +26,7 @@ class UserDaysalaryRequest extends BaseFormRequest
         return [
             'username' => 'filled|string|alpha_dash',
             'date_to'=>'filled|date',
+            'count' => 'filled|integer',
         ];
     }
 
