@@ -4,20 +4,24 @@ namespace App\Rules\Frontend\Lottery\Bet;
 
 use App\Models\Game\Lottery\LotteryList;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Facades\Log;
 
 class BallsCodeRule implements Rule
 {
     protected $message = '注单号不符合';
     protected $lottery;
+    protected $balls;
 
     /**
      * Create a new rule instance.
      *
      * @param $lotterySign
+     * @param $balls
      */
-    public function __construct($lotterySign)
+    public function __construct($lotterySign, $balls)
     {
         $this->lottery = LotteryList::where('en_name', $lotterySign)->first();
+        $this->balls = $balls;
     }
 
 
@@ -29,13 +33,19 @@ class BallsCodeRule implements Rule
      */
     public function passes($attribute, $value)
     {
+
         switch ($this->lottery->series_id) {
             case 'ssc':
                 $pattern = '/^((?!\&)(?!.*\&$)(?!.*?\&\&)[0-9&]{0,19}\|?){1,5}$/';
                 $result = $this->checkValid($pattern, $value);
                 break;
             case 'lotto':
-                $pattern = '/^(((?!\&)(?!.*\&$)(?!\|)(?!.*\|$)(?! )(?!.* $)(((0[1-9]|1[0-1])\&?)|((0[1-9]|1[0-1]) ?)){1,11})\|?)*$/';
+                $methodGroup = $this->checkMethodGroup($attribute);
+                if ($methodGroup == 'QW') {
+                    $pattern = '/^((?! )(?!.*  $)(?!.* $)(([0-5]) ?){1,6})*$/';
+                } else {
+                    $pattern = '/^(((?!\&)(?!.*\&$)(?!\|)(?!.*\|$)(?! )(?!.* $)(((0[1-9]|1[0-1])\&?)|((0[1-9]|1[0-1]) ?)){1,11})\|?)*$/';
+                }
                 $result = $this->checkValid($pattern, $value);
                 break;
             default:
@@ -53,6 +63,27 @@ class BallsCodeRule implements Rule
         } else {
             return true;
         }
+    }
+
+    /**
+     * @param $attribute
+     * @return string
+     */
+    private function checkMethodGroup($attribute): string
+    {
+        $methodGroup = '';
+        preg_match('/\d+/', $attribute, $matches);
+        try {
+            $methodGroup = $this->balls[$matches[0]]['method_group'];
+        } catch (\Exception $e) {
+            if (!empty($this->balls)) {
+                $arrMethod = json_decode($this->balls, true);
+                $methodGroup = $arrMethod[$matches[0]]['method_group'];
+            } else {
+                Log::error($e->getMessage().$e->getTraceAsString().$attribute);
+            }
+        }
+        return $methodGroup;
     }
 
     /**
