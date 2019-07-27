@@ -33,9 +33,9 @@ class Kernel extends ConsoleKernel
         foreach ($scheduleArr as $scheduleItem) {
             $criterias = json_decode($scheduleItem['param'], true);
             if (empty($criterias)) {
-                $schedule->command($scheduleItem['command'])->cron($scheduleItem['schedule']);
+                $schedule->command($scheduleItem['command'])->cron($scheduleItem['schedule']); //没有argument的情况
             } else {
-                $schedule->command($scheduleItem['command'], [$criterias])->cron($scheduleItem['schedule']);
+                $schedule->command($scheduleItem['command'], [$criterias])->cron($scheduleItem['schedule']); //有argument的情况
             }
         }
     }
