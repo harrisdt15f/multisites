@@ -5,7 +5,6 @@
 namespace App\Models\User;
 
 use App\Models\BaseModel;
-use App\Models\User\Fund\FrontendUsersAccountsReport;
 
 class UserProfits extends BaseModel
 {
@@ -19,34 +18,4 @@ class UserProfits extends BaseModel
 
 
     protected $guarded = ['id'];
-
-
-    public static function getSumProfits(string $date, string $username, array $type_sign) : float
-    {
-        return FrontendUsersAccountsReport::where([
-            ['created_at', '>', $date],
-            ['username', $username]
-        ])
-            ->whereIn('type_sign', $type_sign)
-            ->sum('amount');
-    }
-
-
-    public static function updateProfits(array $data) : bool
-    {
-        if($data['user_id'] && $data['date']){
-            $row = self::where([
-                ['user_id', $data['user_id']],
-                ['date', $data['date']]
-            ])->first();
-
-            if (empty($row)){
-
-                return (bool)self::create($data);
-            }else{
-
-                return (bool)$row->update($data);
-            }
-        }
-    }
 }

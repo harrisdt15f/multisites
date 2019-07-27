@@ -20,6 +20,8 @@ class Kernel extends ConsoleKernel
         Commands\GenerateIssueControl::class,
         Commands\ZxyfcInputCodeControl::class,
         Commands\UserProfitsControl::class,
+        Commands\UserDaysalaryControl::class,
+        Commands\SendDaysalaryControl::class,
     ];
 
     /**
@@ -45,6 +47,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('ZxyfcInputCode')->everyMinute();
 
         $schedule->command('UserProfits')->everyFiveMinutes();
+
+        //每日2点 统计用户日工资
+        $schedule->command('UserDaysalary')->daily()->at('02:00');
+        //每日3点 发放用户日工资
+        $schedule->command('SendDaysalary')->daily()->at('03:00');
     }
 
     /**
