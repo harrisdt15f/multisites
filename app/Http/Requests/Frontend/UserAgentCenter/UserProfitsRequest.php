@@ -27,6 +27,7 @@ class UserProfitsRequest extends BaseFormRequest
             'username' => 'filled|string|alpha_dash',
             'date_to'=>'filled|date',
             'date_from'=>'filled|date',
+            'count' => 'filled|integer',
         ];
     }
 
