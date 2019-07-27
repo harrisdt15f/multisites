@@ -19,6 +19,8 @@ class Kernel extends ConsoleKernel
         Commands\GenerateIssueControl::class,
         Commands\LotterySchedule::class,
         Commands\UserProfitsControl::class,
+        Commands\UserDaysalaryControl::class,
+        Commands\SendDaysalaryControl::class,
     ];
 
     /**
