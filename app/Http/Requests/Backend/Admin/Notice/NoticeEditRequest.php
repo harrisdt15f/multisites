@@ -30,13 +30,11 @@ class NoticeEditRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|numeric|exists:frontend_message_notices,id',
-            'type' => 'required|numeric',
+            'id' => 'required|numeric|exists:frontend_message_notices_contents,id',
             'title' => 'required|string',
             'content' => 'required|string',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date',
-            'status' => 'required|numeric|in:0,1',
+            'start_time' => 'date_format:Y-m-d H:i:s',
+            'end_time' => 'date_format:Y-m-d H:i:s',
         ];
     }
 

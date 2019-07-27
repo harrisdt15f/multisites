@@ -38,4 +38,6 @@ Route::group(['prefix' => 'user-handle', 'namespace' => 'Users'], function () {
     Route::match(['post', 'options'], 'user_recharge_history', ['as' => $namePrefix . 'user_recharge_history', 'uses' => $controller . 'userRechargeHistory']);
     //给用户扣款
     Route::match(['post', 'options'], 'deduction_balance', ['as' => $namePrefix . 'deduction_balance', 'uses' => $controller . 'deductionBalance']);
+    //用户银行卡列表
+    Route::match(['post', 'options'], 'bank-card-list', ['as' => $namePrefix . 'bank-card-list', 'uses' => $controller . 'bankCardList']);
 });

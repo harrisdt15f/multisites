@@ -7,10 +7,16 @@ use App\Models\BaseModel;
 
 class FrontendMessageNotice extends BaseModel
 {
+	public const UN_READ=0;//未读
+	public const READ=1;//已读
+
     protected $guarded = ['id'];
 
-    public function admin()
+    /**
+     * 公告|站内信 详情信息
+     */
+    public function messageContent()
     {
-        return $this->hasOne(BackendAdminUser::class, 'id', 'admin_id');
+    	return $this->hasOne(FrontendMessageNoticesContent::class,'id','notices_content_id');
     }
 }

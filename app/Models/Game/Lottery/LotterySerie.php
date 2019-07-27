@@ -9,13 +9,16 @@
 namespace App\Models\Game\Lottery;
 
 use App\Models\BaseModel;
+use App\Models\Game\Lottery\Logics\LotterySerieLogics;
 
 class LotterySerie extends BaseModel
 {
+    use LotterySerieLogics;
+
     protected $guarded = ['id'];
 
     public function lotteries()
     {
-        return $this->hasMany(LotteryList::Class, 'series_id', 'series_name');
+        return $this->hasMany(LotteryList::class, 'series_id', 'series_name');
     }
 }

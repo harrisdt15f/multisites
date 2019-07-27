@@ -23,6 +23,10 @@ class Project extends BaseModel
     public const STATUS_PRIZE_SENT = 4;
     public const STATUS_DROPED_BY_SYSTEM = 5;
 
+    public const FROM_DESKTOP = 1;
+    public const FROM_MOBILE = 2;
+    public const FROM_OTHER = 3;
+
     /**
      * @return HasOne
      */

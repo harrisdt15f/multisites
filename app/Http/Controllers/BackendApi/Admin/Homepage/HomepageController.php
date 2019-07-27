@@ -81,13 +81,15 @@ class HomepageController extends BackEndApiMainController
     public function deleteCache($key): void
     {
         $homepageCache = [
-            'qr.code' => 'homepageQrCode',
-            'notice' => 'homepageNotice',
-            'activity' => 'homepageActivity',
-            'logo' => 'homepageLogo',
-            'frontend.ico' => 'homepageIco',
+            'qr.code' => 'homepage_qrcode',
+            'notice' => 'homepage_notice',
+            'activity' => 'homepage_activity',
+            'logo' => 'homepage_logo',
+            'frontend.ico' => 'homepage_ico',
         ];
-        $cacheRelated = new CacheRelated();
-        $cacheRelated->delete($homepageCache[$key]);
+        if (isset($homepageCache[$key])) {
+            $cacheRelated = new CacheRelated();
+            $cacheRelated->delete($homepageCache[$key]);
+        }
     }
 }

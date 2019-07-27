@@ -9,6 +9,7 @@
 namespace App\Http\Requests\Backend\Admin\Homepage;
 
 use App\Http\Requests\BaseFormRequest;
+use Illuminate\Validation\Rule;
 
 class PopularMethodsEditRequest extends BaseFormRequest
 {
@@ -31,8 +32,8 @@ class PopularMethodsEditRequest extends BaseFormRequest
     {
         return [
             'id' => 'required|exists:frontend_lottery_fnf_betable_lists,id',
-            'lotteries_id' => 'required|exists:lottery_lists,en_name',
-            'method_id' => 'required|exists:frontend_lottery_fnf_betable_methods,id',
+            'lotteries_id' => ['required', 'exists:lottery_lists,en_name', Rule::unique('frontend_lottery_fnf_betable_lists')->ignore($this->get('id'))],
+            'method_id' => ['required', 'exists:frontend_lottery_fnf_betable_methods,id', Rule::unique('frontend_lottery_fnf_betable_lists')->ignore($this->get('id'))],
         ];
     }
 

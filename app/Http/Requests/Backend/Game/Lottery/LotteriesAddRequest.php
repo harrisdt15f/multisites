@@ -47,10 +47,12 @@ class LotteriesAddRequest extends BaseFormRequest
             'lottery.positions' => 'required|string', //
             'lottery.min_prize_group' => 'required|integer', //最小奖金组
             'lottery.max_prize_group' => 'required|integer', //最大奖金组
-            'lottery.min_times' => 'required|integer', //
-            'lottery.max_times' => 'required|integer', //
-            'lottery.valid_modes' => 'required|string', //
+            'lottery.min_times' => 'required|integer', //下注最小倍数
+            'lottery.max_times' => 'required|integer', //下注最大倍数
+            'lottery.max_bonus' => 'required|numeric', //下注最大奖金
+            'lottery.valid_modes' => 'required|string', //下注模式 1元 2角 3分
             'lottery.status' => 'required|in:0,1', //状态：0关闭 1开启
+            'lottery.icon' => 'required|image|mimes:jpeg,png,jpg', //彩种图标
             //issue_rule
             'issue_rule' => 'required|array', //
             'issue_rule.lottery_id' => 'required|same:lottery.en_name', //英文名
@@ -63,6 +65,12 @@ class LotteriesAddRequest extends BaseFormRequest
             'issue_rule.encode_time' => 'required|integer',
             'issue_rule.issue_count' => 'required|integer',
             'issue_rule.status' => 'required|same:lottery.status', //状态：0关闭 1开启
+            //cron
+            'cron' => 'array',
+            'cron.schedule' => 'required_if:lottery.auto_open,1|string', //定时表达式
+            'cron.command' => 'required_if:lottery.auto_open,1|string', //命令
+            'cron.param' => 'required_if:lottery.auto_open,1|string', //参数
+            'cron.status' => 'required_if:lottery.auto_open,1|integer|in:0,1', //自动开奖状态：0关闭 1开启
         ];
     }
 

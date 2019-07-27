@@ -30,12 +30,12 @@ class NoticeAddRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'type' => 'required|numeric',
-            'title' => 'required|string|unique:frontend_message_notices,title',
-            'content' => 'required|string',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date',
-            'status' => 'required|numeric|in:0,1',
+            'type' => 'required|numeric', // 1公告 2站内信
+            // 'receive_user' => 'required_if:type,2',
+            'title' => 'required|string', // 标题
+            'content' => 'required|string', // 内容
+            'start_time' => 'required_if:type,1|date_format:Y-m-d H:i:s', //（公告）开始时间
+            'end_time' => 'required_if:type,1|date_format:Y-m-d H:i:s', //（公告）结束时间
         ];
     }
 

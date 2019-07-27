@@ -5,6 +5,7 @@ namespace App\Http\Controllers\BackendApi\Admin\Notice;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Admin\Notice\NoticeAddRequest;
 use App\Http\Requests\Backend\Admin\Notice\NoticeDeleteRequest;
+use App\Http\Requests\Backend\Admin\Notice\NoticeDetailRequest;
 use App\Http\Requests\Backend\Admin\Notice\NoticeEditRequest;
 use App\Http\Requests\Backend\Admin\Notice\NoticeSortRequest;
 use App\Http\Requests\Backend\Admin\Notice\NoticeTopRequest;
@@ -20,17 +21,18 @@ use Illuminate\Http\JsonResponse;
 class NoticeController extends BackEndApiMainController
 {
     /**
-     * 公告列表
+     * 公告|站内信 列表
      * @param  NoticeDetailAction $action
      * @return JsonResponse
      */
-    public function detail(NoticeDetailAction $action): JsonResponse
+    public function detail(NoticeDetailRequest $request, NoticeDetailAction $action): JsonResponse
     {
-        return $action->execute($this);
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
     }
 
     /**
-     * 添加公告
+     * 添加 公告|站内信
      * @param  NoticeAddRequest $request
      * @param  NoticeAddAction  $action
      * @return JsonResponse
@@ -42,7 +44,7 @@ class NoticeController extends BackEndApiMainController
     }
 
     /**
-     * 编辑公告
+     * 编辑 公告|站内信
      * @param  NoticeEditRequest $request
      * @param  NoticeEditAction  $action
      * @return JsonResponse
@@ -54,7 +56,7 @@ class NoticeController extends BackEndApiMainController
     }
 
     /**
-     * 删除公告
+     * 删除 公告|站内信
      * @param  NoticeDeleteRequest $request
      * @param  NoticeDeleteAction  $action
      * @return JsonResponse
@@ -63,39 +65,5 @@ class NoticeController extends BackEndApiMainController
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
-    }
-
-    /**
-     * 公告排序
-     * @param  NoticeSortRequest $request
-     * @param  NoticeSortAction  $action
-     * @return JsonResponse
-     */
-    public function sort(NoticeSortRequest $request, NoticeSortAction $action): JsonResponse
-    {
-        $inputDatas = $request->validated();
-        return $action->execute($this, $inputDatas);
-    }
-
-    /**
-     * 公告置顶
-     * @param  NoticeTopRequest $request
-     * @param  NoticeTopAction  $action
-     * @return JsonResponse
-     */
-    public function top(NoticeTopRequest $request, NoticeTopAction $action): JsonResponse
-    {
-        $inputDatas = $request->validated();
-        return $action->execute($this, $inputDatas);
-    }
-
-    /**
-     * 删除前台首页缓存
-     * @return void
-     */
-    public function deleteCache(): void
-    {
-        $cacheRelated = new CacheRelated();
-        $cacheRelated->delete('homepageNotice');
     }
 }
