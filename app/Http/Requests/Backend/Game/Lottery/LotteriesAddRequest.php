@@ -71,6 +71,7 @@ class LotteriesAddRequest extends BaseFormRequest
             'cron.command' => 'required_if:lottery.auto_open,1|string', //命令
             'cron.param' => 'required_if:lottery.auto_open,1|string', //参数
             'cron.status' => 'required_if:lottery.auto_open,1|integer|in:0,1', //自动开奖状态：0关闭 1开启
+            'cron.remarks' => 'required_if:lottery.auto_open,1|string', //备注
         ];
     }
 

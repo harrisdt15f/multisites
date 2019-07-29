@@ -10,18 +10,16 @@ trait CronJobLogics
     /**
      * 插入cronJob数据
      * @param  array   $cron
-     * @param  string  $lotteryName
      * @return array
      */
-    public static function createCronJob($cron, $lotteryName): array
+    public static function createCronJob($cron): array
     {
-        $remarks = $lotteryName . '->自动开奖任务';
         $cronJobData = [
             'command' => $cron['command'],
             'param' => $cron['param'],
             'schedule' => $cron['schedule'],
             'status' => $cron['status'],
-            'remarks' => $remarks,
+            'remarks' => $cron['remarks'],
         ];
         $cronJobEloq = new self();
         $cronJobEloq->fill($cronJobData);
