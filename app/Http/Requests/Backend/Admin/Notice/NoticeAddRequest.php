@@ -34,6 +34,8 @@ class NoticeAddRequest extends BaseFormRequest
             // 'receive_user' => 'required_if:type,2',
             'title' => 'required|string', // 标题
             'content' => 'required|string', // 内容
+            'pic_name' => 'string', //图片名称
+            'pic_path' => 'string', //图片路径
             'start_time' => 'required_if:type,1|date_format:Y-m-d H:i:s', //（公告）开始时间
             'end_time' => 'required_if:type,1|date_format:Y-m-d H:i:s', //（公告）结束时间
         ];
