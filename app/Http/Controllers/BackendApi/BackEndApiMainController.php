@@ -362,30 +362,4 @@ class BackEndApiMainController extends Controller
         }
         return $eloqM;
     }
-
-    /** 公用上传
-     * @param $input
-     * @param $folderName
-     * @param $platform_id
-     * @param $platform_name
-     * @return JsonResponse|string
-     */
-    public function publicUploadImg($input, $platform_id, $platform_name): string
-    {
-        if (!isset($input['folder_name'])) {
-            $folderName = date('Ymd');
-        } else {
-            $folderName = $input['folder_name'];
-        }
-        //接收文件信息
-        $imageObj = new ImageArrange();
-        $path = $imageObj->depositPath($folderName, $platform_id, $platform_name);
-        //进行上传
-        $pic = $imageObj->uploadImg($input['pic'], $path);
-        if ($pic['success'] === false) {
-            return $this->msgOut(false, [], '400', $pic['msg']);
-        }
-        return '/' . $pic['path'];
-    }
-
 }
