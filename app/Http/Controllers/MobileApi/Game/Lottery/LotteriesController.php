@@ -5,16 +5,16 @@ namespace App\Http\Controllers\MobileApi\Game\Lottery;
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesAvailableIssuesRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesBetRequest;
-use App\Http\Requests\Frontend\Game\Lottery\LotteriesIssueHistoryRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesProjectHistoryRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesTracesHistoryRequest;
+use App\Http\Requests\Mobile\Game\Lottery\LotteriesIssueHistoryRequest;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesAvailableIssuesAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesBetAction;
-use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesIssueHistoryAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryInfoAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryListAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesProjectHistoryAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesTracesHistoryAction;
+use App\Http\SingleActions\Mobile\Game\Lottery\LotteriesIssueHistoryAction;
 use App\Http\SingleActions\Mobile\Game\Lottery\LotterieslotteryCenterAction;
 use Illuminate\Http\JsonResponse;
 
@@ -45,7 +45,6 @@ class LotteriesController extends FrontendApiMainController
      * @param   LotteriesIssueHistoryRequest  $request
      * @param   LotteriesIssueHistoryAction   $action
      * @return  JsonResponse
-     * @todo    需要改真实数据 暂时先从那边挪接口
      */
     public function issueHistory(
         LotteriesIssueHistoryRequest $request,
