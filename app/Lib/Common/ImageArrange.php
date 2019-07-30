@@ -105,7 +105,7 @@ class ImageArrange
     }
 
     //删除文件
-    public function deletePic($path)
+    public static function deletePic($path)
     {
         if (file_exists($path)) {
             if (!is_writable(dirname($path))) {

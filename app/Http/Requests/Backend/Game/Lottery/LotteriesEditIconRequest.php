@@ -25,7 +25,8 @@ class LotteriesEditIconRequest extends BaseFormRequest
     {
         return [
             'id' => 'required|exists:lottery_lists',
-            'icon' => 'required|image|mimes:jpeg,png,jpg', //彩种icon
+            'icon_name' => 'required|string', //彩种图标名称
+            'icon_path' => 'required|string', //彩种图标路径
         ];
     }
 
