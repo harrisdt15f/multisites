@@ -113,7 +113,7 @@ return [
             'driver' => 'monolog',
             'handler' => Monolog\Handler\GelfHandler::class,
             'handler_with' => [
-                'publisher' =>  GraylogSetup::getGelfPublisher(),
+//                'publisher' =>  GraylogSetup::getGelfPublisher(),
             ],
             'formatter' => GelfMessageFormatter::class
         ],
