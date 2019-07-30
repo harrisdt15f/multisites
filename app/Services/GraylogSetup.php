@@ -14,7 +14,7 @@ use Gelf\Transport\UdpTransport;
 
 class GraylogSetup
 {
-    public function getGelfPublisher() : Publisher
+    public static function getGelfPublisher() : Publisher
     {
         $transport = new UdpTransport(config('graylog.host'), config('graylog.port'),
             UdpTransport::CHUNK_SIZE_LAN);
