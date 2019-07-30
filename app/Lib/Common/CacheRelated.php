@@ -25,21 +25,28 @@ class CacheRelated
     }
 
     /**
-     * @param  array  $picNames
+     * @param  $picStr
+     * @param  $delimiter
      * @return void
      */
-    public function deleteCachePic(array $picNames): void
+    public static function deleteCachePic($picStr, $delimiter = null): void
     {
-        if (Cache::has('cache_pic')) {
-            $cachePic = Cache::get('cache_pic');
-            foreach ($picNames as $picName) {
+        $cacheKey = 'cache_pic';
+        if ($delimiter === null) {
+            $picArr = (array) $picStr;
+        } else {
+            $picArr = explode($delimiter, $picStr);
+        }
+        if (Cache::has($cacheKey)) {
+            $cachePic = Cache::get($cacheKey);
+            foreach ($picArr as $picName) {
                 if (array_key_exists($picName, $cachePic)) {
                     unset($cachePic[$picName]);
                 }
             }
             $hourToStore = 24 * 2;
             $expiresAt = Carbon::now()->addHours($hourToStore);
-            Cache::put('cache_pic', $cachePic, $expiresAt);
+            Cache::put($cacheKey, $cachePic, $expiresAt);
         }
     }
 }

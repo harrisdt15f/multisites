@@ -1,15 +1,10 @@
 <?php
-/**
- * @Author: Fish
- * @Date:   2019/7/8 17:51
- */
 
 namespace App\Http\Requests\Backend\System;
 
-
 use App\Http\Requests\BaseFormRequest;
 
-class SystemRequest extends BaseFormRequest
+class SystemUploadPicRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,7 +24,8 @@ class SystemRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'pic'          => 'required|image',
+            'pic' => 'required|image|mimes:jpeg,png,jpg',
+            'folder_name' => 'required|string|min:2|max:30',
         ];
     }
 }
