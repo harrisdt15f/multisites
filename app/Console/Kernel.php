@@ -2,7 +2,7 @@
 
 namespace App\Console;
 
-use App\Models\Game\Lottery\CronJob;
+use App\Models\DeveloperUsage\TaskScheduling\CronJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 

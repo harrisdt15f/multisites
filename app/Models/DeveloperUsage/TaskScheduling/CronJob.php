@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Models\Game\Lottery;
+namespace App\Models\DeveloperUsage\TaskScheduling;
 
 use App\Models\BaseModel;
-use App\Models\Game\Lottery\Logics\CronJobLogics;
+use App\Models\DeveloperUsage\TaskScheduling\Logics\CronJobLogics;
 
 class CronJob extends BaseModel
 {

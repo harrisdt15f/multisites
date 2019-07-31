@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Models\Game\Lottery\Logics;
+namespace App\Models\DeveloperUsage\TaskScheduling\Logics;
 
-use App\Models\Game\Lottery\LotteryBasicMethod;
 use Illuminate\Support\Facades\Cache;
 
 trait CronJobLogics
