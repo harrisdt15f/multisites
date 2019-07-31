@@ -33,4 +33,8 @@ Route::group(['prefix' => 'homepage', 'namespace' => 'Homepage'], function () {
     Route::match(['get', 'options'], 'ranking', ['as' => $namePrefix . 'ranking', 'uses' => $controller . 'ranking']);
     //开奖公告列表
     Route::match(['get', 'options'], 'lottery-notice-list', ['as' => $namePrefix . 'lottery-notice-list', 'uses' => $controller . 'lotteryNoticeList']);
+    //热门棋牌
+    Route::match(['get', 'options'], 'popular-chess-cards-lists', ['as' => $namePrefix . 'popular-chess-cards-lists', 'uses' => $controller . 'popularChessCardsLists']);
+    //热门电子
+    Route::match(['get', 'options'], 'popular-computer-game-lists', ['as' => $namePrefix . 'popular-computer-game-lists', 'uses' => $controller . 'popularComputerGameLists']);
 });
