@@ -11,7 +11,7 @@ trait CronJobLogics
      * @param  array   $cron
      * @return array
      */
-    public static function createCronJob($cron): array
+    public static function insertCronJob($cron): array
     {
         $cronJobData = [
             'command' => $cron['command'],
@@ -42,6 +42,16 @@ trait CronJobLogics
             $data = self::select('command', 'param', 'schedule')->where('status', 1)->get()->toArray();
             Cache::forever($cacheKey, $data);
         }
+        return $data;
+    }
+
+    /**
+     * 获取所有的的cron_job
+     * @return  array
+     */
+    public static function getAllCronJob(): array
+    {
+        $data = self::select('id', 'command', 'param', 'schedule', 'status', 'remarks')->get()->toArray();
         return $data;
     }
 }
