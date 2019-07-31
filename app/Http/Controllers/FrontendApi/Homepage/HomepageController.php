@@ -7,7 +7,7 @@ use App\Http\Requests\Frontend\Homepage\HomepageNoticeRequest;
 use App\Http\Requests\Frontend\Homepage\HomepageReadMessageRequest;
 use App\Http\SingleActions\Frontend\Homepage\HomepageNoticeAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepagePopularChessCardsListsAction;
-use App\Http\SingleActions\Frontend\Homepage\HomepagePopularComputerGameListsAction;
+use App\Http\SingleActions\Frontend\Homepage\HomepagePopularEGameListsAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageRankingAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageReadMessageAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageShowHomepageModelAction;
@@ -158,10 +158,10 @@ class HomepageController extends FrontendApiMainController
 
     /**
      * 热门电子
-     * @param  HomepagePopularComputerGameListsAction $action
+     * @param  HomepagePopularEGameListsAction $action
      * @return JsonResponse
      */
-    public function popularComputerGameLists(HomepagePopularComputerGameListsAction $action): JsonResponse
+    public function popularEGameLists(HomepagePopularEGameListsAction $action): JsonResponse
     {
         return $action->execute($this);
     }
