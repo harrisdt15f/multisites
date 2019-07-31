@@ -1,12 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-12 15:33:32
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-12 16:34:39
- */
-
 namespace App\Lib\Common;
 
 use App\Models\Admin\SystemAddressIp;

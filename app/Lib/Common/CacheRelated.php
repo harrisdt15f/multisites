@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-20 14:42:53
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-20 16:32:29
- */
 namespace App\Lib\Common;
 
 use Illuminate\Support\Carbon;

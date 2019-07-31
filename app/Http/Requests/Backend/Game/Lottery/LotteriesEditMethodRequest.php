@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-14 18:10:40
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 18:11:04
- */
 namespace App\Http\Requests\Backend\Game\Lottery;
 
 use App\Http\Requests\BaseFormRequest;

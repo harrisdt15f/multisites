@@ -1,12 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-25 16:20:55
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-26 16:50:38
- */
-
 namespace App\Http\Controllers\MobileApi\User\Fund;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;

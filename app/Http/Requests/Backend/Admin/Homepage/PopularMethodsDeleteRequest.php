@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-14 11:37:53
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 11:38:17
- */
 namespace App\Http\Requests\Backend\Admin\Homepage;
 
 use App\Http\Requests\BaseFormRequest;

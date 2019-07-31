@@ -3,12 +3,7 @@
 namespace App\Models\DeveloperUsage\Frontend\Traits;
 
 use Illuminate\Support\Facades\Cache;
-/**
- * @Author: LingPh
- * @Date:   2019-05-29 17:38:37
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-18 20:23:04
- */
+
 trait FrontendModelTraits
 {
 

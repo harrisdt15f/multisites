@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-01 16:09:24
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-20 17:53:48
- */
 namespace App\Lib\Common;
 
 use App\Models\Admin\BackendAdminUser;

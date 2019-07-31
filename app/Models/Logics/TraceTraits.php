@@ -4,12 +4,6 @@ namespace App\Models\Logics;
 
 use App\Models\LotteryTrace;
 
-/**
- * @Author: LingPh
- * @Date:   2019-05-29 17:49:50
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-18 22:21:10
- */
 trait TraceTraits
 {
     /**

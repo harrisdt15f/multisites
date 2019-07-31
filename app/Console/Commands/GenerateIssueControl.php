@@ -1,12 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-05-31 13:46:32
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-07 16:09:22
- */
-
 namespace App\Console\Commands;
 
 use App\Events\IssueGenerateEvent;
