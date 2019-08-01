@@ -63,7 +63,14 @@ trait LotteryBasicWayLogics
 
     public function formatBetNumber($sBetNumber, $oSeriesMethod, $oSeriesWay, $sWnNumber)
     {
-        $sBetNumber = str_replace('&', '', $sBetNumber);
+        switch ($oSeriesWay->series_code) {
+            case 'lotto';
+                $sBetNumber = str_replace('&', ' ', $sBetNumber);
+                break;
+            default:
+                $sBetNumber = str_replace('&', '', $sBetNumber);
+                break;
+        }
         $sSplitChar = '|';
         switch ($this->function) {
             case 'MultiOne':
