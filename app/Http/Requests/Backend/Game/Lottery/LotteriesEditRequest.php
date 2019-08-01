@@ -33,7 +33,6 @@ class LotteriesEditRequest extends BaseFormRequest
             'lottery.en_name' => ['required', 'alpha_num', Rule::unique('lottery_lists', 'en_name')->ignore($this->get('lottery')['id'])], //英文名
             'lottery.series_id' => 'required|alpha_num', //彩种系列
             'lottery.is_fast' => 'required|in:0,1', //是否快彩
-            'lottery.auto_open' => 'required|in:0,1', //是否自开彩
             'lottery.max_trace_number' => 'required|integer', //最大追号期数
             'lottery.day_issue' => 'required|integer', //每日开奖期数
             'lottery.issue_format' => 'required|string', //奖期格式
@@ -48,6 +47,8 @@ class LotteriesEditRequest extends BaseFormRequest
             'lottery.max_bonus' => 'required|numeric', //下注最大奖金
             'lottery.valid_modes' => 'required|string', //
             'lottery.status' => 'required|in:0,1', //状态：0关闭 1开启
+            'lottery.icon_name' => 'string', //彩种图标名称
+            'lottery.icon_path' => 'required|string', //彩种图标路径
             //issue_rule
             'issue_rule' => 'required|array', //
             'issue_rule.lottery_id' => 'required|same:lottery.en_name', //英文名
@@ -60,8 +61,6 @@ class LotteriesEditRequest extends BaseFormRequest
             'issue_rule.encode_time' => 'required|integer',
             'issue_rule.issue_count' => 'required|integer',
             'issue_rule.status' => 'required|same:lottery.status', //状态：0关闭 1开启
-            //cron
-            'cron' => 'required_if:lottery.auto_open,1|string', //定时表达式
         ];
     }
 
