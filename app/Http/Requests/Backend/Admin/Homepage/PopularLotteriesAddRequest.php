@@ -26,7 +26,6 @@ class PopularLotteriesAddRequest extends BaseFormRequest
         return [
             'lotteries_id' => 'required|numeric|unique:frontend_lottery_redirect_bet_lists,lotteries_id|exists:lottery_lists,id', //彩种id
             'lotteries_sign' => 'required|string|unique:frontend_lottery_redirect_bet_lists|exists:lottery_lists,en_name', //彩种标识
-            'pic' => 'required|image',
         ];
     }
 
