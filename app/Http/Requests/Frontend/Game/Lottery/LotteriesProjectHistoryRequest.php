@@ -26,9 +26,9 @@ class LotteriesProjectHistoryRequest extends BaseFormRequest
         //############################需要做验证处理
         return [
             // 'page_size' => 'string', //'integer|min:10|max:100',
-            'lottery_sign' => 'string', //'string|exists:lottery_lists,en_name',
-            'issue' => 'string', //'alpha_num',
-            'status' => 'string', //'',
+            // 'lottery_sign' => 'string', //'string|exists:lottery_lists,en_name',
+            // 'issue' => 'string', //'alpha_num',
+            // 'status' => 'string', //'',
         ];
     }
 
