@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\BackendApi;
 
 use App\Http\Controllers\Controller;
-use App\Lib\Common\ImageArrange;
 use App\Models\Admin\BackendAdminAccessGroup;
 use App\Models\DeveloperUsage\Backend\BackendAdminRoute;
 use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
@@ -16,6 +15,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use Jenssegers\Agent\Agent;
 
 class BackEndApiMainController extends Controller
 {
@@ -32,12 +32,17 @@ class BackEndApiMainController extends Controller
     public $log_uuid; //当前的logId
     protected $currentGuard = 'backend';
     public $currentAuth;
+    /**
+     * @var Agent
+     */
+    public $userAgent;
 
     /**
      * AdminMainController constructor.
      */
     public function __construct()
     {
+        $this->handleEndUser();
         $this->middleware(function ($request, $next) {
             $this->currentAuth = auth($this->currentGuard);
             $this->partnerAdmin = $this->currentAuth->user();
@@ -64,6 +69,26 @@ class BackEndApiMainController extends Controller
             $this->eloqM = 'App\\Models\\' . $this->eloqM; // 当前的eloquent
             return $next($request);
         });
+    }
+
+    /**
+     *处理客户端
+     */
+    private function handleEndUser()
+    {
+        $result = false;
+        $open_route = [];
+        $this->userAgent = new Agent();
+//        if ($this->userAgent->isDesktop()) {
+            $open_route = BackendAdminRoute::where('is_open', 1)->pluck('method')->toArray();
+            $result = true;
+        /*} else {
+            Log::info('robot attacks: '.json_encode(Input::all()).json_encode(Request::header()));
+            die();
+        }*/
+        if ($result === true) {
+            $this->middleware('auth:'.$this->currentGuard, ['except' => $open_route]);
+        }
     }
 
     /**
