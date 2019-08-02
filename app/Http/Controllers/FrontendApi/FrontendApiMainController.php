@@ -9,6 +9,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Jenssegers\Agent\Agent;
 
@@ -30,20 +32,8 @@ class FrontendApiMainController extends Controller
      */
     public function __construct()
     {
-        $this->userAgent = new Agent();
-        if ($this->userAgent->isDesktop()) {
-            $open_route = FrontendWebRoute::where('is_open', 1)->pluck('method')->toArray();
-            $this->currentGuard = 'frontend-web';
-        } else {
-            $open_route = FrontendAppRoute::where('is_open', 1)->pluck('method')->toArray();
-            $this->currentGuard = 'frontend-mobile';
-        }
-        $this->middleware('auth:'.$this->currentGuard, ['except' => $open_route]);
+        $this->handleEndUser();
         $this->middleware(function ($request, $next) {
-            $this->currentAuth = auth($this->currentGuard);
-            $this->partnerUser = $this->currentAuth->user();
-            $this->inputs = Input::all(); //获取所有相关的传参数据
-            //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
             $this->userOperateLog();
             $this->eloqM = 'App\\Models\\'.$this->eloqM; // 当前的eloquent
             return $next($request);
@@ -51,10 +41,40 @@ class FrontendApiMainController extends Controller
     }
 
     /**
+     *处理客户端
+     */
+    private function handleEndUser()
+    {
+        $result = false;
+        $open_route = [];
+        $this->userAgent = new Agent();
+        if ($this->userAgent->isDesktop()) {
+            $open_route = FrontendWebRoute::where('is_open', 1)->pluck('method')->toArray();
+            $this->currentGuard = 'frontend-web';
+            $result = true;
+        } elseif ($this->userAgent->isRobot()) {
+            Log::info('robot attacks: '.json_encode(Input::all()).json_encode(Request::header()));
+            die();
+        } else {
+            $open_route = FrontendAppRoute::where('is_open', 1)->pluck('method')->toArray();
+            $this->currentGuard = 'frontend-mobile';
+            $result = true;
+        }
+        if ($result === true) {
+            $this->middleware('auth:'.$this->currentGuard, ['except' => $open_route]);
+        }
+    }
+
+    /**
      *记录后台管理员操作日志
      */
     private function userOperateLog(): void
     {
+        $this->inputs = Input::all(); //获取所有相关的传参数据
+        $this->currentAuth = auth($this->currentGuard);
+        $this->partnerUser = $this->currentAuth->user();
+        //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
+        $this->currentOptRoute = Route::getCurrentRoute();
         $this->log_uuid = Str::orderedUuid()->getNodeHex();
         $datas['input'] = $this->inputs;
         $datas['route'] = $this->currentOptRoute;

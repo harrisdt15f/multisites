@@ -55,7 +55,7 @@ trait LotteryBasicWayLogics
         $prizeLevelQuery = $oBasicMethod->prizeLevel()->where($arrWhere);
         $prizeLevel = $prizeLevelQuery->first();
         if ($prizeLevel === null) {
-            $errorString = 'PrizeLevel Query Null'.json_encode($oSeriesWay).'whereDatas are '.json_encode($arrWhere).'Query is'.$prizeLevelQuery->toSql();
+            $errorString = 'PrizeLevel Query Null'.json_encode($oSeriesWay).'whereDatas are '.json_encode($arrWhere).'Query is '.$prizeLevelQuery->toSql();
             Log::channel('issues')->error($errorString);
         }
         return $prizeLevel->level;
