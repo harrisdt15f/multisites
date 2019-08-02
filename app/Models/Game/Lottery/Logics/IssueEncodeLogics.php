@@ -8,6 +8,7 @@
 
 namespace App\Models\Game\Lottery\Logics;
 
+use App\Jobs\Lottery\Encode\IssueEncoder;
 use App\Models\Game\Lottery\LotteryIssue;
 use App\Models\Game\Lottery\LotteryList;
 use App\Models\Game\Lottery\LotterySeriesMethod;
@@ -250,5 +251,17 @@ trait IssueEncodeLogics
         }
     }
 
+    /**
+     * @param $openCodeStr
+     */
+    public function recordEncodeNumber($openCodeStr): void
+    {
+        $this->status_encode = LotteryIssue::ENCODED;
+        $this->encode_time = time();
+        $this->official_code = $openCodeStr;
+        if ($this->save()) {
+            dispatch(new IssueEncoder($this->toArray()))->onQueue('open_numbers');
+        }
+    }
 
 }
