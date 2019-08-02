@@ -30,7 +30,7 @@ class LotteriesInputCodeRequest extends BaseFormRequest
         $rules = [
             'lottery_id' => 'required|string|exists:lottery_lists,en_name',
             'code' => 'required|string', //|size:' . $lenght,
-            'issue' => 'required|integer',
+            'issue' => 'required|numeric',
         ];
         return $rules;
     }
