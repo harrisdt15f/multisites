@@ -7,7 +7,6 @@ use App\Models\Admin\SystemConfiguration;
 use App\Models\Game\Lottery\LotteryList;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
 class GenerateIssueControl extends Command
 {
@@ -41,7 +40,6 @@ class GenerateIssueControl extends Command
         }
         $timeNow = date('H:i');
         if ($generateIssueTime == $timeNow) {
-            Log::info('开始定时生成彩票奖期');
             $lotteries = LotteryList::where('status', 1)->where('en_name', '!=', 'hklhc')->pluck('en_name');
             $data = [
                 'start_time' => date('Y-m-d'),

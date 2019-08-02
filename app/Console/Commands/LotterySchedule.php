@@ -7,7 +7,6 @@ use App\Models\Game\Lottery\LotteryIssue;
 use App\Models\Game\Lottery\LotterySerie;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Log;
 
 class LotterySchedule extends Command
 {
@@ -57,8 +56,7 @@ class LotterySchedule extends Command
                     return;
                 }
                 $openCodeStr = implode($splitter, $openCodeArr); //开奖号码string
-                $lotteryIssueEloq->recordEncodeNumber($openCodeStr);//开始录号
-                Log::info($lotterySign . '======================' . $lotteryIssueEloq->issue . '开奖号码' . $openCodeStr);
+                $lotteryIssueEloq->recordEncodeNumber($openCodeStr); //开始录号
             }
         }
     }

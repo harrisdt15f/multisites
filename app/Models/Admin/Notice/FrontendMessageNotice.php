@@ -7,8 +7,8 @@ use App\Models\BaseModel;
 
 class FrontendMessageNotice extends BaseModel
 {
-	public const UN_READ=0;//未读
-	public const READ=1;//已读
+	public const STATUS_UN_READ=0;//未读
+	public const STATUS_READ=1;//已读
 
     protected $guarded = ['id'];
 
