@@ -38,6 +38,10 @@ class LotterySchedule extends Command
                 ['lottery_id', $lotterySign],
                 ['end_time', '<', time()],
             ])->with('lottery')->orderBy('end_time', 'desc')->first();
+            $seriesList = LotterySerie::getList();
+            $serieArr = $seriesList[$lotteryIssueEloq->lottery->series_id]; //当前彩种的系列Arr
+            $splitter = $serieArr['encode_splitter']; //该彩种分割开奖号码的方式
+            //#######################
             if ($lotteryIssueEloq !== null) {
                 $openCodeArr = []; //开奖号码
                 $codeLength = $lotteryIssueEloq->lottery->code_length; //开奖号码的长度
@@ -52,16 +56,8 @@ class LotterySchedule extends Command
                 } else {
                     return;
                 }
-                $seriesList = LotterySerie::getList();
-                $serieArr = $seriesList[$lotteryIssueEloq->lottery->series_id]; //当前彩种的系列Arr
-                $splitter = $serieArr['encode_splitter']; //该彩种分割开奖号码的方式
                 $openCodeStr = implode($splitter, $openCodeArr); //开奖号码string
-                $lotteryIssueEloq->status_encode = LotteryIssue::ENCODED;
-                $lotteryIssueEloq->encode_time = time();
-                $lotteryIssueEloq->official_code = $openCodeStr;
-                if ($lotteryIssueEloq->save()) {
-                    dispatch(new IssueEncoder($lotteryIssueEloq->toArray()))->onQueue('open_numbers');
-                }
+                $lotteryIssueEloq->recordEncodeNumber($openCodeStr);//开始录号
                 Log::info($lotterySign . '======================' . $lotteryIssueEloq->issue . '开奖号码' . $openCodeStr);
             }
         }
