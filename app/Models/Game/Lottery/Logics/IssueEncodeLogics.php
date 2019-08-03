@@ -51,12 +51,6 @@ trait IssueEncodeLogics
                                     $oSeriesWays = $oBasicWay->seriesWays()->where('series_code',
                                         $oLottery->series_id)->where('lottery_method_id', '!=', null)->get();
                                     foreach ($oSeriesWays as $oSeriesWay) {
-                                        #########################
-                                        if ($oSeriesWay->id ===1063)
-                                        {
-                                            $aa = 0;
-                                        }
-                                        #########################
                                         $oSeriesWay->setWinningNumber($aWnNumberOfMethods);
                                         $oProjectsToCalculate = $oProjects->where('status',
                                             Project::STATUS_NORMAL)->where('method_sign',
