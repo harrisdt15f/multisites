@@ -17,6 +17,11 @@ use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesTracesHistoryAction;
 use App\Http\SingleActions\Mobile\Game\Lottery\LotteriesIssueHistoryAction;
 use App\Http\SingleActions\Mobile\Game\Lottery\LotterieslotteryCenterAction;
 use Illuminate\Http\JsonResponse;
+use App\Http\Requests\Frontend\Game\Lottery\LotteriesStopTraceRequest;
+use App\Http\Requests\Frontend\Game\Lottery\LotteriesCancelBetRequest;
+use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesCancelBetAction;
+use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesStopTraceAction;
+
 
 class LotteriesController extends FrontendApiMainController
 {
@@ -118,4 +123,29 @@ class LotteriesController extends FrontendApiMainController
     {
         return $action->execute($this);
     }
+
+    /**
+     * 终止追号
+     * @param  LotteriesStopTraceRequest $request
+     * @param  LotteriesStopTraceAction  $action
+     * @return JsonResponse
+     */
+    public function stopTrace(LotteriesStopTraceRequest $request, LotteriesStopTraceAction $action): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
+    }
+
+    /**
+     * 投注撤单
+     * @param  LotteriesCancelBetRequest $request
+     * @param  LotteriesCancelBetAction  $action
+     * @return JsonResponse
+     */
+    public function cancelBet(LotteriesCancelBetRequest $request, LotteriesCancelBetAction $action): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
+    }
+
 }

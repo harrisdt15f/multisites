@@ -28,4 +28,13 @@ Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], function 
 
     //临时测试接口
     Route::match(['post', 'options'], 'setWinPrize', ['as' => $namePrefix . 'setWinPrize', 'uses' => $controller . 'setWinPrize']);
+
+
+    //终止追号
+    Route::match(['post', 'options'], 'stop-trace', ['as' => $namePrefix . 'stop-trace', 'uses' => $controller . 'stopTrace']);
+
+
+    //撤销投注
+    Route::match(['post', 'options'], 'cancel-bet', ['as' => $namePrefix . 'cancel-bet', 'uses' => $controller . 'cancelBet']);
+
 });
