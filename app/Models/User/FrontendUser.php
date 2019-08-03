@@ -5,13 +5,14 @@ namespace App\Models\User;
 use App\Models\Admin\FrontendUsersPrivacyFlow;
 use App\Models\SystemPlatform;
 use App\Models\User\Fund\FrontendUsersAccount;
+use App\Models\User\Logics\FrontendUserTraits;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class FrontendUser extends Authenticatable implements JWTSubject
 {
-    use Notifiable;
+    use Notifiable, FrontendUserTraits;
 
     const TYPE_TOP_AGENT = 1;
     const TYPE_AGENT = 2;

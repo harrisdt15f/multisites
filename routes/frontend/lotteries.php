@@ -23,6 +23,8 @@ Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], function 
     Route::match(['post', 'options'], 'tracesHistory', ['as' => $namePrefix . 'tracesHistory', 'uses' => $controller . 'tracesHistory']);
     //游戏投注接口
     Route::match(['post', 'options'], 'bet', ['as' => $namePrefix . 'bet', 'uses' => $controller . 'bet']);
+    //终止追号
+    Route::match(['post', 'options'], 'stop-trace', ['as' => $namePrefix . 'stop-trace', 'uses' => $controller . 'stopTrace']);
 
     //临时测试接口
     Route::match(['post', 'options'], 'setWinPrize', ['as' => $namePrefix . 'setWinPrize', 'uses' => $controller . 'setWinPrize']);

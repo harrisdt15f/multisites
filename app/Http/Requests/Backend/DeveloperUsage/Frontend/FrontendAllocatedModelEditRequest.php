@@ -9,6 +9,7 @@
 namespace App\Http\Requests\Backend\DeveloperUsage\Frontend;
 
 use App\Http\Requests\BaseFormRequest;
+use Illuminate\Validation\Rule;
 
 class FrontendAllocatedModelEditRequest extends BaseFormRequest
 {
@@ -31,8 +32,8 @@ class FrontendAllocatedModelEditRequest extends BaseFormRequest
     {
         return [
             'id' => 'required|numeric|exists:frontend_allocated_models,id',
-            'label' => 'required|string',
-            'en_name' => 'required|string',
+            'label' => ['required', 'string', Rule::unique('frontend_allocated_models')->ignore($this->get('id'))],
+            'en_name' => ['required', 'string', Rule::unique('frontend_allocated_models')->ignore($this->get('id'))],
         ];
     }
 

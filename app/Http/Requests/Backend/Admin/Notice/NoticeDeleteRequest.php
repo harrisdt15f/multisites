@@ -30,7 +30,7 @@ class NoticeDeleteRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|numeric|exists:frontend_message_notices,id',
+            'id' => 'required|numeric|exists:frontend_message_notices_contents,id',
         ];
     }
 

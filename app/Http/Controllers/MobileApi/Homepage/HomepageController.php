@@ -3,17 +3,19 @@
 namespace App\Http\Controllers\MobileApi\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Http\Requests\Frontend\Homepage\FrontendAuthNoticeRequest;
+use App\Http\Requests\Frontend\Homepage\HomepageNoticeRequest;
+use App\Http\Requests\Frontend\Homepage\HomepageReadMessageRequest;
+use App\Http\SingleActions\Frontend\Homepage\HomepageNoticeAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageRankingAction;
+use App\Http\SingleActions\Frontend\Homepage\HomepageReadMessageAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageShowHomepageModelAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageActivityAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageBannerAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageIcoAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageLogoAction;
-use App\Http\SingleActions\Frontend\Homepage\HompageNoticeAction;
-use App\Http\SingleActions\Frontend\Homepage\HompagePopularLotteriesAction;
 use App\Http\SingleActions\Frontend\Homepage\HompagePopularMethodsAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageQrCodeAction;
+use App\Http\SingleActions\Mobile\Homepage\HompagePopularLotteriesAction;
 use Illuminate\Http\JsonResponse;
 
 class HomepageController extends FrontendApiMainController
@@ -89,15 +91,26 @@ class HomepageController extends FrontendApiMainController
     }
 
     /**
-     * 首页公告列表
-     * @param  FrontendAuthNoticeRequest  $request
-     * @param  HompageNoticeAction $action
+     * 公告|站内信 列表
+     * @param  HomepageNoticeRequest  $request
+     * @param  HomepageNoticeAction $action
      * @return JsonResponse
      */
-    public function notice(FrontendAuthNoticeRequest $request, HompageNoticeAction $action): JsonResponse
+    public function notice(HomepageNoticeRequest $request, HomepageNoticeAction $action): JsonResponse
     {
-        $input = $request->validated();
-        return $action->execute($this, $input);
+        return $action->execute($this);
+    }
+
+    /**
+     * 公告|站内信 已读处理
+     * @param  HomepageReadMessageRequest $request
+     * @param  HomepageReadMessageAction  $action
+     * @return JsonResponse
+     */
+    public function readMessage(HomepageReadMessageRequest $request, HomepageReadMessageAction $action): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
     }
 
     /**

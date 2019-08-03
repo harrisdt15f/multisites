@@ -2,10 +2,9 @@
 
 namespace App\Console;
 
-use App\Models\Admin\SystemConfiguration;
+use App\Models\Game\Lottery\CronJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use Illuminate\Support\Facades\Cache;
 
 class Kernel extends ConsoleKernel
 {
@@ -18,7 +17,7 @@ class Kernel extends ConsoleKernel
         Commands\DeleteCachePicControl::class,
         Commands\AllocationRechargeFundControl::class,
         Commands\GenerateIssueControl::class,
-        Commands\ZxyfcInputCodeControl::class,
+        Commands\LotterySchedule::class,
         Commands\UserProfitsControl::class,
         Commands\UserDaysalaryControl::class,
         Commands\SendDaysalaryControl::class,
@@ -33,16 +32,16 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('DeleteCachePic')->daily()->at('03:00');
-        $schedule->command('AllocationRechargeFund')->daily()->at('00:00');
-        //定时生成奖期
-        if (Cache::has('generateIssueTime')) {
-            $generateIssueTime = Cache::get('generateIssueTime');
-        } else {
-            $systemConfiguration = new SystemConfiguration();
-            $generateIssueTime = $systemConfiguration->getConfigValue('generate_issue_time');
-            Cache::forever('generateIssueTime', $generateIssueTime);
+        $scheduleArr = CronJob::getOpenCronJob();
+        foreach ($scheduleArr as $scheduleItem) {
+            $criterias = json_decode($scheduleItem['param'], true);
+            if (empty($criterias)) {
+                $schedule->command($scheduleItem['command'])->cron($scheduleItem['schedule']);
+            } else {
+                $schedule->command($scheduleItem['command'], [$criterias])->cron($scheduleItem['schedule']);
+            }
         }
+
         $schedule->command('GenerateIssue')->daily()->at($generateIssueTime);
         //中兴一分彩自动开奖
         $schedule->command('ZxyfcInputCode')->everyMinute();
@@ -57,6 +56,7 @@ class Kernel extends ConsoleKernel
         //每月1号15号 统计计算代理分红
         $schedule->command('UserBonus')->monthlyOn(1, '4:00');
         $schedule->command('UserBonus')->monthlyOn(15, '4:00');
+
     }
 
     /**

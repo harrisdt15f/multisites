@@ -54,8 +54,9 @@ class LotteryList extends BaseModel
         return $this->hasMany(LotteryBasicWay::class, 'lottery_type', 'lottery_type');
     }
 
-    public function oneIssues(): hasOne
+    //各个彩种最新一期的开奖
+    public function specificNewestOpenedIssue(): hasOne
     {
-        return $this->hasOne(LotteryIssue::class, 'lottery_id', 'en_name');
+        return $this->hasOne(LotteryIssue::class, 'lottery_id', 'en_name')->select('lottery_id', 'issue', 'official_code', 'encode_time')->where('status_encode', 1)->orderBy('issue', 'desc');
     }
 }

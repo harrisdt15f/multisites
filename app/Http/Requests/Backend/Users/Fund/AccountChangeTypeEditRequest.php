@@ -9,6 +9,7 @@
 namespace App\Http\Requests\Backend\Users\Fund;
 
 use App\Http\Requests\BaseFormRequest;
+use Illuminate\Validation\Rule;
 
 class AccountChangeTypeEditRequest extends BaseFormRequest
 {
@@ -32,7 +33,7 @@ class AccountChangeTypeEditRequest extends BaseFormRequest
         return [
             'id' => 'required|numeric|exists:frontend_users_accounts_types',
             'name' => 'required|string',
-            'sign' => 'required|string',
+            'sign' => ['required', 'string', Rule::unique('frontend_users_accounts_types')->ignore($this->get('id'))],
             'in_out' => 'required|numeric|in:0,1',
             'param' => 'array',
             'param.*' => 'exists:frontend_users_accounts_types_params,id',

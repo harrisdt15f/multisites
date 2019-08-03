@@ -5,6 +5,7 @@ namespace App\Http\Controllers\BackendApi\Users;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Users\UserHandleApplyResetUserFundPasswordRequest;
 use App\Http\Requests\Backend\Users\UserHandleApplyResetUserPasswordRequest;
+use App\Http\Requests\Backend\Users\UserHandleBankCardListRequest;
 use App\Http\Requests\Backend\Users\UserHandleCommonAuditPasswordRequest;
 use App\Http\Requests\Backend\Users\UserHandleCreateUserRequest;
 use App\Http\Requests\Backend\Users\UserHandleDeactivateDetailRequest;
@@ -12,6 +13,7 @@ use App\Http\Requests\Backend\Users\UserHandleDeactivateRequest;
 use App\Http\Requests\Backend\Users\UserHandleDeductionBalanceRequest;
 use App\Http\Requests\Backend\Users\UserHandleUserAccountChangeRequest;
 use App\Http\Requests\Backend\Users\UserHandleUserRechargeHistoryRequest;
+use App\Http\SingleActions\Backend\Users\UserHandleBankCardListAction;
 use App\Http\SingleActions\Backend\Users\UserHandleCommonAppliedPasswordHandleAction;
 use App\Http\SingleActions\Backend\Users\UserHandleCommonAuditPasswordAction;
 use App\Http\SingleActions\Backend\Users\UserHandleCommonHandleUserPasswordAction;
@@ -210,6 +212,18 @@ class UserHandleController extends BackEndApiMainController
      * @return JsonResponse
      */
     public function deductionBalance(UserHandleDeductionBalanceRequest $request, UserHandleDeductionBalanceAction $action): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
+    }
+
+    /**
+     * 用户银行卡列表
+     * @param  UserHandleBankCardListRequest $request
+     * @param  UserHandleBankCardListAction  $action
+     * @return JsonResponse
+     */
+    public function bankCardList(UserHandleBankCardListRequest $request, UserHandleBankCardListAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);

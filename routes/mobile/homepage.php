@@ -23,8 +23,10 @@ Route::group(['prefix' => 'homepage', 'namespace' => 'Homepage'], function () {
     Route::match(['get', 'options'], 'activity', ['as' => $namePrefix . 'activity', 'uses' => $controller . 'activity']);
     //LOGO
     Route::match(['get', 'options'], 'logo', ['as' => $namePrefix . 'logo', 'uses' => $controller . 'logo']);
-    //公告
+    //公告|站内信 列表
     Route::match(['post', 'options'], 'notice', ['as' => $namePrefix . 'notice', 'uses' => $controller . 'notice']);
+    //公告|站内信 已读处理
+    Route::match(['post', 'options'], 'read-message', ['as' => $namePrefix . 'read-message', 'uses' => $controller . 'readMessage']);
     //ico
     Route::match(['get', 'options'], 'ico', ['as' => $namePrefix . 'ico', 'uses' => $controller . 'ico']);
     //中奖排行

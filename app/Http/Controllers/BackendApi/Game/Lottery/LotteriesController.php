@@ -16,6 +16,7 @@ use App\Http\Requests\Backend\Game\Lottery\LotteriesMethodGroupSwitchRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesMethodRowSwitchRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesMethodSwitchRequest;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesAddAction;
+use App\Http\SingleActions\Backend\Game\Lottery\LotteriesAllLotteriesListAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesCalculateEncodeAgainAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesDeleteAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesEditAction;
@@ -225,5 +226,15 @@ class LotteriesController extends BackEndApiMainController
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
+    }
+
+    /**
+     * 全部的彩种列表
+     * @param  LotteriesAllLotteriesListAction $action
+     * @return JsonResponse
+     */
+    public function allLotteriesList(LotteriesAllLotteriesListAction $action): JsonResponse
+    {
+        return $action->execute($this);
     }
 }

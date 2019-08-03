@@ -20,6 +20,8 @@ trait LotteryBasicMethodLogics
 
     protected $splitChar = '|';
 
+    protected $splitCharInArea = ' ';
+
     /**
      * 按offset来截取中奖号码
      * @param  string  $sFullWinningNumber
@@ -29,38 +31,49 @@ trait LotteryBasicMethodLogics
     public function getWnNumber($sFullWinningNumber, $iOffset)
     {
         $sWnNumber = '';
+        $sFunction = '';
         switch ($this->series_code) {
             case 'ssc':
                 $sWnNumber = substr($sFullWinningNumber, (int)$iOffset, $this->digital_count);
+                $sFunction = 'getWinningNumber'.ucfirst($this->series_code);
+                break;
+            case 'lotto':
+                $aBalls = explode($this->splitCharInArea, $sFullWinningNumber);
+                $aNeedBalls = [];
+                $i = $iOffset;
+                for ($j = 0; $j < $this->digital_count; $j++) {
+                    $aNeedBalls[$j] = $aBalls[$i];
+                    $i++;
+                }
+                $sWnNumber = implode($this->splitCharInArea, $aNeedBalls);
+                $sFunction = 'getWinningNumber'.ucfirst($this->series_code);
                 break;
         }
-        return $this->getWinningNumber($sWnNumber);
+        return $sFunction === '' ? false : $this->$sFunction($sWnNumber);
     }
 
     /**
      * 分析中奖号码
+     * 时时彩系列
+     * area
+     * bsde
+     * combin
+     * contain
+     * equal
+     * interest
+     * optionalcombin
+     * optionalequal
+     * special
+     * sum_tail
+     * tsbs
+     * tsEqual
      * @param  string  $sWinningNumber
      * @return string | array
      */
-    public function getWinningNumber($sWinningNumber)
+    public function getWinningNumberSsc($sWinningNumber)
     {
+        //#############################[时时彩系]#####################################
         switch ($this->wn_function) {
-            //##################################################################
-            /*
-             * 时时彩系列
-             * area
-             * bsde
-             * combin
-             * contain
-             * equal
-             * interest
-             * optionalcombin
-             * optionalequal
-             * special
-             * sum_tail
-             * tsbs
-             * tsEqual
-             */
             case 'area'://返回区间中奖号码
                 $aDigitals = str_split($sWinningNumber);
                 $aWnNumbers = [];
@@ -167,50 +180,105 @@ trait LotteryBasicMethodLogics
             default:
                 $result = false;
             //#############################[时时彩系列结束]#####################################
-
         }
         return $result; //返回合适的计算中奖号码的方法
     }
 
-//##################################################################
+    /**
+     * 分析中奖号码
+     * 十一选五乐透彩系
+     * LottoContain
+     * LottoCombin
+     * LottoEqual
+     * LottoOddEven
+     * LottoMiddle
+     * @param  string  $sWinningNumber
+     * @return string | array
+     */
+    public function getWinningNumberLotto($sWinningNumber)
+    {
+        //#############################[十一选五乐透系列]#####################################
+        switch ($this->wn_function) {
+            case 'LottoContain': //getWnNumberLottoContain 11选5不定位中奖号码
+                $aDigitals = explode($this->splitCharInArea, $sWinningNumber);
+                $aDigitalCount = array_count_values($aDigitals);
+                $aUniqueDigitals = array_keys($aDigitalCount);
+                $aWnNumber = [];
+                if ($this->min_repeat_time) {
+                    if (count($aDigitalCount) >= $this->choose_count && max($aDigitalCount) >= $this->min_repeat_time) {
+                        foreach ($aDigitalCount as $iDigital => $iCount) {
+                            $iCount < $this->min_repeat_time or $aWnNumber[] = $iDigital;
+                        }
+                    }
+                } else {
+                    (count($aDigitalCount) < $this->choose_count) or $aWnNumber = $aUniqueDigitals;
+                }
+                $result = $aWnNumber ?: false;
+                break;
+            case 'LottoCombin'://getWnNumberLottoCombin 任选六中五
+            case 'LottoEqual'://getWnNumberLottoEqual 定位胆
+                $result = $sWinningNumber;
+                break;
+            case 'LottoOddEven'://getWnNumberLottoOddEven 返回定单双
+                $aBalls = explode($this->splitCharInArea, $sWinningNumber);
+                $iOddCount = 0;
+                foreach ($aBalls as $iBall) {
+                    $iOddCount += $iBall % 2;
+                }
+                $result = $iOddCount;
+                break;
+            case 'LottoMiddle'://getWnNumberLottoMiddle 猜中位
+                $aBalls = explode($this->splitCharInArea, $sWinningNumber);
+                sort($aBalls);
+                $result = $aBalls[2];
+                break;
+            default:
+                $result = false;
+            //#############################[十一选五乐透系列结束]#####################################
+        }
+        return $result; //返回合适的计算中奖号码的方法
+    }
 
+    //##################################################################
+
+    /**
+     * @param  LotterySeriesWay  $oSeriesWay
+     * @param  LotteryBasicWay  $oBasicWay
+     * @param $sWnNumber
+     * @param $sBetNumber
+     * @return float|int
+     */
     public function getPrizeCount(LotterySeriesWay $oSeriesWay, LotteryBasicWay $oBasicWay, $sWnNumber, $sBetNumber)
     {
+        $pFunction = 'getPrize'.ucfirst($this->series_code);
         $sFunction = 'prize'.$oBasicWay->function.ucfirst(Str::camel($this->wn_function));
+        return $this->$pFunction($sFunction, $sBetNumber, $sWnNumber, $oSeriesWay);
+    }
+
+    //##########################################################[时时彩系列 prize 计算]#########################################
+
+    /**
+     * ssc 系列
+     * @param $sFunction
+     * @param $sBetNumber
+     * @param $sWnNumber
+     * @param  LotterySeriesWay  $oSeriesWay
+     * @return float|int
+     */
+    private function getPrizeSsc($sFunction, $sBetNumber, $sWnNumber, LotterySeriesWay $oSeriesWay)
+    {
         switch ($sFunction) {
-            //ssc 系列开始
-            /**
-             * 返回组选单式的中奖注数
-             */
-            case 'prizeEnumCombin':
-                /**
-                 * 返回直选单式的中奖注数
-                 */
-            case 'prizeEnumEqual':
-                /**
-                 * 返回混合组选的中奖注数
-                 */
-            case 'prizeMixCombinCombin':
+            case 'prizeEnumCombin'://返回组选单式的中奖注数
+            case 'prizeEnumEqual'://返回直选单式的中奖注数
+            case 'prizeMixCombinCombin'://返回混合组选的中奖注数
                 $aBetNumbers = explode($this->splitChar, $sBetNumber);
                 $aKeys = array_keys($aBetNumbers, $sWnNumber);
                 $result = count($aKeys);
                 break;
-            /**
-             * 返回直选组合的中奖注数
-             */
-            case 'prizeMultiSequencingEqual':
-                /**
-                 * 返回趣味玩法的中奖注数
-                 */
-            case 'prizeFunSeparatedConstitutedInterest':
-                /**
-                 * 返回区间玩法的中奖注数
-                 */
-            case 'prizeSectionalizedSeparatedConstitutedArea':
-                /**
-                 * 返回直选复式的中奖注数
-                 */
-            case 'prizeSeparatedConstitutedEqual':
+            case 'prizeMultiSequencingEqual'://返回直选组合的中奖注数
+            case 'prizeFunSeparatedConstitutedInterest'://返回趣味玩法的中奖注数
+            case 'prizeSectionalizedSeparatedConstitutedArea'://返回区间玩法的中奖注数
+            case 'prizeSeparatedConstitutedEqual'://返回直选复式的中奖注数
                 $aWnDigitals = str_split($sWnNumber);
                 $p = [];
                 foreach ($aWnDigitals as $iDigital) {
@@ -219,11 +287,8 @@ trait LotteryBasicMethodLogics
                 $pattern = '/^'.implode('\|', $p).'$/';
                 $result = (int)preg_match($pattern, $sBetNumber);
                 break;
-            /**
-             * 计算单区型组选复式的中奖注数
-             */
-            case 'prizeConstitutedCombin':
-                if ($this->max_repeat_time == 1) {
+            case 'prizeConstitutedCombin'://计算单区型组选复式的中奖注数
+                if ($this->max_repeat_time === 1) {
                     $aBetDigitals = str_split($sBetNumber);
                     $aWnDigitals = str_split($sWnNumber);
                     $aDiff = array_diff($aWnDigitals, $aBetDigitals);
@@ -239,19 +304,13 @@ trait LotteryBasicMethodLogics
                     $result = (int)(empty($aDiffMax) && empty($aDiffMin));
                 }
                 break;
-            /**
-             * 返回不定位的中奖注数
-             */
-            case 'prizeConstitutedContain':
+            case 'prizeConstitutedContain'://返回不定位的中奖注数
                 $aBetDigitals = array_unique(str_split($sBetNumber));
                 $aBoth = array_intersect($sWnNumber, $aBetDigitals);
                 $iHitCount = count($aBoth);
                 $result = $iHitCount >= $this->choose_count ? Math::combin($iHitCount, $this->choose_count) : 0;
                 break;
-            /**
-             * 返回大小单双的中奖注数
-             */
-            case 'prizeBigSmallOddEvenBsde':
+            case 'prizeBigSmallOddEvenBsde'://返回大小单双的中奖注数
                 $aWnDigitals = explode($this->splitChar, $sWnNumber);
                 $aBetDigitals = explode($this->splitChar, $sBetNumber);
                 $iWonCount = 1;
@@ -265,14 +324,8 @@ trait LotteryBasicMethodLogics
                 }
                 $result = $iWonCount;
                 break;
-            /**
-             * 计算双区型组选复式的中奖注数
-             */
-            case 'prizeConstitutedDoubleAreaCombin':
-                /**
-                 * 计算双区型组选复式的中奖注数
-                 */
-            case 'prizeConstitutedForCombin30Combin':
+            case 'prizeConstitutedDoubleAreaCombin'://计算双区型组选复式的中奖注数
+            case 'prizeConstitutedForCombin30Combin'://计算双区型组选复式的中奖注数
                 $aBetNumber = explode($this->splitChar, $sBetNumber);
                 $aWnDigitals = array_count_values(str_split($sWnNumber));
                 $aWnMaxs = array_keys($aWnDigitals, $this->max_repeat_time);
@@ -282,52 +335,30 @@ trait LotteryBasicMethodLogics
                     str_split($aBetNumber[1])) : array_diff($aWnMins, str_split($aBetNumber[0]));
                 $result = (int)(empty($aDiffMax) && empty($aDiffMin));
                 break;
-            /**
-             * 返回和尾的中奖注数
-             */
-            case 'prizeSumTailSumTail'://prizeSumTailSum_tail
+            case 'prizeSumTailSumTail'://prizeSumTailSum_tail 返回和尾的中奖注数
                 $iSumTail = DigitalNumber::getSumTail($sWnNumber);
                 $aBetNumbers = str_split($sBetNumber);
                 $result = (int)in_array((string)$iSumTail, $aBetNumbers, true);
                 break;
-            /**
-             * 返回三星特殊的中奖注数
-             */
-            case 'prizeSpecialConstitutedSpecial':
+            case 'prizeSpecialConstitutedSpecial'://返回三星特殊的中奖注数
                 $result = (int)preg_match("/$sWnNumber/", $sBetNumber);
                 break;
-            /**
-             * 返回直选跨度的中奖注数
-             */
-            case 'prizeSpanEqual':
+            case 'prizeSpanEqual'://返回直选跨度的中奖注数
                 $iSpan = DigitalNumber::getSpan($sWnNumber);
                 $aBetNumbers = str_split($sBetNumber);
                 $result = (int)in_array((string)$iSpan, $aBetNumbers, true);
                 break;
-            /**
-             * 返回组选包胆的中奖注数
-             */
-            case 'prizeNecessaryCombin':
+            case 'prizeNecessaryCombin'://返回组选包胆的中奖注数
                 $aWnDigitals = array_unique(str_split($sWnNumber));
                 $result = (int)in_array($sBetNumber, $aWnDigitals, true);
                 break;
-
-            case 'prizeSumEqual':
-                /**
-                 * 返回直选和值的中奖注数
-                 */
-            case 'prizeSumCombin':
-                /**
-                 * 返回组选和值的中奖注数
-                 */
+            case 'prizeSumEqual'://返回直选和值的中奖注数
+            case 'prizeSumCombin'://返回组选和值的中奖注数
                 $iSum = DigitalNumber::getSum($sWnNumber);
                 $aBetNumbers = explode($this->splitChar, $sBetNumber);
                 $result = (int)in_array((string)$iSum, $aBetNumbers, true);
                 break;
-            case 'prizeMultiOneEqual':
-                /**
-                 * 返回定位胆的中奖注数
-                 */
+            case 'prizeMultiOneEqual'://返回定位胆的中奖注数
                 $result = (int)preg_match("/$sWnNumber/", $sBetNumber);
                 break;
             case 'prizeTwoStarBigSmallTsbs':
@@ -341,7 +372,7 @@ trait LotteryBasicMethodLogics
                 $result = (int)in_array($iWnDigital, $aBetNumber, true);
                 break;
             default:
-                Log::channel('issues')->info('需要添加方法:'.$sFunction.$oSeriesWay->toJson());
+                Log::channel('issues')->info('需要添加时时彩系列方法:'.$sFunction.$oSeriesWay->toJson());
                 $result = 0;
         }
         return $result;
@@ -368,5 +399,167 @@ trait LotteryBasicMethodLogics
         } elseif ($aWnDigital[0] === $aWnDigital[1]) {
             return 2; //和
         }
+    }
+
+    //##########################################################[十一选五乐透系列 prize 计算]#########################################
+
+    /**
+     * 十一选五系列计算中奖
+     * prizeLottoEqualLottoContain
+     * prizeLottoEqualLottoCombin
+     * prizeLottoEqualLottoEqual
+     * prizeLottoConstitutedLottoContain
+     * prizeLottoConstitutedLottoCombin
+     * prizeLottoMultiOneLottoEqual
+     * prizeLottoConstitutedLottoOddEven
+     * prizeLottoConstitutedLottoMiddle
+     * prizeLottoSeparatedConstitutedLottoEqual
+     * prizeLottoNecessaryConstitutedLottoContain
+     * prizeLottoNecessaryConstitutedLottoCombin
+     * @param $sFunction
+     * @param $sBetNumber
+     * @param $sWnNumber
+     * @param  LotterySeriesWay  $oSeriesWay
+     * @return float|int
+     */
+    private function getPrizeLotto($sFunction, $sBetNumber, $sWnNumber, LotterySeriesWay $oSeriesWay)
+    {
+
+        switch ($sFunction) {
+            case 'prizeLottoEqualLottoContain'://计算11选5任选1至任选5单式的中奖注数
+                sort($sWnNumber);
+                $aBets = explode($this->splitChar, $sBetNumber);
+                $iCount = 0;
+                foreach ($aBets as $sBet) {
+                    $aBetBalls = explode($this->splitCharInArea, $sBet);
+                    $aHits = array_intersect($aBetBalls, $sWnNumber);
+                    $iCount += (int)(count($aHits) === $this->choose_count);
+                }
+                $result = $iCount;
+                break;
+            case 'prizeLottoEqualLottoCombin'://计算11选5任选6中五至任选8中5单式和组选单式的中奖注数
+                $aWnBalls = explode($this->splitCharInArea, $sWnNumber);
+                $aBets = explode($this->splitChar, $sBetNumber);
+                $iCount = 0;
+                foreach ($aBets as $sBet) {
+                    $aTmpBalls = explode($this->splitCharInArea, $sBet);
+                    $aHitBalls = array_intersect($aTmpBalls, $aWnBalls);
+                    if ($bWon = (count($aHitBalls) === $this->wn_length)) {
+                        $iCount++;
+                    }
+                }
+                $result = $iCount;
+                break;
+            case 'prizeLottoEqualLottoEqual'://计算11选5直选单式的中奖注数
+                $aBets = explode($this->splitChar, $sBetNumber);
+                $result = (int)in_array($sWnNumber, $aBets, false);
+                break;
+            case 'prizeLottoConstitutedLottoContain': //计算11选5任选一至五复式的中奖注数
+                $iHitCount = $this->_getHitNumbersOfLotto($sBetNumber, $sWnNumber, $iBetBallCount);
+                $result = Math::combin($iHitCount, $this->choose_count);
+                break;
+            case 'prizeLottoConstitutedLottoCombin'://计算11选5任选五至八复式的中奖注数
+                $iHitCount = $this->_getHitNumbersOfLotto($sBetNumber, $sWnNumber, $iBetBallCount);
+                if ($iHitCount < $this->wn_length) {
+                    $result = 0;
+                    break;
+                }
+                $iNeedOtherBallCount = $this->buy_length - $this->wn_length;
+                $iUnHitCount = $iBetBallCount - $iHitCount;
+                $result = Math::combin($iUnHitCount, $iNeedOtherBallCount);
+                break;
+            case 'prizeLottoMultiOneLottoEqual': //计算11选5定位胆的中奖注数
+            case 'prizeLottoConstitutedLottoOddEven'://计算11选5定单双的中奖数字
+            case 'prizeLottoConstitutedLottoMiddle'://11选5猜中位的中奖注数
+                $aBetBalls = explode($this->splitCharInArea, $sBetNumber);
+                $result = (int)in_array($sWnNumber, $aBetBalls, false);
+                break;
+            case 'prizeLottoSeparatedConstitutedLottoEqual'://计算11选5任选五至八复式的中奖注数
+                $aWnBalls = explode($this->splitCharInArea, $sWnNumber);
+                $aBetBalls = explode($this->splitChar, $sBetNumber);
+                $iHitPosCount = 0;
+                if (count($aWnBalls) !== count($aBetBalls)) {
+                    $result = 0;
+                    break;
+                }
+                foreach ($aBetBalls as $i => $sBetNumberOfPos) {
+                    $aBetBallsOfPos = explode($this->splitCharInArea, $sBetNumberOfPos);
+                    if (!in_array($aWnBalls[$i], $aBetBallsOfPos, false)) {
+                        break;
+                    }
+                    $iHitPosCount++;
+                }
+                $result = (int)($iHitPosCount === $this->wn_length);
+                break;
+            case 'prizeLottoNecessaryConstitutedLottoContain':
+                [$sBetNecessaried, $sBetConstituted] = explode($this->splitChar, $sBetNumber);
+                $aBetNecessaried = explode($this->splitCharInArea, $sBetNecessaried);
+                $aHitNecessaried = array_intersect($aBetNecessaried, $sWnNumber);
+                $iHitNessariedCount = count($aHitNecessaried);
+                if ($iHitNessariedCount !== count($aBetNecessaried)) {
+                    $result = 0;
+                    break;
+                }
+                $iNeedOfNecessariedCount = $this->wn_length - $iHitNessariedCount;
+                if ($iNeedOfNecessariedCount === 0) {
+                    $result = 1;
+                    break;
+                }
+                $aBetConstituted = explode($this->splitCharInArea, $sBetConstituted);
+                $aHitConstituted = array_intersect($aBetConstituted, $sWnNumber);
+                $iHitConstitutedCount = count($aHitConstituted);
+                if ($iHitConstitutedCount < $iNeedOfNecessariedCount) {
+                    $result = 0;
+                    break;
+                }
+                $result = Math::combin($iHitConstitutedCount, $iNeedOfNecessariedCount);
+                break;
+            case 'prizeLottoNecessaryConstitutedLottoCombin':
+                $aWnNumber = explode($this->splitCharInArea, $sWnNumber);
+                [$sBetNecessaried, $sBetConstituted] = explode($this->splitChar, $sBetNumber);
+                $aBetNecessaried = explode($this->splitCharInArea, $sBetNecessaried);
+                $aHitNecessaried = array_intersect($aBetNecessaried, $aWnNumber);
+                $iBetNecessariedCount = count($aBetNecessaried);
+                $iHitNessariedCount = count($aHitNecessaried);
+                $iNeedOfBetBallsCount = $this->buy_length - $iBetNecessariedCount;// 凑足一注投注码还需要的复式码个数
+                $aBetConstituted = explode($this->splitCharInArea, $sBetConstituted);
+                $iBetConstitutedCount = count($aBetConstituted);
+                if ($iNeedOfBetBallsCount > $iBetConstitutedCount) {// 如果复式码个数不足, 则不中奖
+                    $result = 0;
+                    break;
+                }
+                $aHitConstituted = array_intersect($aBetConstituted, $aWnNumber);// 求出中得的复式码个数
+                $iHitConstitutedCount = count($aHitConstituted);
+                if ($iBetNecessariedCount + $iHitConstitutedCount > $this->buy_length) {// 如果胆码个数+中得的复式码个数,则不中奖
+                    $result = 0;
+                    break;
+                }
+                $iNonHitConstitutedCount = $iBetConstitutedCount - $iHitConstitutedCount;// 求出未中得的复式码个数
+                if ($iHitConstitutedCount + $iHitNessariedCount < $this->wn_length) {
+                    $result = 0;
+                    break;
+                }
+                $iNeedNonHitCount = $iNeedOfBetBallsCount - $iHitConstitutedCount;
+                $result = Math::combin($iNonHitConstitutedCount, $iNeedNonHitCount);
+                break;
+            default:
+                Log::channel('issues')->info('需要添加十一选五系列方法:'.$sFunction.$oSeriesWay->toJson());
+                $result = 0;
+        }
+        return $result;
+    }
+
+    /**
+     * @param $sBetNumber
+     * @param $sWnNumber
+     * @param $iBetBallCount
+     * @return int
+     */
+    private function _getHitNumbersOfLotto($sBetNumber, $sWnNumber, & $iBetBallCount): int
+    {
+        $aWnBalls = is_array($sWnNumber) ? $sWnNumber : explode($this->splitCharInArea, $sWnNumber);
+        $aBetBalls = explode($this->splitCharInArea, $sBetNumber);
+        $iBetBallCount = count($aBetBalls);
+        return count(array_intersect($aBetBalls, $aWnBalls));
     }
 }

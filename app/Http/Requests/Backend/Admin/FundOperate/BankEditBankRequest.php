@@ -9,6 +9,7 @@
 namespace App\Http\Requests\Backend\Admin\FundOperate;
 
 use App\Http\Requests\BaseFormRequest;
+use Illuminate\Validation\Rule;
 
 class BankEditBankRequest extends BaseFormRequest
 {
@@ -31,7 +32,7 @@ class BankEditBankRequest extends BaseFormRequest
     {
         return [
             'id' => 'required|numeric|exists:frontend_system_banks,id',
-            'title' => 'required|string',
+            'title' => ['required', 'string', Rule::unique('frontend_system_banks')->ignore($this->get('id'))],
             'code' => 'required|alpha',
             'status' => 'required|in:0,1',
             'min_recharge' => 'required|numeric',

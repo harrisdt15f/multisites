@@ -50,3 +50,19 @@ Route::group(['prefix' => 'popular-methods', 'namespace' => 'Admin\Homepage'], f
     //热门玩法排序
     Route::match(['post', 'options'], 'sort', ['as' => $namePrefix . 'sort', 'uses' => $controller . 'sort']);
 });
+
+//开奖公告
+Route::group(['prefix' => 'lottery-notice', 'namespace' => 'Admin\Homepage'], function () {
+    $namePrefix = 'backend-api.lottery-notice.';
+    $controller = 'LotteryNoticeController@';
+    //开奖公告彩种列表
+    Route::match(['get', 'options'], 'detail', ['as' => $namePrefix . 'detail', 'uses' => $controller . 'detail']);
+    //添加开奖公告的彩种
+    Route::match(['post', 'options'], 'add', ['as' => $namePrefix . 'add', 'uses' => $controller . 'add']);
+    //编辑开奖公告的彩种
+    Route::match(['post', 'options'], 'edit', ['as' => $namePrefix . 'edit', 'uses' => $controller . 'edit']);
+    //删除开奖公告的彩种
+    Route::match(['post', 'options'], 'delete', ['as' => $namePrefix . 'delete', 'uses' => $controller . 'delete']);
+    //排序开奖公告的彩种
+    Route::match(['post', 'options'], 'sort', ['as' => $namePrefix . 'sort', 'uses' => $controller . 'sort']);
+});

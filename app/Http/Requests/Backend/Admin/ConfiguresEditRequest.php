@@ -9,6 +9,7 @@
 namespace App\Http\Requests\Backend\Admin;
 
 use App\Http\Requests\BaseFormRequest;
+use Illuminate\Validation\Rule;
 
 class ConfiguresEditRequest extends BaseFormRequest
 {
@@ -32,7 +33,7 @@ class ConfiguresEditRequest extends BaseFormRequest
         return [
             'id' => 'required|numeric|exists:system_configurations,id',
             'parent_id' => 'required|numeric',
-            'sign' => 'required',
+            'sign' => ['required', Rule::unique('system_configurations')->ignore($this->get('id'))],
             'name' => 'required',
             'description' => 'required',
             'value' => 'string',

@@ -85,14 +85,4 @@ class PopularLotteriesController extends BackEndApiMainController
     {
         return $action->execute($this);
     }
-
-    /**
-     * 删除前台首页热门彩票缓存
-     * @return void
-     */
-    public function deleteCache(): void
-    {
-        $cacheRelated = new CacheRelated();
-        $cacheRelated->delete('popularLotteries');
-    }
 }

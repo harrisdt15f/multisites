@@ -9,6 +9,7 @@
 namespace App\Http\Requests\Frontend\Game\Lottery;
 
 use App\Http\Requests\BaseFormRequest;
+use App\Rules\Frontend\Lottery\Bet\BallsCodeRule;
 use App\Rules\Frontend\Lottery\Bet\MethodCountsRule;
 
 class LotteriesBetRequest extends BaseFormRequest
@@ -34,26 +35,29 @@ class LotteriesBetRequest extends BaseFormRequest
             'lottery_sign' => 'required|string|min:4|max:10|exists:lottery_lists,en_name',
             'trace_issues.*' => 'required|integer|between:1,1000',
             'balls.*.method_id' => 'required|exists:lottery_methods,method_id',
-            'balls.*.method_group'=> 'required|exists:lottery_methods,method_group',
-            'balls.*.method_name' => 'required',//中文
-            'balls.*.codes' => ['required', 'regex:/^((?!\&)(?!.*\&$)(?!.*?\&\&)[0-9&]{0,19}\|?){1,5}$/'],
+            'balls.*.method_group' => 'required|exists:lottery_methods,method_group',
+            'balls.*.method_name' => 'required',
+            'balls.*.codes' =>
+                [
+                    'required',
+                    new BallsCodeRule($this->get('lottery_sign'))
+                ],
             'balls.*.count' => [
                 'required',
                 'integer',
                 new MethodCountsRule($this->get('balls'))
             ],
             'balls.*.times' => 'required|integer',
-            'balls.*.cost' => 'required|regex:/^\d+(\.\d{1,3})?$/',//float
-            'balls.*.mode' => 'required|regex:/^\d+(\.\d{1,3})?$/|in:1.000,0.100,0.010,0.001',//float '1.000', '0.100', '0.010', '0.001'
+            'balls.*.cost' => 'required|regex:/^\d+(\.\d{1,3})?$/',
+            'balls.*.mode' => 'required|regex:/^\d+(\.\d{1,3})?$/|in:1.000,0.100,0.010,0.001',
+            //float '1.000', '0.100', '0.010', '0.001'
             'balls.*.prize_group' => 'required|integer',
             'balls.*.price' => 'required|integer|in:1,2',
             'trace_win_stop' => 'required|integer',
-            'total_cost' => 'required|regex:/^\d+(\.\d{1,3})?$/',//float
+            'total_cost' => 'required|regex:/^\d+(\.\d{1,3})?$/',
             'from' => 'integer',
             'is_trace' => 'required|integer|in:0,1',
         ];
-        //支持定位胆 ||6||
-        //0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9|0&1&2&3&4&5&6&7&8&9
     }
 
     /*public function messages()

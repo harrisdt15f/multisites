@@ -12,7 +12,7 @@ class LotteryTrace extends BaseModel
 
     public const STATUS_RUNNING = 0;
     public const STATUS_FINISHED = 1;
-    public const STATUS_USER_CANCELED = 2;
+    public const STATUS_WIN_STOPED = 2;
 //    public const STATUS_ADMIN_CANCELED = 3;
     public const STATUS_SYSTEM_CANCELED = 4;
     public const STATUS_USER_DROPED = 5;

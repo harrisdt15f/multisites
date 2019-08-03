@@ -7,6 +7,7 @@ use App\Http\Requests\Frontend\Game\Lottery\LotteriesAvailableIssuesRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesBetRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesIssueHistoryRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesProjectHistoryRequest;
+use App\Http\Requests\Frontend\Game\Lottery\LotteriesStopTraceRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesTracesHistoryRequest;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesAvailableIssuesAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesBetAction;
@@ -14,6 +15,7 @@ use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesIssueHistoryAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryInfoAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryListAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesProjectHistoryAction;
+use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesStopTraceAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesTracesHistoryAction;
 use App\Models\Game\Lottery\LotteryIssue;
 use Exception;
@@ -51,7 +53,7 @@ class LotteriesController extends FrontendApiMainController
     public function issueHistory(
         LotteriesIssueHistoryRequest $request,
         LotteriesIssueHistoryAction $action
-    ): JsonResponse {
+    ): JsonResponse{
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -65,7 +67,7 @@ class LotteriesController extends FrontendApiMainController
     public function availableIssues(
         LotteriesAvailableIssuesRequest $request,
         LotteriesAvailableIssuesAction $action
-    ): JsonResponse {
+    ): JsonResponse{
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -79,7 +81,7 @@ class LotteriesController extends FrontendApiMainController
     public function projectHistory(
         LotteriesProjectHistoryRequest $request,
         LotteriesProjectHistoryAction $action
-    ): JsonResponse {
+    ): JsonResponse{
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -93,7 +95,7 @@ class LotteriesController extends FrontendApiMainController
     public function tracesHistory(
         LotteriesTracesHistoryRequest $request,
         LotteriesTracesHistoryAction $action
-    ): JsonResponse {
+    ): JsonResponse{
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -113,6 +115,18 @@ class LotteriesController extends FrontendApiMainController
 
     public function setWinPrize()
     {
-        LotteryIssue::calculateEncodedNumber('zx1fc', '1907121193');
+        LotteryIssue::calculateEncodedNumber('zx115', '201907190983');
+    }
+
+    /**
+     * 终止追号
+     * @param  LotteriesStopTraceRequest $request
+     * @param  LotteriesStopTraceAction  $action
+     * @return JsonResponse
+     */
+    public function stopTrace(LotteriesStopTraceRequest $request, LotteriesStopTraceAction $action): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
     }
 }
