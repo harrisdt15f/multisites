@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Jenssegers\Agent\Agent;
@@ -79,13 +80,14 @@ class BackEndApiMainController extends Controller
         $result = false;
         $open_route = [];
         $this->userAgent = new Agent();
-//        if ($this->userAgent->isDesktop()) {
+        if ($this->userAgent->isDesktop()) {
             $open_route = BackendAdminRoute::where('is_open', 1)->pluck('method')->toArray();
             $result = true;
-        /*} else {
+        } else {
             Log::info('robot attacks: '.json_encode(Input::all()).json_encode(Request::header()));
+            echo '机器人禁止操作';
             die();
-        }*/
+        }
         if ($result === true) {
             $this->middleware('auth:'.$this->currentGuard, ['except' => $open_route]);
         }
