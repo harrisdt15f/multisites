@@ -11,7 +11,7 @@ class FrontendLotteryFnfBetableList extends BaseModel
 
     public function method()
     {
-        return $this->hasOne(FrontendLotteryFnfBetableMethod::class, 'id', 'method_id')->select('id', 'lottery_name', 'method_name');
+        return $this->hasOne(FrontendLotteryFnfBetableMethod::class, 'id', 'method_id');
     }
 
     public function currentIssue()

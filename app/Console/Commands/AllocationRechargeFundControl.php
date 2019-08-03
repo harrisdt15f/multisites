@@ -10,7 +10,6 @@ use App\Models\User\Fund\BackendAdminRechargehumanLog;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class AllocationRechargeFundControl extends Command
 {
@@ -35,7 +34,6 @@ class AllocationRechargeFundControl extends Command
      */
     public function handle()
     {
-        Log::info('开始定时发放人工充值额度');
         $sysConfigures = new SystemConfiguration();
         $everyDayfund = $sysConfigures->select('value')->where('sign', 'admin_recharge_daily_limit')->value('value');
         $groups = BackendAdminRechargePermitGroup::pluck('group_id')->toArray();

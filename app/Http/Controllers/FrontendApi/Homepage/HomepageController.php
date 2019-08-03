@@ -105,7 +105,7 @@ class HomepageController extends FrontendApiMainController
     }
 
     /**
-     * 公告|站内信 已读处理
+     * 站内信 已读处理
      * @param  HomepageReadMessageRequest $request
      * @param  HomepageReadMessageAction  $action
      * @return JsonResponse

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Frontend\Game\Lottery;
+namespace App\Http\Requests\Backend\Game\Lottery;
 
 use App\Http\Requests\BaseFormRequest;
 
-class LotteriesTracesHistoryRequest extends BaseFormRequest
+class WinningNumberSetLotteryNumberRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,12 +23,8 @@ class LotteriesTracesHistoryRequest extends BaseFormRequest
      */
     public function rules(): array
     {
-        //############################需要做验证处理
         return [
-            // 'page_size' => 'string', //'integer|min:10|max:100',
-            // 'lottery_sign' => 'string', //'string|min:4|max:10|exists:lottery_lists,en_name',
-            // 'issue' => 'string', //'alpha_num',
-            // 'status' => 'string', //'',
+
         ];
     }
 

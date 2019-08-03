@@ -9,6 +9,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Jenssegers\Agent\Agent;
 
@@ -30,24 +32,37 @@ class FrontendApiMainController extends Controller
      */
     public function __construct()
     {
+        $this->handleEndUser();
+        $this->middleware(function ($request, $next) {
+            $this->userOperateLog();
+            $this->eloqM = 'App\\Models\\' . $this->eloqM; // 当前的eloquent
+            return $next($request);
+        });
+    }
+
+    /**
+     *处理客户端
+     */
+    private function handleEndUser()
+    {
+        $result = false;
+        $open_route = [];
         $this->userAgent = new Agent();
         if ($this->userAgent->isDesktop()) {
             $open_route = FrontendWebRoute::where('is_open', 1)->pluck('method')->toArray();
             $this->currentGuard = 'frontend-web';
+            $result = true;
+        } elseif ($this->userAgent->isRobot()) {
+            Log::info('robot attacks: ' . json_encode(Input::all()) . json_encode(Request::header()));
+            die();
         } else {
             $open_route = FrontendAppRoute::where('is_open', 1)->pluck('method')->toArray();
             $this->currentGuard = 'frontend-mobile';
+            $result = true;
         }
-        $this->middleware('auth:'.$this->currentGuard, ['except' => $open_route]);
-        $this->middleware(function ($request, $next) {
-            $this->currentAuth = auth($this->currentGuard);
-            $this->partnerUser = $this->currentAuth->user();
-            $this->inputs = Input::all(); //获取所有相关的传参数据
-            //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
-            $this->userOperateLog();
-            $this->eloqM = 'App\\Models\\'.$this->eloqM; // 当前的eloquent
-            return $next($request);
-        });
+        if ($result === true) {
+            $this->middleware('auth:' . $this->currentGuard, ['except' => $open_route]);
+        }
     }
 
     /**
@@ -55,6 +70,11 @@ class FrontendApiMainController extends Controller
      */
     private function userOperateLog(): void
     {
+        $this->inputs = Input::all(); //获取所有相关的传参数据
+        $this->currentAuth = auth($this->currentGuard);
+        $this->partnerUser = $this->currentAuth->user();
+        //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
+        $this->currentOptRoute = Route::getCurrentRoute();
         $this->log_uuid = Str::orderedUuid()->getNodeHex();
         $datas['input'] = $this->inputs;
         $datas['route'] = $this->currentOptRoute;
@@ -79,7 +99,7 @@ class FrontendApiMainController extends Controller
         $message = '',
         $placeholder = null,
         $substituted = null
-    ): JsonResponse {
+    ): JsonResponse{
         $defaultSuccessCode = '200';
         $defaultErrorCode = '404';
         if ($success === true) {
@@ -88,9 +108,9 @@ class FrontendApiMainController extends Controller
             $code = $code == '' ? $defaultErrorCode : $code;
         }
         if ($placeholder === null || $substituted === null) {
-            $message = $message == '' ? __('frontend-codes-map.'.$code) : $message;
+            $message = $message == '' ? __('frontend-codes-map.' . $code) : $message;
         } else {
-            $message = $message == '' ? __('frontend-codes-map.'.$code, [$placeholder => $substituted]) : $message;
+            $message = $message == '' ? __('frontend-codes-map.' . $code, [$placeholder => $substituted]) : $message;
         }
         $datas = [
             'success' => $success,
@@ -103,7 +123,7 @@ class FrontendApiMainController extends Controller
 
     protected function modelWithNameSpace($eloqM = null)
     {
-        return $eloqM !== null ? 'App\\Models\\'.$eloqM : $eloqM;
+        return $eloqM !== null ? 'App\\Models\\' . $eloqM : $eloqM;
     }
 
     /**
@@ -144,16 +164,18 @@ class FrontendApiMainController extends Controller
             //for single where condition searching
             if (!empty($searchCriterias)) {
                 foreach ($searchCriterias as $key => $value) {
-                    $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
-                    if ($sign == 'LIKE') {
-                        $sign = strtolower($sign);
-                        $value = '%'.$value.'%';
+                    if ($value !== '*') {
+                        $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
+                        if ($sign == 'LIKE') {
+                            $sign = strtolower($sign);
+                            $value = '%' . $value . '%';
+                        }
+                        $whereCriteria = [];
+                        $whereCriteria[] = $key;
+                        $whereCriteria[] = $sign;
+                        $whereCriteria[] = $value;
+                        $whereData[] = $whereCriteria;
                     }
-                    $whereCriteria = [];
-                    $whereCriteria[] = $key;
-                    $whereCriteria[] = $sign;
-                    $whereCriteria[] = $value;
-                    $whereData[] = $whereCriteria;
                 }
                 if (!empty($timeConditions)) {
                     $whereData = array_merge($whereData, $timeConditions);
@@ -179,17 +201,20 @@ class FrontendApiMainController extends Controller
                 if (!empty($searchCriterias)) {
                     $whereData = [];
                     foreach ($searchCriterias as $key => $value) {
-                        $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
-                        if ($sign == 'LIKE') {
-                            $sign = strtolower($sign);
-                            $value = '%'.$value.'%';
-                        }
-                        $whereCriteria = [];
-                        $whereCriteria[] = $key;
+                        if ($value !== '*') {
+                            $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
+                            if ($sign == 'LIKE') {
+                                $sign = strtolower($sign);
+                                $value = '%' . $value . '%';
+                            }
+                            $whereCriteria = [];
+                            $whereCriteria[] = $key;
 
-                        $whereCriteria[] = $sign;
-                        $whereCriteria[] = $value;
-                        $whereData[] = $whereCriteria;
+                            $whereCriteria[] = $sign;
+                            $whereCriteria[] = $value;
+                            $whereData[] = $whereCriteria;
+                        }
+
                     }
                     if (!empty($timeConditions)) {
                         $whereData = array_merge($whereData, $timeConditions);
@@ -285,7 +310,7 @@ class FrontendApiMainController extends Controller
                                                 $queryConditions) ? $queryConditions[$key] : '=';
                                             if ($sign == 'LIKE') {
                                                 $sign = strtolower($sign);
-                                                $value = '%'.$value.'%';
+                                                $value = '%' . $value . '%';
                                             }
                                             $query->where($key, $sign, $value);
                                         }
