@@ -47,15 +47,25 @@ class UserProfitsControl extends Command
         if (is_object($todayAccountsReportsUsers)){
             foreach ($todayAccountsReportsUsers as $child){
 
-                $data['team_deposit'] = Self::getSumProfits($today, $child->username, UserProfits::TEAM_DEPOSIT_SIGN) ;
-                $data['team_withdrawal'] = Self::getSumProfits($today, $child->username, UserProfits::TEAM_WITHDRAWAL_SIGN) ;
-                $data['team_turnover'] = Self::getSumProfits($today, $child->username, UserProfits::TEAM_TURNOVER_SIGN) ;
-                $data['team_prize'] = Self::getSumProfits($today, $child->username, UserProfits::TEAM_PRIZE_SIGN) ;
+                $data['team_deposit'] = Self::getSumChildProfits($today, $child->user_id, UserProfits::TEAM_DEPOSIT_SIGN) ;
+                $data['team_withdrawal'] = Self::getSumChildProfits($today, $child->user_id, UserProfits::TEAM_WITHDRAWAL_SIGN) ;
+                $data['team_turnover'] = Self::getSumChildProfits($today, $child->user_id, UserProfits::TEAM_TURNOVER_SIGN) ;
+                $data['team_prize'] = Self::getSumChildProfits($today, $child->user_id, UserProfits::TEAM_PRIZE_SIGN) ;
                 $data['team_profit'] = $data['team_prize'] -  $data['team_turnover'];
                 $data['team_commission'] = 0 ;  //todo 下级返点
                 $data['team_bet_commission'] = 0 ;  //todo 投注返点
-                $data['team_dividend'] = Self::getSumProfits($today, $child->username, UserProfits::TEAM_DVIVDEND_SIGN) ;
-                $data['team_daily_salary'] = Self::getSumProfits($today, $child->username, UserProfits::TEAM_DAILYSALARY_SIGN) ;
+                $data['team_dividend'] = Self::getSumChildProfits($today, $child->user_id, UserProfits::TEAM_DVIVDEND_SIGN) ;
+                $data['team_daily_salary'] = Self::getSumChildProfits($today, $child->user_id, UserProfits::TEAM_DAILYSALARY_SIGN) ;
+
+                $data['deposit'] = Self::getSumProfits($today, $child->user_id, UserProfits::TEAM_DEPOSIT_SIGN) ;
+                $data['withdrawal'] = Self::getSumProfits($today, $child->user_id, UserProfits::TEAM_WITHDRAWAL_SIGN) ;
+                $data['turnover'] = Self::getSumProfits($today, $child->user_id, UserProfits::TEAM_TURNOVER_SIGN) ;
+                $data['prize'] = Self::getSumProfits($today, $child->user_id, UserProfits::TEAM_PRIZE_SIGN) ;
+                $data['profit'] = $data['prize'] -  $data['turnover'];
+                $data['commission'] = 0 ;  //todo 下级返点
+                $data['bet_commission'] = 0 ;  //todo 投注返点
+                $data['dividend'] = Self::getSumProfits($today, $child->user_id, UserProfits::TEAM_DVIVDEND_SIGN) ;
+                $data['daily_salary'] = Self::getSumProfits($today, $child->user_id, UserProfits::TEAM_DAILYSALARY_SIGN) ;
 
                 $data['date'] = $today;
                 $data['user_id'] =  $child->user_id;
@@ -68,11 +78,21 @@ class UserProfitsControl extends Command
         }
     }
 
-    public static function getSumProfits(string $date, string $username, array $type_sign) : float
+    public static function getSumProfits(string $date, int $user_id, array $type_sign) : float
     {
         return FrontendUsersAccountsReport::where([
             ['created_at', '>', $date],
-            ['username', $username]
+            ['user_id', $user_id]
+        ])
+            ->whereIn('type_sign', $type_sign)
+            ->sum('amount');
+    }
+
+    public static function getSumChildProfits(string $date, int $parent_id, array $type_sign) : float
+    {
+        return FrontendUsersAccountsReport::where([
+            ['created_at', '>', $date],
+            ['parent_id', $parent_id]
         ])
             ->whereIn('type_sign', $type_sign)
             ->sum('amount');

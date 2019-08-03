@@ -22,6 +22,7 @@ class Kernel extends ConsoleKernel
         Commands\UserProfitsControl::class,
         Commands\UserDaysalaryControl::class,
         Commands\SendDaysalaryControl::class,
+        Commands\UserBonusControl::class,
     ];
 
     /**
@@ -52,6 +53,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('UserDaysalary')->daily()->at('02:00');
         //每日3点 发放用户日工资
         $schedule->command('SendDaysalary')->daily()->at('03:00');
+
+        //每月1号15号 统计计算代理分红
+        $schedule->command('UserBonus')->monthlyOn(1, '4:00');
+        $schedule->command('UserBonus')->monthlyOn(15, '4:00');
     }
 
     /**

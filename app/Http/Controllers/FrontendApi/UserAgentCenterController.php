@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers\FrontendApi;
 
-use App\Http\Requests\Frontend\UserAgentCenter\UserDaysalaryRequest;
-use App\Http\SingleActions\Frontend\User\AgentCenter\UserProfitsAction;
-use App\Http\SingleActions\Frontend\User\AgentCenter\UserDaysalaryAction;
+use App\Http\Requests\Frontend\UserAgentCenter\{UserBonusRequest, UserDaysalaryRequest, UserProfitsRequest};
+use App\Http\SingleActions\Frontend\User\AgentCenter\{UserProfitsAction, UserDaysalaryAction, UserBonusAction};
 use Illuminate\Http\{JsonResponse};
-use App\Http\Requests\Frontend\UserAgentCenter\UserProfitsRequest;
 
 class UserAgentCenterController extends FrontendApiMainController
 {
@@ -30,6 +28,17 @@ class UserAgentCenterController extends FrontendApiMainController
      */
 
     public function UserDaysalary(UserDaysalaryAction $action , UserDaysalaryRequest $request): JsonResponse
+    {
+        return $action->execute($this, $request);
+    }
+
+    /**
+     * 用户分红
+     * @param UserBonusAction $action
+     * @param UserBonusRequest $request
+     * @return JsonResponse
+     */
+    public function UserBonus(UserBonusAction $action, UserBonusRequest $request) : JsonResponse
     {
         return $action->execute($this, $request);
     }
