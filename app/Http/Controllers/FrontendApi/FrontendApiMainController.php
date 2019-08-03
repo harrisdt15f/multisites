@@ -35,7 +35,7 @@ class FrontendApiMainController extends Controller
         $this->handleEndUser();
         $this->middleware(function ($request, $next) {
             $this->userOperateLog();
-            $this->eloqM = 'App\\Models\\'.$this->eloqM; // 当前的eloquent
+            $this->eloqM = 'App\\Models\\' . $this->eloqM; // 当前的eloquent
             return $next($request);
         });
     }
@@ -53,7 +53,7 @@ class FrontendApiMainController extends Controller
             $this->currentGuard = 'frontend-web';
             $result = true;
         } elseif ($this->userAgent->isRobot()) {
-            Log::info('robot attacks: '.json_encode(Input::all()).json_encode(Request::header()));
+            Log::info('robot attacks: ' . json_encode(Input::all()) . json_encode(Request::header()));
             die();
         } else {
             $open_route = FrontendAppRoute::where('is_open', 1)->pluck('method')->toArray();
@@ -61,7 +61,7 @@ class FrontendApiMainController extends Controller
             $result = true;
         }
         if ($result === true) {
-            $this->middleware('auth:'.$this->currentGuard, ['except' => $open_route]);
+            $this->middleware('auth:' . $this->currentGuard, ['except' => $open_route]);
         }
     }
 
@@ -99,7 +99,7 @@ class FrontendApiMainController extends Controller
         $message = '',
         $placeholder = null,
         $substituted = null
-    ): JsonResponse {
+    ): JsonResponse{
         $defaultSuccessCode = '200';
         $defaultErrorCode = '404';
         if ($success === true) {
@@ -108,9 +108,9 @@ class FrontendApiMainController extends Controller
             $code = $code == '' ? $defaultErrorCode : $code;
         }
         if ($placeholder === null || $substituted === null) {
-            $message = $message == '' ? __('frontend-codes-map.'.$code) : $message;
+            $message = $message == '' ? __('frontend-codes-map.' . $code) : $message;
         } else {
-            $message = $message == '' ? __('frontend-codes-map.'.$code, [$placeholder => $substituted]) : $message;
+            $message = $message == '' ? __('frontend-codes-map.' . $code, [$placeholder => $substituted]) : $message;
         }
         $datas = [
             'success' => $success,
@@ -123,7 +123,7 @@ class FrontendApiMainController extends Controller
 
     protected function modelWithNameSpace($eloqM = null)
     {
-        return $eloqM !== null ? 'App\\Models\\'.$eloqM : $eloqM;
+        return $eloqM !== null ? 'App\\Models\\' . $eloqM : $eloqM;
     }
 
     /**
@@ -164,16 +164,18 @@ class FrontendApiMainController extends Controller
             //for single where condition searching
             if (!empty($searchCriterias)) {
                 foreach ($searchCriterias as $key => $value) {
-                    $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
-                    if ($sign == 'LIKE') {
-                        $sign = strtolower($sign);
-                        $value = '%'.$value.'%';
+                    if ($value !== '*') {
+                        $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
+                        if ($sign == 'LIKE') {
+                            $sign = strtolower($sign);
+                            $value = '%' . $value . '%';
+                        }
+                        $whereCriteria = [];
+                        $whereCriteria[] = $key;
+                        $whereCriteria[] = $sign;
+                        $whereCriteria[] = $value;
+                        $whereData[] = $whereCriteria;
                     }
-                    $whereCriteria = [];
-                    $whereCriteria[] = $key;
-                    $whereCriteria[] = $sign;
-                    $whereCriteria[] = $value;
-                    $whereData[] = $whereCriteria;
                 }
                 if (!empty($timeConditions)) {
                     $whereData = array_merge($whereData, $timeConditions);
@@ -199,17 +201,20 @@ class FrontendApiMainController extends Controller
                 if (!empty($searchCriterias)) {
                     $whereData = [];
                     foreach ($searchCriterias as $key => $value) {
-                        $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
-                        if ($sign == 'LIKE') {
-                            $sign = strtolower($sign);
-                            $value = '%'.$value.'%';
-                        }
-                        $whereCriteria = [];
-                        $whereCriteria[] = $key;
+                        if ($value !== '*') {
+                            $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
+                            if ($sign == 'LIKE') {
+                                $sign = strtolower($sign);
+                                $value = '%' . $value . '%';
+                            }
+                            $whereCriteria = [];
+                            $whereCriteria[] = $key;
 
-                        $whereCriteria[] = $sign;
-                        $whereCriteria[] = $value;
-                        $whereData[] = $whereCriteria;
+                            $whereCriteria[] = $sign;
+                            $whereCriteria[] = $value;
+                            $whereData[] = $whereCriteria;
+                        }
+
                     }
                     if (!empty($timeConditions)) {
                         $whereData = array_merge($whereData, $timeConditions);
@@ -305,7 +310,7 @@ class FrontendApiMainController extends Controller
                                                 $queryConditions) ? $queryConditions[$key] : '=';
                                             if ($sign == 'LIKE') {
                                                 $sign = strtolower($sign);
-                                                $value = '%'.$value.'%';
+                                                $value = '%' . $value . '%';
                                             }
                                             $query->where($key, $sign, $value);
                                         }
