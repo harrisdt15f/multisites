@@ -8,10 +8,10 @@
 
 namespace App\Http\Controllers\BackendApi\Game\Lottery;
 
-
+use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Game\Lottery\WinningNumberSetLotteryNumberRequest;
-use App\Http\SingleActions\Backend\Game\Lottery\JsonResponse;
 use App\Http\SingleActions\Backend\Game\Lottery\WinningNumberSetLotteryNumberAction;
+use Illuminate\Http\JsonResponse;
 
 class WinningNumberController extends BackEndApiMainController
 {
@@ -24,7 +24,7 @@ class WinningNumberController extends BackEndApiMainController
         WinningNumberSetLotteryNumberRequest $request,
         WinningNumberSetLotteryNumberAction $action
     ): JsonResponse {
-        $inputDatas = $request->validated();
+        $inputDatas = $request->all();
         $headers = $request->header();
         return $action->execute($this, $inputDatas, $headers);
     }
