@@ -28,7 +28,8 @@ trait LotteryBasicWayLogics
         foreach ($oSeriesWay->WinningNumber as $iSeriesMethodId => $sWnNumber) {
             $oSeriesMethod = LotterySeriesMethod::find($iSeriesMethodId);
             $oBasicMethod = $oSeriesMethod->basicMethod;
-            $this->sPosition = $sPosition;
+            $iOffset = $oSeriesMethod->offset >= 0 ? $oSeriesMethod->offset : $oSeriesMethod->offset + $oSeriesWay->digital_count;
+            $this->sPosition = $sPosition ?? $iOffset;
 //            $oBasicMethod->sPosition = $sPosition;
             $sBetNumberFinal = $this->formatBetNumber($sBetNumber, $oSeriesMethod, $oSeriesWay, $sWnNumber);
             $iCount = $oBasicMethod->getPrizeCount($oSeriesWay, $this, $sWnNumber, $sBetNumberFinal);
@@ -79,6 +80,11 @@ trait LotteryBasicWayLogics
                 $iOffset = $oSeriesMethod->offset >= 0 ? $oSeriesMethod->offset : $oSeriesMethod->offset + $oSeriesWay->digital_count;
                 $this->sPosition = $iOffset;
                 $sBetNumberFinal = $aBetNumbers[$iOffset];
+                break;
+            case 'LottoSingleOne':
+                $iOffset = $oSeriesMethod->offset >= 0 ? $oSeriesMethod->offset : $oSeriesMethod->offset + $oSeriesWay->digital_count;
+                $this->sPosition = $iOffset;
+                $sBetNumberFinal = $sBetNumber;
                 break;
             case 'MultiSequencing':
                 $iWidthOfWnNumber = strlen($sWnNumber);
