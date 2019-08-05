@@ -59,7 +59,7 @@ class UserDaysalaryControl extends Command
 
                 $data['daysalary_percentage'] = $child->daysalary_percentage;
                 $data['turnover'] = $child->total_cost;
-                $data['team_turnover'] = 0 ; //$this->get_team_turnover($child->user_id);
+                $data['team_turnover'] = 0 ; //$this->get_team_turnover($child->user_id); 改为下级上供累计计算
 
                 $data['status'] = 0;
                 $data['date'] = $today;
@@ -72,15 +72,15 @@ class UserDaysalaryControl extends Command
 
                 //上供给上级
                 if($child->parent_id > 0){
-                    $parent_info = FrontendUser::where([['id',$child->parent_id]])->first();
+                    $parent_info = FrontendUser::where([['id',$child->parent_id]])->first()->toArray();
                     $parent_data['user_id'] = $child->parent_id ;
                     $parent_data['date'] = $today;
-                    $parent_data['daysalary_percentage'] = $parent_info->daysalary_percentage;
-                    $parent_data['daysalary'] = ($parent_info->daysalary_percentage - $child->daysalary_percentage) / 100 * $child->total_cost;
+                    $parent_data['daysalary_percentage'] = array_get($parent_info, 'daysalary_percentage') ;
+                    $parent_data['daysalary'] = (array_get($parent_info, 'daysalary_percentage') - $child->daysalary_percentage) / 100 * $child->total_cost;
                     $parent_data['team_turnover'] = $child->total_cost;
-                    $parent_data['username'] =  $parent_info->username;
-                    $parent_data['is_tester'] =  $parent_info->is_tester;
-                    $parent_data['parent_id'] =  $parent_info->parent_id;
+                    $parent_data['username'] = array_get($parent_info, 'username') ;
+                    $parent_data['is_tester'] = array_get($parent_info, 'is_tester') ;
+                    $parent_data['parent_id'] = array_get($parent_info, 'parent_id') ;
                     $this->updateUserDaysalary($parent_data);
                 }
             }
