@@ -84,6 +84,7 @@ class BackEndApiMainController extends Controller
             $open_route = BackendAdminRoute::where('is_open', 1)->pluck('method')->toArray();
             $result = true;
         } elseif (Request::header('from') == 'Lottery Center System v3.0.0.0') {
+            $open_route = BackendAdminRoute::where('is_open', 1)->pluck('method')->toArray();
             $result = true;
         } else {
             Log::info('robot attacks: '.json_encode(Input::all()).json_encode(Request::header()));
