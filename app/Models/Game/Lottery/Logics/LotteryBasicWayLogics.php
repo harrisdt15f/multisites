@@ -50,10 +50,13 @@ trait LotteryBasicWayLogics
             ['method_id', '=', $oSeriesWay->lottery_method_id],
             ['series_id', '=', $oSeriesWay->series_code],
         ];
-        if ($this->sPosition !== null) {
-            $arrWhere[] = ['position', '=', (string)$this->sPosition];
-        }
         $prizeLevelQuery = $oBasicMethod->prizeLevel()->where($arrWhere);
+        if ($this->sPosition !== null) {
+//            $arrWhere[] = ['position', '=', (string)$this->sPosition];
+            $positon = (string)$this->sPosition;
+            $prizeLevelQuery->whereRaw('FIND_IN_SET('.$positon.',position)');
+        }
+
         $prizeLevel = $prizeLevelQuery->first();
         if ($prizeLevel === null) {
             $errorString = 'PrizeLevel Query Null'.json_encode($oSeriesWay).'whereDatas are '.json_encode($arrWhere).'Query is '.$prizeLevelQuery->toSql();
