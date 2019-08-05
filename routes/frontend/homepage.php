@@ -2,7 +2,7 @@
 /**
  * author: Alvin
  * Date: 5/21/2019
- * Time: 16:27 PM
+ * Time: 16:27 Pm
  */
 
 //首页
@@ -10,7 +10,10 @@ Route::group(['prefix' => 'homepage', 'namespace' => 'Homepage'], function () {
     $namePrefix = 'web-api.HomepageController.';
     $controller = 'HomepageController@';
     //首页-需要展示的模块
-    Route::match(['get', 'options'], 'show-homepage-model', ['as' => $namePrefix . 'show-homepage-model', 'uses' => $controller . 'showHomepageModel']);
+    Route::match(
+        ['get', 'options'],
+        'show-homepage-model',
+        ['as' => $namePrefix . 'show-homepage-model', 'uses' => $controller . 'showHomepageModel']);
     //轮播图
     Route::match(['get', 'options'], 'banner', ['as' => $namePrefix . 'banner', 'uses' => $controller . 'banner']);
     //热门彩票

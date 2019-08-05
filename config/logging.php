@@ -179,6 +179,12 @@ return [
             'level' => 'debug',
             'days' => 14,
         ],
+        'open-center' => [//开奖中心日志
+            'driver' => 'daily',
+            'path' => storage_path('logs/opencenter.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
     ],
 
 ];
