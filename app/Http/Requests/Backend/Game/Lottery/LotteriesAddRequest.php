@@ -43,7 +43,7 @@ class LotteriesAddRequest extends BaseFormRequest
             'lottery.max_prize_group' => 'required|integer', //最大奖金组
             'lottery.min_times' => 'required|integer', //下注最小倍数
             'lottery.max_times' => 'required|integer', //下注最大倍数
-            'lottery.max_bonus' => 'required|numeric', //下注最大奖金
+            'lottery.max_profit_bonus' => 'required|numeric', //最大盈利奖金
             'lottery.valid_modes' => 'required|string', //下注模式 1元 2角 3分
             'lottery.status' => 'required|in:0,1', //状态：0关闭 1开启
             'lottery.icon_name' => 'required|string', //彩种图标名称
