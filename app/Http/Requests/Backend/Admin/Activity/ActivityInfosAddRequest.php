@@ -34,6 +34,7 @@ class ActivityInfosAddRequest extends BaseFormRequest
             'is_redirect' => 'required|integer|in:0,1', //是否跳转 0不跳转 1跳转
             'redirect_url' => 'string|required_if:is_redirect,1', //跳转地址
             'is_time_interval' => 'required|numeric', //是否有期限 0无期限 1有期限
+            'type' => 'required|numeric', //是否有期限 0无期限 1有期限
         ];
     }
 

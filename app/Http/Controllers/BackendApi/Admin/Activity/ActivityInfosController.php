@@ -7,6 +7,7 @@ use App\Http\Requests\Backend\Admin\Activity\ActivityInfosAddRequest;
 use App\Http\Requests\Backend\Admin\Activity\ActivityInfosDeleteRequest;
 use App\Http\Requests\Backend\Admin\Activity\ActivityInfosEditRequest;
 use App\Http\Requests\Backend\Admin\Activity\ActivityInfosSortRequest;
+use App\Http\Requests\Backend\Admin\Activity\ActivityInfosDetailRequest;
 use App\Http\SingleActions\Backend\Admin\Activity\ActivityInfosAddAction;
 use App\Http\SingleActions\Backend\Admin\Activity\ActivityInfosDeleteAction;
 use App\Http\SingleActions\Backend\Admin\Activity\ActivityInfosDetailAction;
@@ -24,9 +25,10 @@ class ActivityInfosController extends BackEndApiMainController
      * @param  ActivityInfosDetailAction $action
      * @return JsonResponse
      */
-    public function detail(ActivityInfosDetailAction $action): JsonResponse
+    public function detail(ActivityInfosDetailRequest $request,ActivityInfosDetailAction $action): JsonResponse
     {
-        return $action->execute($this);
+        $inputDatas = $request->validated();
+        return $action->execute($this,$inputDatas);
     }
 
     /**
