@@ -43,7 +43,7 @@ trait IssueEncodeLogics
                 } else {
                     if ($oIssue->projects()->exists()) {
                         if ($oIssue->official_code !== null) {
-                            $oProjects = $oIssue->projects->fresh();
+                            $oProjects = $oIssue->projects->where('lottery_sign', $lottery_id)->fresh();
                             $aWnNumberOfMethods = self::getWnNumberOfSeriesMethods($oLottery,
                                 $oIssue->official_code); //wn_number
                             if ($oLottery->basicways()->exists()) {
