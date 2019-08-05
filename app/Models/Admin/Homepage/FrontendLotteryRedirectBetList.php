@@ -19,6 +19,6 @@ class FrontendLotteryRedirectBetList extends BaseModel
 
     public function issueRule()
     {
-        return $this->hasOne(LotteryIssueRule::class, 'lottery_id', 'lotteries_sign');
+        return $this->hasMany(LotteryIssueRule::class, 'lottery_id', 'lotteries_sign');
     }
 }

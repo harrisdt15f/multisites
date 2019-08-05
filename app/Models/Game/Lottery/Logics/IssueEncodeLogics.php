@@ -289,6 +289,7 @@ trait IssueEncodeLogics
         } else {
             return $openCodeStr;
         }
+        shuffle($openCodeArr); //打乱号码顺序
         $openCodeStr = implode($splitter, $openCodeArr); //开奖号码string
         return $openCodeStr;
     }

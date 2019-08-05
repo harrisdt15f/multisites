@@ -29,9 +29,9 @@ class LotteryList extends BaseModel
         'issue_format' => 'required|min:2|max:32',
     ];
 
-    public function issueRule(): HasOne
+    public function issueRule(): hasMany
     {
-        return $this->hasOne(LotteryIssueRule::class, 'lottery_id', 'en_name');
+        return $this->hasMany(LotteryIssueRule::class, 'lottery_id', 'en_name');
     }
 
     public function gameMethods(): HasMany
