@@ -17,6 +17,7 @@ use App\Http\SingleActions\Frontend\Homepage\HompagePopularMethodsAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageQrCodeAction;
 use App\Http\SingleActions\Mobile\Homepage\HompagePopularLotteriesAction;
 use Illuminate\Http\JsonResponse;
+use App\Http\SingleActions\Frontend\Homepage\HomepageActivityListAction;
 
 class HomepageController extends FrontendApiMainController
 {
@@ -73,13 +74,23 @@ class HomepageController extends FrontendApiMainController
     }
 
     /**
-     * 首页活动列表
+     * 热门活动
      * @param  HompageActivityAction $action
      * @return JsonResponse
      */
     public function activity(HompageActivityAction $action): JsonResponse
     {
-        return $action->execute($this);
+        return $action->execute($this,2);
+    }
+    /**
+     * 首页活动列表
+     * @param  HompageActivityAction $action
+     * @return JsonResponse
+     */
+    public function activityList(HomepageActivityListAction $action): JsonResponse
+    {
+        $inputDatas['type'] = '2';
+        return $action->execute($this,$inputDatas);
     }
 
     /**
