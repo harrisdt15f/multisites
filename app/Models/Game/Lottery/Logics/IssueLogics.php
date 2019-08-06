@@ -72,13 +72,14 @@ trait IssueLogics
     }
 
     /**
-     * 获取上一期
+     * 获取已经结束的一条奖期（默认最后一条）
      * @param  string  $lotterySign
+     * @param  int     $skipNum
      * @return mixed
      */
-    public static function getLastIssue($lotterySign)
+    public static function getPastIssue($lotterySign, $skipNum = 0)
     {
         $time = time();
-        return self::where('lottery_id', $lotterySign)->where('end_time', '<=', $time)->orderBy('id', 'DESC')->first();
+        return self::where('lottery_id', $lotterySign)->where('end_time', '<=', $time)->orderBy('id', 'DESC')->skip($skipNum)->first();
     }
 }
