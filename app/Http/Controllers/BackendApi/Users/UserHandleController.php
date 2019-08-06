@@ -6,6 +6,7 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Users\UserHandleApplyResetUserFundPasswordRequest;
 use App\Http\Requests\Backend\Users\UserHandleApplyResetUserPasswordRequest;
 use App\Http\Requests\Backend\Users\UserHandleBankCardListRequest;
+use App\Http\Requests\Backend\Users\UserHandleSetUserAvatarRequest;
 use App\Http\Requests\Backend\Users\UserHandleCommonAuditPasswordRequest;
 use App\Http\Requests\Backend\Users\UserHandleCreateUserRequest;
 use App\Http\Requests\Backend\Users\UserHandleDeactivateDetailRequest;
@@ -24,6 +25,8 @@ use App\Http\SingleActions\Backend\Users\UserHandleDeductionBalanceAction;
 use App\Http\SingleActions\Backend\Users\UserHandleUserAccountChangeAction;
 use App\Http\SingleActions\Backend\Users\UserHandleUserRechargeHistoryAction;
 use App\Http\SingleActions\Backend\Users\UserHandleUsersInfoAction;
+use App\Http\SingleActions\Backend\Users\UserHandlePublicAvatarAction;
+use App\Http\SingleActions\Backend\Users\UserHandleSetUserAvatarAction;
 use App\Models\Admin\BackendAdminAuditPasswordsList;
 use Illuminate\Http\JsonResponse;
 
@@ -227,5 +230,25 @@ class UserHandleController extends BackEndApiMainController
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
+    }
+    /**
+     * 获取系统公共头像列表
+     * @param  UserHandleCommonAppliedPasswordHandleAction $action
+     * @return JsonResponse
+     */
+    public function publicAvatar(UserHandlePublicAvatarAction $action): JsonResponse
+    {
+        return $action->execute($this);
+    }
+    /**
+     * 设定用户头像
+     * @param  UserHandleSetUserAvatarRequest $request
+     * @param  UserHandlePublicAvatarAction $action
+     * @return JsonResponse
+     */
+    public function setUserAvatar(UserHandleSetUserAvatarRequest $request,UserHandleSetUserAvatarAction $action): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this,$inputDatas);
     }
 }

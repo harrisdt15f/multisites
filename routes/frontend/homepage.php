@@ -41,6 +41,6 @@ Route::group(['prefix' => 'homepage', 'namespace' => 'Homepage'], function () {
     //热门电子
     Route::match(['get', 'options'], 'popular-e-game-lists', ['as' => $namePrefix . 'popular-e-game-lists', 'uses' => $controller . 'popularEGameLists']);
     //活动接口
-    Route::match(['post', 'options'], 'activity-list', ['as' => $namePrefix . 'activity', 'uses' => $controller . 'activityList']);
+    Route::match(['post', 'options'], 'activity-list', ['as' => $namePrefix . 'activity-list', 'uses' => $controller . 'activityList']);
 
 });
