@@ -38,7 +38,7 @@ class UserDaysalaryControl extends Command
      */
     public function handle()
     {
-        $today =  Carbon::yesterday()->toDateString();
+        $today = Carbon::yesterday()->toDateString();
 
         $usersList = Project::where([
             ['projects.created_at', '>', $today],
@@ -113,12 +113,12 @@ class UserDaysalaryControl extends Command
             ])->first();
 
             if (empty($row)){
-                Log::info('新建用户日工资'.json_encode($data));
+                Log::channel('daysalary')->info('新建用户日工资'.json_encode($data));
                 return (bool)UserDaysalary::create($data);
             }else{
                 $data['daysalary'] = $data['daysalary'] + $row['daysalary'] ;
                 $data['team_turnover'] = $data['team_turnover'] + $row['team_turnover'] ;
-                Log::info('更新用户日工资'.json_encode($data));
+                Log::channel('daysalary')->info('更新用户日工资'.json_encode($data));
                 return (bool)$row->update($data);
             }
         }
