@@ -293,12 +293,14 @@ class FrontendApiMainController extends Controller
 
                                 if (!empty($withSearchCriterias)) {
                                     foreach ($withSearchCriterias as $key => $value) {
-                                        $whereCriteria = [];
-                                        $whereCriteria[] = $key;
-                                        $whereCriteria[] = array_key_exists($key,
-                                            $queryConditions) ? $queryConditions[$key] : '=';
-                                        $whereCriteria[] = $value;
-                                        $whereData[] = $whereCriteria;
+                                        if ($value !== '*') {
+                                            $whereCriteria = [];
+                                            $whereCriteria[] = $key;
+                                            $whereCriteria[] = array_key_exists($key,
+                                                $queryConditions) ? $queryConditions[$key] : '=';
+                                            $whereCriteria[] = $value;
+                                            $whereData[] = $whereCriteria;
+                                        }
                                     }
                                     $query->where($whereData);
                                 }
@@ -306,13 +308,16 @@ class FrontendApiMainController extends Controller
                                 if ($sizeOfWithInputs == 1) {
                                     if (!empty($withSearchCriterias)) {
                                         foreach ($withSearchCriterias as $key => $value) {
-                                            $sign = array_key_exists($key,
-                                                $queryConditions) ? $queryConditions[$key] : '=';
-                                            if ($sign == 'LIKE') {
-                                                $sign = strtolower($sign);
-                                                $value = '%' . $value . '%';
+                                            if ($value !== '*') {
+                                                $sign = array_key_exists($key,
+                                                    $queryConditions) ? $queryConditions[$key] : '=';
+                                                if ($sign == 'LIKE') {
+                                                    $sign = strtolower($sign);
+                                                    $value = '%' . $value . '%';
+                                                }
+                                                $query->where($key, $sign, $value);
                                             }
-                                            $query->where($key, $sign, $value);
+
                                         }
                                     }
                                 }
