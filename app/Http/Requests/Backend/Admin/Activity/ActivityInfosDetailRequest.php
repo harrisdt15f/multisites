@@ -24,7 +24,7 @@ class ActivityInfosDetailRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'type' => 'required|numeric', //是否有期限 0无期限 1有期限
+            'type' => 'required|numeric', //指定活动属于哪端 1:web端 2：手机端
         ];
     }
 
