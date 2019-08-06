@@ -58,7 +58,7 @@ trait FrontendLotteryRedirectBetListTraits
             $datas[$key]['cn_name'] = $dataIthem->lotteries->cn_name ?? null;
             $datas[$key]['en_name'] = $dataIthem->lotteries->en_name ?? null;
             $datas[$key]['icon_path'] = $dataIthem->lotteries->icon_path ?? null;
-            $datas[$key]['issue_seconds'] = $dataIthem->issueRule->issue_seconds ?? null;
+            $datas[$key]['issue_seconds'] = $dataIthem->issueRule->first->issue_seconds ?? null;
             $datas[$key]['day_issue'] = $dataIthem->lotteries->day_issue ?? null;
         }
         $expiresAt = Carbon::now()->addHours(24);

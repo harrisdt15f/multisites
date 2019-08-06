@@ -67,7 +67,7 @@ class BackEndApiMainController extends Controller
             $this->inputs = Input::all(); //获取所有相关的传参数据
             //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
             $this->adminOperateLog();
-            $this->eloqM = 'App\\Models\\' . $this->eloqM; // 当前的eloquent
+            $this->eloqM = 'App\\Models\\'.$this->eloqM; // 当前的eloquent
             return $next($request);
         });
     }
@@ -81,6 +81,9 @@ class BackEndApiMainController extends Controller
         $open_route = [];
         $this->userAgent = new Agent();
         if ($this->userAgent->isDesktop()) {
+            $open_route = BackendAdminRoute::where('is_open', 1)->pluck('method')->toArray();
+            $result = true;
+        } elseif (Request::header('from') == 'Lottery Center System v3.0.0.0') {
             $open_route = BackendAdminRoute::where('is_open', 1)->pluck('method')->toArray();
             $result = true;
         } else {
@@ -144,16 +147,22 @@ class BackEndApiMainController extends Controller
     }
 
     /**
-     * @param  bool    $success
-     * @param  array   $data
+     * @param  bool  $success
+     * @param  array  $data
      * @param  string  $message
      * @param  string  $code
-     * @param  null    $placeholder
-     * @param  null    $substituted
+     * @param  null  $placeholder
+     * @param  null  $substituted
      * @return JsonResponse
      */
-    public function msgOut($success = false, $data = [], $code = '', $message = '', $placeholder = null, $substituted = null): JsonResponse
-    {
+    public function msgOut(
+        $success = false,
+        $data = [],
+        $code = '',
+        $message = '',
+        $placeholder = null,
+        $substituted = null
+    ): JsonResponse {
         /*if ($this->currentAuth->user())
         {
         $data['access_token']=$this->currentAuth->user()->remember_token;
@@ -166,9 +175,9 @@ class BackEndApiMainController extends Controller
             $code = $code == '' ? $defaultErrorCode : $code;
         }
         if ($placeholder === null || $substituted === null) {
-            $message = $message == '' ? __('codes-map.' . $code) : $message;
+            $message = $message == '' ? __('codes-map.'.$code) : $message;
         } else {
-            $message = $message == '' ? __('codes-map.' . $code, [$placeholder => $substituted]) : $message;
+            $message = $message == '' ? __('codes-map.'.$code, [$placeholder => $substituted]) : $message;
         }
         $datas = [
             'success' => $success,
@@ -181,7 +190,7 @@ class BackEndApiMainController extends Controller
 
     public function modelWithNameSpace($eloqM = null)
     {
-        return $eloqM !== null ? 'App\\Models\\' . $eloqM : $eloqM;
+        return $eloqM !== null ? 'App\\Models\\'.$eloqM : $eloqM;
     }
 
     /**
@@ -225,7 +234,7 @@ class BackEndApiMainController extends Controller
                     $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
                     if ($sign == 'LIKE') {
                         $sign = strtolower($sign);
-                        $value = '%' . $value . '%';
+                        $value = '%'.$value.'%';
                     }
                     $whereCriteria = [];
                     $whereCriteria[] = $key;
@@ -260,7 +269,7 @@ class BackEndApiMainController extends Controller
                         $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
                         if ($sign == 'LIKE') {
                             $sign = strtolower($sign);
-                            $value = '%' . $value . '%';
+                            $value = '%'.$value.'%';
                         }
                         $whereCriteria = [];
                         $whereCriteria[] = $key;
@@ -363,7 +372,7 @@ class BackEndApiMainController extends Controller
                                                 $queryConditions) ? $queryConditions[$key] : '=';
                                             if ($sign == 'LIKE') {
                                                 $sign = strtolower($sign);
-                                                $value = '%' . $value . '%';
+                                                $value = '%'.$value.'%';
                                             }
                                             $query->where($key, $sign, $value);
                                         }

@@ -34,6 +34,7 @@ trait LotteryBasicMethodLogics
         $sFunction = '';
         switch ($this->series_code) {
             case 'ssc':
+            case 'k3':
                 $sWnNumber = substr($sFullWinningNumber, (int)$iOffset, $this->digital_count);
                 $sFunction = 'getWinningNumber'.ucfirst($this->series_code);
                 break;
@@ -235,6 +236,45 @@ trait LotteryBasicMethodLogics
             default:
                 $result = false;
             //#############################[十一选五乐透系列结束]#####################################
+        }
+        return $result; //返回合适的计算中奖号码的方法
+    }
+
+    /**
+     * 分析中奖号码
+     * 十一选五乐透彩系
+     * BigSmallOddEven
+     * Enum
+     * @param  string  $sWinningNumber
+     * @return string | array
+     */
+    public function getWinningNumberK3($sWinningNumber)
+    {
+        //#############################[k3系列开始]#####################################
+        switch ($this->wn_function) {
+            case 'k3bsde': //getWnNumberK3bsde 快3大小单双的中奖号
+                $iSum = DigitalNumber::getSum($sWinningNumber);
+                if ($iSum < 3 || $iSum > 18) {
+                    return '';
+                }
+                $sWnNumber = (int)($iSum >= 11); // 大小
+                $sWnNumber .= $iSum % 2 + 2; // 单双
+                $result = $sWnNumber;
+                break;
+            case 'k3combin'://getWnNumberK3combin 快3组选的中奖号
+                $sWinningNumber = str_split($sWinningNumber, 1);
+                sort($sWinningNumber);
+                $sWinningNumber = implode($sWinningNumber);
+                $result = $this->checkSpan($sWinningNumber) ? $sWinningNumber : '';
+                break;
+            case 'k3contain'://getWnNumberLottoEqual 定位胆
+                $sWinningNumber = str_split($sWinningNumber, 1);
+                sort($sWinningNumber);
+                $result = implode($sWinningNumber);
+                break;
+            default:
+                $result = false;
+            //#############################[k3系列结束]#####################################
         }
         return $result; //返回合适的计算中奖号码的方法
     }
@@ -561,5 +601,83 @@ trait LotteryBasicMethodLogics
         $aBetBalls = explode($this->splitCharInArea, $sBetNumber);
         $iBetBallCount = count($aBetBalls);
         return count(array_intersect($aBetBalls, $aWnBalls));
+    }
+//##########################################################[k3系列 prize 计算]#########################################
+
+    /**
+     * 十一选五系列计算中奖
+     * prizeBigSmallOddEvenK3bsde
+     * prizeEnumK3combin
+     * prizeEnumK3contain
+     * prizeSumK3combin
+     * @param $sFunction
+     * @param $sBetNumber
+     * @param $sWnNumber
+     * @param  LotterySeriesWay  $oSeriesWay
+     * @return float|int
+     */
+    private function getPrizeK3($sFunction, $sBetNumber, $sWnNumber, LotterySeriesWay $oSeriesWay)
+    {
+
+        switch ($sFunction) {
+            case 'prizeBigSmallOddEvenK3bsde'://K3大小单双和值的中奖注数
+                $aWnNumber = str_split($sWnNumber);
+                $aBetNumber = str_split($sBetNumber);
+                $aBoth = array_intersect($aWnNumber, $aBetNumber);
+                $result = count($aBoth);
+                break;
+            case 'prizeEnumK3combin'://快3组选单式的中奖注数
+                $aBetNumbers = explode($this->splitChar, $sBetNumber);
+                $result = (int)array_keys($aBetNumbers, $sWnNumber);
+                break;
+            case 'prizeEnumK3contain'://返回快3任选单式的中奖注数
+                $winCount = 0;
+                $aBetNumbers = explode($this->splitChar, $sBetNumber);
+                $aWnNumber = str_split($sWnNumber);
+                $aCombinations = Math::getCombinationToString($aWnNumber, $this->choose_count);
+                $aDigitals = [];
+                foreach ($aCombinations as $sCombination) {
+                    $aDigital = explode(',', $sCombination);
+                    sort($aDigital);
+                    $aDigitals[] = implode($aDigital);
+                }
+                foreach ($aBetNumbers as $ithemBetNumber) {
+                    if (in_array($ithemBetNumber, $aDigitals, false)) {
+                        $winCount++;
+                    }
+                }
+                $result = $winCount;
+                break;
+            case 'prizeSumK3combin'://K3组选和值的中奖注数
+                $iSum = DigitalNumber::getSum($sWnNumber);
+                $aBetNumbers = explode($this->splitChar, $sBetNumber);
+                $result = (int)in_array($iSum, $aBetNumbers, false);
+                break;
+            default:
+                Log::channel('issues')->info('需要添加k3系列方法:'.$sFunction.$oSeriesWay->toJson());
+                $result = 0;
+        }
+        return $result;
+    }
+
+    /**
+     * 检查跨度是否合法
+     * @param $sNumber
+     * @return bool
+     */
+    public function checkSpan(& $sNumber): bool
+    {
+        if (!is_null($this->span)) {
+            $aDigitals = str_split($sNumber, 1);
+            if ($this->min_span && (max($aDigitals) - min($aDigitals)) == $this->span) {
+                $aSpan = [];
+                for ($i = 1, $iMax = count($aDigitals); $i < $iMax; $aSpan[] = abs($aDigitals[$i] - $aDigitals[$i++ - 1])) {
+                }
+                min($aSpan) == $this->min_span or $sNumber = '';
+            } else {
+                $sNumber = '';
+            }
+        }
+        return $sNumber ? true : false;
     }
 }
