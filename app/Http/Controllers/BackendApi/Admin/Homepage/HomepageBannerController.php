@@ -7,6 +7,7 @@ use App\Http\Requests\Backend\Admin\Homepage\HomepageBannerAddRequest;
 use App\Http\Requests\Backend\Admin\Homepage\HomepageBannerDeleteRequest;
 use App\Http\Requests\Backend\Admin\Homepage\HomepageBannerEditRequest;
 use App\Http\Requests\Backend\Admin\Homepage\HomepageBannerSortRequest;
+use App\Http\Requests\Backend\Admin\Homepage\HomepageBannerDetailRequest;
 use App\Http\SingleActions\Backend\Admin\Homepage\HomepageActivityListAction;
 use App\Http\SingleActions\Backend\Admin\Homepage\HomepageBannerAddAction;
 use App\Http\SingleActions\Backend\Admin\Homepage\HomepageBannerDeleteAction;
@@ -27,9 +28,10 @@ class HomepageBannerController extends BackEndApiMainController
      * @param    HomepageBannerDetailAction $action
      * @return   JsonResponse
      */
-    public function detail(HomepageBannerDetailAction $action): JsonResponse
+    public function detail(HomepageBannerDetailRequest $request,HomepageBannerDetailAction $action): JsonResponse
     {
-        return $action->execute($this);
+        $inputDatas = $request->validated();
+        return $action->execute($this,$inputDatas);
     }
 
     /**

@@ -20,6 +20,8 @@ use Illuminate\Http\JsonResponse;
 
 class HomepageController extends FrontendApiMainController
 {
+    private $bannerFlag = 2;//网页端banner
+
     /**
      * 需要展示的前台模块
      * @param  HomepageShowHomepageModelAction $action
@@ -37,7 +39,7 @@ class HomepageController extends FrontendApiMainController
      */
     public function banner(HompageBannerAction $action): JsonResponse
     {
-        return $action->execute($this);
+        return $action->execute($this,$this->bannerFlag);
     }
 
     /**

@@ -20,9 +20,12 @@ use App\Http\SingleActions\Frontend\Homepage\HompagePopularLotteriesAction;
 use App\Http\SingleActions\Frontend\Homepage\HompagePopularMethodsAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageQrCodeAction;
 use Illuminate\Http\JsonResponse;
+use App\Http\SingleActions\Frontend\Homepage\HomepageActivityListAction;
+
 
 class HomepageController extends FrontendApiMainController
 {
+    private $bannerFlag = 1;//网页端banner
     /**
      * 需要展示的前台模块
      * @param  HomepageShowHomepageModelAction $action
@@ -40,7 +43,7 @@ class HomepageController extends FrontendApiMainController
      */
     public function banner(HompageBannerAction $action): JsonResponse
     {
-        return $action->execute($this);
+        return $action->execute($this,$this->bannerFlag);
     }
 
     /**
@@ -165,4 +168,14 @@ class HomepageController extends FrontendApiMainController
     {
         return $action->execute($this);
     }
+    /**
+     * 活动列表
+     * @return JsonResponse
+     */
+    public function activityList(HomepageActivityListAction $action): JsonResponse
+    {
+        $inputDatas['type'] = '1';
+        return $action->execute($this,$inputDatas);
+    }
+
 }
