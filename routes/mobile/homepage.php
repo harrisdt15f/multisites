@@ -31,4 +31,6 @@ Route::group(['prefix' => 'homepage', 'namespace' => 'Homepage'], function () {
     Route::match(['get', 'options'], 'ico', ['as' => $namePrefix . 'ico', 'uses' => $controller . 'ico']);
     //中奖排行
     Route::match(['get', 'options'], 'ranking', ['as' => $namePrefix . 'ranking', 'uses' => $controller . 'ranking']);
+    //活动列表
+    Route::match(['get', 'options'], 'activity-list', ['as' => $namePrefix . 'ranking', 'uses' => $controller . 'activityList']);
 });
