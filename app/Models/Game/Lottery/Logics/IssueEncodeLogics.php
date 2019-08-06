@@ -268,14 +268,14 @@ trait IssueEncodeLogics
     }
 
     /**
-     * 组合一个奖期合法的随机开奖号码例子
+     * 生成一个奖期合法的随机开奖号码
      * @param  int     $codeLength   [开奖号码的长度]
      * @param  string  $validCode    [合法开奖号码]
      * @param  int     $lotteryType  [开奖号码是否可以重复 ？ 1可重复 2不可重复]
      * @param          $splitter     [该彩种分割开奖号码的方式]
      * @return string  $openCodeStr  [开奖号码string]
      */
-    public static function getAwardCodeExample($codeLength, $validCode, $lotteryType, $splitter): string
+    public static function getOpenNumber($codeLength, $validCode, $lotteryType, $splitter): string
     {
         $openCodeArr = []; //开奖号码array
         $openCodeStr = ''; //开奖号码string
@@ -292,5 +292,24 @@ trait IssueEncodeLogics
         shuffle($openCodeArr); //打乱号码顺序
         $openCodeStr = implode($splitter, $openCodeArr); //开奖号码string
         return $openCodeStr;
+    }
+
+    /**
+     * 奖期录号
+     * @param  int     $lotteryId
+     * @param  int     $issue
+     * @param  string  $code       开奖号码
+     * @return void
+     */
+    public static function enCode($lotteryId, $issue, $code): void
+    {
+        $lotteryIssueEloq = self::where([
+            ['lottery_id', $lotteryId],
+            ['issue', $issue],
+            ['status_encode', self::ENCODE_NONE],
+        ])->first();
+        if ($lotteryIssueEloq !== null) {
+            $lotteryIssueEloq->recordEncodeNumber($code);
+        }
     }
 }
