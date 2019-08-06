@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Game\Lottery\LotteryIssue;
 use App\Models\Game\Lottery\LotterySerie;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class LotterySchedule extends Command
 {
@@ -35,13 +36,16 @@ class LotterySchedule extends Command
                 ['lottery_id', $lotterySign],
                 ['end_time', '<', time()],
             ])->with('lottery')->orderBy('end_time', 'desc')->first();
-            $seriesList = LotterySerie::getList();
-            $serieArr = $seriesList[$lotteryIssueEloq->lottery->series_id]; //当前彩种的系列Arr
-            $splitter = $serieArr['encode_splitter']; //该彩种分割开奖号码的方式
             if ($lotteryIssueEloq !== null) {
-                $openCodeStr = LotteryIssue::getAwardCodeExample($lotteryIssueEloq->lottery->code_length, $lotteryIssueEloq->lottery->valid_code, $lotteryIssueEloq->lottery->lottery_type, $splitter); //获取一个合法的随机开奖号码string
-                $lotteryIssueEloq->recordEncodeNumber($openCodeStr); //开始录号
+                $seriesList = LotterySerie::getList();
+                $serieArr = $seriesList[$lotteryIssueEloq->lottery->series_id]; //当前彩种的系列Arr
+                $splitter = $serieArr['encode_splitter']; //该彩种分割开奖号码的方式
+                if ($lotteryIssueEloq !== null) {
+                    $openCodeStr = LotteryIssue::getOpenNumber($lotteryIssueEloq->lottery->code_length, $lotteryIssueEloq->lottery->valid_code, $lotteryIssueEloq->lottery->lottery_type, $splitter); //获取一个合法的随机开奖号码string
+                    $lotteryIssueEloq->recordEncodeNumber($openCodeStr); //开始录号
+                }
             }
+
         }
     }
 }
