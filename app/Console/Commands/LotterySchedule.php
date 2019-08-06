@@ -38,7 +38,6 @@ class LotterySchedule extends Command
             ])->with('lottery')->orderBy('end_time', 'desc')->first();
             if ($lotteryIssueEloq !== null) {
                 $seriesList = LotterySerie::getList();
-                Log::info($lotteryIssueEloq->lottery->series_id);
                 $serieArr = $seriesList[$lotteryIssueEloq->lottery->series_id]; //当前彩种的系列Arr
                 $splitter = $serieArr['encode_splitter']; //该彩种分割开奖号码的方式
                 if ($lotteryIssueEloq !== null) {
