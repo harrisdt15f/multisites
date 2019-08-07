@@ -54,7 +54,7 @@ class BallsCodeRule implements Rule
                 $result = $this->checkValid($pattern, $value);
                 break;
             case 'k3'://1-18
-                $pattern = '/^(?!\|)(?!.*\|\|$)(?!.*\|$)(([0-1]?[0-8])\|?)*$/';
+                $pattern = '/^(?!\|)(?!.*\|\|$)(?!.*\|$)(([0-1]?[\d])\|?)*$/';
                 $result = $this->checkValid($pattern, $value);
                 break;
             default:
