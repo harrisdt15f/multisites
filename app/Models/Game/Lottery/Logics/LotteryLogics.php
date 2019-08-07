@@ -521,6 +521,7 @@ trait LotteryLogics
                     $hasGroup[] = $method->method_group;
                 }
             }
+            $lottery->serie;
             $cacheData[$lottery->en_name] = [
                 'lottery' => $lottery,
                 'methodConfig' => $methodData,
