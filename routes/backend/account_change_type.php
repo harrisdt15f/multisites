@@ -13,4 +13,12 @@ Route::group(['prefix' => 'accountChangeType', 'namespace' => 'Users\Fund'], fun
     Route::match(['post', 'options'], 'delete', ['as' => $namePrefix . 'delete', 'uses' => $controller . 'delete']);
     //操作帐变类型时需要的字段列表
     Route::match(['get', 'options'], 'param-list', ['as' => $namePrefix . 'param-list', 'uses' => $controller . 'paramList']);
+    //账变类型字段列表
+    Route::match(['post', 'options'], 'field-detail', ['as' => $namePrefix . 'field-detail', 'uses' => $controller . 'fieldDetail']);
+    //账变类型字段添加
+    Route::match(['post', 'options'], 'field-add', ['as' => $namePrefix . 'field-add', 'uses' => $controller . 'fieldAdd']);
+    //账变类型字段删除
+    Route::match(['post', 'options'], 'field-del', ['as' => $namePrefix . 'field-del', 'uses' => $controller . 'fieldDel']);
+    //账变类型字段修改
+    Route::match(['post', 'options'], 'field-mod', ['as' => $namePrefix . 'field-mod', 'uses' => $controller . 'fieldMod']);
 });

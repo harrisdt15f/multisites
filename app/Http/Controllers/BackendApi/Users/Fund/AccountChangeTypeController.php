@@ -6,11 +6,18 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Users\Fund\AccountChangeTypeAddRequest;
 use App\Http\Requests\Backend\Users\Fund\AccountChangeTypeDeleteRequest;
 use App\Http\Requests\Backend\Users\Fund\AccountChangeTypeEditRequest;
+use App\Http\Requests\Backend\Users\Fund\AccountChangeTypeAddFieldRequest;
+use App\Http\Requests\Backend\Users\Fund\AccountChangeTypeModFieldRequest;
+use App\Http\Requests\Backend\Users\Fund\AccountChangeTypeDelFieldRequest;
 use App\Http\SingleActions\Backend\Users\Fund\AccountChangeTypeAddAction;
 use App\Http\SingleActions\Backend\Users\Fund\AccountChangeTypeDeleteAction;
 use App\Http\SingleActions\Backend\Users\Fund\AccountChangeTypeDetailAction;
 use App\Http\SingleActions\Backend\Users\Fund\AccountChangeTypeEditAction;
 use App\Http\SingleActions\Backend\Users\Fund\AccountChangeTypeParamListAction;
+use App\Http\SingleActions\Backend\Users\Fund\AccountChangeTypeFieldDetailAction;
+use App\Http\SingleActions\Backend\Users\Fund\AccountChangeTypeFieldAddAction;
+use App\Http\SingleActions\Backend\Users\Fund\AccountChangeTypeFieldModAction;
+use App\Http\SingleActions\Backend\Users\Fund\AccountChangeTypeFieldDelAction;
 use Illuminate\Http\JsonResponse;
 
 class AccountChangeTypeController extends BackEndApiMainController
@@ -70,4 +77,48 @@ class AccountChangeTypeController extends BackEndApiMainController
     {
         return $action->execute($this);
     }
+    /**
+     * 获取帐变类型字段列表
+     * @param  AccountChangeTypeFieldDetailAction $action
+     * @return JsonResponse
+     */
+    public function fieldDetail(AccountChangeTypeFieldDetailAction $action): JsonResponse
+    {
+        return $action->execute($this);
+    }
+    /**
+     * 添加帐变类型字段
+     * @param   AccountChangeTypeAddFieldRequest $request
+     * @param  AccountChangeTypeFieldAddAction $action
+     * @return JsonResponse
+     */
+    public function fieldAdd(AccountChangeTypeAddFieldRequest $request,AccountChangeTypeFieldAddAction $action): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
+    }
+    /**
+     * 修改帐变类型字段
+     * @param   AccountChangeTypeModFieldRequest $request
+     * @param  AccountChangeTypeFieldModAction $action
+     * @return JsonResponse
+     */
+    public function fieldMod(AccountChangeTypeModFieldRequest $request,AccountChangeTypeFieldModAction $action): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
+    }
+    /**
+     * 删除帐变类型字段
+     * @param   AccountChangeTypeModFieldRequest $request
+     * @param  AccountChangeTypeFieldModAction $action
+     * @return JsonResponse
+     */
+    public function fieldDel(AccountChangeTypeDelFieldRequest $request,AccountChangeTypeFieldDelAction $action): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
+    }
+
+
 }
