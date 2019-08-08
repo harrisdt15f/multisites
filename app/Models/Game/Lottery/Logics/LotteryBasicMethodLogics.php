@@ -35,10 +35,10 @@ trait LotteryBasicMethodLogics
         $sFunction = '';
         switch ($this->series_code) {
             case 'ssc':
+            case 'k3':
                 $sWnNumber = substr($sFullWinningNumber, (int)$iOffset, $this->digital_count);
                 $sFunction = 'getWinningNumber'.ucfirst($this->series_code);
                 break;
-            case 'k3':
             case 'lotto':
                 $aBalls = explode($this->splitCharInArea, $sFullWinningNumber);
                 $aNeedBalls = [];
@@ -671,11 +671,13 @@ trait LotteryBasicMethodLogics
         if (!is_null($this->span)) {
             $aDigitals = str_split($sNumber, 1);
             try {
-                if ($this->min_span && (max($aDigitals) - min($aDigitals)) == $this->span) {
+                if ($this->min_span && (max($aDigitals) - min($aDigitals)) === $this->span) {
                     $aSpan = [];
-                    for ($i = 1, $iMax = count($aDigitals); $i < $iMax; $aSpan[] = abs($aDigitals[$i] - $aDigitals[$i++ - 1])) {
+                    $iMax = count($aDigitals);
+                    for ($i = 1; $i < $iMax; $i++) {
+                        $aSpan[] = abs($aDigitals[$i] - $aDigitals[$i - 1]);
                     }
-                    min($aSpan) == $this->min_span or $sNumber = '';
+                    min($aSpan) === $this->min_span or $sNumber = '';
                 } else {
                     $sNumber = '';
                 }

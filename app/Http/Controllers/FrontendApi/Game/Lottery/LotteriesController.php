@@ -117,7 +117,7 @@ class LotteriesController extends FrontendApiMainController
 
     public function setWinPrize()
     {
-        LotteryIssue::calculateEncodedNumber('zxk3', '201908071374');
+        LotteryIssue::calculateEncodedNumber('zxk3', '201908081051');
     }
 
     /**
