@@ -123,7 +123,7 @@ class ImageArrange
     //生成存放图片的路径
     public function depositPath($name, $platform_id, $platform_name)
     {
-        return 'uploaded_files/' . $platform_name . '_' . $platform_id . '/' . $name . '_' . $platform_name . '_' . $platform_id;
+        return 'uploaded_files/' . $platform_name . '_' . $platform_id . '/' . $name;
     }
 
     //生成头像图片的路径
