@@ -12,6 +12,7 @@ use App\Lib\Game\DigitalNumber;
 use App\Lib\Game\Math;
 use App\Models\Game\Lottery\LotteryBasicWay;
 use App\Models\Game\Lottery\LotterySeriesWay;
+use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -34,10 +35,10 @@ trait LotteryBasicMethodLogics
         $sFunction = '';
         switch ($this->series_code) {
             case 'ssc':
-            case 'k3':
                 $sWnNumber = substr($sFullWinningNumber, (int)$iOffset, $this->digital_count);
                 $sFunction = 'getWinningNumber'.ucfirst($this->series_code);
                 break;
+            case 'k3':
             case 'lotto':
                 $aBalls = explode($this->splitCharInArea, $sFullWinningNumber);
                 $aNeedBalls = [];
@@ -669,12 +670,16 @@ trait LotteryBasicMethodLogics
     {
         if (!is_null($this->span)) {
             $aDigitals = str_split($sNumber, 1);
-            if ($this->min_span && (max($aDigitals) - min($aDigitals)) == $this->span) {
-                $aSpan = [];
-                for ($i = 1, $iMax = count($aDigitals); $i < $iMax; $aSpan[] = abs($aDigitals[$i] - $aDigitals[$i++ - 1])) {
+            try {
+                if ($this->min_span && (max($aDigitals) - min($aDigitals)) == $this->span) {
+                    $aSpan = [];
+                    for ($i = 1, $iMax = count($aDigitals); $i < $iMax; $aSpan[] = abs($aDigitals[$i] - $aDigitals[$i++ - 1])) {
+                    }
+                    min($aSpan) == $this->min_span or $sNumber = '';
+                } else {
+                    $sNumber = '';
                 }
-                min($aSpan) == $this->min_span or $sNumber = '';
-            } else {
+            } catch (Exception $e) {
                 $sNumber = '';
             }
         }
