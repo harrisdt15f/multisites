@@ -4,7 +4,7 @@ namespace App\Http\Requests\Backend\Game\Lottery;
 
 use App\Http\Requests\BaseFormRequest;
 
-class LotteriesEditIconRequest extends BaseFormRequest
+class LotteriesDeleteIssuesRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,12 +21,14 @@ class LotteriesEditIconRequest extends BaseFormRequest
      *
      * @return array
      */
-    public function rules(): array
+    public function rules(): array 
     {
         return [
-            'id' => 'required|exists:lottery_lists',
-            'icon_name' => 'required|string', //彩种图标名称
-            'icon_path' => 'required|string', //彩种图标路径
+            'type' => 'required|integer|in:1,2', // 1：按id删除     2：删除某个彩种一天的所有奖期
+            'id' => 'required_if:type,1|array',
+            'id.*' => 'exists:lottery_issues,id',
+            'lottery' => 'required_if:type,2|exists:lottery_issue_rules,lottery_id', //彩种标识
+            'day' => 'required_if:type,2|date_format:Ymd', //日期
         ];
     }
 

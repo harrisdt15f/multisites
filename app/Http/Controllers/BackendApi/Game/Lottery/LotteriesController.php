@@ -5,8 +5,8 @@ namespace App\Http\Controllers\BackendApi\Game\Lottery;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesAddRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesCalculateEncodeAgainRequest;
+use App\Http\Requests\Backend\Game\Lottery\LotteriesDeleteIssuesRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesDeleteRequest;
-use App\Http\Requests\Backend\Game\Lottery\LotteriesEditIconRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesEditMethodRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesEditRequest;
 use App\Http\Requests\Backend\Game\Lottery\LotteriesGenerateIssueRequest;
@@ -20,8 +20,8 @@ use App\Http\SingleActions\Backend\Game\Lottery\LotteriesAddAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesAllLotteriesListAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesCalculateEncodeAgainAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesDeleteAction;
+use App\Http\SingleActions\Backend\Game\Lottery\LotteriesDeleteIssuesAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesEditAction;
-use App\Http\SingleActions\Backend\Game\Lottery\LotteriesEditIconAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesEditMethodAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesGenerateIssueAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesInputCodeAction;
@@ -40,7 +40,6 @@ use Illuminate\Http\JsonResponse;
 class LotteriesController extends BackEndApiMainController
 {
     public $lotteryIssueEloq = 'Game\Lottery\LotteryIssue'; //issueLists
-    public $folderName = 'lottery_icon';
 
     /**
      * 获取系列接口
@@ -242,12 +241,12 @@ class LotteriesController extends BackEndApiMainController
     }
 
     /**
-     * 修改彩种icon
-     * @param  LotteriesEditIconRequest $request
-     * @param  LotteriesEditIconAction  $action
+     * 删除奖期
+     * @param  LotteriesDeleteIssuesRequest $request
+     * @param  LotteriesDeleteIssuesAction  $action
      * @return JsonResponse
      */
-    public function editIcon(LotteriesEditIconRequest $request, LotteriesEditIconAction $action): JsonResponse
+    public function deleteIssues(LotteriesDeleteIssuesRequest $request, LotteriesDeleteIssuesAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
