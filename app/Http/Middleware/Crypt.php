@@ -18,7 +18,6 @@ class Crypt
      */
     public function handle($request, Closure $next)
     {
-        header('Access-Control-Allow-Origin:*'); // *代表允许任何网址请求
         $inData = $request->input('data');
         //空参接口
         if(!$inData)
