@@ -27,6 +27,11 @@ class Project extends BaseModel
     public const FROM_MOBILE = 2;
     public const FROM_OTHER = 3;
 
+    public const STATUS_COMMISSION_WAIT = 0;
+    public const STATUS_COMMISSION_PROCESSING = 1;
+    public const STATUS_COMMISSION_PARTIAL = 2;
+    public const STATUS_COMMISSION_FINISHED = 4;
+
     /**
      * @return HasOne
      */
