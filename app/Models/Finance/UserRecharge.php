@@ -5,7 +5,7 @@ namespace App\Models\Finance;
 use App\Models\BaseModel;
 use Illuminate\Support\Facades\Request;
 
-class Recharge extends BaseModel
+class UserRecharge extends BaseModel
 {
     protected $table = 'user_recharge';
 
@@ -106,7 +106,7 @@ class Recharge extends BaseModel
      * @param $bankSign
      * @param string $from
      * @param string $description
-     * @return Recharge|bool
+     * @return UserRecharge|bool
      */
     static public function request($user, $money, $channel, $bankSign, $from = "web", $description = '')
     {
@@ -114,7 +114,7 @@ class Recharge extends BaseModel
         db()->beginTransaction();
         try {
             // 加入请求
-            $request = new Recharge;
+            $request = new UserRecharge;
             $request->user_id       = $user->id;
             $request->top_id        = $user->top_id;
             $request->username      = $user->username;

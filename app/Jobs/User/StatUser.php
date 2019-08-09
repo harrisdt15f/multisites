@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\Finance\Recharge;
+use App\Models\Finance\UserRecharge;
 use App\Models\Stat\UserStat;
 use App\Models\Stat\UserStatDay;
 use App\Models\User\FrontendUser;
@@ -175,7 +175,7 @@ class StatUser implements ShouldQueue
     // 统计充值
     protected function doStatRecharge() {
 
-        $record = Recharge::find($recordId);
+        $record = UserRecharge::find($recordId);
 
         $dateDay    = date("Ymd", strtotime($this->dateTime));
         $player     = $this->player;
