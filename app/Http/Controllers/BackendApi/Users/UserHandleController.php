@@ -6,12 +6,12 @@ use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Users\UserHandleApplyResetUserFundPasswordRequest;
 use App\Http\Requests\Backend\Users\UserHandleApplyResetUserPasswordRequest;
 use App\Http\Requests\Backend\Users\UserHandleBankCardListRequest;
-use App\Http\Requests\Backend\Users\UserHandleSetUserAvatarRequest;
 use App\Http\Requests\Backend\Users\UserHandleCommonAuditPasswordRequest;
 use App\Http\Requests\Backend\Users\UserHandleCreateUserRequest;
 use App\Http\Requests\Backend\Users\UserHandleDeactivateDetailRequest;
 use App\Http\Requests\Backend\Users\UserHandleDeactivateRequest;
 use App\Http\Requests\Backend\Users\UserHandleDeductionBalanceRequest;
+use App\Http\Requests\Backend\Users\UserHandleSetUserAvatarRequest;
 use App\Http\Requests\Backend\Users\UserHandleUserAccountChangeRequest;
 use App\Http\Requests\Backend\Users\UserHandleUserRechargeHistoryRequest;
 use App\Http\SingleActions\Backend\Users\UserHandleBankCardListAction;
@@ -22,11 +22,11 @@ use App\Http\SingleActions\Backend\Users\UserHandleCreateUserAction;
 use App\Http\SingleActions\Backend\Users\UserHandleDeactivateAction;
 use App\Http\SingleActions\Backend\Users\UserHandleDeactivateDetailAction;
 use App\Http\SingleActions\Backend\Users\UserHandleDeductionBalanceAction;
+use App\Http\SingleActions\Backend\Users\UserHandlePublicAvatarAction;
+use App\Http\SingleActions\Backend\Users\UserHandleSetUserAvatarAction;
 use App\Http\SingleActions\Backend\Users\UserHandleUserAccountChangeAction;
 use App\Http\SingleActions\Backend\Users\UserHandleUserRechargeHistoryAction;
 use App\Http\SingleActions\Backend\Users\UserHandleUsersInfoAction;
-use App\Http\SingleActions\Backend\Users\UserHandlePublicAvatarAction;
-use App\Http\SingleActions\Backend\Users\UserHandleSetUserAvatarAction;
 use App\Models\Admin\BackendAdminAuditPasswordsList;
 use Illuminate\Http\JsonResponse;
 
@@ -233,7 +233,7 @@ class UserHandleController extends BackEndApiMainController
     }
     /**
      * 获取系统公共头像列表
-     * @param  UserHandleCommonAppliedPasswordHandleAction $action
+     * @param  UserHandlePublicAvatarAction $action
      * @return JsonResponse
      */
     public function publicAvatar(UserHandlePublicAvatarAction $action): JsonResponse
@@ -243,12 +243,12 @@ class UserHandleController extends BackEndApiMainController
     /**
      * 设定用户头像
      * @param  UserHandleSetUserAvatarRequest $request
-     * @param  UserHandlePublicAvatarAction $action
+     * @param  UserHandleSetUserAvatarAction $action
      * @return JsonResponse
      */
-    public function setUserAvatar(UserHandleSetUserAvatarRequest $request,UserHandleSetUserAvatarAction $action): JsonResponse
+    public function setUserAvatar(UserHandleSetUserAvatarRequest $request, UserHandleSetUserAvatarAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        return $action->execute($this,$inputDatas);
+        return $action->execute($this, $inputDatas);
     }
 }

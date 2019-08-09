@@ -5,23 +5,22 @@ namespace App\Http\Controllers\MobileApi\Game\Lottery;
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesAvailableIssuesRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesBetRequest;
+use App\Http\Requests\Frontend\Game\Lottery\LotteriesCancelBetRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesProjectHistoryRequest;
+use App\Http\Requests\Frontend\Game\Lottery\LotteriesStopTraceRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesTracesHistoryRequest;
 use App\Http\Requests\Mobile\Game\Lottery\LotteriesIssueHistoryRequest;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesAvailableIssuesAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesBetAction;
+use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesCancelBetAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryInfoAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryListAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesProjectHistoryAction;
+use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesStopTraceAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesTracesHistoryAction;
 use App\Http\SingleActions\Mobile\Game\Lottery\LotteriesIssueHistoryAction;
 use App\Http\SingleActions\Mobile\Game\Lottery\LotterieslotteryCenterAction;
 use Illuminate\Http\JsonResponse;
-use App\Http\Requests\Frontend\Game\Lottery\LotteriesStopTraceRequest;
-use App\Http\Requests\Frontend\Game\Lottery\LotteriesCancelBetRequest;
-use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesCancelBetAction;
-use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesStopTraceAction;
-
 
 class LotteriesController extends FrontendApiMainController
 {
@@ -89,8 +88,8 @@ class LotteriesController extends FrontendApiMainController
 
     /**
      * 游戏-追号历史
-     * @param   LotteriesProjectHistoryRequest  $request
-     * @param   LotteriesProjectHistoryAction   $action
+     * @param   LotteriesTracesHistoryRequest  $request
+     * @param   LotteriesTracesHistoryAction   $action
      * @return  JsonResponse
      */
     public function tracesHistory(
@@ -106,7 +105,6 @@ class LotteriesController extends FrontendApiMainController
      * @param   LotteriesBetRequest  $request
      * @param   LotteriesBetAction   $action
      * @return  JsonResponse
-     * @throws  Exception
      */
     public function bet(LotteriesBetRequest $request, LotteriesBetAction $action): JsonResponse
     {
