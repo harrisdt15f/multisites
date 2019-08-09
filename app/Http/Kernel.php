@@ -23,6 +23,7 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\TrustProxies::class,
         \Barryvdh\Cors\HandleCors::class,
         \Illuminate\Session\Middleware\StartSession::class,
+        \App\Http\Middleware\Crypt::class,//全局加密
     ];
 
     /**
