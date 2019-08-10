@@ -20,5 +20,5 @@ yarn-error.log
 public/uploaded_files/
 
 composer\.lock
-
 app/Http/SingleActions/Backend
+.gitmodules

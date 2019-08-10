@@ -37,13 +37,8 @@ class DeleteCachePicControl extends Command
                     if (file_exists($path)) {
                         if (!is_writable(dirname($path))) {
                         } else {
-                            try {
-                                unlink($path);
-                                unset($cachePic[$key]);
-                            } catch (Exception $e) {
-                                $errorObj = $e->getPrevious()->getPrevious();
-                                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-                            }
+                            unlink($path);
+                            unset($cachePic[$key]);
                         }
                     } else {
                         unset($cachePic[$key]);

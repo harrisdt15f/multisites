@@ -26,7 +26,7 @@ class FrontendWebRouteController extends BackEndApiMainController
 
     /**
      * 添加web路由
-     * @param   FrontendAppRouteAddRequest $request
+     * @param   FrontendWebRouteAddRequest $request
      * @param   FrontendWebRouteAddAction  $action
      * @return  JsonResponse
      */
@@ -38,7 +38,7 @@ class FrontendWebRouteController extends BackEndApiMainController
 
     /**
      * 删除web路由
-     * @param   FrontendAppRouteDeleteRequest $request
+     * @param   FrontendWebRouteDeleteRequest $request
      * @param   FrontendWebRouteDeleteAction  $action
      * @return  JsonResponse
      */
@@ -50,7 +50,7 @@ class FrontendWebRouteController extends BackEndApiMainController
 
     /**
      * 设置web路由是否开放
-     * @param   FrontendAppRouteIsOpenRequest $request
+     * @param   FrontendWebRouteIsOpenRequest $request
      * @param   FrontendWebRouteIsOpenAction  $action
      * @return  JsonResponse
      */
