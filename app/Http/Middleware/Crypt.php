@@ -18,10 +18,22 @@ class Crypt
      */
     public function handle($request, Closure $next)
     {
-        $inData = $request->input('data');
-        //空参接口
-        if(!$inData)
+        $requestNum = count($request->request);
+        //空参放行
+        if(!$requestNum){
             return $next($request);
+        }
+        //检验参数是否符合规范 系统只允许接入一个名为DATA的参数
+        if($requestNum!=1 || !isset($request['data'])){
+            $con = new FrontendApiMainController();
+            return $con->msgOut(false,[],100507);die;
+        }
+        $inData = $request->input('data');
+        //带DATA数据却为null
+        if(is_null($inData)){
+            $con = new FrontendApiMainController();
+            return $con->msgOut(false,[],100506);die;
+        }
         //错误返回
         if(!is_string($inData)){
             $con = new FrontendApiMainController();
