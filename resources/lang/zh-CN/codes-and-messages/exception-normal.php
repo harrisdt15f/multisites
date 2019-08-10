@@ -56,7 +56,6 @@ return [
     '101300' => '该管理员没有人工充值权限',
     '101301' => '请先添加 sign=admin_recharge_daily_limit 的管理员充值额度系统配置',
     //RouteController
-    '101400' => '该路由标题已存在',
     '101401' => '该路由不存在',
     //FrontendWebRouteController
     '101500' => '该路由已存在',
