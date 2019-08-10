@@ -6,7 +6,9 @@ use App\Events\IssueGenerateEvent;
 use App\Models\Admin\SystemConfiguration;
 use App\Models\Game\Lottery\LotteryList;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class GenerateIssueControl extends Command
 {
@@ -22,7 +24,7 @@ class GenerateIssueControl extends Command
      *
      * @var string
      */
-    protected $description = '定时生成彩票奖期';
+    protected $description = '定时生成第二天的彩票奖期';
 
     /**
      * Execute the console command.
@@ -31,19 +33,13 @@ class GenerateIssueControl extends Command
      */
     public function handle()
     {
-        if (Cache::has('generateIssueTime')) {
-            $generateIssueTime = Cache::get('generateIssueTime');
-        } else {
-            $systemConfiguration = new SystemConfiguration();
-            $generateIssueTime = $systemConfiguration->getConfigValue('generate_issue_time');
-            Cache::forever('generateIssueTime', $generateIssueTime);
-        }
+        $generateIssueTime = SystemConfiguration::getGenerateIssueTime();
         $timeNow = date('H:i');
         if ($generateIssueTime == $timeNow) {
             $lotteries = LotteryList::where('status', 1)->where('en_name', '!=', 'hklhc')->pluck('en_name');
             $data = [
-                'start_time' => date('Y-m-d'),
-                'end_time' => date('Y-m-d'),
+                'start_time' => Carbon::tomorrow(), //生成第二天的奖期
+                'end_time' => Carbon::tomorrow(),
                 'start_issue' => '',
             ];
             foreach ($lotteries as $lotterie) {
