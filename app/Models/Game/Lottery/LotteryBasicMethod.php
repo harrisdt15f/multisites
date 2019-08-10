@@ -12,11 +12,21 @@ namespace App\Models\Game\Lottery;
 use App\Models\BaseModel;
 use App\Models\DeveloperUsage\MethodLevel\LotteryMethodsWaysLevel;
 use App\Models\Game\Lottery\Logics\LotteryBasicMethodLogics;
+use App\models\Game\Lottery\Logics\SeriesLogic\Prizes\K3Prize;
+use App\models\Game\Lottery\Logics\SeriesLogic\Prizes\LottoPrize;
+use App\models\Game\Lottery\Logics\SeriesLogic\Prizes\SdPrize;
+use App\models\Game\Lottery\Logics\SeriesLogic\Prizes\SscPrize;
+use App\models\Game\Lottery\Logics\SeriesLogic\WinningNumber\K3BM;
+use App\models\Game\Lottery\Logics\SeriesLogic\WinningNumber\LottoBM;
+use App\models\Game\Lottery\Logics\SeriesLogic\WinningNumber\SdBM;
+use App\models\Game\Lottery\Logics\SeriesLogic\WinningNumber\SscBM;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class LotteryBasicMethod extends BaseModel
 {
     use LotteryBasicMethodLogics;
+    use SscBM,LottoBM,K3BM,SdBM;
+    use SscPrize,LottoPrize,K3Prize,SdPrize;
 
     protected $guarded = ['id'];
 
