@@ -44,8 +44,13 @@ trait IssueEncodeLogics
                     if ($oIssue->projects()->exists()) {
                         if ($oIssue->official_code !== null) {
                             $oProjects = $oIssue->projects->where('lottery_sign', $lottery_id)->fresh();
-                            $aWnNumberOfMethods = self::getWnNumberOfSeriesMethods($oLottery,
-                                $oIssue->official_code); //wn_number
+                            try {
+                                $aWnNumberOfMethods = self::getWnNumberOfSeriesMethods($oLottery,
+                                    $oIssue->official_code);//wn_number
+                            } catch (\Exception $e) {
+                                Log::error('Winning Number Calculation on error');
+                                Log::error($e->getMessage(), $e->getTraceAsString());
+                            }
                             if ($oLottery->basicways()->exists()) {
                                 $oBasicWays = $oLottery->basicways;
                                 foreach ($oBasicWays as $oBasicWay) {
@@ -69,14 +74,25 @@ trait IssueEncodeLogics
                                                 if ($oSeriesWay->basicWay()->exists()) {
                                                     $oBasicWay = $oSeriesWay->basicWay;
                                                     foreach ($oProjectsToCalculate as $project) {
-                                                        $aPrized = $oBasicWay->checkPrize($oSeriesWay,
-                                                            $project->bet_number,
-                                                            $sPostion = null);
-                                                        $strlog = 'aPrized is ' . json_encode($aPrized,
-                                                            JSON_PRETTY_PRINT);
+                                                        try {
+                                                            $aPrized = $oBasicWay->checkPrize($oSeriesWay,
+                                                                $project->bet_number,
+                                                                $sPostion = null);
+                                                        } catch (\Exception $e) {
+                                                            Log::error('Prize Checking on error');
+                                                            Log::error($e->getMessage(), $e->getTraceAsString());
+                                                        }
+                                                        $strlog = 'aPrized is '.json_encode($aPrized,
+                                                                JSON_PRETTY_PRINT);
                                                         Log::channel('issues')->info($strlog);
-                                                        $result = $project->setWon($oIssue->official_code, $sWnNumber,
-                                                            $aPrized); //@todo Trace
+                                                        try {
+                                                            $result = $project->setWon($oIssue->official_code,
+                                                                $sWnNumber,
+                                                                $aPrized);//@todo Trace
+                                                        } catch (\Exception $e) {
+                                                            Log::error('Set Won on error');
+                                                            Log::error($e->getMessage(), $e->getTraceAsString());
+                                                        }
                                                         if ($result !== true) {
                                                             Log::channel('issues')->info($result);
                                                         }
@@ -269,10 +285,10 @@ trait IssueEncodeLogics
 
     /**
      * 生成一个奖期合法的随机开奖号码
-     * @param  int     $codeLength   [开奖号码的长度]
-     * @param  string  $validCode    [合法开奖号码]
-     * @param  int     $lotteryType  [开奖号码是否可以重复 ？ 1可重复 2不可重复]
-     * @param          $splitter     [该彩种分割开奖号码的方式]
+     * @param  int  $codeLength  [开奖号码的长度]
+     * @param  string  $validCode  [合法开奖号码]
+     * @param  int  $lotteryType  [开奖号码是否可以重复 ？ 1可重复 2不可重复]
+     * @param          $splitter  [该彩种分割开奖号码的方式]
      * @return string  $openCodeStr  [开奖号码string]
      */
     public static function getOpenNumber($codeLength, $validCode, $lotteryType, $splitter): string
@@ -296,9 +312,9 @@ trait IssueEncodeLogics
 
     /**
      * 奖期录号
-     * @param  int     $lotteryId
-     * @param  int     $issue
-     * @param  string  $code       开奖号码
+     * @param  int  $lotteryId
+     * @param  int  $issue
+     * @param  string  $code  开奖号码
      * @return void
      */
     public static function enCode($lotteryId, $issue, $code): void
