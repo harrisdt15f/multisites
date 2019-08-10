@@ -16,8 +16,6 @@ use Illuminate\Http\JsonResponse;
 
 class LotteryNoticeController extends BackEndApiMainController
 {
-    public $folderName = 'lottery_icons';
-
     /**
      * 开奖公告的彩种列表
      * @param   LotteryNoticeDetailAction $action

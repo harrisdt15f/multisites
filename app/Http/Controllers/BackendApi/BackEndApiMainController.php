@@ -394,7 +394,9 @@ class BackEndApiMainController extends Controller
     public function editAssignment($eloqM, $datas)
     {
         foreach ($datas as $k => $v) {
-            $eloqM->$k = $v;
+            if(isset($eloqM->$k)){
+                $eloqM->$k = $v;
+            }
         }
         return $eloqM;
     }

@@ -44,6 +44,6 @@ Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], function 
     Route::match(['post', 'options'], 'calculate-encode-again', ['as' => $namePrefix . 'calculate-encode-again', 'uses' => $controller . 'CalculateEncodeAgain']);
     //全部的彩种列表
     Route::match(['get', 'options'], 'all-lotteries-list', ['as' => $namePrefix . 'all-lotteries-list', 'uses' => $controller . 'allLotteriesList']);
-    //修改彩种icon
-    Route::match(['post', 'options'], 'edit-icon', ['as' => $namePrefix . 'edit-icon', 'uses' => $controller . 'editIcon']);
+    //删除奖期
+    Route::match(['post', 'options'], 'delete-lotteries-issues', ['as' => $namePrefix . 'delete-lotteries-issues', 'uses' => $controller . 'deleteIssues']);
 });

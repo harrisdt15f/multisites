@@ -16,6 +16,7 @@ use App\Http\SingleActions\Backend\Admin\Homepage\HomepageBannerEditAction;
 use App\Http\SingleActions\Backend\Admin\Homepage\HomepageBannerPicStandardAction;
 use App\Http\SingleActions\Backend\Admin\Homepage\HomepageBannerSortAction;
 use App\Http\SingleActions\Backend\Admin\Homepage\HomepageReplaceImageAction;
+use Illuminate\Support\Facades\Cache;
 use App\Lib\Common\CacheRelated;
 use Illuminate\Http\JsonResponse;
 
@@ -28,16 +29,16 @@ class HomepageBannerController extends BackEndApiMainController
      * @param    HomepageBannerDetailAction $action
      * @return   JsonResponse
      */
-    public function detail(HomepageBannerDetailRequest $request,HomepageBannerDetailAction $action): JsonResponse
+    public function detail(HomepageBannerDetailRequest $request, HomepageBannerDetailAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        return $action->execute($this,$inputDatas);
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * 添加首页轮播图
      * @param   HomepageBannerAddRequest $request
-     * @param   HomepageBannerAddAction  $action
+     * @param   HomepageBannerAddAction $action
      * @return  JsonResponse
      */
     public function add(HomepageBannerAddRequest $request, HomepageBannerAddAction $action): JsonResponse
@@ -48,8 +49,8 @@ class HomepageBannerController extends BackEndApiMainController
 
     /**
      * 编辑首页轮播图
-     * @param   HomepageBannerEditRequest  $request
-     * @param   HomepageBannerEditAction   $action
+     * @param   HomepageBannerEditRequest $request
+     * @param   HomepageBannerEditAction $action
      * @return  JsonResponse
      */
     public function edit(HomepageBannerEditRequest $request, HomepageBannerEditAction $action): JsonResponse
@@ -61,7 +62,7 @@ class HomepageBannerController extends BackEndApiMainController
     /**
      * 删除首页轮播图
      * @param   HomepageBannerDeleteRequest $request
-     * @param   HomepageBannerDeleteAction  $action
+     * @param   HomepageBannerDeleteAction $action
      * @return  JsonResponse
      */
     public function delete(HomepageBannerDeleteRequest $request, HomepageBannerDeleteAction $action): JsonResponse
@@ -73,7 +74,7 @@ class HomepageBannerController extends BackEndApiMainController
     /**
      * 首页轮播图排序
      * @param   HomepageBannerSortRequest $request
-     * @param   HomepageBannerSortAction  $action
+     * @param   HomepageBannerSortAction $action
      * @return  JsonResponse
      */
     public function sort(HomepageBannerSortRequest $request, HomepageBannerSortAction $action): JsonResponse
@@ -104,11 +105,20 @@ class HomepageBannerController extends BackEndApiMainController
 
     /**
      * 清除首页banner缓存
+     * @param   $Flag Int/Bool 指定清除缓存或者同时清除 默认值为false
      * @return void
      */
-    public function deleteCache(): void
+    public function deleteCache($flag = false): void
     {
         $cacheRelated = new CacheRelated();
-        $cacheRelated->delete('homepageBanner');
+        $cacheName = $flag == 1 ? 'homepage_banner_web' : 'homepage_banner_app';
+        if ($flag == 1 || $flag == 2) {
+            $cacheRelated->delete($cacheName);
+        } else {
+            //同时清除
+            $cacheRelated->delete('homepage_banner_web');
+            $cacheRelated->delete('homepage_banner_app');
+        }
     }
+
 }
