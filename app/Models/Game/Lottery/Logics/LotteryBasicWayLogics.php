@@ -56,11 +56,21 @@ trait LotteryBasicWayLogics
             $positon = (string)$this->sPosition;
             $prizeLevelQuery->whereRaw('FIND_IN_SET('.$positon.',position)');
         }
-
         $prizeLevel = $prizeLevelQuery->first();
         if ($prizeLevel === null) {
-            $errorString = 'PrizeLevel Query Null'.json_encode($oSeriesWay).'whereDatas are '.json_encode($arrWhere).'Query is '.$prizeLevelQuery->toSql();
-            Log::channel('issues')->error($errorString);
+            $prizeLevelQuery = $oBasicMethod->prizeLevel()->where($arrWhere);
+            $prizeLevelRowCount = $prizeLevelQuery->count();
+            if ($prizeLevelRowCount === 1) { //只有一行奖金的时候就取一行
+                $prizeLevel = $prizeLevelQuery->first();
+            } elseif ($prizeLevelRowCount < 1) { //没有奖金的时候
+                $errorString = 'PrizeLevel Query Null'.json_encode($oSeriesWay).'whereDatas are '.json_encode($arrWhere).'Query is '.$prizeLevelQuery->toSql();
+                Log::channel('issues')->error($errorString);
+            } else {//有多条奖金时候
+                $errorString = 'PrizeLevel Query have Multiple Rows '.json_encode($oSeriesWay).'whereDatas are '.json_encode($arrWhere).'Query is '.$prizeLevelQuery->toSql();
+                $prizeDetailToDecide = $prizeLevelQuery->get()->toJson();
+                Log::channel('issues')->error($errorString);
+                Log::channel('issues')->error($prizeDetailToDecide);
+            }
         }
         return $prizeLevel->level;
     }
