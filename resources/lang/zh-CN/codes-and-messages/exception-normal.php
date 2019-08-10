@@ -31,6 +31,8 @@ return [
     '100203' => '获取平台信息失败',
     //ActivityInfosController
     '100301' => '获取平台信息失败',
+    //LotterySeriesController
+    '100400' => '该系列下存在彩种，请先删除彩种后再删除系列',
     //ArticlesController
     '100502' => '获取平台信息失败',
     //ConfiguresController
