@@ -22,3 +22,10 @@ public/uploaded_files/
 composer\.lock
 app/Http/SingleActions/Backend
 .gitmodules
+app/Http/SingleActions/Frontend
+
+app/Lib/Game
+
+app/models/Game/Lottery/Logics/SeriesLogic
+
+database
