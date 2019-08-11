@@ -54,7 +54,7 @@ trait IssueLogics
     public static function getCanBetIssue($lotteryId, $count = 50)
     {
         $time = time();
-        return self::where('lottery_id', $lotteryId)->where('end_time', '>', $time)->orderBy('issue',
+        return self::where('lottery_id', $lotteryId)->where('end_time', '>', $time)->orderBy('begin_time',
             'ASC')->skip(0)->take($count)->get();
     }
 
@@ -67,7 +67,7 @@ trait IssueLogics
     public static function getHistoryIssue($lotteryId, $count = 50)
     {
         $time = time();
-        return self::where('lottery_id', $lotteryId)->where('begin_time', '<=', $time)->orderBy('issue',
+        return self::where('lottery_id', $lotteryId)->where('begin_time', '<=', $time)->orderBy('begin_time',
             'ASC')->skip(0)->take($count)->get();
     }
 

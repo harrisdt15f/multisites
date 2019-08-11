@@ -32,7 +32,7 @@ class LotterieslotteryCenterAction
             $data[] = [
                 'cn_name' => $lotteryEloq->cn_name,
                 'lotteries_id' => $lotteryEloq->lotteries_id,
-                'icon' => $lotteryEloq->lottery->icon_path,
+                'icon' => $lotteryEloq->lottery->icon_path ?? null,
                 'issue' => $issue,
                 'official_code' => $officialCode,
                 'encode_time' => $encodeTime,
