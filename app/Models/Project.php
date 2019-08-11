@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Game\Lottery\LotteryIssue;
+use App\Models\Game\Lottery\LotteryList;
 use App\Models\Game\Lottery\LotteryTraceList;
 use App\Models\Logics\ProjectTraits;
 use App\Models\User\FrontendUser;
@@ -50,4 +51,8 @@ class Project extends BaseModel
         return $this->hasOneThrough(FrontendUsersAccount::class,FrontendUser::class,'id','user_id','user_id','id');
     }
 
+    public function lottery()
+    {
+        return $this->belongsTo(LotteryList::class,'lottery_sign','en_name');
+    }
 }

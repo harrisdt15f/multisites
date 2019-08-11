@@ -14,12 +14,12 @@ use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesAvailableIssuesAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesBetAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesCancelBetAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryInfoAction;
-use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesProjectHistoryAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesStopTraceAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesTracesHistoryAction;
 use App\Http\SingleActions\Mobile\Game\Lottery\LotteriesIssueHistoryAction;
 use App\Http\SingleActions\Mobile\Game\Lottery\LotterieslotteryCenterAction;
 use App\Http\SingleActions\Mobile\Game\Lottery\LotteriesLotteryListAction;
+use App\Http\SingleActions\Mobile\Game\Lottery\LotteriesProjectHistoryAction;
 use Illuminate\Http\JsonResponse;
 
 class LotteriesController extends FrontendApiMainController
