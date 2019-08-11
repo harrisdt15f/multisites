@@ -21,6 +21,7 @@ class Kernel extends ConsoleKernel
         Commands\UserProfitsControl::class,
         Commands\UserDaysalaryControl::class,
         Commands\SendDaysalaryControl::class,
+        Commands\UserBonusControl::class,
     ];
 
     /**

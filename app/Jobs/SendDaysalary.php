@@ -39,10 +39,10 @@ class SendDaysalary implements ShouldQueue
         $send_salary_id = $this->datas['salary_id'];
         $oUserDaysalary = UserDaysalary::find($send_salary_id);
         if(!$oUserDaysalary) {
-            Log::error('日工资数据ID不存在!'.$send_salary_id) ;
+            Log::channel('daysalary')->error('日工资数据ID不存在!'.$send_salary_id) ;
         }
         if($oUserDaysalary->status == 1) {
-            Log::error('日工资已发放!'.$send_salary_id) ;
+            Log::channel('daysalary')->error('日工资已发放!'.$send_salary_id) ;
         }
         if($oUserDaysalary->daysalary == 0){
             $oUserDaysalary->status=1;
@@ -64,12 +64,13 @@ class SendDaysalary implements ShouldQueue
                 $oUserDaysalary->status = 1;
                 $oUserDaysalary->sent_time = date("Y-m-d H:i:s");
                 $oUserDaysalary->save();
-                Log::info( $oUserDaysalary->username." salaray:".$oUserDaysalary->daysalary.'日工资已发放!') ;
+                Log::channel('daysalary')->info($oUserDaysalary->username." salaray:".$oUserDaysalary->daysalary.'日工资已发放!');
             }
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
-            Log::info('异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine());
+            Log::channel('daysalary')->info('异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine());
+
         }
     }
 }

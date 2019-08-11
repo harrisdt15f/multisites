@@ -6,5 +6,6 @@ Route::group(['prefix' => 'user-agent-center'], function () {
 
     Route::match(['get', 'options'], 'user-profits', ['as' => $namePrefix . 'user-profits', 'uses' => $controller . 'UserProfits']);
     Route::match(['get', 'options'], 'user-daysalary', ['as' => $namePrefix . 'user-daysalary', 'uses' => $controller . 'UserDaysalary']);
+    Route::match(['get', 'options'], 'user-bonus', ['as' => $namePrefix . 'user-bonus', 'uses' => $controller . 'UserBonus']);
 
 });

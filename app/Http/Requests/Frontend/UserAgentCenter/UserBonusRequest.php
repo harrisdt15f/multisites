@@ -4,7 +4,7 @@ namespace App\Http\Requests\Frontend\UserAgentCenter;
 
 use App\Http\Requests\BaseFormRequest;
 
-class UserDaysalaryRequest extends BaseFormRequest
+class UserBonusRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +25,7 @@ class UserDaysalaryRequest extends BaseFormRequest
     {
         return [
             'username' => 'filled|string|alpha_dash',
-            'date_to'=>'filled|date',
+            'date'=>'filled|date',
             'count' => 'filled|integer',
         ];
     }
