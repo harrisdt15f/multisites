@@ -185,6 +185,12 @@ return [
             'level' => 'debug',
             'days' => 14,
         ],
+        'daysalary' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/daysalary.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
     ],
 
 ];
