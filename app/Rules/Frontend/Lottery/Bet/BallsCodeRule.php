@@ -33,13 +33,20 @@ class BallsCodeRule implements Rule
      */
     public function passes($attribute, $value)
     {
+        $methodId = $this->checkMethodId($attribute);
         switch ($this->lottery->series_id) {
             case 'ssc':
-                $pattern = '/^((?!\&)(?!.*\&$)(?!.*?\&\&)[0-9&]{0,19}\|?){1,5}$/';
+                switch ($methodId) {
+                    case 'QZXHZ'://和值
+                        $pattern = '//';
+                        break;
+                    default:
+                        $pattern = '/^((?!\&)(?!.*\&$)(?!.*?\&\&)[0-9&]{0,19}\|?){1,5}$/';
+                        break;
+                }
                 $result = $this->checkValid($pattern, $value);
                 break;
             case 'lotto':
-                $methodId = $this->checkMethodId($attribute);
                 switch ($methodId) {
                     case 'LTDDS'://趣味 定单双
                         $pattern = '/^((?! )(?!.*  $)(?!.* $)(([0-5]) ?){1,6})*$/';
