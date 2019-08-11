@@ -37,8 +37,23 @@ class BallsCodeRule implements Rule
         switch ($this->lottery->series_id) {
             case 'ssc':
                 switch ($methodId) {
-                    case 'QZXHZ'://和值
-                        $pattern = '//';
+                    case 'QZXHZ'://前三直选和值
+                        $pattern = '/^((?!\&)(?!.*\&$)(?!.*?\&\&)[0-9&]{0,19}\|?){1,28}$/';
+                        break;
+                    case 'QZUHZ'://前三组选和值
+                        $pattern = '/^((?!\&)(?!.*\&$)(?!.*?\&\&)[0-9&]{0,19}\|?){1,26}$/';
+                        break;
+                    case 'ZZXHZ'://中三直选和值
+                        $pattern = '/^((?!\&)(?!.*\&$)(?!.*?\&\&)[0-9&]{0,19}\|?){1,28}$/';
+                        break;
+                    case 'ZZUHZ'://中三组选和值
+                        $pattern = '/^((?!\&)(?!.*\&$)(?!.*?\&\&)[0-9&]{0,19}\|?){1,26}$/';
+                        break;
+                    case 'HZXHZ'://后三直选和值
+                        $pattern = '/^((?!\&)(?!.*\&$)(?!.*?\&\&)[0-9&]{0,19}\|?){1,28}$/';
+                        break;
+                    case 'HZUHZ'://后三组选和值
+                        $pattern = '/^((?!\&)(?!.*\&$)(?!.*?\&\&)[0-9&]{0,19}\|?){1,26}$/';
                         break;
                     default:
                         $pattern = '/^((?!\&)(?!.*\&$)(?!.*?\&\&)[0-9&]{0,19}\|?){1,5}$/';
