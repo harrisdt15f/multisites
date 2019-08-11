@@ -7,6 +7,7 @@
  */
 
 namespace App\Models\Game\Lottery\Logics;
+
 use App\Models\Game\Lottery\LotteryBasicWay;
 use App\Models\Game\Lottery\LotterySeriesWay;
 use Illuminate\Support\Str;
@@ -32,6 +33,7 @@ trait LotteryBasicMethodLogics
             case 'ssc':
             case 'k3':
             case 'sd':
+            case 'p3p5':
                 $sWnNumber = substr($sFullWinningNumber, (int)$iOffset, $this->digital_count);
                 $sFunction = 'getWinningNumber'.ucfirst($this->series_code);
                 break;
@@ -51,6 +53,7 @@ trait LotteryBasicMethodLogics
     }
 
     //##################################################################
+
     /**
      * @param  LotterySeriesWay  $oSeriesWay
      * @param  LotteryBasicWay  $oBasicWay
