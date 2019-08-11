@@ -16,7 +16,7 @@ trait LotteryBasicMethodLogics
 {
 
     protected $splitChar = '|';
-
+    protected $splitCharSumDigital = ',';
     protected $splitCharInArea = ' ';
 
     /**
@@ -36,6 +36,10 @@ trait LotteryBasicMethodLogics
             case 'p3p5':
                 $sWnNumber = substr($sFullWinningNumber, (int)$iOffset, $this->digital_count);
                 $sFunction = 'getWinningNumber'.ucfirst($this->series_code);
+                break;
+            case 'pk10':
+                $sWnNumber = explode($this->splitCharSumDigital, $sFullWinningNumber);
+                $sWnNumber = array_slice($sWnNumber, (int)$iOffset, $this->digital_count);
                 break;
             case 'lotto':
                 $aBalls = explode($this->splitCharInArea, $sFullWinningNumber);
