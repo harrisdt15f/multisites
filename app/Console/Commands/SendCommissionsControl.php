@@ -30,7 +30,7 @@ class SendCommissionsControl extends Command{
 
     public function handle()
     {
-        UserCommissions::sendCommissions(152342); // 测试用
+//        UserCommissions::sendCommissions(152315);  测试用
     }
 
 }
