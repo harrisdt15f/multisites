@@ -49,11 +49,13 @@ class Kernel extends HttpKernel
             'throttle:300,1',
             'bindings',
             'cors',
+            'crypt',
         ],
         'mobile-api' => [
             'throttle:300,1',
             'bindings',
             'cors',
+            'crypt',
         ],
         'api' => [
             'throttle:300,1',
@@ -83,6 +85,8 @@ class Kernel extends HttpKernel
         'jwt.auth' => \Tymon\JWTAuth\Http\Middleware\Authenticate::class,
 //        'jwt.refresh' => \Tymon\JWTAuth\Http\Middleware\RefreshToken::class,
         'jwt.extend' => JWTRefresh::class,
+        'crypt' =>  \App\Http\Middleware\Crypt::class,//全局加密
+
     ];
 
     /**
