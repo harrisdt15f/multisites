@@ -13,4 +13,6 @@ Route::group(['prefix' => 'route', 'namespace' => 'DeveloperUsage\Backend\Routes
     Route::match(['post', 'options'], 'delete', ['as' => $namePrefix . 'delete', 'uses' => $controller . 'delete']);
     //路由开放接口
     Route::match(['post', 'options'], 'is-open', ['as' => $namePrefix . 'is-open', 'uses' => $controller . 'isOpen']);
+    //前台解密接口
+    Route::match(['post', 'options'], 'decrypt-front', ['as' => $namePrefix . 'decrypt-front', 'uses' => $controller . 'decryptFront']);
 });
