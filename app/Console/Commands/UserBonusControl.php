@@ -48,7 +48,9 @@ class UserBonusControl extends Command
                $dateTo = date('Y-m-15') ;
                break;
            default:
-               exit();
+               $dateFrom = date('Y-m-01') ;
+               $dateTo = date('Y-m-15') ;
+//               exit();
 
        }
 

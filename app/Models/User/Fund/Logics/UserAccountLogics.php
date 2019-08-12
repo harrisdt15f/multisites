@@ -281,9 +281,9 @@ trait UserAccountLogics
                 return '对不起, ' . $res;
             }
 //            $accountChange->triggerSave();
+            $accountLocker->release();
             //处理更新用户盈亏
             Artisan::call('UserProfits '.$this->user->id);
-            $accountLocker->release();
             return true;
         } catch (Exception $e) {
             $accountLocker->release();
