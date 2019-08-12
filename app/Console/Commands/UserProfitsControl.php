@@ -1,7 +1,7 @@
 <?php
 /**
  * 团队盈亏处理脚本
- * 每5分钟运行一次，更新盈亏数据到user_prifits
+ * 实时更新盈亏数据到user_prifits ，第二日凌晨1点 再更新昨日整天的数据 。
  */
 
 namespace App\Console\Commands;
@@ -18,7 +18,7 @@ class UserProfitsControl extends Command
      *
      * @var string
      */
-    protected $signature = 'UserProfits {date=today}';
+    protected $signature = 'UserProfits {userId?}';
 
     /**
      * The console command description.
@@ -34,18 +34,25 @@ class UserProfitsControl extends Command
      */
     public function handle()
     {
-        if($this->argument('date') == 'today'){
+        if( (int)$this->argument('userId') >0){
             $today = Carbon::now()->toDateString();
+            $todayAccountsReportsUsers = FrontendUsersAccountsReport::where([
+                ['created_at', '>', $today],
+                ['user_id', '=', $this->argument('userId')],
+            ])
+                ->select('username','user_id','is_tester','parent_id')
+                ->get();
         }else{
-            $today = Carbon::yesterday()->toDateString();
+            $today = Carbon::now()->toDateString();
+            $yesterday = Carbon::yesterday()->toDateString();
+            $todayAccountsReportsUsers = FrontendUsersAccountsReport::where([
+                ['created_at', '>', $yesterday],
+                ['created_at', '<', $today],
+            ])
+                ->select('username','user_id','is_tester','parent_id')
+                ->get();
         }
 
-        $todayAccountsReportsUsers = FrontendUsersAccountsReport::where([
-            ['created_at', '>', $today],
-        ])
-            ->select('username','user_id','is_tester','parent_id')
-            ->groupby('username')
-            ->get();
 
 
         if (is_object($todayAccountsReportsUsers)){
@@ -71,7 +78,7 @@ class UserProfitsControl extends Command
                 $data['daily_salary'] = Self::getSumProfits($today, $child->user_id, UserProfits::TEAM_DAILYSALARY_SIGN) ;
                 $data['profit'] = $data['prize'] + $data['commission'] + $data['bet_commission'] - $data['turnover'];
 
-                $data['date'] = $today;
+                $data['date'] = $yesterday ?? $today;
                 $data['user_id'] =  $child->user_id;
                 $data['username'] =  $child->username;
                 $data['is_tester'] =  $child->is_tester;
