@@ -5,6 +5,7 @@ namespace App\Http\Controllers\BackendApi\Admin\Activity;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use App\Http\Requests\Backend\Admin\Activity\ActivityInfosAddRequest;
 use App\Http\Requests\Backend\Admin\Activity\ActivityInfosDeleteRequest;
+use App\Http\Requests\Backend\Admin\Activity\ActivityInfosDetailRequest;
 use App\Http\Requests\Backend\Admin\Activity\ActivityInfosEditRequest;
 use App\Http\Requests\Backend\Admin\Activity\ActivityInfosSortRequest;
 use App\Http\SingleActions\Backend\Admin\Activity\ActivityInfosAddAction;
@@ -21,18 +22,20 @@ class ActivityInfosController extends BackEndApiMainController
 
     /**
      * 活动列表
-     * @param  ActivityInfosDetailAction $action
+     * @param  ActivityInfosDetailRequest $request
+     * @param  ActivityInfosDetailAction  $action
      * @return JsonResponse
      */
-    public function detail(ActivityInfosDetailAction $action): JsonResponse
+    public function detail(ActivityInfosDetailRequest $request, ActivityInfosDetailAction $action): JsonResponse
     {
-        return $action->execute($this);
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
     }
 
     /**
      * 添加活动
      * @param   ActivityInfosAddRequest $request
-     * @param   ActivityInfosAddAction $action
+     * @param   ActivityInfosAddAction  $action
      * @return  JsonResponse
      */
     public function add(ActivityInfosAddRequest $request, ActivityInfosAddAction $action): JsonResponse
@@ -44,7 +47,7 @@ class ActivityInfosController extends BackEndApiMainController
     /**
      * 编辑活动
      * @param   ActivityInfosEditRequest $request
-     * @param   ActivityInfosEditAction $action
+     * @param   ActivityInfosEditAction  $action
      * @return  JsonResponse
      */
     public function edit(ActivityInfosEditRequest $request, ActivityInfosEditAction $action): JsonResponse
@@ -56,7 +59,7 @@ class ActivityInfosController extends BackEndApiMainController
     /**
      * 删除活动
      * @param   ActivityInfosDeleteRequest $request
-     * @param   ActivityInfosDeleteAction $action
+     * @param   ActivityInfosDeleteAction  $action
      * @return  JsonResponse
      */
     public function delete(ActivityInfosDeleteRequest $request, ActivityInfosDeleteAction $action): JsonResponse

@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-14 11:52:15
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 11:52:36
- */
 namespace App\Http\Requests\Backend\Admin\Notice;
 
 use App\Http\Requests\BaseFormRequest;
@@ -33,6 +27,8 @@ class NoticeEditRequest extends BaseFormRequest
             'id' => 'required|numeric|exists:frontend_message_notices_contents,id',
             'title' => 'required|string',
             'content' => 'required|string',
+            'pic_name' => 'string', //图片名称
+            'pic_path' => 'string', //图片路径
             'start_time' => 'date_format:Y-m-d H:i:s',
             'end_time' => 'date_format:Y-m-d H:i:s',
         ];

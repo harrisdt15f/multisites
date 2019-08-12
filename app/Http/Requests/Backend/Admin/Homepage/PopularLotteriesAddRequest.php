@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-14 11:19:01
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 11:20:19
- */
 namespace App\Http\Requests\Backend\Admin\Homepage;
 
 use App\Http\Requests\BaseFormRequest;
@@ -32,7 +26,6 @@ class PopularLotteriesAddRequest extends BaseFormRequest
         return [
             'lotteries_id' => 'required|numeric|unique:frontend_lottery_redirect_bet_lists,lotteries_id|exists:lottery_lists,id', //彩种id
             'lotteries_sign' => 'required|string|unique:frontend_lottery_redirect_bet_lists|exists:lottery_lists,en_name', //彩种标识
-            'pic' => 'required|image',
         ];
     }
 

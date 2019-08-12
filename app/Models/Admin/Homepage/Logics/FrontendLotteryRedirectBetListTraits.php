@@ -52,13 +52,13 @@ trait FrontendLotteryRedirectBetListTraits
      */
     public static function updateCache($cacheKey, $showNum): array
     {
-        $dataEloq = self::select('id', 'lotteries_id', 'lotteries_sign', 'pic_path')->with(['lotteries:id,day_issue,en_name,cn_name', 'issueRule:lottery_id,issue_seconds'])->orderBy('sort', 'asc')->limit($showNum)->get();
+        $dataEloq = self::select('id', 'lotteries_id', 'lotteries_sign')->with(['lotteries:id,day_issue,en_name,cn_name,icon_path', 'issueRule:lottery_id,issue_seconds'])->orderBy('sort', 'asc')->limit($showNum)->get();
         $datas = [];
         foreach ($dataEloq as $key => $dataIthem) {
             $datas[$key]['cn_name'] = $dataIthem->lotteries->cn_name ?? null;
             $datas[$key]['en_name'] = $dataIthem->lotteries->en_name ?? null;
-            $datas[$key]['pic_path'] = $dataIthem->pic_path ?? null;
-            $datas[$key]['issue_seconds'] = $dataIthem->issueRule->issue_seconds ?? null;
+            $datas[$key]['icon_path'] = $dataIthem->lotteries->icon_path ?? null;
+            $datas[$key]['issue_seconds'] = $dataIthem->issueRule->first->issue_seconds ?? null;
             $datas[$key]['day_issue'] = $dataIthem->lotteries->day_issue ?? null;
         }
         $expiresAt = Carbon::now()->addHours(24);

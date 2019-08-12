@@ -31,6 +31,7 @@ class LotteriesBetRequest extends BaseFormRequest
      */
     public function rules(): array
     {
+
         return [
             'lottery_sign' => 'required|string|min:4|max:10|exists:lottery_lists,en_name',
             'trace_issues.*' => 'required|integer|between:1,1000',
@@ -39,8 +40,7 @@ class LotteriesBetRequest extends BaseFormRequest
             'balls.*.method_name' => 'required',
             'balls.*.codes' =>
                 [
-                    'required',
-                    new BallsCodeRule($this->get('lottery_sign'))
+                    new BallsCodeRule($this->get('lottery_sign'),$this->get('balls'))
                 ],
             'balls.*.count' => [
                 'required',

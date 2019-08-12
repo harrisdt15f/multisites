@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-25 16:39:51
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-25 19:53:24
- */
 Route::group(['prefix' => 'user-bank-card', 'namespace' => 'User\Fund'], function () {
     $namePrefix = 'web-api.UserBankCardController.';
     $controller = 'UserBankCardController@';

@@ -113,7 +113,7 @@ return [
             'driver' => 'monolog',
             'handler' => Monolog\Handler\GelfHandler::class,
             'handler_with' => [
-                'publisher' =>  app(GraylogSetup::class)->getGelfPublisher(),
+//                'publisher' =>  GraylogSetup::getGelfPublisher(),
             ],
             'formatter' => GelfMessageFormatter::class
         ],
@@ -176,6 +176,12 @@ return [
         'addchild' => [ // Clog::userAddChild
             'driver' => 'daily',
             'path' => storage_path('logs/user/addchild.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
+        'open-center' => [//开奖中心日志
+            'driver' => 'daily',
+            'path' => storage_path('logs/opencenter.log'),
             'level' => 'debug',
             'days' => 14,
         ],

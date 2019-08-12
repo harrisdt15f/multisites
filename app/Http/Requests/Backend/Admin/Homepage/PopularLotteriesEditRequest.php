@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-14 11:21:48
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 11:22:11
- */
 namespace App\Http\Requests\Backend\Admin\Homepage;
 
 use App\Http\Requests\BaseFormRequest;
@@ -32,7 +26,6 @@ class PopularLotteriesEditRequest extends BaseFormRequest
     {
         return [
             'id' => 'required|numeric|exists:frontend_lottery_redirect_bet_lists,id',
-            'pic' => 'image',
             'lotteries_id' => ['required', 'numeric', 'exists:lottery_lists,id', Rule::unique('frontend_lottery_redirect_bet_lists')->ignore($this->get('id'))],
             'lotteries_sign' => ['required', 'string', 'exists:lottery_lists,en_name', Rule::unique('frontend_lottery_redirect_bet_lists')->ignore($this->get('id'))],
         ];

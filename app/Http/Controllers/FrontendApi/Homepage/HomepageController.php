@@ -6,6 +6,8 @@ use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Http\Requests\Frontend\Homepage\HomepageNoticeRequest;
 use App\Http\Requests\Frontend\Homepage\HomepageReadMessageRequest;
 use App\Http\SingleActions\Frontend\Homepage\HomepageNoticeAction;
+use App\Http\SingleActions\Frontend\Homepage\HomepagePopularChessCardsListsAction;
+use App\Http\SingleActions\Frontend\Homepage\HomepagePopularEGameListsAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageRankingAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageReadMessageAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageShowHomepageModelAction;
@@ -18,9 +20,12 @@ use App\Http\SingleActions\Frontend\Homepage\HompagePopularLotteriesAction;
 use App\Http\SingleActions\Frontend\Homepage\HompagePopularMethodsAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageQrCodeAction;
 use Illuminate\Http\JsonResponse;
+use App\Http\SingleActions\Frontend\Homepage\HomepageActivityListAction;
+
 
 class HomepageController extends FrontendApiMainController
 {
+    private $bannerFlag = 1;//网页端banner
     /**
      * 需要展示的前台模块
      * @param  HomepageShowHomepageModelAction $action
@@ -38,7 +43,7 @@ class HomepageController extends FrontendApiMainController
      */
     public function banner(HompageBannerAction $action): JsonResponse
     {
-        return $action->execute($this);
+        return $action->execute($this,$this->bannerFlag);
     }
 
     /**
@@ -72,13 +77,13 @@ class HomepageController extends FrontendApiMainController
     }
 
     /**
-     * 首页活动列表
+     * 热门活动
      * @param  HompageActivityAction $action
      * @return JsonResponse
      */
     public function activity(HompageActivityAction $action): JsonResponse
     {
-        return $action->execute($this);
+        return $action->execute($this,1);
     }
 
     /**
@@ -103,7 +108,7 @@ class HomepageController extends FrontendApiMainController
     }
 
     /**
-     * 公告|站内信 已读处理
+     * 站内信 已读处理
      * @param  HomepageReadMessageRequest $request
      * @param  HomepageReadMessageAction  $action
      * @return JsonResponse
@@ -143,4 +148,34 @@ class HomepageController extends FrontendApiMainController
     {
         return $action->execute($this);
     }
+
+    /**
+     * 热门棋牌
+     * @param  HomepagePopularChessCardsListsAction $action
+     * @return JsonResponse
+     */
+    public function popularChessCardsLists(HomepagePopularChessCardsListsAction $action): JsonResponse
+    {
+        return $action->execute($this);
+    }
+
+    /**
+     * 热门电子
+     * @param  HomepagePopularEGameListsAction $action
+     * @return JsonResponse
+     */
+    public function popularEGameLists(HomepagePopularEGameListsAction $action): JsonResponse
+    {
+        return $action->execute($this);
+    }
+    /**
+     * 活动列表
+     * @return JsonResponse
+     */
+    public function activityList(HomepageActivityListAction $action): JsonResponse
+    {
+        $inputDatas['type'] = '1';
+        return $action->execute($this,$inputDatas);
+    }
+
 }

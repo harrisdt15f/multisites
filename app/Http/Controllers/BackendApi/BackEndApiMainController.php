@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\BackendApi;
 
 use App\Http\Controllers\Controller;
-use App\Lib\Common\ImageArrange;
 use App\Models\Admin\BackendAdminAccessGroup;
 use App\Models\DeveloperUsage\Backend\BackendAdminRoute;
 use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
@@ -14,8 +13,10 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use Jenssegers\Agent\Agent;
 
 class BackEndApiMainController extends Controller
 {
@@ -32,12 +33,17 @@ class BackEndApiMainController extends Controller
     public $log_uuid; //当前的logId
     protected $currentGuard = 'backend';
     public $currentAuth;
+    /**
+     * @var Agent
+     */
+    public $userAgent;
 
     /**
      * AdminMainController constructor.
      */
     public function __construct()
     {
+        $this->handleEndUser();
         $this->middleware(function ($request, $next) {
             $this->currentAuth = auth($this->currentGuard);
             $this->partnerAdmin = $this->currentAuth->user();
@@ -61,9 +67,33 @@ class BackEndApiMainController extends Controller
             $this->inputs = Input::all(); //获取所有相关的传参数据
             //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
             $this->adminOperateLog();
-            $this->eloqM = 'App\\Models\\' . $this->eloqM; // 当前的eloquent
+            $this->eloqM = 'App\\Models\\'.$this->eloqM; // 当前的eloquent
             return $next($request);
         });
+    }
+
+    /**
+     *处理客户端
+     */
+    private function handleEndUser()
+    {
+        $result = false;
+        $open_route = [];
+        $this->userAgent = new Agent();
+        if ($this->userAgent->isDesktop()) {
+            $open_route = BackendAdminRoute::where('is_open', 1)->pluck('method')->toArray();
+            $result = true;
+        } elseif (Request::header('from') == 'Lottery Center System v3.0.0.0') {
+            $open_route = BackendAdminRoute::where('is_open', 1)->pluck('method')->toArray();
+            $result = true;
+        } else {
+            Log::info('robot attacks: '.json_encode(Input::all()).json_encode(Request::header()));
+            echo '机器人禁止操作';
+            die();
+        }
+        if ($result === true) {
+            $this->middleware('auth:'.$this->currentGuard, ['except' => $open_route]);
+        }
     }
 
     /**
@@ -117,16 +147,22 @@ class BackEndApiMainController extends Controller
     }
 
     /**
-     * @param  bool    $success
-     * @param  array   $data
+     * @param  bool  $success
+     * @param  array  $data
      * @param  string  $message
      * @param  string  $code
-     * @param  null    $placeholder
-     * @param  null    $substituted
+     * @param  null  $placeholder
+     * @param  null  $substituted
      * @return JsonResponse
      */
-    public function msgOut($success = false, $data = [], $code = '', $message = '', $placeholder = null, $substituted = null): JsonResponse
-    {
+    public function msgOut(
+        $success = false,
+        $data = [],
+        $code = '',
+        $message = '',
+        $placeholder = null,
+        $substituted = null
+    ): JsonResponse {
         /*if ($this->currentAuth->user())
         {
         $data['access_token']=$this->currentAuth->user()->remember_token;
@@ -139,9 +175,9 @@ class BackEndApiMainController extends Controller
             $code = $code == '' ? $defaultErrorCode : $code;
         }
         if ($placeholder === null || $substituted === null) {
-            $message = $message == '' ? __('codes-map.' . $code) : $message;
+            $message = $message == '' ? __('codes-map.'.$code) : $message;
         } else {
-            $message = $message == '' ? __('codes-map.' . $code, [$placeholder => $substituted]) : $message;
+            $message = $message == '' ? __('codes-map.'.$code, [$placeholder => $substituted]) : $message;
         }
         $datas = [
             'success' => $success,
@@ -154,7 +190,7 @@ class BackEndApiMainController extends Controller
 
     public function modelWithNameSpace($eloqM = null)
     {
-        return $eloqM !== null ? 'App\\Models\\' . $eloqM : $eloqM;
+        return $eloqM !== null ? 'App\\Models\\'.$eloqM : $eloqM;
     }
 
     /**
@@ -198,7 +234,7 @@ class BackEndApiMainController extends Controller
                     $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
                     if ($sign == 'LIKE') {
                         $sign = strtolower($sign);
-                        $value = '%' . $value . '%';
+                        $value = '%'.$value.'%';
                     }
                     $whereCriteria = [];
                     $whereCriteria[] = $key;
@@ -233,7 +269,7 @@ class BackEndApiMainController extends Controller
                         $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
                         if ($sign == 'LIKE') {
                             $sign = strtolower($sign);
-                            $value = '%' . $value . '%';
+                            $value = '%'.$value.'%';
                         }
                         $whereCriteria = [];
                         $whereCriteria[] = $key;
@@ -336,7 +372,7 @@ class BackEndApiMainController extends Controller
                                                 $queryConditions) ? $queryConditions[$key] : '=';
                                             if ($sign == 'LIKE') {
                                                 $sign = strtolower($sign);
-                                                $value = '%' . $value . '%';
+                                                $value = '%'.$value.'%';
                                             }
                                             $query->where($key, $sign, $value);
                                         }
@@ -358,34 +394,10 @@ class BackEndApiMainController extends Controller
     public function editAssignment($eloqM, $datas)
     {
         foreach ($datas as $k => $v) {
-            $eloqM->$k = $v;
+            if(isset($eloqM->$k)){
+                $eloqM->$k = $v;
+            }
         }
         return $eloqM;
     }
-
-    /** 公用上传
-     * @param $input
-     * @param $folderName
-     * @param $platform_id
-     * @param $platform_name
-     * @return JsonResponse|string
-     */
-    public function publicUploadImg($input, $platform_id, $platform_name): string
-    {
-        if (!isset($input['folder_name'])) {
-            $folderName = date('Ymd');
-        } else {
-            $folderName = $input['folder_name'];
-        }
-        //接收文件信息
-        $imageObj = new ImageArrange();
-        $path = $imageObj->depositPath($folderName, $platform_id, $platform_name);
-        //进行上传
-        $pic = $imageObj->uploadImg($input['pic'], $path);
-        if ($pic['success'] === false) {
-            return $this->msgOut(false, [], '400', $pic['msg']);
-        }
-        return '/' . $pic['path'];
-    }
-
 }

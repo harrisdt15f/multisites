@@ -28,7 +28,6 @@ class LotteryNoticeEditRequest extends BaseFormRequest
             'id' => 'required|exists:frontend_lottery_notice_lists',
             'lotteries_id' => ['exists:lottery_lists,en_name', Rule::unique('frontend_lottery_notice_lists')->ignore($this->get('id'))], //彩种标识
             'cn_name' => ['exists:lottery_lists,cn_name', Rule::unique('frontend_lottery_notice_lists')->ignore($this->get('id'))], //彩种中文名
-            'icon' => 'image', //图标
             'status' => 'integer|in:0,1', //开启状态：0关闭 1开启
         ];
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\MobileApi\Homepage;
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Http\Requests\Frontend\Homepage\HomepageNoticeRequest;
 use App\Http\Requests\Frontend\Homepage\HomepageReadMessageRequest;
+use App\Http\SingleActions\Frontend\Homepage\HomepageActivityListAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageNoticeAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageRankingAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageReadMessageAction;
@@ -20,6 +21,8 @@ use Illuminate\Http\JsonResponse;
 
 class HomepageController extends FrontendApiMainController
 {
+    private $bannerFlag = 2; //网页端banner
+
     /**
      * 需要展示的前台模块
      * @param  HomepageShowHomepageModelAction $action
@@ -37,7 +40,7 @@ class HomepageController extends FrontendApiMainController
      */
     public function banner(HompageBannerAction $action): JsonResponse
     {
-        return $action->execute($this);
+        return $action->execute($this, $this->bannerFlag);
     }
 
     /**
@@ -71,13 +74,24 @@ class HomepageController extends FrontendApiMainController
     }
 
     /**
-     * 首页活动列表
+     * 热门活动
      * @param  HompageActivityAction $action
      * @return JsonResponse
      */
     public function activity(HompageActivityAction $action): JsonResponse
     {
-        return $action->execute($this);
+        return $action->execute($this, 2);
+    }
+
+    /**
+     * 首页活动列表
+     * @param  HomepageActivityListAction $action
+     * @return JsonResponse
+     */
+    public function activityList(HomepageActivityListAction $action): JsonResponse
+    {
+        $inputDatas['type'] = '2';
+        return $action->execute($this, $inputDatas);
     }
 
     /**

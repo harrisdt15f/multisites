@@ -1,14 +1,9 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-14 15:29:25
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-24 14:08:44
- */
 namespace App\Http\Requests\Backend\DeveloperUsage\Backend\Routes;
 
 use App\Http\Requests\BaseFormRequest;
+use Illuminate\Validation\Rule;
 
 class RouteEditRequest extends BaseFormRequest
 {
@@ -34,7 +29,7 @@ class RouteEditRequest extends BaseFormRequest
             'controller' => 'required|string',
             'method' => 'required|string',
             'menu_group_id' => 'required|numeric|exists:backend_system_menus,id',
-            'title' => 'required|string',
+            'title' => ['required', 'string', Rule::unique('backend_admin_routes')->ignore($this->get('id'))],
         ];
     }
 

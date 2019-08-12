@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-14 11:00:28
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-14 11:01:03
- */
 namespace App\Http\Requests\Backend\Admin\Homepage;
 
 use App\Http\Requests\BaseFormRequest;
@@ -39,6 +33,7 @@ class HomepageBannerAddRequest extends BaseFormRequest
             'status' => 'required|numeric|in:0,1',
             'start_time' => 'required|date',
             'end_time' => 'required|date',
+            'flag' => 'required|numeric',//banner 属于哪端 1:网页端 , 2:手机端
         ];
     }
 

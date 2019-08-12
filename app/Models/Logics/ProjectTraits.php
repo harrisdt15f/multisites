@@ -125,6 +125,7 @@ trait ProjectTraits
                         'parent_id' => $user->parent_id,
                         'is_tester' => $user->is_tester,
                         'series_id' => $lottery->series_id,
+                        'project_id' => $projectId,
                         'lottery_sign' => $lottery->en_name,
                         'method_sign' => $dataItem['method_id'],
                         'method_group' => $_item['method_group'],

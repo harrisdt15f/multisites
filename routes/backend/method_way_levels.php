@@ -1,12 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-05-30 14:24:38
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-05-30 14:38:35
- */
-
 //开发管理-玩法等级
 Route::group(['prefix' => 'method-level', 'namespace' => 'DeveloperUsage\MethodLevel'], function () {
     $namePrefix = 'backend-api.methodLevel.';

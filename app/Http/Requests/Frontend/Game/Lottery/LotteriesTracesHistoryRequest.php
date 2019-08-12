@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-28 16:03:31
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-28 16:04:14
- */
 namespace App\Http\Requests\Frontend\Game\Lottery;
 
 use App\Http\Requests\BaseFormRequest;
@@ -29,9 +23,12 @@ class LotteriesTracesHistoryRequest extends BaseFormRequest
      */
     public function rules(): array
     {
+        //############################需要做验证处理
         return [
-            'page_size' => 'integer|min:10|max:100',
-            'lottery_sign' => 'string|min:4|max:10|exists:lottery_lists,en_name',
+            // 'page_size' => 'string', //'integer|min:10|max:100',
+            // 'lottery_sign' => 'string', //'string|min:4|max:10|exists:lottery_lists,en_name',
+            // 'issue' => 'string', //'alpha_num',
+            // 'status' => 'string', //'',
         ];
     }
 

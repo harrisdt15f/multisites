@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-27 15:08:33
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-27 15:22:43
- */
 namespace App\Lib\Common;
 
 use App\Models\Admin\SystemConfiguration;

@@ -5,12 +5,14 @@ namespace App\Http\Controllers\FrontendApi\Game\Lottery;
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesAvailableIssuesRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesBetRequest;
+use App\Http\Requests\Frontend\Game\Lottery\LotteriesCancelBetRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesIssueHistoryRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesProjectHistoryRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesStopTraceRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesTracesHistoryRequest;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesAvailableIssuesAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesBetAction;
+use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesCancelBetAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesIssueHistoryAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryInfoAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryListAction;
@@ -115,7 +117,7 @@ class LotteriesController extends FrontendApiMainController
 
     public function setWinPrize()
     {
-        LotteryIssue::calculateEncodedNumber('zx115', '201907190983');
+        LotteryIssue::calculateEncodedNumber('zx3d', '201908101048');
     }
 
     /**
@@ -125,6 +127,18 @@ class LotteriesController extends FrontendApiMainController
      * @return JsonResponse
      */
     public function stopTrace(LotteriesStopTraceRequest $request, LotteriesStopTraceAction $action): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
+    }
+
+    /**
+     * 投注撤单
+     * @param  LotteriesCancelBetRequest $request
+     * @param  LotteriesCancelBetAction  $action
+     * @return JsonResponse
+     */
+    public function cancelBet(LotteriesCancelBetRequest $request, LotteriesCancelBetAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);

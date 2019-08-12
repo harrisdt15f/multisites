@@ -18,7 +18,7 @@ Route::group(['middleware' => ['backend-api'], 'namespace' => 'BackendApi', 'pre
     Route::match(['post', 'options'], 'login', ['as' => 'backend-api.login', 'uses' => 'BackendAuthController@login']);
 });
 Route::group([
-    'middleware' => ['backend-api', 'auth:backend'],
+    'middleware' => ['backend-api'],
     'namespace' => 'BackendApi',
     'prefix' => 'api'
 ], function () {

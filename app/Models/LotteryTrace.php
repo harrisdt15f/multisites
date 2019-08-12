@@ -17,12 +17,14 @@ class LotteryTrace extends BaseModel
     public const STATUS_SYSTEM_CANCELED = 4;
     public const STATUS_USER_DROPED = 5;
 
+
     public function traceRunningLists()
     {
         return $this->hasMany(LotteryTraceList::class, 'trace_id', 'id')->where('status', 0);
     }
 
-    public function traceLists(){
-        return $this->hasMany(LotteryTraceList::class, 'trace_id', 'id')->select('trace_id','series_id','issue','lottery_sign','method_name','bet_number','times','total_price','status','finished_status','created_at');
+    public function traceLists()
+    {
+        return $this->hasMany(LotteryTraceList::class, 'trace_id', 'id');
     }
 }

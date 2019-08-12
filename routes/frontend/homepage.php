@@ -2,7 +2,7 @@
 /**
  * author: Alvin
  * Date: 5/21/2019
- * Time: 16:27 PM
+ * Time: 16:27 Pm
  */
 
 //首页
@@ -10,7 +10,10 @@ Route::group(['prefix' => 'homepage', 'namespace' => 'Homepage'], function () {
     $namePrefix = 'web-api.HomepageController.';
     $controller = 'HomepageController@';
     //首页-需要展示的模块
-    Route::match(['get', 'options'], 'show-homepage-model', ['as' => $namePrefix . 'show-homepage-model', 'uses' => $controller . 'showHomepageModel']);
+    Route::match(
+        ['get', 'options'],
+        'show-homepage-model',
+        ['as' => $namePrefix . 'show-homepage-model', 'uses' => $controller . 'showHomepageModel']);
     //轮播图
     Route::match(['get', 'options'], 'banner', ['as' => $namePrefix . 'banner', 'uses' => $controller . 'banner']);
     //热门彩票
@@ -33,4 +36,11 @@ Route::group(['prefix' => 'homepage', 'namespace' => 'Homepage'], function () {
     Route::match(['get', 'options'], 'ranking', ['as' => $namePrefix . 'ranking', 'uses' => $controller . 'ranking']);
     //开奖公告列表
     Route::match(['get', 'options'], 'lottery-notice-list', ['as' => $namePrefix . 'lottery-notice-list', 'uses' => $controller . 'lotteryNoticeList']);
+    //热门棋牌
+    Route::match(['get', 'options'], 'popular-chess-cards-lists', ['as' => $namePrefix . 'popular-chess-cards-lists', 'uses' => $controller . 'popularChessCardsLists']);
+    //热门电子
+    Route::match(['get', 'options'], 'popular-e-game-lists', ['as' => $namePrefix . 'popular-e-game-lists', 'uses' => $controller . 'popularEGameLists']);
+    //活动接口
+    Route::match(['post', 'options'], 'activity-list', ['as' => $namePrefix . 'activity-list', 'uses' => $controller . 'activityList']);
+
 });

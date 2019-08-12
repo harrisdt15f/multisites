@@ -40,4 +40,8 @@ Route::group(['prefix' => 'user-handle', 'namespace' => 'Users'], function () {
     Route::match(['post', 'options'], 'deduction_balance', ['as' => $namePrefix . 'deduction_balance', 'uses' => $controller . 'deductionBalance']);
     //用户银行卡列表
     Route::match(['post', 'options'], 'bank-card-list', ['as' => $namePrefix . 'bank-card-list', 'uses' => $controller . 'bankCardList']);
+    //获取系统头像
+    Route::match(['post', 'options'], 'public-avatar', ['as' => $namePrefix . 'public-avatar', 'uses' => $controller . 'publicAvatar']);
+    //设定用户头像
+    Route::match(['post', 'options'], 'set-user-avatar', ['as' => $namePrefix . 'set-user-avatar', 'uses' => $controller . 'setUserAvatar']);
 });

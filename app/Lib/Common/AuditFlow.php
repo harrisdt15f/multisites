@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-20 16:44:35
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-26 17:01:48
- */
 namespace App\Lib\Common;
 
 use App\Models\BackendAdminAuditFlowList;

@@ -1,15 +1,10 @@
 <?php
-/**
- * @Author: Fish
- * @Date:   2019/7/8 17:51
- */
 
-namespace App\Http\Requests\Backend\System;
-
+namespace App\Http\Requests\Backend\Users\Fund;
 
 use App\Http\Requests\BaseFormRequest;
 
-class SystemRequest extends BaseFormRequest
+class AccountChangeTypeDelFieldRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,7 +24,16 @@ class SystemRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'pic'          => 'required|image',
+            'id' => 'required|int',
         ];
     }
+
+    /*public function messages()
+{
+return [
+'lottery_sign.required' => 'lottery_sign is required!',
+'trace_issues.required' => 'trace_issues is required!',
+'balls.required' => 'balls is required!'
+];
+}*/
 }

@@ -1,12 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-01 14:35:16
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-01 17:57:48
- */
-
 //运营管理-站内消息
 Route::group(['prefix' => 'internal-notice-message', 'namespace' => 'Admin\Message'], function () {
     $namePrefix = 'backend-api.internalMessage.';

@@ -1,13 +1,8 @@
 <?php
 
 namespace App\Models\Admin\Logics;
+use Illuminate\Support\Facades\Cache;
 
-/**
- * @Author: LingPh
- * @Date:   2019-05-29 17:36:06
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-05-29 17:36:45
- */
 trait SysConfiguresTraits
 {
 
@@ -24,4 +19,14 @@ trait SysConfiguresTraits
         }
     }
 
+    public static function getGenerateIssueTime(){
+        $redisKey = 'generateIssueTime';
+        if (Cache::has($redisKey)) {
+            $generateIssueTime = Cache::get($redisKey);
+        } else {
+            $generateIssueTime = self::getConfigValue('generate_issue_time');
+            Cache::forever($redisKey, $generateIssueTime);
+        }
+        return $generateIssueTime;
+    }
 }

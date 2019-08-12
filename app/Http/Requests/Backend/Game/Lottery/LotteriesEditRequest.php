@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @Author: LingPh
- * @Date:   2019-06-28 20:29:44
- * @Last Modified by:   LingPh
- * @Last Modified time: 2019-06-29 11:23:45
- */
 namespace App\Http\Requests\Backend\Game\Lottery;
 
 use App\Http\Requests\BaseFormRequest;
@@ -39,7 +33,6 @@ class LotteriesEditRequest extends BaseFormRequest
             'lottery.en_name' => ['required', 'alpha_num', Rule::unique('lottery_lists', 'en_name')->ignore($this->get('lottery')['id'])], //英文名
             'lottery.series_id' => 'required|alpha_num', //彩种系列
             'lottery.is_fast' => 'required|in:0,1', //是否快彩
-            'lottery.auto_open' => 'required|in:0,1', //是否自开彩
             'lottery.max_trace_number' => 'required|integer', //最大追号期数
             'lottery.day_issue' => 'required|integer', //每日开奖期数
             'lottery.issue_format' => 'required|string', //奖期格式
@@ -51,23 +44,36 @@ class LotteriesEditRequest extends BaseFormRequest
             'lottery.max_prize_group' => 'required|integer', //最大奖金组
             'lottery.min_times' => 'required|integer', //下注最小倍数
             'lottery.max_times' => 'required|integer', //下注最大倍数
-            'lottery.max_bonus' => 'required|numeric', //下注最大奖金
+            'lottery.max_profit_bonus' => 'required|numeric', //最大盈利奖金
             'lottery.valid_modes' => 'required|string', //
             'lottery.status' => 'required|in:0,1', //状态：0关闭 1开启
-            //issue_rule
+            'lottery.icon_name' => 'string', //彩种图标名称
+            'lottery.icon_path' => 'required|string', //彩种图标路径
+            //issue_rule 1
             'issue_rule' => 'required|array', //
-            'issue_rule.lottery_id' => 'required|same:lottery.en_name', //英文名
-            'issue_rule.lottery_name' => 'required|same:lottery.cn_name', //中文名
-            'issue_rule.begin_time' => 'required|date_format:H:i:s', //开始时间
-            'issue_rule.end_time' => 'required|date_format:H:i:s', //结束时间
-            'issue_rule.issue_seconds' => 'required|integer', //奖期周期（秒）
-            'issue_rule.first_time' => 'required|date_format:H:i:s', //首期结束时间
-            'issue_rule.adjust_time' => 'required|integer', //调整截止时间（秒）
-            'issue_rule.encode_time' => 'required|integer',
-            'issue_rule.issue_count' => 'required|integer',
-            'issue_rule.status' => 'required|same:lottery.status', //状态：0关闭 1开启
-            //cron
-            'cron' => 'required_if:lottery.auto_open,1|string', //定时表达式
+            'issue_rule.0.id' => 'required|exists:lottery_issue_rules,id', //id
+            'issue_rule.0.lottery_id' => 'required|same:lottery.en_name', //英文名
+            'issue_rule.0.lottery_name' => 'required|same:lottery.cn_name', //中文名
+            'issue_rule.0.begin_time' => 'required|date_format:H:i:s', //开始时间
+            'issue_rule.0.end_time' => 'required|date_format:H:i:s', //结束时间
+            'issue_rule.0.issue_seconds' => 'required|integer', //奖期周期（秒）
+            'issue_rule.0.first_time' => 'required|date_format:H:i:s', //首期结束时间
+            'issue_rule.0.adjust_time' => 'required|integer', //调整截止时间（秒）
+            'issue_rule.0.encode_time' => 'required|integer',
+            'issue_rule.0.issue_count' => 'required|integer',
+            'issue_rule.0.status' => 'required|same:lottery.status', //状态：0关闭 1开启
+            //issue_rule 2    重庆时时彩存在2条奖期规则
+            'issue_rule.1.id' => 'required_with:issue_rule.1|exists:lottery_issue_rules,id', //id
+            'issue_rule.1.lottery_id' => 'required_with:issue_rule.1|same:lottery.en_name', //英文名
+            'issue_rule.1.lottery_name' => 'required_with:issue_rule.1|same:lottery.cn_name', //中文名
+            'issue_rule.1.begin_time' => 'required_with:issue_rule.1|date_format:H:i:s', //开始时间
+            'issue_rule.1.end_time' => 'required_with:issue_rule.1|date_format:H:i:s', //结束时间
+            'issue_rule.1.issue_seconds' => 'required_with:issue_rule.1|integer', //奖期周期（秒）
+            'issue_rule.1.first_time' => 'required_with:issue_rule.1|date_format:H:i:s', //首期结束时间
+            'issue_rule.1.adjust_time' => 'required_with:issue_rule.1|integer', //调整截止时间（秒）
+            'issue_rule.1.encode_time' => 'required_with:issue_rule.1|integer',
+            'issue_rule.1.issue_count' => 'required_with:issue_rule.1|integer',
+            'issue_rule.1.status' => 'required_with:issue_rule.1|same:lottery.status', //状态：0关闭 1开启
         ];
     }
 
