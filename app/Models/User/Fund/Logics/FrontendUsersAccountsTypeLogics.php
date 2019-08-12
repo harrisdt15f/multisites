@@ -3,7 +3,6 @@
 namespace App\Models\User\Fund\Logics;
 
 use App\Lib\BaseCache;
-use App\Models\User\Fund\FrontendUsersAccountsType;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -111,6 +110,15 @@ trait FrontendUsersAccountsTypeLogics
         $paramsFlipped = array_flip($params);
         $finalParams = array_fill_keys(array_keys($paramsFlipped), 'required');
         return $finalParams;
+    }
+
+    /**
+     * @param  array  $field
+     * @return array
+     */
+    public static function getTypeList($field)
+    {
+       return self::all($field);
     }
 
 }

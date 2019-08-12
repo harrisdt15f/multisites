@@ -61,6 +61,7 @@ trait BaseCache
      * @throws \Exception
      */
     public static function _hasCache($key) {
+        self::_flushCache();
         $cacheConfig = self::_getCacheConfig($key);
         return  Cache::has($cacheConfig['key']);
     }
