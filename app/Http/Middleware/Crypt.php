@@ -19,7 +19,6 @@ class Crypt
      */
     public function handle($request, Closure $next)
     {
-        dd(env('APP_DEBUG'));
         $requestNum = count($request->request);
         //空参放行
         if(!$requestNum){
