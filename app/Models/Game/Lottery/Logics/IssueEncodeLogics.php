@@ -15,7 +15,6 @@ use App\Models\Game\Lottery\LotterySeriesMethod;
 use App\Models\Game\Lottery\LotteryTraceList;
 use App\Models\LotteryTrace;
 use App\Models\Project;
-use App\Models\User\UserCommissions;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 
@@ -68,8 +67,6 @@ trait IssueEncodeLogics
                                                 foreach ($oProjectsToCalculate as $project) {
                                                     $project->setFail($oIssue->official_code);
                                                     self::startTrace($oLottery, $project);
-
-                                                    UserCommissions::sendCommissions($project->id);
                                                 }
                                             } else {
                                                 //中奖的时候
@@ -100,8 +97,6 @@ trait IssueEncodeLogics
                                                             Log::channel('issues')->info($result);
                                                         }
                                                         self::startTrace($oLottery, $project);
-
-                                                        UserCommissions::sendCommissions($project->id);
                                                     }
                                                 } else {
                                                     Log::channel('issues')->info('no basic way');

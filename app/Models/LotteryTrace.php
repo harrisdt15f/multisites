@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Game\Lottery\LotteryTraceList;
+use App\Models\Game\Lottery\LotteryList;
 use App\Models\Logics\TraceTraits;
 
 class LotteryTrace extends BaseModel
@@ -26,5 +27,10 @@ class LotteryTrace extends BaseModel
     public function traceLists()
     {
         return $this->hasMany(LotteryTraceList::class, 'trace_id', 'id');
+    }
+    
+    public function lottery()
+    {
+        return $this->belongsTo(LotteryList::class,'lottery_sign','en_name');
     }
 }
