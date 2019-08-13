@@ -1,5 +1,6 @@
 <?php namespace App\Lib;
 
+use Exception;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -10,9 +11,10 @@ trait BaseCache
      * 获取缓存
      * @param $key
      * @return Repository
-     * @throws \Exception
+     * @throws Exception
      */
-    public static function _getCacheData($key) {
+    public static function _getCacheData($key)
+    {
         $cacheConfig = self::_getCacheConfig($key);
         return Cache::get($cacheConfig['key'], []);
     }
@@ -21,9 +23,10 @@ trait BaseCache
      * 保存
      * @param $key
      * @param $value
-     * @throws \Exception
+     * @throws Exception
      */
-    public static function _saveCacheData($key, $value) {
+    public static function _saveCacheData($key, $value)
+    {
         $cacheConfig = self::_getCacheConfig($key);
         if ($cacheConfig['expire_time'] <= 0) {
             return Cache::forever($cacheConfig['key'], $value);
@@ -37,9 +40,10 @@ trait BaseCache
      * 刷新缓存
      * @param $key
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
-    public static function _flushCache($key) {
+    public static function _flushCache($key)
+    {
         $cacheConfig = self::_getCacheConfig($key);
         return Cache::forget($cacheConfig['key'], []);
     }
@@ -49,7 +53,8 @@ trait BaseCache
      * @param $key
      * @return mixed
      */
-    public static function _getCacheConfig($key) {
+    public static function _getCacheConfig($key)
+    {
         $cacheConfig = config('web.main.cache');
         return $cacheConfig[$key] ?? $cacheConfig['common'];
     }
@@ -58,10 +63,15 @@ trait BaseCache
      * 检查是否存在缓存
      * @param $key
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
+<<<<<<< HEAD
     public static function _hasCache($key) {
+=======
+    public static function _hasCache($key): bool
+    {
+>>>>>>> master
         $cacheConfig = self::_getCacheConfig($key);
-        return  Cache::has($cacheConfig['key']);
+        return Cache::has($cacheConfig['key']);
     }
 }

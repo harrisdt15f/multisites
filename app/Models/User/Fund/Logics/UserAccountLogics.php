@@ -11,7 +11,6 @@ use App\Models\User\FrontendUsersAccount;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Artisan;
 
 /**
  * Created by PhpStorm.
@@ -281,8 +280,6 @@ trait UserAccountLogics
                 return '对不起, ' . $res;
             }
 //            $accountChange->triggerSave();
-            //处理更新用户盈亏
-            Artisan::call('UserProfits '.$this->user->id);
             $accountLocker->release();
             return true;
         } catch (Exception $e) {
