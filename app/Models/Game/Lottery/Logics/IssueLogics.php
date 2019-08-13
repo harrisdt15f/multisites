@@ -80,6 +80,6 @@ trait IssueLogics
     public static function getPastIssue($lotterySign, $skipNum = 0)
     {
         $time = time();
-        return self::where('lottery_id', $lotterySign)->where('end_time', '<=', $time)->orderBy('id', 'DESC')->skip($skipNum)->first();
+        return self::where('lottery_id', $lotterySign)->where('end_time', '<=', $time)->orderBy('begin_time', 'DESC')->skip($skipNum)->first();
     }
 }

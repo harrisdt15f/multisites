@@ -462,7 +462,7 @@ trait LotteryLogics
     /**
      * 更新首页lotteryInfo缓存
      */
-    public function lotteryInfoCache()
+    public static function lotteryInfoCache()
     {
         $lotteries = self::where('status', 1)->get();
         $cacheData = [];

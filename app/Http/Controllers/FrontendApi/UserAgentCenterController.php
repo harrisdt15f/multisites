@@ -4,6 +4,9 @@ namespace App\Http\Controllers\FrontendApi;
 
 use App\Http\Requests\Frontend\UserAgentCenter\{UserBonusRequest, UserDaysalaryRequest, UserProfitsRequest};
 use App\Http\SingleActions\Frontend\User\AgentCenter\{UserProfitsAction, UserDaysalaryAction, UserBonusAction};
+use App\Http\Requests\Frontend\UserAgentCenter\UserAgentCenterRegisterLinkRequest;
+use App\Http\SingleActions\Frontend\User\AgentCenter\UserAgentCenterRegisterableLinkAction;
+use App\Http\SingleActions\Frontend\User\AgentCenter\UserAgentCenterRegisterLinkAction;
 use Illuminate\Http\{JsonResponse};
 
 class UserAgentCenterController extends FrontendApiMainController
@@ -30,6 +33,28 @@ class UserAgentCenterController extends FrontendApiMainController
     public function UserDaysalary(UserDaysalaryAction $action , UserDaysalaryRequest $request): JsonResponse
     {
         return $action->execute($this, $request);
+    }
+
+    /**
+     * 链接开户信息
+     * @param UserAgentCenterRegisterableLinkAction $action
+     * @return JsonResponse
+     */
+    public function RegisterableLink(UserAgentCenterRegisterableLinkAction $action):JsonResponse
+    {
+        return $action->execute($this);
+    }
+
+
+    /**
+     * 生成开户链接
+     * @param UserAgentCenterRegisterLinkRequest $request
+     * @param UserAgentCenterRegisterLinkAction $action
+     * @return JsonResponse
+     */
+    public function RegisterLink(UserAgentCenterRegisterLinkRequest $request, UserAgentCenterRegisterLinkAction $action):JsonResponse
+    {
+        return $action->execute($this, $request->validated());
     }
 
     /**
