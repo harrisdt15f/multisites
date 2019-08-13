@@ -37,29 +37,28 @@ class UserBonusControl extends Command
     {
         $today =  Carbon::now()->toDateString();
 
-       switch (date('d')){
-           case '1':
-               $dateFrom = date('Y-m-15',strtotime('-1 months -1 day')) ;
-               $dateTo = date('Y-m-d',strtotime(date('Y-m-1').'-1 day')) ;
-               break;
+        switch (date('d')) {
+            case '1':
+                $dateFrom = date('Y-m-15', strtotime('-1 months -1 day')) ;
+                $dateTo = date('Y-m-d', strtotime(date('Y-m-1').'-1 day')) ;
+                break;
 
-           case '15':
-               $dateFrom = date('Y-m-01') ;
-               $dateTo = date('Y-m-15') ;
-               break;
-           default:
-               $dateFrom = date('Y-m-01') ;
-               $dateTo = date('Y-m-15') ;
-//               exit();
-
-       }
+            case '15':
+                $dateFrom = date('Y-m-01') ;
+                $dateTo = date('Y-m-15') ;
+                break;
+            default:
+                $dateFrom = date('Y-m-01') ;
+                $dateTo = date('Y-m-15') ;
+ //               exit();
+        }
 
         $whereDate = [
             ['date', '>=', $dateFrom],
             ['date', '<=', $dateTo],
         ];
 
-       $selectSum = [
+        $selectSum = [
             'user_profits.username',
             'user_profits.user_id',
             'user_profits.is_tester',
@@ -76,15 +75,15 @@ class UserBonusControl extends Command
         ];
 
         $UserProfits = UserProfits::where($whereDate)
-            ->select(DB::raw(implode(',',$selectSum)))
+            ->select(DB::raw(implode(',', $selectSum)))
             ->groupby('user_id')
             ->leftJoin('frontend_users', function ($join) {
                 $join->on('frontend_users.id', '=', 'user_id');
             })
             ->get();
 
-        if (is_object($UserProfits)){
-            foreach ($UserProfits as $child){
+        if (is_object($UserProfits)) {
+            foreach ($UserProfits as $child) {
                 $data['period'] = $today;
                 $data['user_id'] =  $child->user_id;
                 $data['username'] =  $child->username;
@@ -99,34 +98,33 @@ class UserBonusControl extends Command
 
                 $data['bet_counts'] = $this->countBet($whereDate, $child->user_id) ;  //下级有效投注数量
                 $data['bonus_percentage'] = $child->bonus_percentage ;
-                $data['net_profit_total'] = $child->team_profit ;;
+                $data['net_profit_total'] = $child->team_profit ;
+                ;
                 $data['bonus_total'] = $data['net_profit_total'] * $data['bonus_percentage'] /100 ;
 
-                Self::updateBonus($data);
+                self::updateBonus($data);
             }
         }
     }
 
     public function countBet($whereDate, $userId) : int
     {
-        $where = array_merge($whereDate,[['parent_id','=',$userId]]);
+        $where = array_merge($whereDate, [['parent_id','=',$userId]]);
         return (int)UserProfits::where($where)->groupby('user_id')->count();
     }
 
 
     public static function updateBonus(array $data) : bool
     {
-        if($data['user_id'] && $data['period']){
+        if ($data['user_id'] && $data['period']) {
             $row = UserBonus::where([
                 ['user_id', $data['user_id']],
                 ['period', $data['period']]
             ])->first();
 
-            if (empty($row)){
-
+            if (empty($row)) {
                 return (bool)UserBonus::create($data);
-            }else{
-
+            } else {
                 return (bool)$row->update($data);
             }
         }
