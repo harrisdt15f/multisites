@@ -10,6 +10,7 @@ use App\Http\Requests\Frontend\FrontendAuthSelfResetPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthSetFundPasswordRequest;
 use App\Http\SingleActions\Frontend\FrontendAuthLoginAction;
 use App\Http\SingleActions\Frontend\FrontendAuthLogoutAction;
+use App\Http\SingleActions\Frontend\FrontendAuthRegisterAction;
 use App\Http\SingleActions\Frontend\FrontendAuthResetSpecificInfosAction;
 use App\Http\SingleActions\Frontend\FrontendAuthSetFundPasswordAction;
 use App\Http\SingleActions\Frontend\FrontendAuthUserDetailAction;
@@ -97,29 +98,10 @@ class FrontendAuthController extends FrontendApiMainController
      * @param  FrontendAuthRegisterRequest $request
      * @return JsonResponse
      */
-    public function register(FrontendAuthRegisterRequest $request): JsonResponse
+    public function register(FrontendAuthRegisterRequest $request,FrontendAuthRegisterAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        $group = BackendAdminAccessGroup::find($inputDatas['group_id']);
-        $role = $group->role == '*' ? Arr::wrap($group->role) : Arr::wrap(json_decode($group->role, true));
-        $isManualRecharge = false;
-        $FundOperation = PartnerMenus::select('id')->where('route', '/manage/recharge')->first()->toArray();
-        $isManualRecharge = in_array($FundOperation['id'], $role, true);
-        $input = $inputDatas;
-        $input['password'] = bcrypt($input['password']);
-        $input['platform_id'] = $this->currentPlatformEloq->platform_id;
-        $user = BackendAdminUser::create($input);
-        if ($isManualRecharge === true) {
-            $insertData = ['admin_id' => $user->id];
-            $FundOperationEloq = new BackendAdminRechargePocessAmount();
-            $FundOperationEloq->fill($insertData);
-            $FundOperationEloq->save();
-        }
-        $credentials = request(['email', 'password']);
-        $token = $this->currentAuth->attempt($credentials);
-        $success['token'] = $token;
-        $success['name'] = $user->name;
-        return $this->msgOut(true, $success);
+        return $action->execute($this, $inputDatas);
     }
 
     /**

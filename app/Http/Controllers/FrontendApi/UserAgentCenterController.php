@@ -7,6 +7,7 @@ use App\Http\SingleActions\Frontend\User\AgentCenter\{UserProfitsAction, UserDay
 use App\Http\Requests\Frontend\UserAgentCenter\UserAgentCenterRegisterLinkRequest;
 use App\Http\SingleActions\Frontend\User\AgentCenter\UserAgentCenterRegisterableLinkAction;
 use App\Http\SingleActions\Frontend\User\AgentCenter\UserAgentCenterRegisterLinkAction;
+use App\Http\SingleActions\Frontend\User\AgentCenter\UserAgentCenterPrizeGroupAction;
 use Illuminate\Http\{JsonResponse};
 
 class UserAgentCenterController extends FrontendApiMainController
@@ -66,5 +67,15 @@ class UserAgentCenterController extends FrontendApiMainController
     public function UserBonus(UserBonusAction $action, UserBonusRequest $request) : JsonResponse
     {
         return $action->execute($this, $request);
+    }
+
+    /**
+     * 代理开户-奖金组最大最小值
+     * @param UserAgentCenterPrizeGroupAction $action
+     * @return JsonResponse
+     */
+    
+    public function PrizeGroup(UserAgentCenterPrizeGroupAction $action){
+        return $action->execute($this);
     }
 }
