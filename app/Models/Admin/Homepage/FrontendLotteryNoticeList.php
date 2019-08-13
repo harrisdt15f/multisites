@@ -13,7 +13,12 @@ class FrontendLotteryNoticeList extends BaseModel
     //各个彩种最新一期的开奖
     public function specificNewestOpenedIssue()
     {
-        return $this->hasOne(LotteryIssue::class, 'lottery_id', 'lotteries_id')->select('lottery_id', 'issue', 'official_code', 'encode_time')->where('status_encode', 1)->orderBy('issue', 'desc');
+        return $this->hasOne(LotteryIssue::class, 'lottery_id', 'lotteries_id')->select(
+            'lottery_id',
+            'issue',
+            'official_code',
+            'encode_time'
+        )->where('status_encode', 1)->orderBy('official_open_time', 'desc');
     }
 
     public function lottery()
