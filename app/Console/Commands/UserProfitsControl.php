@@ -3,7 +3,6 @@
  * 团队盈亏处理脚本
  * 实时更新盈亏数据到user_prifits ，第二日凌晨1点 再更新昨日整天的数据 。
  */
-
 namespace App\Console\Commands;
 
 use App\Models\User\Fund\FrontendUsersAccountsReport;

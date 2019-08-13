@@ -3,7 +3,6 @@
  * 分红计算处理脚本
  * 每月1/15号运行一次，分红计算数据到user_bonus
  */
-
 namespace App\Console\Commands;
 
 use App\Models\User\UserBonus;

@@ -1,12 +1,11 @@
 <?php
 namespace App\Console\Commands;
 
-
 use App\Models\User\UserCommissions;
 use Illuminate\Console\Command;
 
-
-class SendCommissionsControl extends Command{
+class SendCommissionsControl extends Command
+{
 
     /**
      * The name and signature of the console command.
@@ -32,5 +31,4 @@ class SendCommissionsControl extends Command{
     {
         UserCommissions::sendCommissions(152342); // 测试用
     }
-
 }
