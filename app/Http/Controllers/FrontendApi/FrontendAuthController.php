@@ -15,12 +15,9 @@ use App\Http\SingleActions\Frontend\FrontendAuthResetSpecificInfosAction;
 use App\Http\SingleActions\Frontend\FrontendAuthSetFundPasswordAction;
 use App\Http\SingleActions\Frontend\FrontendAuthUserDetailAction;
 use App\Http\SingleActions\Frontend\FrontendAuthUserSpecificInfosAction;
-use App\Models\Admin\BackendAdminAccessGroup;
-use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 
@@ -31,8 +28,8 @@ class FrontendAuthController extends FrontendApiMainController
     /**
      * Login user and create token
      *
-     * @param  Request                  $request
-     * @param  FrontendAuthLoginAction  $action
+     * @param Request $request
+     * @param FrontendAuthLoginAction $action
      * @return JsonResponse [string]    access_token
      */
     public function login(Request $request, FrontendAuthLoginAction $action): JsonResponse
@@ -42,7 +39,7 @@ class FrontendAuthController extends FrontendApiMainController
 
     /**
      * 用户信息
-     * @param  FrontendAuthUserDetailAction $action
+     * @param FrontendAuthUserDetailAction $action
      * @return JsonResponse
      */
     public function userDetail(FrontendAuthUserDetailAction $action): JsonResponse
@@ -51,19 +48,8 @@ class FrontendAuthController extends FrontendApiMainController
     }
 
     /**
-     * Refresh a token.
-     *
-     * @return JsonResponse
-     */
-    public function refresh()
-    {
-        $token = $this->currentAuth->refresh();
-        return $token;
-    }
-
-    /**
      * change partner user Password
-     * @param  FrontendAuthSelfResetPasswordRequest $request
+     * @param FrontendAuthSelfResetPasswordRequest $request
      * @return JsonResponse
      */
     public function selfResetPassword(FrontendAuthSelfResetPasswordRequest $request)
@@ -94,11 +80,22 @@ class FrontendAuthController extends FrontendApiMainController
     }
 
     /**
-     * Register api
-     * @param  FrontendAuthRegisterRequest $request
+     * Refresh a token.
+     *
      * @return JsonResponse
      */
-    public function register(FrontendAuthRegisterRequest $request,FrontendAuthRegisterAction $action): JsonResponse
+    public function refresh()
+    {
+        $token = $this->currentAuth->refresh();
+        return $token;
+    }
+
+    /**
+     * Register api
+     * @param FrontendAuthRegisterRequest $request
+     * @return JsonResponse
+     */
+    public function register(FrontendAuthRegisterRequest $request, FrontendAuthRegisterAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
@@ -106,7 +103,7 @@ class FrontendAuthController extends FrontendApiMainController
 
     /**
      * Logout user (Revoke the token)
-     * @param  Request  $request
+     * @param Request $request
      * @return JsonResponse [string] message
      */
     public function logout(Request $request, FrontendAuthLogoutAction $action): JsonResponse
@@ -117,7 +114,7 @@ class FrontendAuthController extends FrontendApiMainController
     /**
      * Get the authenticated User
      *
-     * @param  Request  $request
+     * @param Request $request
      * @return JsonResponse [json] user object
      */
     public function user(Request $request): JsonResponse
@@ -127,7 +124,7 @@ class FrontendAuthController extends FrontendApiMainController
 
     /**
      * 用户修改登录密码
-     * @param  FrontendAuthResetUserPasswordRequest $request
+     * @param FrontendAuthResetUserPasswordRequest $request
      * @return JsonResponse
      */
     public function resetUserPassword(FrontendAuthResetUserPasswordRequest $request): JsonResponse
@@ -137,20 +134,9 @@ class FrontendAuthController extends FrontendApiMainController
     }
 
     /**
-     * 用户修改资金密码
-     * @param  FrontendAuthResetFundPasswordRequest $request
-     * @return JsonResponse
-     */
-    public function resetFundPassword(FrontendAuthResetFundPasswordRequest $request): JsonResponse
-    {
-        $inputDatas = $request->validated();
-        return $this->commonHandleUserPassword($inputDatas, 2);
-    }
-
-    /**
      * 修改 用户密码1 资金密码2 共用处理
-     * @param  array  $inputDatas
-     * @param  int    $type
+     * @param array $inputDatas
+     * @param int $type
      * @return JsonResponse
      */
     public function commonHandleUserPassword($inputDatas, $type): JsonResponse
@@ -187,6 +173,17 @@ class FrontendAuthController extends FrontendApiMainController
     }
 
     /**
+     * 用户修改资金密码
+     * @param FrontendAuthResetFundPasswordRequest $request
+     * @return JsonResponse
+     */
+    public function resetFundPassword(FrontendAuthResetFundPasswordRequest $request): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $this->commonHandleUserPassword($inputDatas, 2);
+    }
+
+    /**
      * 用户是否设置了资金密码
      * @return JsonResponse
      */
@@ -201,28 +198,34 @@ class FrontendAuthController extends FrontendApiMainController
     }
 
     //用户设置资金密码
-    public function setFundPassword(FrontendAuthSetFundPasswordRequest $request, FrontendAuthSetFundPasswordAction $action): JsonResponse
-    {
+    public function setFundPassword(
+        FrontendAuthSetFundPasswordRequest $request,
+        FrontendAuthSetFundPasswordAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
+
     /**
      * 用户个人信息
-     * @param  FrontendAuthUserSpecificInfosAction $action
+     * @param FrontendAuthUserSpecificInfosAction $action
      * @return JsonResponse
      */
     public function userSpecificInfos(FrontendAuthUserSpecificInfosAction $action): JsonResponse
     {
         return $action->execute($this);
     }
+
     /**
      * 用户设置个人信息
-     * @param  FrontendAuthResetSpecificInfosRequest $request
-     * @param  FrontendAuthResetSpecificInfosAction  $action
+     * @param FrontendAuthResetSpecificInfosRequest $request
+     * @param FrontendAuthResetSpecificInfosAction $action
      * @return JsonResponse
      */
-    public function resetSpecificInfos(FrontendAuthResetSpecificInfosRequest $request, FrontendAuthResetSpecificInfosAction $action): JsonResponse
-    {
+    public function resetSpecificInfos(
+        FrontendAuthResetSpecificInfosRequest $request,
+        FrontendAuthResetSpecificInfosAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
