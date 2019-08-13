@@ -82,7 +82,7 @@ trait LotteryIssueGenerate
      * @param $rules
      * @return bool|string
      */
-    public function _genIssue($day, $rules)
+    public function genOneDayIssue($day, $rules)
     {
         if (!$rules) {
             return "对不起, 彩种{$this->cn_name}未配置奖期规则!!";
@@ -130,7 +130,6 @@ trait LotteryIssueGenerate
             $endTime = $endTimeOrigin->copy();
             if ($rule['end_time'] == '00:00:00') {
                 $endTime = $endTime->addDay();
-
             } else {
                 if ($beginTime->greaterThan($endTimeOrigin)) {
                     $endTime = $endTime->addDay();
@@ -175,7 +174,6 @@ trait LotteryIssueGenerate
                 $beginTime = $issueEndTime->copy();
                 $index++;
             } while ($beginTime->lessThan($endTime));
-
         }
         $totalGenCount = count($data);
         if ($totalGenCount != $this->day_issue) {

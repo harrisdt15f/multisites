@@ -13,9 +13,9 @@ trait BaseCache
      * @return Repository
      * @throws Exception
      */
-    public static function _getCacheData($key)
+    public static function getCacheData($key)
     {
-        $cacheConfig = self::_getCacheConfig($key);
+        $cacheConfig = self::getCacheConfig($key);
         return Cache::get($cacheConfig['key'], []);
     }
 
@@ -25,9 +25,9 @@ trait BaseCache
      * @param $value
      * @throws Exception
      */
-    public static function _saveCacheData($key, $value)
+    public static function saveCacheData($key, $value)
     {
-        $cacheConfig = self::_getCacheConfig($key);
+        $cacheConfig = self::getCacheConfig($key);
         if ($cacheConfig['expire_time'] <= 0) {
             return Cache::forever($cacheConfig['key'], $value);
         } else {
@@ -42,9 +42,9 @@ trait BaseCache
      * @return bool
      * @throws Exception
      */
-    public static function _flushCache($key)
+    public static function flushCache($key)
     {
-        $cacheConfig = self::_getCacheConfig($key);
+        $cacheConfig = self::getCacheConfig($key);
         return Cache::forget($cacheConfig['key'], []);
     }
 
@@ -53,7 +53,7 @@ trait BaseCache
      * @param $key
      * @return mixed
      */
-    public static function _getCacheConfig($key)
+    public static function getCacheConfig($key)
     {
         $cacheConfig = config('web.main.cache');
         return $cacheConfig[$key] ?? $cacheConfig['common'];
@@ -65,9 +65,9 @@ trait BaseCache
      * @return bool
      * @throws Exception
      */
-    public static function _hasCache($key): bool
+    public static function hasCache($key): bool
     {
-        $cacheConfig = self::_getCacheConfig($key);
+        $cacheConfig = self::getCacheConfig($key);
         return Cache::has($cacheConfig['key']);
     }
 }
