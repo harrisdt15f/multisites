@@ -180,11 +180,11 @@ class HomepageController extends FrontendApiMainController
     }
 
     /**
-     * 获取网站基本配置
+     * 获取网站基本信息
      * @param  HomepageGetWebInfoAction $action
      * @return JsonResponse
      */
-    public function getWebConfig(HomepageGetWebInfoAction $action): JsonResponse
+    public function getWebInfo(HomepageGetWebInfoAction $action): JsonResponse
     {
         return $action->execute($this);
     }

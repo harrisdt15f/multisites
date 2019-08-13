@@ -52,33 +52,41 @@ Route::group(['prefix' => 'homepage', 'namespace' => 'Homepage'], function () {
     //公告|站内信 已读处理
     Route::match(['post', 'options'], 'read-message', [
         'as' => $namePrefix . 'read-message',
-        'uses' => $controller . 'readMessage']);
+        'uses' => $controller . 'readMessage',
+    ]);
     //ico
     Route::match(['get', 'options'], 'ico', [
         'as' => $namePrefix . 'ico',
-        'uses' => $controller . 'ico']);
+        'uses' => $controller . 'ico',
+    ]);
     //中奖排行
     Route::match(['get', 'options'], 'ranking', [
         'as' => $namePrefix . 'ranking',
-        'uses' => $controller . 'ranking']);
+        'uses' => $controller . 'ranking',
+    ]);
     //开奖公告列表
     Route::match(['get', 'options'], 'lottery-notice-list', [
         'as' => $namePrefix . 'lottery-notice-list',
-        'uses' => $controller . 'lotteryNoticeList']);
+        'uses' => $controller . 'lotteryNoticeList',
+    ]);
     //热门棋牌
     Route::match(['get', 'options'], 'popular-chess-cards-lists', [
         'as' => $namePrefix . 'popular-chess-cards-lists',
-        'uses' => $controller . 'popularChessCardsLists']);
+        'uses' => $controller . 'popularChessCardsLists',
+    ]);
     //热门电子
     Route::match(['get', 'options'], 'popular-e-game-lists', [
         'as' => $namePrefix . 'popular-e-game-lists',
-        'uses' => $controller . 'popularEGameLists']);
+        'uses' => $controller . 'popularEGameLists',
+    ]);
     //活动接口
     Route::match(['post', 'options'], 'activity-list', [
         'as' => $namePrefix . 'activity-list',
-        'uses' => $controller . 'activityList']);
+        'uses' => $controller . 'activityList',
+    ]);
     //获取网站基本配置
-    Route::match(['get', 'options'], 'get-web-config', [
-        'as' => $namePrefix . 'get-web-config',
-        'uses' => $controller . 'getWebConfig']);
+    Route::match(['get', 'options'], 'get-web-info', [
+        'as' => $namePrefix . 'get-web-info',
+        'uses' => $controller . 'getWebInfo',
+    ]);
 });
