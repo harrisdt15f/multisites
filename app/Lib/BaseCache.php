@@ -65,12 +65,8 @@ trait BaseCache
      * @return bool
      * @throws Exception
      */
-<<<<<<< HEAD
-    public static function _hasCache($key) {
-=======
     public static function _hasCache($key): bool
     {
->>>>>>> master
         $cacheConfig = self::_getCacheConfig($key);
         return Cache::has($cacheConfig['key']);
     }
