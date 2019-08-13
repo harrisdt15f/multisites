@@ -42,7 +42,7 @@ trait BaseCache
      * @return bool
      * @throws Exception
      */
-    public static function flushCache($key)
+    public static function mtsFlushCache($key): bool
     {
         $cacheConfig = self::getCacheConfig($key);
         return Cache::forget($cacheConfig['key'], []);
