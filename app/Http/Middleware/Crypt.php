@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use Config;
+
 class Crypt
 {
     //数据串间隔标志 前后统一
@@ -15,7 +15,6 @@ class Crypt
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @return mixed
-     *
      */
     public function handle($request, Closure $next)
     {
@@ -24,13 +23,10 @@ class Crypt
         if(!$requestNum){
             return $next($request);
         }
-        //本地模式关闭参数唯一性判断
-        if(Config::get('app.env') !== "local"){
-            //检验参数是否符合规范 系统只允许接入一个名为DATA的参数
-            if($requestNum!==1 || !isset($request['data'])){
-                $con = new FrontendApiMainController();
-                return $con->msgOut(false,[],100507);die;
-            }
+        //检验参数是否符合规范 系统只允许接入一个名为DATA的参数
+        if($requestNum!=1 || !isset($request['data'])){
+            $con = new FrontendApiMainController();
+            return $con->msgOut(false,[],100507);die;
         }
         $inData = $request->input('data');
         //带DATA数据却为null

@@ -24,20 +24,14 @@ class FrontendAuthRegisterRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|unique:backend_admin_users',
-            'email' => 'required|email|unique:backend_admin_users',
-            'password' => 'required',
-            'is_test' => 'required|numeric',
-            'group_id' => 'required|numeric',
+            'username' => 'required|alpha_dash|unique:frontend_users',
+            'password' => 'required|string',
+            're_password' => 'string',
+            'keyword' => 'alpha_num',
+            'register_type' => 'integer',
+            'prize_group' => 'integer',//奖金组
+            'platform_id' => 'integer',//平台id
+            'platform_sign' => 'string',//平台sign
         ];
     }
-
-    /*public function messages()
-{
-return [
-'lottery_sign.required' => 'lottery_sign is required!',
-'trace_issues.required' => 'trace_issues is required!',
-'balls.required' => 'balls is required!'
-];
-}*/
 }
