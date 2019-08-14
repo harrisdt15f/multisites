@@ -6,6 +6,7 @@ use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesAvailableIssuesRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesBetRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesCancelBetRequest;
+use App\Http\Requests\Frontend\Game\Lottery\LotteriesLastIssuesRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesProjectHistoryRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesStopTraceRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesTracesHistoryRequest;
@@ -13,6 +14,7 @@ use App\Http\Requests\Mobile\Game\Lottery\LotteriesIssueHistoryRequest;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesAvailableIssuesAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesBetAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesCancelBetAction;
+use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLastIssuesAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryInfoAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesStopTraceAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesTracesHistoryAction;
@@ -53,7 +55,7 @@ class LotteriesController extends FrontendApiMainController
     public function issueHistory(
         LotteriesIssueHistoryRequest $request,
         LotteriesIssueHistoryAction $action
-    ): JsonResponse{
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -67,7 +69,7 @@ class LotteriesController extends FrontendApiMainController
     public function availableIssues(
         LotteriesAvailableIssuesRequest $request,
         LotteriesAvailableIssuesAction $action
-    ): JsonResponse{
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -81,7 +83,7 @@ class LotteriesController extends FrontendApiMainController
     public function projectHistory(
         LotteriesProjectHistoryRequest $request,
         LotteriesProjectHistoryAction $action
-    ): JsonResponse{
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -95,7 +97,7 @@ class LotteriesController extends FrontendApiMainController
     public function tracesHistory(
         LotteriesTracesHistoryRequest $request,
         LotteriesTracesHistoryAction $action
-    ): JsonResponse{
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -146,4 +148,15 @@ class LotteriesController extends FrontendApiMainController
         return $action->execute($this, $inputDatas);
     }
 
+    /**
+     * 获取彩种上期的奖期
+     * @param  LotteriesLastIssuesRequest $request
+     * @param  LotteriesLastIssuesAction  $action
+     * @return JsonResponse
+     */
+    public function lastIssue(LotteriesLastIssuesRequest $request, LotteriesLastIssuesAction $action): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
+    }
 }
