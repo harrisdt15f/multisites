@@ -67,7 +67,7 @@ class BackEndApiMainController extends Controller
             $this->inputs = Input::all(); //获取所有相关的传参数据
             //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
             $this->adminOperateLog();
-            $this->eloqM = 'App\\Models\\'.$this->eloqM; // 当前的eloquent
+            $this->eloqM = 'App\\Models\\' . $this->eloqM; // 当前的eloquent
             return $next($request);
         });
     }
@@ -87,12 +87,12 @@ class BackEndApiMainController extends Controller
             $open_route = BackendAdminRoute::where('is_open', 1)->pluck('method')->toArray();
             $result = true;
         } else {
-            Log::info('robot attacks: '.json_encode(Input::all()).json_encode(Request::header()));
+            Log::info('robot attacks: ' . json_encode(Input::all()) . json_encode(Request::header()));
             echo '机器人禁止操作';
             die();
         }
         if ($result === true) {
-            $this->middleware('auth:'.$this->currentGuard, ['except' => $open_route]);
+            $this->middleware('auth:' . $this->currentGuard, ['except' => $open_route]);
         }
     }
 
@@ -175,9 +175,9 @@ class BackEndApiMainController extends Controller
             $code = $code == '' ? $defaultErrorCode : $code;
         }
         if ($placeholder === null || $substituted === null) {
-            $message = $message == '' ? __('codes-map.'.$code) : $message;
+            $message = $message == '' ? __('codes-map.' . $code) : $message;
         } else {
-            $message = $message == '' ? __('codes-map.'.$code, [$placeholder => $substituted]) : $message;
+            $message = $message == '' ? __('codes-map.' . $code, [$placeholder => $substituted]) : $message;
         }
         $datas = [
             'success' => $success,
@@ -190,7 +190,7 @@ class BackEndApiMainController extends Controller
 
     public function modelWithNameSpace($eloqM = null)
     {
-        return $eloqM !== null ? 'App\\Models\\'.$eloqM : $eloqM;
+        return $eloqM !== null ? 'App\\Models\\' . $eloqM : $eloqM;
     }
 
     /**
@@ -234,7 +234,7 @@ class BackEndApiMainController extends Controller
                     $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
                     if ($sign == 'LIKE') {
                         $sign = strtolower($sign);
-                        $value = '%'.$value.'%';
+                        $value = '%' . $value . '%';
                     }
                     $whereCriteria = [];
                     $whereCriteria[] = $key;
@@ -250,14 +250,26 @@ class BackEndApiMainController extends Controller
                 }
                 $queryEloq = $eloqM::where($whereData);
                 if ($fixedJoin > 0) {
-                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs,
-                        $withSearchCriterias, $queryConditions);
+                    $queryEloq = $this->eloqToJoin(
+                        $queryEloq,
+                        $fixedJoin,
+                        $withTable,
+                        $sizeOfWithInputs,
+                        $withSearchCriterias,
+                        $queryConditions
+                    );
                 }
             } else {
                 //for default
                 if ($fixedJoin > 0) {
-                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs,
-                        $withSearchCriterias, $queryConditions);
+                    $queryEloq = $this->eloqToJoin(
+                        $queryEloq,
+                        $fixedJoin,
+                        $withTable,
+                        $sizeOfWithInputs,
+                        $withSearchCriterias,
+                        $queryConditions
+                    );
                 }
             }
         } else {
@@ -269,7 +281,7 @@ class BackEndApiMainController extends Controller
                         $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
                         if ($sign == 'LIKE') {
                             $sign = strtolower($sign);
-                            $value = '%'.$value.'%';
+                            $value = '%' . $value . '%';
                         }
                         $whereCriteria = [];
                         $whereCriteria[] = $key;
@@ -286,13 +298,25 @@ class BackEndApiMainController extends Controller
                     }
                     $queryEloq = $eloqM::where($whereData);
                     if ($fixedJoin > 0) {
-                        $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs,
-                            $withSearchCriterias, $queryConditions);
+                        $queryEloq = $this->eloqToJoin(
+                            $queryEloq,
+                            $fixedJoin,
+                            $withTable,
+                            $sizeOfWithInputs,
+                            $withSearchCriterias,
+                            $queryConditions
+                        );
                     }
                 } else {
                     if ($fixedJoin > 0) {
-                        $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs,
-                            $withSearchCriterias, $queryConditions);
+                        $queryEloq = $this->eloqToJoin(
+                            $queryEloq,
+                            $fixedJoin,
+                            $withTable,
+                            $sizeOfWithInputs,
+                            $withSearchCriterias,
+                            $queryConditions
+                        );
                     }
                 }
             } else {
@@ -307,8 +331,14 @@ class BackEndApiMainController extends Controller
                     $queryEloq = $eloqM::where($whereData); //$extraContitions
                 }
                 if ($fixedJoin > 0) {
-                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs,
-                        $withSearchCriterias, $queryConditions);
+                    $queryEloq = $this->eloqToJoin(
+                        $queryEloq,
+                        $fixedJoin,
+                        $withTable,
+                        $sizeOfWithInputs,
+                        $withSearchCriterias,
+                        $queryConditions
+                    );
                 }
             }
         }
@@ -339,8 +369,7 @@ class BackEndApiMainController extends Controller
         $withSearchCriterias,
         $queryConditions
     ) {
-        if (empty($sizeOfWithInputs)) //如果with 没有参数可以查询时查询全部
-        {
+        if (empty($sizeOfWithInputs)) {//如果with 没有参数可以查询时查询全部
             switch ($fixedJoin) {
                 case 1: //有一个连表查询的情况下
                     $queryEloq = $queryEloq->with($withTable);
@@ -349,16 +378,16 @@ class BackEndApiMainController extends Controller
         } else {
             switch ($fixedJoin) {
                 case 1: //有一个连表查询的情况下
-                    $queryEloq = $queryEloq->with($withTable)->whereHas($withTable,
+                    $queryEloq = $queryEloq->with($withTable)->whereHas(
+                        $withTable,
                         function ($query) use ($sizeOfWithInputs, $withSearchCriterias, $queryConditions) {
                             if ($sizeOfWithInputs > 1) {
-
                                 if (!empty($withSearchCriterias)) {
                                     foreach ($withSearchCriterias as $key => $value) {
                                         $whereCriteria = [];
                                         $whereCriteria[] = $key;
-                                        $whereCriteria[] = array_key_exists($key,
-                                            $queryConditions) ? $queryConditions[$key] : '=';
+                                        $whereCriteria[] = array_key_exists($key, $queryConditions) ?
+                                        $queryConditions[$key] : '=';
                                         $whereCriteria[] = $value;
                                         $whereData[] = $whereCriteria;
                                     }
@@ -368,22 +397,22 @@ class BackEndApiMainController extends Controller
                                 if ($sizeOfWithInputs == 1) {
                                     if (!empty($withSearchCriterias)) {
                                         foreach ($withSearchCriterias as $key => $value) {
-                                            $sign = array_key_exists($key,
-                                                $queryConditions) ? $queryConditions[$key] : '=';
+                                            $sign = array_key_exists($key, $queryConditions) ?
+                                            $queryConditions[$key] : '=';
                                             if ($sign == 'LIKE') {
                                                 $sign = strtolower($sign);
-                                                $value = '%'.$value.'%';
+                                                $value = '%' . $value . '%';
                                             }
                                             $query->where($key, $sign, $value);
                                         }
                                     }
                                 }
                             }
-                        });
+                        }
+                    );
                     break;
             }
         }
-
         return $queryEloq;
     }
 
@@ -394,9 +423,7 @@ class BackEndApiMainController extends Controller
     public function editAssignment($eloqM, $datas)
     {
         foreach ($datas as $k => $v) {
-            if(isset($eloqM->$k)){
-                $eloqM->$k = $v;
-            }
+            $eloqM->$k = $v;
         }
         return $eloqM;
     }
