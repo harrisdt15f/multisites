@@ -6,6 +6,7 @@ use App\Models\BaseModel;
 use App\Models\LotteryTrace;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Game\Lottery\Logics\LotteryTraceListLogics;
+
 class LotteryTraceList extends BaseModel
 {
     use LotteryTraceListLogics;

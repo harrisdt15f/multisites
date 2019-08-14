@@ -10,24 +10,58 @@ Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], function 
     $namePrefix = 'web-api.LotteriesController.';
     $controller = 'LotteriesController@';
     //获取彩种接口
-    Route::match(['post', 'options'], 'lotteryList', ['as' => $namePrefix . 'lotteryList', 'uses' => $controller . 'lotteryList']);
+    Route::match(['post', 'options'], 'lotteryList', [
+        'as' => $namePrefix . 'lotteryList',
+        'uses' => $controller . 'lotteryList'
+    ]);
     //获取彩种接口
-    Route::match(['post', 'options'], 'lotteryInfo', ['as' => $namePrefix . 'lotteryInfo', 'uses' => $controller . 'lotteryInfo']);
+    Route::match(['post', 'options'], 'lotteryInfo', [
+        'as' => $namePrefix . 'lotteryInfo',
+        'uses' => $controller . 'lotteryInfo'
+    ]);
     //获取彩种接口
-    Route::match(['post', 'options'], 'issueHistory', ['as' => $namePrefix . 'issueHistory', 'uses' => $controller . 'issueHistory']);
+    Route::match(['post', 'options'], 'issueHistory', [
+        'as' => $namePrefix . 'issueHistory',
+        'uses' => $controller . 'issueHistory'
+    ]);
     //获取可用奖期接口
-    Route::match(['post', 'options'], 'availableIssues', ['as' => $namePrefix . 'availableIssues', 'uses' => $controller . 'availableIssues']);
+    Route::match(['post', 'options'], 'availableIssues', [
+        'as' => $namePrefix . 'availableIssues',
+        'uses' => $controller . 'availableIssues'
+    ]);
     //获取下注历史接口
-    Route::match(['post', 'options'], 'projectHistory', ['as' => $namePrefix . 'projectHistory', 'uses' => $controller . 'projectHistory']);
+    Route::match(['post', 'options'], 'projectHistory', [
+        'as' => $namePrefix . 'projectHistory',
+        'uses' => $controller . 'projectHistory'
+    ]);
     //获取追号历史接口
-    Route::match(['post', 'options'], 'tracesHistory', ['as' => $namePrefix . 'tracesHistory', 'uses' => $controller . 'tracesHistory']);
+    Route::match(['post', 'options'], 'tracesHistory', [
+        'as' => $namePrefix . 'tracesHistory',
+        'uses' => $controller . 'tracesHistory'
+    ]);
     //游戏投注接口
-    Route::match(['post', 'options'], 'bet', ['as' => $namePrefix . 'bet', 'uses' => $controller . 'bet']);
+    Route::match(['post', 'options'], 'bet', [
+        'as' => $namePrefix . 'bet',
+        'uses' => $controller . 'bet'
+    ]);
     //终止追号
-    Route::match(['post', 'options'], 'stop-trace', ['as' => $namePrefix . 'stop-trace', 'uses' => $controller . 'stopTrace']);
+    Route::match(['post', 'options'], 'stop-trace', [
+        'as' => $namePrefix . 'stop-trace',
+        'uses' => $controller . 'stopTrace'
+    ]);
     //撤销投注
-    Route::match(['post', 'options'], 'cancel-bet', ['as' => $namePrefix . 'cancel-bet', 'uses' => $controller . 'cancelBet']);
-
+    Route::match(['post', 'options'], 'cancel-bet', [
+        'as' => $namePrefix . 'cancel-bet',
+        'uses' => $controller . 'cancelBet'
+    ]);
+    //获取彩种上期的奖期
+    Route::match(['post', 'options'], 'last-issue', [
+        'as' => $namePrefix . 'last-issue',
+        'uses' => $controller . 'lastIssue'
+    ]);
     //临时测试接口
-    Route::match(['post', 'options'], 'setWinPrize', ['as' => $namePrefix . 'setWinPrize', 'uses' => $controller . 'setWinPrize']);
+    Route::match(['post', 'options'], 'setWinPrize', [
+        'as' => $namePrefix . 'setWinPrize',
+        'uses' => $controller . 'setWinPrize'
+    ]);
 });

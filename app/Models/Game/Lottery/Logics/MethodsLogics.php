@@ -3,6 +3,7 @@
 namespace App\Models\Game\Lottery\Logics;
 
 use App\Models\Game\Lottery\LotteryMethodsStandard;
+
 /**
  * Created by PhpStorm.
  * author: Harris

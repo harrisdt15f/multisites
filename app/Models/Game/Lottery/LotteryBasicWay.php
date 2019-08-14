@@ -8,7 +8,6 @@
 
 namespace App\Models\Game\Lottery;
 
-
 use App\Models\BaseModel;
 use App\Models\Game\Lottery\Logics\LotteryBasicWayLogics;
 use Illuminate\Database\Eloquent\Relations\HasMany;

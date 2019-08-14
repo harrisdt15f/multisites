@@ -30,5 +30,4 @@ class UserProfitsRequest extends BaseFormRequest
             'count' => 'filled|integer',
         ];
     }
-
 }

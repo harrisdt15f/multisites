@@ -7,5 +7,4 @@ use App\Models\BaseModel;
 class LotteryMethodsNumberButtonRule extends BaseModel
 {
     protected $guarded = ['id'];
-
 }

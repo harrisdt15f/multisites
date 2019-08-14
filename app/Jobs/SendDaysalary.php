@@ -38,19 +38,19 @@ class SendDaysalary implements ShouldQueue
     {
         $send_salary_id = $this->datas['salary_id'];
         $oUserDaysalary = UserDaysalary::find($send_salary_id);
-        if(!$oUserDaysalary) {
+        if (!$oUserDaysalary) {
             Log::channel('daysalary')->error('日工资数据ID不存在!'.$send_salary_id) ;
         }
-        if($oUserDaysalary->status == 1) {
+        if ($oUserDaysalary->status == 1) {
             Log::channel('daysalary')->error('日工资已发放!'.$send_salary_id) ;
         }
-        if($oUserDaysalary->daysalary == 0){
+        if ($oUserDaysalary->daysalary == 0) {
             $oUserDaysalary->status=1;
             $oUserDaysalary->save();
         }
         DB::beginTransaction();
 
-        try{
+        try {
             $params = [
                 'user_id' => $oUserDaysalary->user_id,
                 'amount' => $oUserDaysalary->daysalary,
@@ -60,17 +60,17 @@ class SendDaysalary implements ShouldQueue
             if ($res !== true) {
                 DB::rollBack();
             }
-            if($res) {
+            if ($res) {
                 $oUserDaysalary->status = 1;
                 $oUserDaysalary->sent_time = date("Y-m-d H:i:s");
                 $oUserDaysalary->save();
-                Log::channel('daysalary')->info($oUserDaysalary->username." salaray:".$oUserDaysalary->daysalary.'日工资已发放!');
+                Log::channel('daysalary')
+                    ->info($oUserDaysalary->username." salaray:".$oUserDaysalary->daysalary.'日工资已发放!');
             }
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
             Log::channel('daysalary')->info('异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine());
-
         }
     }
 }

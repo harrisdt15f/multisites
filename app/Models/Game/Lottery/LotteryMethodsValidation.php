@@ -5,6 +5,5 @@ use App\Models\BaseModel;
 
 class LotteryMethodsValidation extends BaseModel
 {
-
     protected $guarded = ['id'];
 }

@@ -41,7 +41,11 @@ class LotteryList extends BaseModel
 
     public function methodGroups()
     {
-        return $this->hasMany(LotteryMethod::class, 'lottery_id', 'en_name')->select(['method_group', 'status', 'lottery_id'])->groupBy('method_group');
+        return $this->hasMany(LotteryMethod::class, 'lottery_id', 'en_name')->select([
+            'method_group',
+            'status',
+            'lottery_id'
+        ])->groupBy('method_group');
     }
 
     public function serie(): BelongsTo
@@ -57,6 +61,11 @@ class LotteryList extends BaseModel
     //各个彩种最新一期的开奖
     public function specificNewestOpenedIssue(): hasOne
     {
-        return $this->hasOne(LotteryIssue::class, 'lottery_id', 'en_name')->select('lottery_id', 'issue', 'official_code', 'encode_time')->where('status_encode', 1)->orderBy('issue', 'desc');
+        return $this->hasOne(LotteryIssue::class, 'lottery_id', 'en_name')->select(
+            'lottery_id',
+            'issue',
+            'official_code',
+            'encode_time'
+        )->where('status_encode', 1)->orderBy('issue', 'desc');
     }
 }

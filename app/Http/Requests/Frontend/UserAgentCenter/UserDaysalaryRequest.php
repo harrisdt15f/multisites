@@ -29,5 +29,4 @@ class UserDaysalaryRequest extends BaseFormRequest
             'count' => 'filled|integer',
         ];
     }
-
 }

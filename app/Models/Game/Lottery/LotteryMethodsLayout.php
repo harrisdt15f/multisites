@@ -2,7 +2,6 @@
 
 namespace App\Models\Game\Lottery;
 
-
 use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\FrontendApi\Homepage;
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Http\Requests\Frontend\Homepage\HomepageNoticeRequest;
 use App\Http\Requests\Frontend\Homepage\HomepageReadMessageRequest;
+use App\Http\SingleActions\Frontend\Homepage\HomepageActivityListAction;
+use App\Http\SingleActions\Frontend\Homepage\HomepageGetWebInfoAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageNoticeAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepagePopularChessCardsListsAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepagePopularEGameListsAction;
@@ -20,12 +22,10 @@ use App\Http\SingleActions\Frontend\Homepage\HompagePopularLotteriesAction;
 use App\Http\SingleActions\Frontend\Homepage\HompagePopularMethodsAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageQrCodeAction;
 use Illuminate\Http\JsonResponse;
-use App\Http\SingleActions\Frontend\Homepage\HomepageActivityListAction;
-
 
 class HomepageController extends FrontendApiMainController
 {
-    private $bannerFlag = 1;//网页端banner
+    private $bannerFlag = 1; //网页端banner
     /**
      * 需要展示的前台模块
      * @param  HomepageShowHomepageModelAction $action
@@ -43,7 +43,7 @@ class HomepageController extends FrontendApiMainController
      */
     public function banner(HompageBannerAction $action): JsonResponse
     {
-        return $action->execute($this,$this->bannerFlag);
+        return $action->execute($this, $this->bannerFlag);
     }
 
     /**
@@ -83,7 +83,7 @@ class HomepageController extends FrontendApiMainController
      */
     public function activity(HompageActivityAction $action): JsonResponse
     {
-        return $action->execute($this,1);
+        return $action->execute($this, 1);
     }
 
     /**
@@ -168,6 +168,7 @@ class HomepageController extends FrontendApiMainController
     {
         return $action->execute($this);
     }
+
     /**
      * 活动列表
      * @return JsonResponse
@@ -175,7 +176,16 @@ class HomepageController extends FrontendApiMainController
     public function activityList(HomepageActivityListAction $action): JsonResponse
     {
         $inputDatas['type'] = '1';
-        return $action->execute($this,$inputDatas);
+        return $action->execute($this, $inputDatas);
     }
 
+    /**
+     * 获取网站基本信息
+     * @param  HomepageGetWebInfoAction $action
+     * @return JsonResponse
+     */
+    public function getWebInfo(HomepageGetWebInfoAction $action): JsonResponse
+    {
+        return $action->execute($this);
+    }
 }
