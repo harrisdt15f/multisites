@@ -5,6 +5,7 @@ namespace App\Http\Controllers\FrontendApi;
 use App\Http\Controllers\Controller;
 use App\Models\DeveloperUsage\Frontend\FrontendAppRoute;
 use App\Models\DeveloperUsage\Frontend\FrontendWebRoute;
+use App\Models\SystemPlatform;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Input;
@@ -35,6 +36,12 @@ class FrontendApiMainController extends Controller
         $this->handleEndUser();
         $this->middleware(function ($request, $next) {
             $this->userOperateLog();
+            if ($this->partnerUser !== null) {
+                if ($this->partnerUser->platform()->exists()) {
+                    $this->currentPlatformEloq = new SystemPlatform();
+                    $this->currentPlatformEloq = $this->partnerUser->platform; //获取目前账号用户属于平台的对象
+                }
+            }
             $this->eloqM = 'App\\Models\\' . $this->eloqM; // 当前的eloquent
             return $next($request);
         });
@@ -99,7 +106,7 @@ class FrontendApiMainController extends Controller
         $message = '',
         $placeholder = null,
         $substituted = null
-    ): JsonResponse{
+    ): JsonResponse {
         $defaultSuccessCode = '200';
         $defaultErrorCode = '404';
         if ($success === true) {
@@ -185,14 +192,26 @@ class FrontendApiMainController extends Controller
                 }
                 $queryEloq = $eloqM::where($whereData);
                 if ($fixedJoin > 0) {
-                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs,
-                        $withSearchCriterias, $queryConditions);
+                    $queryEloq = $this->eloqToJoin(
+                        $queryEloq,
+                        $fixedJoin,
+                        $withTable,
+                        $sizeOfWithInputs,
+                        $withSearchCriterias,
+                        $queryConditions
+                    );
                 }
             } else {
                 //for default
                 if ($fixedJoin > 0) {
-                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs,
-                        $withSearchCriterias, $queryConditions);
+                    $queryEloq = $this->eloqToJoin(
+                        $queryEloq,
+                        $fixedJoin,
+                        $withTable,
+                        $sizeOfWithInputs,
+                        $withSearchCriterias,
+                        $queryConditions
+                    );
                 }
             }
         } else {
@@ -214,7 +233,6 @@ class FrontendApiMainController extends Controller
                             $whereCriteria[] = $value;
                             $whereData[] = $whereCriteria;
                         }
-
                     }
                     if (!empty($timeConditions)) {
                         $whereData = array_merge($whereData, $timeConditions);
@@ -224,13 +242,25 @@ class FrontendApiMainController extends Controller
                     }
                     $queryEloq = $eloqM::where($whereData);
                     if ($fixedJoin > 0) {
-                        $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs,
-                            $withSearchCriterias, $queryConditions);
+                        $queryEloq = $this->eloqToJoin(
+                            $queryEloq,
+                            $fixedJoin,
+                            $withTable,
+                            $sizeOfWithInputs,
+                            $withSearchCriterias,
+                            $queryConditions
+                        );
                     }
                 } else {
                     if ($fixedJoin > 0) {
-                        $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs,
-                            $withSearchCriterias, $queryConditions);
+                        $queryEloq = $this->eloqToJoin(
+                            $queryEloq,
+                            $fixedJoin,
+                            $withTable,
+                            $sizeOfWithInputs,
+                            $withSearchCriterias,
+                            $queryConditions
+                        );
                     }
                 }
             } else {
@@ -245,8 +275,14 @@ class FrontendApiMainController extends Controller
                     $queryEloq = $eloqM::where($whereData); //$extraContitions
                 }
                 if ($fixedJoin > 0) {
-                    $queryEloq = $this->eloqToJoin($queryEloq, $fixedJoin, $withTable, $sizeOfWithInputs,
-                        $withSearchCriterias, $queryConditions);
+                    $queryEloq = $this->eloqToJoin(
+                        $queryEloq,
+                        $fixedJoin,
+                        $withTable,
+                        $sizeOfWithInputs,
+                        $withSearchCriterias,
+                        $queryConditions
+                    );
                 }
             }
         }
@@ -277,8 +313,7 @@ class FrontendApiMainController extends Controller
         $withSearchCriterias,
         $queryConditions
     ) {
-        if (empty($sizeOfWithInputs)) //如果with 没有参数可以查询时查询全部
-        {
+        if (empty($sizeOfWithInputs)) {//如果with 没有参数可以查询时查询全部
             switch ($fixedJoin) {
                 case 1: //有一个连表查询的情况下
                     $queryEloq = $queryEloq->with($withTable);
@@ -287,17 +322,23 @@ class FrontendApiMainController extends Controller
         } else {
             switch ($fixedJoin) {
                 case 1: //有一个连表查询的情况下
-                    $queryEloq = $queryEloq->with($withTable)->whereHas($withTable,
-                        function ($query) use ($sizeOfWithInputs, $withSearchCriterias, $queryConditions) {
+                    $queryEloq = $queryEloq->with($withTable)->whereHas(
+                        $withTable,
+                        function ($query) use (
+                            $sizeOfWithInputs,
+                            $withSearchCriterias,
+                            $queryConditions
+                        ) {
                             if ($sizeOfWithInputs > 1) {
-
                                 if (!empty($withSearchCriterias)) {
                                     foreach ($withSearchCriterias as $key => $value) {
                                         if ($value !== '*') {
                                             $whereCriteria = [];
                                             $whereCriteria[] = $key;
-                                            $whereCriteria[] = array_key_exists($key,
-                                                $queryConditions) ? $queryConditions[$key] : '=';
+                                            $whereCriteria[] = array_key_exists(
+                                                $key,
+                                                $queryConditions
+                                            ) ? $queryConditions[$key] : '=';
                                             $whereCriteria[] = $value;
                                             $whereData[] = $whereCriteria;
                                         }
@@ -309,24 +350,25 @@ class FrontendApiMainController extends Controller
                                     if (!empty($withSearchCriterias)) {
                                         foreach ($withSearchCriterias as $key => $value) {
                                             if ($value !== '*') {
-                                                $sign = array_key_exists($key,
-                                                    $queryConditions) ? $queryConditions[$key] : '=';
+                                                $sign = array_key_exists(
+                                                    $key,
+                                                    $queryConditions
+                                                ) ? $queryConditions[$key] : '=';
                                                 if ($sign == 'LIKE') {
                                                     $sign = strtolower($sign);
                                                     $value = '%' . $value . '%';
                                                 }
                                                 $query->where($key, $sign, $value);
                                             }
-
                                         }
                                     }
                                 }
                             }
-                        });
+                        }
+                    );
                     break;
             }
         }
-
         return $queryEloq;
     }
 

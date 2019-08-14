@@ -8,7 +8,6 @@
 
 namespace App\Models\Game\Lottery;
 
-
 use App\Models\BaseModel;
 use App\Models\DeveloperUsage\MethodLevel\LotteryMethodsWaysLevel;
 use App\Models\Game\Lottery\Logics\LotterySeriesWayLogics;
@@ -20,14 +19,13 @@ class LotterySeriesWay extends BaseModel
 
     protected $guarded = ['id'];
 
-    protected function getSeriesMethodIdsAttribute(){
-        return explode(',',$this->attributes[ 'series_methods' ]);
+    protected function getSeriesMethodIdsAttribute()
+    {
+        return explode(',', $this->attributes[ 'series_methods' ]);
     }
 
     public function basicWay(): HasOne
     {
         return $this->hasOne(LotteryBasicWay::class, 'id', 'basic_way_id');
     }
-
-
 }

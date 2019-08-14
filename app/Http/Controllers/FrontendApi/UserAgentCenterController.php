@@ -11,6 +11,7 @@ use App\Http\SingleActions\Frontend\User\AgentCenter\UserBonusAction;
 use App\Http\Requests\Frontend\UserAgentCenter\UserAgentCenterRegisterLinkRequest;
 use App\Http\SingleActions\Frontend\User\AgentCenter\UserAgentCenterRegisterableLinkAction;
 use App\Http\SingleActions\Frontend\User\AgentCenter\UserAgentCenterRegisterLinkAction;
+use App\Http\SingleActions\Frontend\User\AgentCenter\UserAgentCenterPrizeGroupAction;
 use Illuminate\Http\JsonResponse;
 
 class UserAgentCenterController extends FrontendApiMainController
@@ -22,7 +23,7 @@ class UserAgentCenterController extends FrontendApiMainController
      * @param UserProfitsRequest $request
      * @return JsonResponse
      */
-    public function userProfits(UserProfitsAction $action, UserProfitsRequest $request): JsonResponse
+    public function userProfits(UserProfitsAction $action, UserProfitsRequest $request) : JsonResponse
     {
         return $action->execute($this, $request);
     }
@@ -59,7 +60,7 @@ class UserAgentCenterController extends FrontendApiMainController
     public function registerLink(
         UserAgentCenterRegisterLinkRequest $request,
         UserAgentCenterRegisterLinkAction $action
-    ):JsonResponse {
+    ) :JsonResponse {
         return $action->execute($this, $request->validated());
     }
 
@@ -72,5 +73,16 @@ class UserAgentCenterController extends FrontendApiMainController
     public function userBonus(UserBonusAction $action, UserBonusRequest $request) : JsonResponse
     {
         return $action->execute($this, $request);
+    }
+
+    /**
+     * 代理开户-奖金组最大最小值
+     * @param UserAgentCenterPrizeGroupAction $action
+     * @return JsonResponse
+     */
+    
+    public function prizeGroup(UserAgentCenterPrizeGroupAction $action)
+    {
+        return $action->execute($this);
     }
 }

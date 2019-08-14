@@ -8,7 +8,6 @@
 
 namespace App\Models\Game\Lottery\Logics;
 
-
 trait LotterySeriesWayLogics
 {
 
@@ -20,8 +19,8 @@ trait LotterySeriesWayLogics
     public function setWinningNumber($aWnNumberOfMethods): array
     {
         $aWnNumbers = [];
-        foreach ($this->series_method_ids as $iSeriesMethodId){
-            if ($aWnNumberOfMethods[ $iSeriesMethodId ] === false){
+        foreach ($this->series_method_ids as $iSeriesMethodId) {
+            if ($aWnNumberOfMethods[ $iSeriesMethodId ] === false) {
                 continue;
             }
             $aWnNumbers[ $iSeriesMethodId ] = $aWnNumberOfMethods[ $iSeriesMethodId ];
@@ -29,5 +28,4 @@ trait LotterySeriesWayLogics
         $this->WinningNumber = count($aWnNumbers) > 0 ? $aWnNumbers : false;
         return $aWnNumbers;
     }
-
 }

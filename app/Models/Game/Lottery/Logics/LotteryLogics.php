@@ -140,8 +140,7 @@ trait LotteryLogics
         $issueItems = LotteryIssue::whereIn('issue', $traceData)->where([
             ['lottery_id', '=', $this->en_name],
             ['end_time', '>=', time()],
-        ])->orderBy('begin_time',
-            'ASC')->get();
+        ])->orderBy('begin_time', 'ASC')->get();
         return $issueItems;
     }
 
@@ -165,11 +164,11 @@ trait LotteryLogics
     public static function getAllLotteryByCache()
     {
         $key = 'lottery';
-        if (self::_hasCache($key)) {
-            return self::_getCacheData($key);
+        if (self::hasCache($key)) {
+            return self::getCacheData($key);
         } else {
             $lotteries = self::getAllLotteries();
-            self::_saveCacheData($key, $lotteries);
+            self::saveCacheData($key, $lotteries);
             return $lotteries;
         }
     }
@@ -180,9 +179,9 @@ trait LotteryLogics
      * @return bool
      * @throws \Exception
      */
-    public static function _hasCache($key)
+    public static function hasCache($key)
     {
-        $cacheConfig = self::_getCacheConfig($key);
+        $cacheConfig = self::getCacheConfig($key);
         return Cache::has($cacheConfig['key']);
     }
 
@@ -191,7 +190,7 @@ trait LotteryLogics
      * @param $key
      * @return mixed
      */
-    public static function _getCacheConfig($key)
+    public static function getCacheConfig($key)
     {
         $cacheConfig = Config::get('web.main.cache');
         return $cacheConfig[$key] ?? $cacheConfig['common'];
@@ -203,9 +202,9 @@ trait LotteryLogics
      * @return Repository
      * @throws \Exception
      */
-    public static function _getCacheData($key)
+    public static function getCacheData($key)
     {
-        $cacheConfig = self::_getCacheConfig($key);
+        $cacheConfig = self::getCacheConfig($key);
         return Cache::get($cacheConfig['key'], []);
     }
 
@@ -248,9 +247,9 @@ trait LotteryLogics
      * @param $value
      * @throws \Exception
      */
-    public static function _saveCacheData($key, $value): void
+    public static function saveCacheData($key, $value): void
     {
-        $cacheConfig = self::_getCacheConfig($key);
+        $cacheConfig = self::getCacheConfig($key);
         if ($cacheConfig['expire_time'] <= 0) {
             Cache::forever($cacheConfig['key'], $value);
         } else {
@@ -281,8 +280,8 @@ trait LotteryLogics
     public static function getAllMethodObject($seriesId)
     {
         $data = [];
-        if (self::_hasCache('method_object')) {
-            $data = self::_getCacheData('method_object');
+        if (self::hasCache('method_object')) {
+            $data = self::getCacheData('method_object');
             if (isset($data[$seriesId])) {
                 return $data[$seriesId];
             }
@@ -298,7 +297,7 @@ trait LotteryLogics
             $_data[$item->method_id] = $methodObject;
         }
         $data[$seriesId] = $_data;
-        self::_saveCacheData('method_object', $data);
+        self::saveCacheData('method_object', $data);
         return $_data;
     }
 
@@ -320,8 +319,8 @@ trait LotteryLogics
      */
     public static function getAllLotteryToFrontEnd()
     {
-        if (self::_hasCache('lottery_for_frontend')) {
-            return self::_getCacheData('lottery_for_frontend');
+        if (self::hasCache('lottery_for_frontend')) {
+            return self::getCacheData('lottery_for_frontend');
         }
         $lotteries = self::where('status', 1)->get();
         $cacheData = [];
@@ -347,8 +346,8 @@ trait LotteryLogics
                     $groupData[$method->method_group] = [];
                 }
 
-                if (!isset($hasRow[$method->method_group]) || !in_array($method->method_row,
-                    $hasRow[$method->method_group])) {
+                if (!isset($hasRow[$method->method_group])||
+                    !in_array($method->method_row, $hasRow[$method->method_group])) {
                     $groupData[$method->method_group][] = [
                         'name' => $rowName[$method->method_row],
                         'sign' => $method->method_row,
@@ -384,7 +383,7 @@ trait LotteryLogics
                 'defaultMethod' => $defaultMethod,
             ];
         }
-        self::_saveCacheData('lottery_for_frontend', $cacheData);
+        self::saveCacheData('lottery_for_frontend', $cacheData);
         return $cacheData;
     }
 
@@ -490,9 +489,8 @@ trait LotteryLogics
                 if (!isset($groupData[$method->method_group])) {
                     $groupData[$method->method_group] = [];
                 }
-
-                if (!isset($hasRow[$method->method_group]) || !in_array($method->method_row,
-                    $hasRow[$method->method_group])) {
+                if (!isset($hasRow[$method->method_group]) ||
+                !in_array($method->method_row, $hasRow[$method->method_group])) {
                     $groupData[$method->method_group][] = [
                         'name' => $rowName[$method->method_row],
                         'sign' => $method->method_row,

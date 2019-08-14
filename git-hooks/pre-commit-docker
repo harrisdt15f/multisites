@@ -35,8 +35,9 @@ do
   echo "Here is filelocation $filelocation and here is  phpcslocation $phpcslocation"
   docker exec ${container} bash -c "cd $phpcsbin;\
 ./phpcs --standard=$RULESET $filelocation"
-  # docker exec -i ${container} ${phpcslocation} --standard="$RULESET" "$filelocation"
-  if [[ "$?" == 0 ]]; then
+  EXIT_STATUS=$?
+  echo "exist status is $EXIT_STATUS"
+    if [ "$EXIT_STATUS" -eq "0" ]; then
     echo "\t\033[32mPHPCS Passed: $FILE\033[0m result"
   else
     echo "\t\033[41mPHPCS Failed: $FILE\033[0m"

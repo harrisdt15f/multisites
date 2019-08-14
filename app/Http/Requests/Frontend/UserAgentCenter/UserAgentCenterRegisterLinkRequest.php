@@ -29,4 +29,5 @@ class UserAgentCenterRegisterLinkRequest extends BaseFormRequest
             'prize_group'=>'required|integer',
         ];
     }
+
 }
