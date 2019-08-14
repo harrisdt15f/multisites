@@ -1,58 +1,41 @@
 <?php
-/**
- * 团队盈亏处理脚本
- * 实时更新盈亏数据到user_prifits ，第二日凌晨1点 再更新昨日整天的数据 。
- */
-namespace App\Console\Commands;
+
+namespace App\Jobs;
 
 use App\Models\User\Fund\FrontendUsersAccountsReport;
 use App\Models\User\UserProfits;
-use Illuminate\Console\Command;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Carbon;
 
-class UserProfitsControl extends Command
+class UpdateUserProfits implements ShouldQueue
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'UserProfits {userId?}';
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    protected $userId;
+
+    public function __construct($userId)
+    {
+        $this->userId = $userId;
+    }
 
     /**
-     * The console command description.
+     * Execute the job.
      *
-     * @var string
-     */
-    protected $description = '团队盈亏处理脚本';
-
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
+     * @return void
      */
     public function handle()
     {
-        if ((int)$this->argument('userId') >0) {
             $today = Carbon::now()->toDateString();
             $todayAccountsReportsUsers = FrontendUsersAccountsReport::where([
                 ['created_at', '>', $today],
-                ['user_id', '=', $this->argument('userId')],
+                ['user_id', '=', $this->userId],
             ])
                 ->select('username', 'user_id', 'is_tester', 'parent_id')
                 ->get();
-        } else {
-            $today = Carbon::now()->toDateString();
-            $yesterday = Carbon::yesterday()->toDateString();
-            $todayAccountsReportsUsers = FrontendUsersAccountsReport::where([
-                ['created_at', '>', $yesterday],
-                ['created_at', '<', $today],
-            ])
-                ->select('username', 'user_id', 'is_tester', 'parent_id')
-                ->get();
-        }
-
-
 
         if (is_object($todayAccountsReportsUsers)) {
             foreach ($todayAccountsReportsUsers as $child) {
@@ -153,7 +136,7 @@ class UserProfitsControl extends Command
         }
     }
 
-    public static function getSumProfits(string $date, int $user_id, array $type_sign) : float
+    private static function getSumProfits(string $date, int $user_id, array $type_sign) : float
     {
         return FrontendUsersAccountsReport::where([
             ['created_at', '>', $date],
@@ -163,7 +146,7 @@ class UserProfitsControl extends Command
             ->sum('amount');
     }
 
-    public static function getSumChildProfits(string $date, int $parent_id, array $type_sign) : float
+    private static function getSumChildProfits(string $date, int $parent_id, array $type_sign) : float
     {
         return FrontendUsersAccountsReport::where([
             ['created_at', '>', $date],
@@ -174,7 +157,7 @@ class UserProfitsControl extends Command
     }
 
 
-    public static function updateProfits(array $data) : bool
+    private static function updateProfits(array $data) : bool
     {
         if ($data['user_id'] && $data['date']) {
             $row = UserProfits::where([
