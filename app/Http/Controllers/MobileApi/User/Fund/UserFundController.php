@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\MobileApi\User\Fund;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
+use App\Http\SingleActions\Frontend\User\Fund\UserChangeTypeList;
 use App\Http\SingleActions\Frontend\User\Fund\UserFundAction;
 use App\Http\SingleActions\Frontend\User\Fund\UserRechargeListAction;
 use Illuminate\Http\JsonResponse;
@@ -25,6 +26,16 @@ class UserFundController extends FrontendApiMainController
      * @return JsonResponse
      */
     public function rechargeList(UserRechargeListAction $action): JsonResponse
+    {
+        return $action->execute($this);
+    }
+
+    /**
+     * 帐变类型列表
+     * @param   AccountChangeTypeDetailAction $action
+     * @return  JsonResponse
+     */
+    public function changeTypeList(UserChangeTypeList $action): JsonResponse
     {
         return $action->execute($this);
     }
