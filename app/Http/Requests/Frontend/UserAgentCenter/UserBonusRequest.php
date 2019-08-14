@@ -29,5 +29,4 @@ class UserBonusRequest extends BaseFormRequest
             'count' => 'filled|integer',
         ];
     }
-
 }
