@@ -32,6 +32,12 @@ Route::group(['prefix' => 'user-agent-center'], function () {
         'register-link',
         ['as' => $namePrefix . 'register-link', 'uses' => $controller . 'registerLink']
     );
+    //链接开户-链接详情
+    Route::match(
+        ['post', 'options'],
+        'link-del',
+        ['as' => $namePrefix . 'link-del', 'uses' => $controller . 'linkDel']
+    );
     Route::match(
         ['get', 'options'],
         'user-bonus',
