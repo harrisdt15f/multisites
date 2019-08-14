@@ -28,6 +28,11 @@ class Project extends BaseModel
     public const FROM_MOBILE = 2;
     public const FROM_OTHER = 3;
 
+    public const STATUS_COMMISSION_WAIT = 0;
+    public const STATUS_COMMISSION_PROCESSING = 1;
+    public const STATUS_COMMISSION_PARTIAL = 2;
+    public const STATUS_COMMISSION_FINISHED = 4;
+
     /**
      * @return HasOne
      */
@@ -48,11 +53,18 @@ class Project extends BaseModel
      */
     public function account(): HasOneThrough
     {
-        return $this->hasOneThrough(FrontendUsersAccount::class,FrontendUser::class,'id','user_id','user_id','id');
+        return $this->hasOneThrough(
+            FrontendUsersAccount::class,
+            FrontendUser::class,
+            'id',
+            'user_id',
+            'user_id',
+            'id'
+        );
     }
 
     public function lottery()
     {
-        return $this->belongsTo(LotteryList::class,'lottery_sign','en_name');
+        return $this->belongsTo(LotteryList::class, 'lottery_sign', 'en_name');
     }
 }

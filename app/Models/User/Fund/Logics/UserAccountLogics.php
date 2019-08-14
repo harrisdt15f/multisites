@@ -288,7 +288,9 @@ trait UserAccountLogics
 //            $accountChange->triggerSave();
             $accountLocker->release();
             //处理更新用户盈亏
-            Artisan::call('UserProfits '.$this->user->id);
+            Artisan::call('UserProfits', [
+                'userId' => $this->user->id, '--queue' => 'default'
+            ]);
             return true;
         } catch (Exception $e) {
             $accountLocker->release();

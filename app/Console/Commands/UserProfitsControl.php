@@ -17,7 +17,7 @@ class UserProfitsControl extends Command
      *
      * @var string
      */
-    protected $signature = 'UserProfits {userId?}';
+    protected $signature = 'UserProfits {userId?}  {--queue}';
 
     /**
      * The console command description.
