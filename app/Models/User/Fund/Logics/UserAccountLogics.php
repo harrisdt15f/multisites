@@ -2,6 +2,7 @@
 
 namespace App\Models\User\Fund\Logics;
 
+use App\Jobs\UpdateUserProfits;
 use App\Lib\Clog;
 use App\Lib\Locker\AccountLocker;
 use App\Lib\Logic\AccountChange;
@@ -287,10 +288,9 @@ trait UserAccountLogics
             }
 //            $accountChange->triggerSave();
             $accountLocker->release();
-            //处理更新用户盈亏
-            Artisan::call('UserProfits', [
-                'userId' => $this->user->id, '--queue' => 'default'
-            ]);
+            //推入消息队列处理更新用户盈亏
+            dispatch(new UpdateUserProfits($this->user->id));
+
             return true;
         } catch (Exception $e) {
             $accountLocker->release();
