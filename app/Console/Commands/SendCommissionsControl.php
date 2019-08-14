@@ -29,6 +29,6 @@ class SendCommissionsControl extends Command
 
     public function handle()
     {
-        UserCommissions::sendCommissions(152342); // 测试用
+        dump(UserCommissions::sendCommissions(152778)); // 测试用
     }
 }
