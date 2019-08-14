@@ -6,11 +6,11 @@ use App\Lib\Clog;
 use App\Lib\Locker\AccountLocker;
 use App\Lib\Logic\AccountChange;
 use App\Models\Account\FrontendUsersAccountsType;
-use App\Models\Project;
 use App\Models\User\FrontendUsersAccount;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Artisan;
 
 /**
  * Created by PhpStorm.
@@ -209,7 +209,8 @@ trait UserAccountLogics
     public function add($money): bool
     {
         $updated_at = date('Y-m-d H:i:s');
-        $sql = "update `frontend_users_accounts` set `balance`=`balance`+'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}'";
+        $sql = "update `frontend_users_accounts` set `balance`=`balance`+'{$money}' , 
+`updated_at`='$updated_at'  where `user_id` ='{$this->user_id}'";
         $ret = DB::update($sql) > 0;
         if ($ret) {
             $this->balance += $money;
@@ -221,7 +222,8 @@ trait UserAccountLogics
     public function cost($money): bool
     {
         $updated_at = date('Y-m-d H:i:s');
-        $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}' and `balance`>='{$money}'") > 0;
+        $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}' , 
+`updated_at`='$updated_at'  where `user_id` ='{$this->user_id}' and `balance`>='{$money}'") > 0;
         if ($ret) {
             $this->balance -= $money;
         }
@@ -232,7 +234,9 @@ trait UserAccountLogics
     public function frozen($money)
     {
         $updated_at = date('Y-m-d H:i:s');
-        $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}', `frozen`=`frozen`+ '{$money}'  , `updated_at`='$updated_at' where `user_id` ='{$this->user_id}' and `balance`>='{$money}'") > 0;
+        $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}', 
+`frozen`=`frozen`+ '{$money}'  , 
+`updated_at`='$updated_at' where `user_id` ='{$this->user_id}' and `balance`>='{$money}'") > 0;
         if ($ret) {
             $this->balance -= $money;
             $this->frozen += $money;
@@ -244,7 +248,8 @@ trait UserAccountLogics
     public function unFrozen($money)
     {
         $updated_at = date('Y-m-d H:i:s');
-        $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`+'{$money}', `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}'") > 0;
+        $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`+'{$money}', 
+`frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}'") > 0;
         if ($ret) {
             $this->balance += $money;
             $this->frozen -= $money;
@@ -256,7 +261,8 @@ trait UserAccountLogics
     public function unFrozenToPlayer($money)
     {
         $updated_at = date('Y-m-d H:i:s');
-        $ret = DB::update("update `frontend_users_accounts` set  `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}'") > 0;
+        $ret = DB::update("update `frontend_users_accounts` set  `frozen`=`frozen`- '{$money}' , 
+`updated_at`='$updated_at'  where `user_id` ='{$this->user_id}'") > 0;
         if ($ret) {
             $this->frozen -= $money;
         }
@@ -281,10 +287,12 @@ trait UserAccountLogics
             }
 //            $accountChange->triggerSave();
             $accountLocker->release();
+            //处理更新用户盈亏
+            Artisan::call('UserProfits '.$this->user->id);
             return true;
         } catch (Exception $e) {
             $accountLocker->release();
-            Log::info('投注-异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine()); //Clog::userBet
+            Log::info('投注-异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine());
             return '对不起, ' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine();
         }
     }

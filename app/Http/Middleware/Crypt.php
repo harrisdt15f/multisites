@@ -4,68 +4,81 @@ namespace App\Http\Middleware;
 
 use Closure;
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
+use Config;
 
 class Crypt
 {
     //数据串间隔标志 前后统一
-    private CONST LIMIT='aesrsastart';
+    private const LIMIT='aesrsastart';
     /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @return mixed
+     *
      */
     public function handle($request, Closure $next)
     {
         $requestNum = count($request->request);
         //空参放行
-        if(!$requestNum){
+        if (!$requestNum) {
             return $next($request);
         }
-        //检验参数是否符合规范 系统只允许接入一个名为DATA的参数
-        if($requestNum!=1 || !isset($request['data'])){
-            $con = new FrontendApiMainController();
-            return $con->msgOut(false,[],100507);die;
+        //本地模式关闭参数唯一性判断
+        if (Config::get('app.env') !== "local") {
+            //检验参数是否符合规范 系统只允许接入一个名为DATA的参数
+            if ($requestNum!==1 || !isset($request['data'])) {
+                $con = new FrontendApiMainController();
+                return $con->msgOut(false, [], 100507);
+                die;
+            }
         }
         $inData = $request->input('data');
         //带DATA数据却为null
-        if(is_null($inData)){
+        if (is_null($inData)) {
             $con = new FrontendApiMainController();
-            return $con->msgOut(false,[],100506);die;
+            return $con->msgOut(false, [], 100506);
+            die;
         }
         //错误返回
-        if(!is_string($inData)){
+        if (!is_string($inData)) {
             $con = new FrontendApiMainController();
-            return $con->msgOut(false,[],100500);die;
+            return $con->msgOut(false, [], 100500);
+            die;
         }
-        $requestCryptData = explode(self::LIMIT,$inData);
-        if(count($requestCryptData)!=3){
+        $requestCryptData = explode(self::LIMIT, $inData);
+        if (count($requestCryptData)!=3) {
             $con = new FrontendApiMainController();
-            return  $con->msgOut(false,[],100501);die;
+            return  $con->msgOut(false, [], 100501);
+            die;
         }
         $data = $requestCryptData[0];//固定位 数组 自生成
-        $iv =self::rsaDeCrypt( $requestCryptData[1] );
-        if(!$iv){
+        $iv =self::rsaDeCrypt($requestCryptData[1]);
+        if (!$iv) {
             $con = new FrontendApiMainController();
-            return $con->msgOut(false,[],100502);die;
+            return $con->msgOut(false, [], 100502);
+            die;
         }
-        $key =self::rsaDeCrypt( $requestCryptData[2] );
-        if(!$key){
+        $key =self::rsaDeCrypt($requestCryptData[2]);
+        if (!$key) {
             $con = new FrontendApiMainController();
-            return $con->msgOut(false,[],100503);die;
+            return $con->msgOut(false, [], 100503);
+            die;
         }
-        $deAesData = self::deAesCrypt($data,$key,$iv) ;
-        if(!$deAesData){
+        $deAesData = self::deAesCrypt($data, $key, $iv) ;
+        if (!$deAesData) {
             $con = new FrontendApiMainController();
-            return $con->msgOut(false,[],100505);die;
+            return $con->msgOut(false, [], 100505);
+            die;
         }
-        $deData = json_decode( $deAesData );
-        if(is_null($deData)){
+        $deData = json_decode($deAesData);
+        if (is_null($deData)) {
             $con = new FrontendApiMainController();
-            return $con->msgOut(false,[],100504);die;
+            return $con->msgOut(false, [], 100504);
+            die;
         }
-        foreach ($deData as $k=>$v){
+        foreach ($deData as $k => $v) {
             $request[$k]=$v;
         }
         unset($request['data']);
@@ -76,7 +89,8 @@ class Crypt
      * @param  $rsaData rsa加密后的数据串
      * @return Sting/Bool 解密后的字符串或false
      */
-    private function rsaDeCrypt($rsaData){
+    private function rsaDeCrypt($rsaData)
+    {
         //中间件还未生成缓存 所以将私钥配置在此 以减少系统开销
         $pkcs8_private="-----BEGIN PRIVATE KEY-----
 MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAK3m6BabZZ2qQwjm
@@ -94,9 +108,10 @@ VUrzdZKeuW5UHV0aS2KJBdQge3uzRKxWvaM7qsGpSGIlQQzIO055AkBvkOcvyrkV
 s+RmDzYuKUoG0zIjmIZidcaTP1p2ngqCl/RXl1evVAmXet26uDPkFtmOGvFTngZM
 Web+LMihoBTa
 -----END PRIVATE KEY-----";
-          $flag = openssl_private_decrypt(base64_decode($rsaData), $deRsaCryptData,$pkcs8_private);
-          if(!$flag)
+          $flag = openssl_private_decrypt(base64_decode($rsaData), $deRsaCryptData, $pkcs8_private);
+        if (!$flag) {
             return false;
+        }
           return $deRsaCryptData;
     }
     /**
@@ -106,10 +121,9 @@ Web+LMihoBTa
      * @param  $iv AES加密时使用的偏移量
      * @return Sting/Bool 解密后的字符串或false
      */
-    private function deAesCrypt($enAes,$key,$iv){
-        $str =  openssl_decrypt(base64_decode($enAes),"AES-128-CBC",$key,OPENSSL_RAW_DATA,$iv);
+    private function deAesCrypt($enAes, $key, $iv)
+    {
+        $str =  openssl_decrypt(base64_decode($enAes), "AES-128-CBC", $key, OPENSSL_RAW_DATA, $iv);
         return $str;
     }
-
-
 }

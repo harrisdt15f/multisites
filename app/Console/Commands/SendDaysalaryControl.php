@@ -6,7 +6,8 @@ use App\Models\User\UserDaysalary;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 
-class SendDaysalaryControl extends Command{
+class SendDaysalaryControl extends Command
+{
 
     /**
      * The name and signature of the console command.
@@ -33,13 +34,11 @@ class SendDaysalaryControl extends Command{
 
 
         $iYesterDay = Carbon::yesterday()->toDateString();
-        $aDatas = UserDaysalary::where("date" , $iYesterDay)->where('status',0)->get(['id']);
+        $aDatas = UserDaysalary::where("date", $iYesterDay)->where('status', 0)->get(['id']);
 
-        foreach($aDatas as $oUserDaysalary){
+        foreach ($aDatas as $oUserDaysalary) {
             $data['salary_id'] = $oUserDaysalary->id;
             dispatch(new SendDaysalary($data));
         }
-
     }
-
 }
