@@ -84,9 +84,19 @@ Route::group(['prefix' => 'homepage', 'namespace' => 'Homepage'], function () {
         'as' => $namePrefix . 'activity-list',
         'uses' => $controller . 'activityList',
     ]);
-    //获取网站基本配置
+    //获取网站基本信息
     Route::match(['get', 'options'], 'get-web-info', [
         'as' => $namePrefix . 'get-web-info',
         'uses' => $controller . 'getWebInfo',
+    ]);
+    //获取网站基本内容
+    Route::match(['get', 'options'], 'get-basic-content', [
+        'as' => $namePrefix . 'get-basic-content',
+        'uses' => $controller . 'getBasicContent',
+    ]);
+    //热门游戏
+    Route::match(['get', 'options'], 'get-popular-game', [
+        'as' => $namePrefix . 'get-popular-game',
+        'uses' => $controller . 'getPopularGame',
     ]);
 });

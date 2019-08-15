@@ -6,6 +6,8 @@ use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Http\Requests\Frontend\Homepage\HomepageNoticeRequest;
 use App\Http\Requests\Frontend\Homepage\HomepageReadMessageRequest;
 use App\Http\SingleActions\Frontend\Homepage\HomepageActivityListAction;
+use App\Http\SingleActions\Frontend\Homepage\HomepageGetBasicContentAction;
+use App\Http\SingleActions\Frontend\Homepage\HomepageGetPopularGameAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageGetWebInfoAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageNoticeAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepagePopularChessCardsListsAction;
@@ -26,6 +28,7 @@ use Illuminate\Http\JsonResponse;
 class HomepageController extends FrontendApiMainController
 {
     private $bannerFlag = 1; //网页端banner
+
     /**
      * 需要展示的前台模块
      * @param  HomepageShowHomepageModelAction $action
@@ -185,6 +188,22 @@ class HomepageController extends FrontendApiMainController
      * @return JsonResponse
      */
     public function getWebInfo(HomepageGetWebInfoAction $action): JsonResponse
+    {
+        return $action->execute($this);
+    }
+
+    /**
+     * 获取首页基本内容
+     * @param  HomepageGetBasicContentAction $action
+     * @return JsonResponse
+     */
+    public function getBasicContent(HomepageGetBasicContentAction $action): JsonResponse
+    {
+        return $action->execute($this);
+    }
+
+    //获取热门游戏列表
+    public function getPopularGame(HomepageGetPopularGameAction $action): JsonResponse
     {
         return $action->execute($this);
     }
