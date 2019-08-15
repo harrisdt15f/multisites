@@ -3,10 +3,10 @@
 namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
 class IssueSeparateGenJob implements ShouldQueue
@@ -36,10 +36,10 @@ class IssueSeparateGenJob implements ShouldQueue
      */
     public function handle()
     {
-        $res = $this->lotteryEloq->_genIssue($this->day, $this->rules);
+        $res = $this->lotteryEloq->genOneDayIssue($this->day, $this->rules);
         if ($res !== true) {
             $eloqDataMsg = json_encode($this->lotteryEloq->toArray(), JSON_UNESCAPED_UNICODE);
-            $message = $res . '奖期数据无法生成' . $eloqDataMsg . '[' . $this->day . ']' . "\n";
+            $message = $res . '奖期数据无法生成 ' . $eloqDataMsg . '[' . $this->day . ']' . "\n";
             Log::channel('issues')->error($message);
         }
     }
