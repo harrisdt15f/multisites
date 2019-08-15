@@ -12,6 +12,8 @@ use App\Http\Requests\Frontend\UserAgentCenter\UserAgentCenterRegisterLinkReques
 use App\Http\SingleActions\Frontend\User\AgentCenter\UserAgentCenterRegisterableLinkAction;
 use App\Http\SingleActions\Frontend\User\AgentCenter\UserAgentCenterRegisterLinkAction;
 use App\Http\SingleActions\Frontend\User\AgentCenter\UserAgentCenterPrizeGroupAction;
+use App\Http\Requests\Frontend\UserAgentCenter\UserAgentCenterLinkDelRequest;
+use App\Http\SingleActions\Frontend\User\AgentCenter\UserAgentCenterLinkDelAction;
 use Illuminate\Http\JsonResponse;
 
 class UserAgentCenterController extends FrontendApiMainController
@@ -81,8 +83,21 @@ class UserAgentCenterController extends FrontendApiMainController
      * @return JsonResponse
      */
     
-    public function prizeGroup(UserAgentCenterPrizeGroupAction $action)
+    public function prizeGroup(UserAgentCenterPrizeGroupAction $action) : JsonResponse
     {
         return $action->execute($this);
+    }
+
+    /**
+     * 开户链接删除
+     * @param UserAgentCenterLinkDelRequest $request
+     * @param UserAgentCenterLinkDelAction $action
+     * @return JsonResponse
+     */
+    public function linkDel(
+        UserAgentCenterLinkDelRequest $request,
+        UserAgentCenterLinkDelAction $action
+    ) :JsonResponse {
+        return $action->execute($this, $request->validated());
     }
 }

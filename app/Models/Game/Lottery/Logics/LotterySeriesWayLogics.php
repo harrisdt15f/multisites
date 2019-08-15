@@ -20,12 +20,25 @@ trait LotterySeriesWayLogics
     {
         $aWnNumbers = [];
         foreach ($this->series_method_ids as $iSeriesMethodId) {
-            if ($aWnNumberOfMethods[ $iSeriesMethodId ] === false) {
+            if ($aWnNumberOfMethods[$iSeriesMethodId] === false) {
                 continue;
             }
-            $aWnNumbers[ $iSeriesMethodId ] = $aWnNumberOfMethods[ $iSeriesMethodId ];
+            $aWnNumbers[$iSeriesMethodId] = $aWnNumberOfMethods[$iSeriesMethodId];
         }
         $this->WinningNumber = count($aWnNumbers) > 0 ? $aWnNumbers : false;
         return $aWnNumbers;
+    }
+
+    /**
+     * @param $methodId
+     * @param $seriesCode
+     * @return mixed
+     */
+    public static function getSeriesWayByMethodId($methodId, $seriesCode)
+    {
+        return self::where('lottery_method_id', $methodId)
+            ->where('series_code', $seriesCode)
+            ->withCacheCooldownSeconds(86400)
+            ->first();// override default cooldown seconds in model
     }
 }
