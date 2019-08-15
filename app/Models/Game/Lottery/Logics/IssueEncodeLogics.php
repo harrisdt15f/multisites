@@ -50,7 +50,7 @@ trait IssueEncodeLogics
                                 ); //wn_number
                             } catch (\Exception $e) {
                                 Log::error('Winning Number Calculation on error');
-                                Log::error($e->getMessage() . $e->getTraceAsString());
+                                Log::error($e->getMessage().$e->getTraceAsString());
                             }
                             if ($oLottery->basicways()->exists()) {
                                 $oBasicWays = $oLottery->basicways;
@@ -59,21 +59,21 @@ trait IssueEncodeLogics
                                         'series_code',
                                         $oLottery->series_id
                                     )
-                                    ->where(
-                                        'lottery_method_id',
-                                        '!=',
-                                        null
-                                    )->get();
+                                        ->where(
+                                            'lottery_method_id',
+                                            '!=',
+                                            null
+                                        )->get();
                                     foreach ($oSeriesWays as $oSeriesWay) {
                                         $oSeriesWay->setWinningNumber($aWnNumberOfMethods);
                                         $oProjectsToCalculate = $oProjects->where(
                                             'status',
                                             Project::STATUS_NORMAL
                                         )
-                                        ->where(
-                                            'method_sign',
-                                            $oSeriesWay->lottery_method_id
-                                        );
+                                            ->where(
+                                                'method_sign',
+                                                $oSeriesWay->lottery_method_id
+                                            );
                                         if ($oProjectsToCalculate->count() >= 1) {
                                             //不中奖的时候
                                             if ($oSeriesWay->WinningNumber === false) {
@@ -95,9 +95,9 @@ trait IssueEncodeLogics
                                                             );
                                                         } catch (\Exception $e) {
                                                             Log::error('Prize Checking on error');
-                                                            Log::error($e->getMessage() . $e->getTraceAsString());
+                                                            Log::error($e->getMessage().$e->getTraceAsString());
                                                         }
-                                                        $strlog = 'aPrized is ' . json_encode(
+                                                        $strlog = 'aPrized is '.json_encode(
                                                             $aPrized,
                                                             JSON_PRETTY_PRINT
                                                         );
@@ -110,7 +110,7 @@ trait IssueEncodeLogics
                                                             ); //@todo Trace
                                                         } catch (\Exception $e) {
                                                             Log::error('Set Won on error');
-                                                            Log::error($e->getMessage() . $e->getTraceAsString());
+                                                            Log::error($e->getMessage().$e->getTraceAsString());
                                                         }
                                                         if ($result !== true) {
                                                             Log::channel('issues')->info($result);
@@ -261,7 +261,7 @@ trait IssueEncodeLogics
                                 'total_cost' => $oTraceList->total_price,
                                 'bet_number' => $oTraceList->bet_number,
                                 'issue' => $oTraceList->issue,
-                                'prize_set' => '',
+                                'prize_set' => $oTraceList->prize_set,
                                 'ip' => $oTraceList->ip,
                                 'proxy_ip' => $oTraceList->proxy_ip,
                                 'bet_from' => $oTraceList->bet_from,

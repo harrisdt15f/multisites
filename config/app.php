@@ -188,6 +188,8 @@ return [
         Waavi\Sanitizer\Laravel\SanitizerServiceProvider::class,
         //telegram
         RicardoFontanelli\LaravelTelegram\TelegramServiceProvider::class,
+        //ConfigureService Prover
+        App\Providers\ConfigureServiceProvider::class,
     ],
 
     /*
