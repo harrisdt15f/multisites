@@ -98,6 +98,7 @@ class FrontendAuthController extends FrontendApiMainController
     public function register(FrontendAuthRegisterRequest $request, FrontendAuthRegisterAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
+        $inputDatas['host'] = $request->server('HTTP_HOST');
         return $action->execute($this, $inputDatas);
     }
 

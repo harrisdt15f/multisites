@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\MobileApi;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
+use App\Http\Requests\Frontend\FrontendAuthRegisterRequest;
 use App\Http\Requests\Frontend\FrontendAuthResetFundPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthResetSpecificInfosRequest;
 use App\Http\Requests\Frontend\FrontendAuthResetUserPasswordRequest;
@@ -10,6 +11,7 @@ use App\Http\Requests\Frontend\FrontendAuthSelfResetPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthSetFundPasswordRequest;
 use App\Http\SingleActions\Frontend\FrontendAuthLoginAction;
 use App\Http\SingleActions\Frontend\FrontendAuthLogoutAction;
+use App\Http\SingleActions\Frontend\FrontendAuthRegisterAction;
 use App\Http\SingleActions\Frontend\FrontendAuthResetSpecificInfosAction;
 use App\Http\SingleActions\Frontend\FrontendAuthSetFundPasswordAction;
 use App\Http\SingleActions\Frontend\FrontendAuthUserDetailAction;
@@ -38,6 +40,19 @@ class MobileAuthController extends FrontendApiMainController
     {
         return $action->execute($this, $request);
     }
+
+    /**
+     * @param FrontendAuthRegisterRequest $request
+     * @param FrontendAuthRegisterAction $action
+     * @return JsonResponse
+     */
+    public function register(FrontendAuthRegisterRequest $request, FrontendAuthRegisterAction $action): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        $inputDatas['host'] = $request->server('HTTP_HOST');
+        return $action->execute($this, $inputDatas);
+    }
+    
 
     /**
      * 用户信息
@@ -157,8 +172,10 @@ class MobileAuthController extends FrontendApiMainController
     }
 
     //用户设置资金密码
-    public function setFundPassword(FrontendAuthSetFundPasswordRequest $request, FrontendAuthSetFundPasswordAction $action): JsonResponse
-    {
+    public function setFundPassword(
+        FrontendAuthSetFundPasswordRequest $request,
+        FrontendAuthSetFundPasswordAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -177,8 +194,10 @@ class MobileAuthController extends FrontendApiMainController
      * @param  FrontendAuthResetSpecificInfosAction  $action
      * @return JsonResponse
      */
-    public function resetSpecificInfos(FrontendAuthResetSpecificInfosRequest $request, FrontendAuthResetSpecificInfosAction $action): JsonResponse
-    {
+    public function resetSpecificInfos(
+        FrontendAuthResetSpecificInfosRequest $request,
+        FrontendAuthResetSpecificInfosAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }

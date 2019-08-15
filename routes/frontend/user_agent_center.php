@@ -32,7 +32,7 @@ Route::group(['prefix' => 'user-agent-center'], function () {
         'register-link',
         ['as' => $namePrefix . 'register-link', 'uses' => $controller . 'registerLink']
     );
-    //链接开户-链接详情
+    //链接开户-链接删除
     Route::match(
         ['post', 'options'],
         'link-del',

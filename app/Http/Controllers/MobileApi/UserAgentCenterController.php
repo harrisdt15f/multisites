@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\MobileApi;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
+use App\Http\Requests\Frontend\UserAgentCenter\UserAgentCenterLinkDelRequest;
 use App\Http\Requests\Frontend\UserAgentCenter\UserBonusRequest;
 use App\Http\Requests\Frontend\UserAgentCenter\UserDaysalaryRequest;
 use App\Http\Requests\Frontend\UserAgentCenter\UserProfitsRequest;
+use App\Http\SingleActions\Frontend\User\AgentCenter\UserAgentCenterLinkDelAction;
+use App\Http\SingleActions\Frontend\User\AgentCenter\UserAgentCenterPrizeGroupAction;
 use App\Http\SingleActions\Frontend\User\AgentCenter\UserProfitsAction;
 use App\Http\SingleActions\Frontend\User\AgentCenter\UserDaysalaryAction;
 use App\Http\SingleActions\Frontend\User\AgentCenter\UserBonusAction;
@@ -73,5 +76,29 @@ class UserAgentCenterController extends FrontendApiMainController
     public function userBonus(UserBonusAction $action, UserBonusRequest $request) : JsonResponse
     {
         return $action->execute($this, $request);
+    }
+
+    /**
+     * 代理开户-奖金组最大最小值
+     * @param UserAgentCenterPrizeGroupAction $action
+     * @return JsonResponse
+     */
+
+    public function prizeGroup(UserAgentCenterPrizeGroupAction $action) : JsonResponse
+    {
+        return $action->execute($this);
+    }
+
+    /**
+     * 开户链接删除
+     * @param UserAgentCenterLinkDelRequest $request
+     * @param UserAgentCenterLinkDelAction $action
+     * @return JsonResponse
+     */
+    public function linkDel(
+        UserAgentCenterLinkDelRequest $request,
+        UserAgentCenterLinkDelAction $action
+    ) :JsonResponse {
+        return $action->execute($this, $request->validated());
     }
 }
