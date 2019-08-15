@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Backend\Admin;
+namespace App\Http\Requests\Backend;
 
 use App\Http\Requests\BaseFormRequest;
 
-class ConfiguresConfigSwitchRequest extends BaseFormRequest
+class BackendAuthSearchUserRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,8 +24,7 @@ class ConfiguresConfigSwitchRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|numeric|exists:system_configurations,id',
-            'status' => 'required|numeric|in:0,1',
+            'email' => 'required|string',
         ];
     }
 
