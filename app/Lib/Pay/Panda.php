@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Lib\Pay;
+
 use App\Lib\Clog;
 
 class Panda extends BasePay
@@ -37,12 +38,14 @@ class Panda extends BasePay
         $this->constant['withdrawal_query_url']     = $this->constant['url'] . 'payment_query';
     }
 
-    public function renderSuccess() {
+    public function renderSuccess()
+    {
         echo "success";
         die;
     }
 
-    public function renderFail() {
+    public function renderFail()
+    {
         echo "fail";
         die;
     }
@@ -53,7 +56,8 @@ class Panda extends BasePay
      * @param $user
      * @return array
      */
-    public function getRechargeChannel($source = "phone", $user) {
+    public function getRechargeChannel($source = "phone", $user = [obj])
+    {
 
         $params = [
             'merchant_id'   => $this->constant["merchantId"],
@@ -67,7 +71,7 @@ class Panda extends BasePay
         $result         = curl_post($this->constant["recharge_channel_url"], $params);
 
         Clog::rechargeLog("recharge-channel:", $result);
-        if($result['status']){
+        if ($result['status']) {
             $data = $result["data"];
             if ($data['status'] === "success") {
                 return $data['data'];
@@ -86,7 +90,8 @@ class Panda extends BasePay
      * @param string $source
      * @return array|string
      */
-    public function recharge( $amount, $orderId, $channel, $bankId = "", $source = "phone" ){
+    public function recharge($amount, $orderId, $channel, $bankId = "", $source = "phone")
+    {
         $callbackUrl    = Pay::getCallbackUrl($this->sign);
         $url            = $this->constant['recharge_url'];
         $merchantId     = $this->constant['merchantId'];
@@ -104,12 +109,12 @@ class Panda extends BasePay
 
         $key = $this->constant['key'];
 
-        $param['sign'] = $this->encrypt($param , $key);
+        $param['sign'] = $this->encrypt($param, $key);
 
         $this->setRechargeParams($param);
         $this->initRechargeLog();
 
-        $result = curl_post($url, $param,[
+        $result = curl_post($url, $param, [
             'time_out' => 10
         ]);
 
@@ -124,7 +129,9 @@ class Panda extends BasePay
         if ($result['status']) {
             $data = $result['data'];
             if ($data['status'] == "success") {
-                $this->updateRechargeLog(['request_status' => 1, 'request_reason' => "发起充值成功", "request_back" => json_encode($result['data'])]);
+                $this->updateRechargeLog(['request_status' => 1,
+                    'request_reason' => "发起充值成功",
+                    "request_back" => json_encode($result['data'])]);
                 return ['url'=> $data['data']['pay_url'], 'type'=> "url" ];
             } else {
                 Clog::rechargeLog("Error-Panda-{$data['msg']}-", $logData);
@@ -139,14 +146,14 @@ class Panda extends BasePay
         $this->updateRechargeLog(['request_status' => 2, 'request_reason' => $result['msg']]);
 
         return $result['msg'];
-
     }
 
     /**
      * 由于每个第三方接受的值都不一样， 此方法只处理接收的字段名称，外层会有try catch 捕获异常
      * @return array 订单号, 三方订单号, 金额
      */
-    public function receive(){
+    public function receive()
+    {
         $body = file_get_contents("php://input");
         $params = json_decode($body, true);
 
@@ -154,7 +161,7 @@ class Panda extends BasePay
         $orderId = $params['game_order_id'];
         $trxId = $params['game_order_id'];
         $amt = $params['money'];
-        if(isset($params['status']) && $params['status'] === 1){
+        if (isset($params['status']) && $params['status'] === 1) {
             return [$orderId, $trxId, $amt];
         }
         echo 'invalid';
@@ -165,9 +172,10 @@ class Panda extends BasePay
      * 检查回调的参数
      * @return bool
      */
-    public function checkRechargeCallbackParams() {
+    public function checkRechargeCallbackParams()
+    {
         $params = $this->rechargeCallbackParams;
-        Clog::rechargeCallback("panda", "接受的参数" , $params);
+        Clog::rechargeCallback("panda", "接受的参数", $params);
 
         $needParams = $this->rechargeCallbackNeedParams;
         $validator  = \Validator::make($params, $needParams);
@@ -179,28 +187,29 @@ class Panda extends BasePay
         return true;
     }
 
-    public function processOrder() {
+    public function processOrder()
+    {
         $data   = $this->rechargeCallbackParams;
 
         // 检查订单
         $order  = $this->rechargeOrder;
 
         if (!in_array($order->status, [0, 1], true)) {
-            Clog::rechargeCallback("panda", "订单已经处理-" . $order->status );
+            Clog::rechargeCallback("panda", "订单已经处理-" . $order->status);
             return "订单已经处理-" . $order->status;
         }
 
         // 检测金额
         $amount = intval($data['money'] * 10000);
         if ($order->amount != $amount) {
-            Clog::rechargeCallback("panda", "订单金额不符合-" . $order->amount, $data );
+            Clog::rechargeCallback("panda", "订单金额不符合-" . $order->amount, $data);
             return "订单金额不符合-" . $order->amount;
         }
 
         // 处理订单
         $res = $order->process($amount, 0, "");
         if (true !== $res) {
-            Clog::rechargeCallback("panda", "处理订单失败:$res" );
+            Clog::rechargeCallback("panda", "处理订单失败:$res");
             return $res;
         }
 
@@ -210,7 +219,8 @@ class Panda extends BasePay
     protected $platform_sign = null;
 
     //渠道id
-    public function setSign($sign){
+    public function setSign($sign)
+    {
         $this->platform_sign = $sign;
         return $this;
     }
@@ -280,7 +290,8 @@ class Panda extends BasePay
      * @param null $channel
      * @return array
      */
-    public function queryWithdrawOrderStatus($oWithdrawal, $channel = null){
+    public function queryWithdrawOrderStatus($oWithdrawal, $channel = null)
+    {
 
         $key = $this->constant['key'];
         $url = $this->constant['withdrawal_query_url'];
@@ -296,15 +307,15 @@ class Panda extends BasePay
 
         $this->setWithdrawQueryParams($params);
 
-        $returnData = curl_post($url, $params,  []);
+        $returnData = curl_post($url, $params, []);
 
         $this->updateWithdrawQueryLog(['content' => json_encode($returnData)]);
 
         Clog::withdrawQueryLog("请求结果", $returnData);
 
-        if(isset($returnData["status"])) {
+        if (isset($returnData["status"])) {
             $data = $returnData['data'];
-            if($data['status'] == "success") {
+            if ($data['status'] == "success") {
                 $this->updateWithdrawQueryLog(['back_status' => 1, 'back_reason' => "成功"]);
                 return ['amount' => $data['data']['amount'], 'status' => $data['data']['result_status']];
             } else {
@@ -315,7 +326,6 @@ class Panda extends BasePay
             $this->updateWithdrawQueryLog(['back_status' => 2, 'back_reason' => $returnData["msg"]]);
             return ['status' => -1, 'msg' => $returnData["msg"]];
         }
-
     }
 
     public function encrypt(Array $data, $signKey)
@@ -334,17 +344,18 @@ class Panda extends BasePay
     }
 
     // 异步验签方法
-    public function checkRechargeCallbackSign($keySign = 'sign'){
+    public function checkRechargeCallbackSign($keySign = 'sign')
+    {
         $data   = $this->rechargeCallbackParams;
         $key    = $this->constant['key'];
         $mySign = $this->encrypt($data, $key);
-        if(isset($data[$keySign]) && !empty($data[$keySign]) && $data[$keySign] == $mySign){
+        if (isset($data[$keySign]) && !empty($data[$keySign]) && $data[$keySign] == $mySign) {
             return true;
         }
         return false;
     }
 
-    public function check_curl($result, $info = null)
+    public function checkCurl($result, $info = null)
     {
         if (!empty($info) && $info['http_code'] != 200) {
             return ['status' => -5, 'msg' => '线路异常，无法获取交易结果', 'data' => '000'];
@@ -355,9 +366,8 @@ class Panda extends BasePay
         return null;
     }
 
-    static public function isEmpty($value)
+    public static function isEmpty($value)
     {
         return $value === null || $value === [] || $value === '';
     }
-
 }

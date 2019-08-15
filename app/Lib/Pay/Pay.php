@@ -6,9 +6,11 @@ use App\Models\Finance\RechargeLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 
-class Pay {
+class Pay
+{
 
-    public static function getHandle() {
+    public static function getHandle()
+    {
         return new Panda();
     }
 
@@ -17,7 +19,8 @@ class Pay {
      * @param $user;
      * @return array
      */
-    public static function getRechargeChannel($user) {
+    public static function getRechargeChannel($user)
+    {
         $handle = new Panda();
         return $handle->getRechargeChannel("phone", $user);
     }
@@ -25,14 +28,16 @@ class Pay {
     /**
      * @return \Illuminate\Foundation\Application|mixed
      */
-    public static function getNotifyUrl($sign) {
+    public static function getNotifyUrl($sign)
+    {
         return configure("finance_notify_url") . "/" . $sign;
     }
 
     /**
      * @return \Illuminate\Foundation\Application|mixed
      */
-    public static function getCallbackUrl($sign) {
+    public static function getCallbackUrl($sign)
+    {
         return configure("finance_callback_url"). "/" . $sign;
     }
 
@@ -41,7 +46,8 @@ class Pay {
      * @param $channelSign
      * @return bool
      */
-    public static function isRechargeChannel($channelSign) {
+    public static function isRechargeChannel($channelSign)
+    {
         $allChannel = self::getRechargeChannel();
         if ($channelSign && array_key_exists($channelSign, $allChannel)) {
             return true;
@@ -50,7 +56,8 @@ class Pay {
     }
 
 
-    static function getAllPlatform() {
+    public static function getAllPlatform()
+    {
         $payConfig  = config('web.pay');
         return array_keys($payConfig);
     }
@@ -63,7 +70,8 @@ class Pay {
      * @param bool $params
      * @return array|mixed
      */
-    public static function curl($url, $params = false) {
+    public static function curl($url, $params = false)
+    {
         $curl = curl_init();                                            // 启动一个CURL会话
         curl_setopt($curl, CURLOPT_URL, $url);                  // 要访问的地址
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);   // 使用自动跳转
@@ -76,7 +84,7 @@ class Pay {
 
         $response = curl_exec($curl);                                   // 执行操作
 
-        if ($response === FALSE) {
+        if ($response === false) {
             $error = curl_error($curl);
             return  [
                 'status' => "fail",
