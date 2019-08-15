@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Game\Lottery\LotteryIssue;
 use App\Models\Game\Lottery\LotteryList;
 use App\Models\Game\Lottery\LotteryTraceList;
 use App\Models\Logics\ProjectTraits;

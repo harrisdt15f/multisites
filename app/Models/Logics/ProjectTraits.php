@@ -3,6 +3,7 @@
 namespace App\Models\Logics;
 
 use App\Models\DeveloperUsage\MethodLevel\LotteryMethodsWaysLevel;
+use App\Models\Game\Lottery\LotteryPrizeGroup;
 use App\Models\Game\Lottery\LotteryTraceList;
 use App\Models\LotteryTrace;
 use App\Models\Project;
@@ -45,116 +46,215 @@ trait ProjectTraits
         }
         $returnData = [];
         foreach ($data as $_item) {
-            $projectData = [
-                'serial_number' => self::getProjectSerialNumber(),
-                'user_id' => $user->id,
-                'username' => $user->username,
-                'top_id' => $user->top_id,
-                'rid' => $user->rid,
-                'parent_id' => $user->parent_id,
-                'is_tester' => $user->is_tester,
-                'series_id' => $lottery->series_id,
-                'lottery_sign' => $lottery->en_name,
-                'method_sign' => $_item['method_id'],
-                'method_name' => $_item['method_name'],
-                'method_group' => $_item['method_group'],
-                'user_prize_group' => $user->prize_group,
-                'bet_prize_group' => $_item['prize_group'],
-                'mode' => $_item['mode'],
-                'times' => $isTrace === 1 && count($inputDatas['trace_issues']) > 0 ? $_item['times'] * $traceFirstMultiple : $_item['times'],
-                'price' => $isTrace === 1 && count($inputDatas['trace_issues']) > 0 ? $_item['price'] * $traceFirstMultiple : $_item['price'],
-                'total_cost' => $_item['total_price'],
-                'bet_number' => $_item['code'],
-                'issue' => $currentIssue->issue,
-                'prize_set' => '',
-                'ip' => Request::ip(),
-                'proxy_ip' => json_encode(Request::ip()),
-                'bet_from' => $from,
-                'time_bought' => time(),
-            ];
-        }
-        $projectId = Project::create($projectData)->id;
-        if ($traceData) {
-            $traceMainData = [
-                'user_id' => $user->id,
-                'username' => $user->username,
-                'top_id' => $user->top_id,
-                'rid' => $user->rid,
-                'parent_id' => $user->parent_id,
-                'is_tester' => $user->is_tester,
-                'series_id' => $lottery->series_id,
-                'lottery_sign' => $lottery->en_name,
-                'method_sign' => $_item['method_id'],
-                'method_group' => $_item['method_group'],
-                'method_name' => $_item['method_name'],
-                'bet_number' => $_item['code'],
-                'user_prize_group' => $user->prize_group,
-                'bet_prize_group' => $_item['prize_group'],
-                'mode' => $_item['mode'],
-                'times' => $_item['times'],
-                'single_price' => $_item['price'],
-                'total_price' => $_item['total_price'],
-                'win_stop' => $inputDatas['trace_win_stop'],
-                'total_issues' => count($traceData),
-                'finished_issues' => 0,
-                'canceled_issues' => 0,
-                'start_issue' => key($traceData),
-                'now_issue' => '',
-                'end_issue' => array_key_last($traceData),
-                'stop_issue' => '',
-                'issue_process' => json_encode($traceData),
-                'add_time' => time(),
-                'stop_time' => 0,
-                'ip' => Request::ip(),
-                'proxy_ip' => json_encode(Request::ip()),
-                'bet_from' => $from,
-            ];
-            // 保存追号主
-            $traceId = LotteryTrace::create($traceMainData)->id;
-            // 保存追号
-            $i = 1;
-            foreach ($traceData as $issue => $multiple) {
-                foreach ($data as $dataItem) {
-                    $traceListData = [
-                        'user_id' => $user->id,
-                        'username' => $user->username,
-                        'top_id' => $user->top_id,
-                        'rid' => $user->rid,
-                        'trace_id' => $traceId,
-                        'order_queue' => $i,
-                        'parent_id' => $user->parent_id,
-                        'is_tester' => $user->is_tester,
-                        'series_id' => $lottery->series_id,
-                        'project_id' => $projectId,
-                        'lottery_sign' => $lottery->en_name,
-                        'method_sign' => $dataItem['method_id'],
-                        'method_group' => $_item['method_group'],
-                        'method_name' => $dataItem['method_name'],
-                        'issue' => $issue,
-                        'bet_number' => $dataItem['code'],
-                        'mode' => $dataItem['mode'],
-                        'times' => $dataItem['times'] * $multiple,
-                        'single_price' => $dataItem['price'],
-                        'total_price' => $dataItem['total_price'] * $multiple,
-                        'user_prize_group' => $user->prize_group,
-                        'bet_prize_group' => $dataItem['prize_group'],
-                        'ip' => Request::ip(),
-                        'proxy_ip' => json_encode(Request::ip()),
-                        'bet_from' => $from,
-                    ];
-                    $_item['total_price'] += $traceListData['total_price'];
-                    LotteryTraceList::create($traceListData);
-                }
-                $i++;
+            $projectId = self::saveSingleProject(
+                $user,
+                $lottery,
+                $_item,
+                $inputDatas,
+                $isTrace,
+                $traceFirstMultiple,
+                $currentIssue,
+                $from
+            );
+            if ($traceData) {
+                self::saveTrace(
+                    $projectId,
+                    $user,
+                    $lottery,
+                    $data,
+                    $traceData,
+                    $_item,
+                    $inputDatas,
+                    $from
+                );
             }
+            $returnData['project'][] = [
+                'id' => $projectId,
+                'cost' => $_item['total_price'],
+                'lottery_id' => $lottery->en_name,
+                'method_id' => $_item['method_id'],
+            ];
         }
-        $returnData['project'][] = [
-            'id' => $projectId,
-            'cost' => $_item['total_price'],
-            'lottery_id' => $lottery->en_name,
-            'method_id' => $_item['method_id'],
-        ];
         return $returnData;
+    }
+
+    /**
+     * @param $user
+     * @param $lottery
+     * @param $_item
+     * @param $inputDatas
+     * @param $isTrace
+     * @param $traceFirstMultiple
+     * @param $currentIssue
+     * @param $from
+     * @return mixed
+     */
+    public static function saveSingleProject(
+        $user,
+        $lottery,
+        $_item,
+        $inputDatas,
+        $isTrace,
+        $traceFirstMultiple,
+        $currentIssue,
+        $from
+    ) {
+        $bresult = LotteryPrizeGroup::makePrizeSettingArray(
+            $_item['method_id'],
+            $_item['prize_group'],
+            $lottery->series_id,
+            $aPrizeSettings,
+            $aPrizeSettingOfWay,
+            $aMaxPrize
+        );
+        if ($bresult) {
+            die('奖金组错误');
+        }
+        $projectData = [
+            'serial_number' => self::getProjectSerialNumber(),
+            'user_id' => $user->id,
+            'username' => $user->username,
+            'top_id' => $user->top_id,
+            'rid' => $user->rid,
+            'parent_id' => $user->parent_id,
+            'is_tester' => $user->is_tester,
+            'series_id' => $lottery->series_id,
+            'lottery_sign' => $lottery->en_name,
+            'method_sign' => $_item['method_id'],
+            'method_name' => $_item['method_name'],
+            'method_group' => $_item['method_group'],
+            'user_prize_group' => $user->prize_group,
+            'bet_prize_group' => $_item['prize_group'],
+            'prize_set' => json_encode($aPrizeSettingOfWay),
+            'mode' => $_item['mode'],
+            'times' => $isTrace === 1 && count(
+                $inputDatas['trace_issues']
+            ) > 0 ? $_item['times'] * $traceFirstMultiple : $_item['times'],
+            'price' => $isTrace === 1 && count(
+                $inputDatas['trace_issues']
+            ) > 0 ? $_item['price'] * $traceFirstMultiple : $_item['price'],
+            'total_cost' => $_item['total_price'],
+            'bet_number' => $_item['code'],
+            'issue' => $currentIssue->issue,
+            'ip' => Request::ip(),
+            'proxy_ip' => json_encode(Request::ip()),
+            'bet_from' => $from,
+            'time_bought' => time(),
+        ];
+        $projectId = Project::create($projectData)->id;
+        return $projectId;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getProjectSerialNumber(): string
+    {
+        return Str::orderedUuid()->getHex();
+    }
+
+    /**
+     * @param $projectId
+     * @param $user
+     * @param $lottery
+     * @param $data
+     * @param $traceData
+     * @param $_item
+     * @param $inputDatas
+     * @param $from
+     */
+    public static function saveTrace(
+        $projectId,
+        $user,
+        $lottery,
+        $data,
+        $traceData,
+        $_item,
+        $inputDatas,
+        $from
+    ): void {
+        LotteryPrizeGroup::makePrizeSettingArray(
+            $_item['method_id'],
+            $_item['prize_group'],
+            $lottery->series_id,
+            $aPrizeSettings,
+            $aPrizeSettingOfWay,
+            $aMaxPrize
+        );
+        $traceMainData = [
+            'user_id' => $user->id,
+            'username' => $user->username,
+            'top_id' => $user->top_id,
+            'rid' => $user->rid,
+            'parent_id' => $user->parent_id,
+            'is_tester' => $user->is_tester,
+            'series_id' => $lottery->series_id,
+            'lottery_sign' => $lottery->en_name,
+            'method_sign' => $_item['method_id'],
+            'method_group' => $_item['method_group'],
+            'method_name' => $_item['method_name'],
+            'bet_number' => $_item['code'],
+            'user_prize_group' => $user->prize_group,
+            'bet_prize_group' => $_item['prize_group'],
+            'prize_set' => json_encode($aPrizeSettingOfWay),
+            'mode' => $_item['mode'],
+            'times' => $_item['times'],
+            'single_price' => $_item['price'],
+            'total_price' => $_item['total_price'],
+            'win_stop' => $inputDatas['trace_win_stop'],
+            'total_issues' => count($traceData),
+            'finished_issues' => 0,
+            'canceled_issues' => 0,
+            'start_issue' => key($traceData),
+            'now_issue' => '',
+            'end_issue' => array_key_last($traceData),
+            'stop_issue' => '',
+            'issue_process' => json_encode($traceData),
+            'add_time' => time(),
+            'stop_time' => 0,
+            'ip' => Request::ip(),
+            'proxy_ip' => json_encode(Request::ip()),
+            'bet_from' => $from,
+        ];
+        // 保存追号主
+        $traceId = LotteryTrace::create($traceMainData)->id;
+        // 保存追号
+        $i = 1;
+        foreach ($traceData as $issue => $multiple) {
+            foreach ($data as $dataItem) {
+                $traceListData = [
+                    'user_id' => $user->id,
+                    'username' => $user->username,
+                    'top_id' => $user->top_id,
+                    'rid' => $user->rid,
+                    'trace_id' => $traceId,
+                    'order_queue' => $i,
+                    'parent_id' => $user->parent_id,
+                    'is_tester' => $user->is_tester,
+                    'series_id' => $lottery->series_id,
+                    'project_id' => $projectId,
+                    'lottery_sign' => $lottery->en_name,
+                    'method_sign' => $dataItem['method_id'],
+                    'method_group' => $_item['method_group'],
+                    'method_name' => $dataItem['method_name'],
+                    'issue' => $issue,
+                    'bet_number' => $dataItem['code'],
+                    'mode' => $dataItem['mode'],
+                    'times' => $dataItem['times'] * $multiple,
+                    'single_price' => $dataItem['price'],
+                    'total_price' => $dataItem['total_price'] * $multiple,
+                    'user_prize_group' => $user->prize_group,
+                    'bet_prize_group' => $dataItem['prize_group'],
+                    'prize_set' => json_encode($aPrizeSettingOfWay),
+                    'ip' => Request::ip(),
+                    'proxy_ip' => json_encode(Request::ip()),
+                    'bet_from' => $from,
+                ];
+                $_item['total_price'] += $traceListData['total_price'];
+                LotteryTraceList::create($traceListData);
+            }
+            $i++;
+        }
     }
 
     /**
@@ -196,7 +296,8 @@ trait ProjectTraits
                         Log::channel('issues')->info($errorString);
                     }
                 } else {
-                    $errorString = 'There have no prize for  Basic MethodId'.$iBasicMethodId.'leveldata'.json_encode($aPrizeOfBasicMethod);
+                    $levelDataNote = 'leveldata'.json_encode($aPrizeOfBasicMethod);
+                    $errorString = 'There have no prize for  Basic MethodId'.$iBasicMethodId.$levelDataNote;
                     Log::channel('issues')->error($errorString);
                 }
             }
@@ -230,40 +331,13 @@ trait ProjectTraits
     }
 
     /**
-     * @param $openNumber
      * @param $sWnNumber
-     * @param $iBasicMethodId
-     * @return bool
+     * @return string|null
      */
-    public function setFail(
-        $openNumber,
-        $sWnNumber = null,
-        $iBasicMethodId = null
-    ): bool {
-        try {
-            DB::beginTransaction();
-//            $lockProject = $this->lockForUpdate()->find($this->id);
-            $this->status = self::STATUS_LOST;
-            $data = [
-                'basic_method_id' => $iBasicMethodId,
-                'open_number' => $openNumber,
-                'winning_number' => $this->formatWiningNumber($sWnNumber),
-                'time_count' => now()->timestamp,
-                'status' => self::STATUS_LOST,
-            ];
-            if ($this->update($data)) {
-                DB::commit();
-                $this->sendMoney();
-            } else {
-                $strError = json_encode($this->errors()->first(), JSON_PRETTY_PRINT);
-                Log::channel('issues')->info($strError);
-            }
-        } catch (Exception $e) {
-            Log::channel('issues')->info($e->getMessage());
-            DB::rollBack();
-            return false;
-        }
-        return true;
+    public function formatWiningNumber(
+        $sWnNumber = null
+    ): ?string {
+        return is_array($sWnNumber) ? implode('', $sWnNumber) : $sWnNumber;
     }
 
     public function sendMoney(): void
@@ -313,20 +387,39 @@ trait ProjectTraits
     }
 
     /**
+     * @param $openNumber
      * @param $sWnNumber
-     * @return string|null
+     * @param $iBasicMethodId
+     * @return bool
      */
-    public function formatWiningNumber(
-        $sWnNumber = null
-    ): ?string {
-        return is_array($sWnNumber) ? implode('', $sWnNumber) : $sWnNumber;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getProjectSerialNumber(): string
-    {
-        return Str::orderedUuid()->getHex();
+    public function setFail(
+        $openNumber,
+        $sWnNumber = null,
+        $iBasicMethodId = null
+    ): bool {
+        try {
+            DB::beginTransaction();
+//            $lockProject = $this->lockForUpdate()->find($this->id);
+            $this->status = self::STATUS_LOST;
+            $data = [
+                'basic_method_id' => $iBasicMethodId,
+                'open_number' => $openNumber,
+                'winning_number' => $this->formatWiningNumber($sWnNumber),
+                'time_count' => now()->timestamp,
+                'status' => self::STATUS_LOST,
+            ];
+            if ($this->update($data)) {
+                DB::commit();
+                $this->sendMoney();
+            } else {
+                $strError = json_encode($this->errors()->first(), JSON_PRETTY_PRINT);
+                Log::channel('issues')->info($strError);
+            }
+        } catch (Exception $e) {
+            Log::channel('issues')->info($e->getMessage());
+            DB::rollBack();
+            return false;
+        }
+        return true;
     }
 }
