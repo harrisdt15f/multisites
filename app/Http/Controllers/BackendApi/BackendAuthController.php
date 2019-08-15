@@ -6,6 +6,8 @@ use App\Http\Requests\Backend\BackendAuthDeletePartnerAdminRequest;
 use App\Http\Requests\Backend\BackendAuthRegisterRequest;
 use App\Http\Requests\Backend\BackendAuthSelfResetPasswordRequest;
 use App\Http\Requests\Backend\BackendAuthUpdatePAdmPasswordRequest;
+use App\Http\Requests\Backend\BackendAuthSearchUserRequest;
+use App\Http\Requests\Backend\BackendAuthSearchGroupRequest;
 use App\Http\Requests\Backend\BackendAuthUpdateUserGroupRequest;
 use App\Http\SingleActions\Backend\BackendAuthAllUserAction;
 use App\Http\SingleActions\Backend\BackendAuthDeletePartnerAdminAction;
@@ -14,6 +16,8 @@ use App\Http\SingleActions\Backend\BackendAuthLogoutAction;
 use App\Http\SingleActions\Backend\BackendAuthRegisterAction;
 use App\Http\SingleActions\Backend\BackendAuthSelfResetPasswordAction;
 use App\Http\SingleActions\Backend\BackendAuthUpdatePAdmPasswordAction;
+use App\Http\SingleActions\Backend\BackendAuthSearchUserAction;
+use App\Http\SingleActions\Backend\BackendAuthSearchGroupAction;
 use App\Http\SingleActions\Backend\BackendAuthUpdateUserGroupAction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -24,8 +28,8 @@ class BackendAuthController extends BackEndApiMainController
     /**
      * Login user and create token
      *
-     * @param  Request                 $request
-     * @param  BackendAuthLoginAction  $action
+     * @param  Request $request
+     * @param  BackendAuthLoginAction $action
      * @return JsonResponse [string]   access_token
      */
     public function login(Request $request, BackendAuthLoginAction $action): JsonResponse
@@ -47,11 +51,13 @@ class BackendAuthController extends BackEndApiMainController
     /**
      * change partner user Password
      * @param  BackendAuthSelfResetPasswordRequest $request
-     * @param  BackendAuthSelfResetPasswordAction  $action
+     * @param  BackendAuthSelfResetPasswordAction $action
      * @return JsonResponse
      */
-    public function selfResetPassword(BackendAuthSelfResetPasswordRequest $request, BackendAuthSelfResetPasswordAction $action): JsonResponse
-    {
+    public function selfResetPassword(
+        BackendAuthSelfResetPasswordRequest $request,
+        BackendAuthSelfResetPasswordAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -59,7 +65,7 @@ class BackendAuthController extends BackEndApiMainController
     /**
      * Register api
      * @param  BackendAuthRegisterRequest $request
-     * @param  BackendAuthRegisterAction  $action
+     * @param  BackendAuthRegisterAction $action
      * @return JsonResponse
      */
     public function register(BackendAuthRegisterRequest $request, BackendAuthRegisterAction $action): JsonResponse
@@ -70,10 +76,10 @@ class BackendAuthController extends BackEndApiMainController
 
     /**
      * 获取所有当前平台的商户管理员用户
-     * @param  BackendAuthAllUserAction  $action
+     * @param  BackendAuthAllUserAction $action
      * @return JsonResponse
      */
-    public function allUser(BackendAuthAllUserAction $action):  ? JsonResponse
+    public function allUser(BackendAuthAllUserAction $action): ?JsonResponse
     {
         return $action->execute($this);
     }
@@ -81,11 +87,13 @@ class BackendAuthController extends BackEndApiMainController
     /**
      * 修改管理员的归属组
      * @param  BackendAuthUpdateUserGroupRequest $request
-     * @param  BackendAuthUpdateUserGroupAction  $action
+     * @param  BackendAuthUpdateUserGroupAction $action
      * @return JsonResponse
      */
-    public function updateUserGroup(BackendAuthUpdateUserGroupRequest $request, BackendAuthUpdateUserGroupAction $action) : JsonResponse
-    {
+    public function updateUserGroup(
+        BackendAuthUpdateUserGroupRequest $request,
+        BackendAuthUpdateUserGroupAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -103,8 +111,8 @@ class BackendAuthController extends BackEndApiMainController
 
     /**
      * Logout user (Revoke the token)
-     * @param  Request                  $request
-     * @param  BackendAuthLogoutAction  $action
+     * @param  Request $request
+     * @param  BackendAuthLogoutAction $action
      * @return JsonResponse [string]    message
      */
     public function logout(Request $request, BackendAuthLogoutAction $action): JsonResponse
@@ -115,7 +123,7 @@ class BackendAuthController extends BackEndApiMainController
     /**
      * Get the authenticated User
      *
-     * @param  Request  $request
+     * @param  Request $request
      * @return JsonResponse [json] user object
      */
     public function user(Request $request): JsonResponse
@@ -126,22 +134,52 @@ class BackendAuthController extends BackEndApiMainController
     /**
      * 删除管理员
      * @param  BackendAuthDeletePartnerAdminRequest $request
-     * @param  BackendAuthDeletePartnerAdminAction  $action
+     * @param  BackendAuthDeletePartnerAdminAction $action
      * @return JsonResponse
      */
-    public function deletePartnerAdmin(BackendAuthDeletePartnerAdminRequest $request, BackendAuthDeletePartnerAdminAction $action):  ? JsonResponse
-    {
+    public function deletePartnerAdmin(
+        BackendAuthDeletePartnerAdminRequest $request,
+        BackendAuthDeletePartnerAdminAction $action
+    ): ?JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
 
     /**
      * @param  BackendAuthUpdatePAdmPasswordRequest $request
-     * @param  BackendAuthUpdatePAdmPasswordAction  $action
+     * @param  BackendAuthUpdatePAdmPasswordAction $action
      * @return JsonResponse
      */
-    public function updatePAdmPassword(BackendAuthUpdatePAdmPasswordRequest $request, BackendAuthUpdatePAdmPasswordAction $action) :  ? JsonResponse
-    {
+    public function updatePAdmPassword(
+        BackendAuthUpdatePAdmPasswordRequest $request,
+        BackendAuthUpdatePAdmPasswordAction $action
+    ): ?JsonResponse {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
+    }
+
+    /**
+     * @param  BackendAuthSearchUserRequest $request
+     * @param  BackendAuthSearchUserAction $action
+     * @return JsonResponse
+     */
+    public function searchUser(
+        BackendAuthSearchUserRequest $request,
+        BackendAuthSearchUserAction $action
+    ): ?JsonResponse {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
+    }
+
+    /**
+     * @param  BackendAuthSearchGroupRequest $request
+     * @param  BackendAuthSearchGroupAction $action
+     * @return JsonResponse
+     */
+    public function searchGroup(
+        BackendAuthSearchGroupRequest $request,
+        BackendAuthSearchGroupAction $action
+    ): ?JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
