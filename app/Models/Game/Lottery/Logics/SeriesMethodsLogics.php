@@ -8,17 +8,14 @@
 
 namespace App\Models\Game\Lottery\Logics;
 
-
 use App\Models\Game\Lottery\LotteryBasicMethod;
 
 trait SeriesMethodsLogics
 {
-
     public function getWinningNumber($sFullWinningNumber)
     {
         $oBasicMethod = LotteryBasicMethod::find($this->basic_method_id);
         $aWinningNumber = $oBasicMethod->getWnNumber($sFullWinningNumber, (int)$this->offset);
         return $aWinningNumber;
     }
-
 }

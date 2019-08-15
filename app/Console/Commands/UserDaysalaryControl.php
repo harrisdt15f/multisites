@@ -14,7 +14,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-
 class UserDaysalaryControl extends Command
 {
     /**
@@ -43,18 +42,18 @@ class UserDaysalaryControl extends Command
         $usersList = Project::where([
             ['projects.created_at', '>', $today],
         ])
-            ->whereIn('projects.status',  [Project::STATUS_LOST,Project::STATUS_WON])
+            ->whereIn('projects.status', [Project::STATUS_LOST,Project::STATUS_WON])
             ->select(DB::raw(implode(',', ['sum(total_cost) as total_cost','projects.user_id',
-                'daysalary_percentage','frontend_users.parent_id','frontend_users.username','frontend_users.is_tester',])))
+                'daysalary_percentage','frontend_users.parent_id',
+                'frontend_users.username','frontend_users.is_tester',])))
             ->groupby('projects.username')
             ->leftJoin('frontend_users', function ($join) {
                 $join->on('frontend_users.id', '=', 'user_id');
             })
             ->get();
 
-        if (is_object($usersList)){
-            foreach ($usersList as $child){
-
+        if (is_object($usersList)) {
+            foreach ($usersList as $child) {
                 $data['daysalary'] =$child->total_cost * $child->daysalary_percentage / 100 ;
 
                 $data['daysalary_percentage'] = $child->daysalary_percentage;
@@ -71,12 +70,13 @@ class UserDaysalaryControl extends Command
                 $this->updateUserDaysalary($data);
 
                 //上供给上级
-                if($child->parent_id > 0){
+                if ($child->parent_id > 0) {
                     $parent_info = FrontendUser::where([['id',$child->parent_id]])->first()->toArray();
                     $parent_data['user_id'] = $child->parent_id ;
                     $parent_data['date'] = $today;
                     $parent_data['daysalary_percentage'] = array_get($parent_info, 'daysalary_percentage') ;
-                    $parent_data['daysalary'] = (array_get($parent_info, 'daysalary_percentage') - $child->daysalary_percentage) / 100 * $child->total_cost;
+                    $parent_data['daysalary'] = (array_get($parent_info, 'daysalary_percentage')
+                            - $child->daysalary_percentage) / 100 * $child->total_cost;
                     $parent_data['team_turnover'] = $child->total_cost;
                     $parent_data['username'] = array_get($parent_info, 'username') ;
                     $parent_data['is_tester'] = array_get($parent_info, 'is_tester') ;
@@ -87,35 +87,30 @@ class UserDaysalaryControl extends Command
         }
     }
 
-    /**
-     * 获取下级投注额
-     * @param int $user_id
-     * @return float
-     */
 
-    private function get_team_turnover(int $user_id) : float
-    {
-        $today =   Carbon::yesterday()->toDateString();
-        return Project::where([
-            ['created_at', '>', $today],
-            ['parent_id', '=', $user_id],
-        ])
-            ->whereIn('status',  [Project::STATUS_LOST,Project::STATUS_WON])
-            ->sum('total_cost');
-    }
+//    private function get_team_turnover(int $user_id) : float
+//    {
+//        $today =   Carbon::yesterday()->toDateString();
+//        return Project::where([
+//            ['created_at', '>', $today],
+//            ['parent_id', '=', $user_id],
+//        ])
+//            ->whereIn('status', [Project::STATUS_LOST,Project::STATUS_WON])
+//            ->sum('total_cost');
+//    }
 
     public function updateUserDaysalary(array $data) : bool
     {
-        if($data['user_id'] && $data['date']){
+        if ($data['user_id'] && $data['date']) {
             $row = UserDaysalary::where([
                 ['user_id', $data['user_id']],
                 ['date', $data['date']]
             ])->first();
 
-            if (empty($row)){
+            if (empty($row)) {
                 Log::channel('daysalary')->info('新建用户日工资'.json_encode($data));
                 return (bool)UserDaysalary::create($data);
-            }else{
+            } else {
                 $data['daysalary'] = $data['daysalary'] + $row['daysalary'] ;
                 $data['team_turnover'] = $data['team_turnover'] + $row['team_turnover'] ;
                 Log::channel('daysalary')->info('更新用户日工资'.json_encode($data));

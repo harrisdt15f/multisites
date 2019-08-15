@@ -28,7 +28,8 @@ trait LotteryBasicWayLogics
         foreach ($oSeriesWay->WinningNumber as $iSeriesMethodId => $sWnNumber) {
             $oSeriesMethod = LotterySeriesMethod::find($iSeriesMethodId);
             $oBasicMethod = $oSeriesMethod->basicMethod;
-            $iOffset = $oSeriesMethod->offset >= 0 ? $oSeriesMethod->offset : $oSeriesMethod->offset + $oSeriesWay->digital_count;
+            $iOffset = $oSeriesMethod->offset >= 0 ?
+            $oSeriesMethod->offset : $oSeriesMethod->offset + $oSeriesWay->digital_count;
             $this->sPosition = $sPosition ?? $iOffset;
 //            $oBasicMethod->sPosition = $sPosition;
             $sBetNumberFinal = $this->formatBetNumber($sBetNumber, $oSeriesMethod, $oSeriesWay, $sWnNumber);
@@ -63,10 +64,14 @@ trait LotteryBasicWayLogics
             if ($prizeLevelRowCount === 1) { //只有一行奖金的时候就取一行
                 $prizeLevel = $prizeLevelQuery->first();
             } elseif ($prizeLevelRowCount < 1) { //没有奖金的时候
-                $errorString = 'PrizeLevel Query Null'.json_encode($oSeriesWay).'whereDatas are '.json_encode($arrWhere).'Query is '.$prizeLevelQuery->toSql();
+                $errorString = 'PrizeLevel Query Null'.json_encode($oSeriesWay).
+                'whereDatas are '.json_encode($arrWhere).
+                'Query is '.$prizeLevelQuery->toSql();
                 Log::channel('issues')->error($errorString);
             } else {//有多条奖金时候
-                $errorString = 'PrizeLevel Query have Multiple Rows '.json_encode($oSeriesWay).'whereDatas are '.json_encode($arrWhere).'Query is '.$prizeLevelQuery->toSql();
+                $errorString = 'PrizeLevel Query have Multiple Rows '.json_encode($oSeriesWay).
+                'whereDatas are '.json_encode($arrWhere).
+                'Query is '.$prizeLevelQuery->toSql();
                 $prizeDetailToDecide = $prizeLevelQuery->get()->toJson();
                 Log::channel('issues')->error($errorString);
                 Log::channel('issues')->error($prizeDetailToDecide);
@@ -78,7 +83,7 @@ trait LotteryBasicWayLogics
     public function formatBetNumber($sBetNumber, $oSeriesMethod, $oSeriesWay, $sWnNumber)
     {
         switch ($oSeriesWay->series_code) {
-            case 'lotto';
+            case 'lotto':
                 $sBetNumber = str_replace('&', ' ', $sBetNumber);
                 break;
             default:
@@ -90,12 +95,14 @@ trait LotteryBasicWayLogics
             case 'MultiOne':
             case 'LottoMultiOne':
                 $aBetNumbers = explode($sSplitChar, $sBetNumber);
-                $iOffset = $oSeriesMethod->offset >= 0 ? $oSeriesMethod->offset : $oSeriesMethod->offset + $oSeriesWay->digital_count;
+                $iOffset = $oSeriesMethod->offset >= 0 ?
+                $oSeriesMethod->offset : $oSeriesMethod->offset + $oSeriesWay->digital_count;
                 $this->sPosition = $iOffset;
                 $sBetNumberFinal = $aBetNumbers[$iOffset];
                 break;
             case 'LottoSingleOne':
-                $iOffset = $oSeriesMethod->offset >= 0 ? $oSeriesMethod->offset : $oSeriesMethod->offset + $oSeriesWay->digital_count;
+                $iOffset = $oSeriesMethod->offset >= 0 ?
+                $oSeriesMethod->offset : $oSeriesMethod->offset + $oSeriesWay->digital_count;
                 $this->sPosition = $iOffset;
                 $sBetNumberFinal = $sBetNumber;
                 break;
@@ -114,6 +121,4 @@ trait LotteryBasicWayLogics
         }
         return $sBetNumberFinal;
     }
-
-
 }

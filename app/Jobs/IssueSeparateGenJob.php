@@ -12,11 +12,9 @@ use Illuminate\Support\Facades\Log;
 class IssueSeparateGenJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
     protected $day;
     protected $rules;
     protected $lotteryEloq;
-
     /**
      * Create a new job instance.
      *
@@ -39,10 +37,9 @@ class IssueSeparateGenJob implements ShouldQueue
     public function handle()
     {
         $res = $this->lotteryEloq->_genIssue($this->day, $this->rules);
-
-        if($res!== true)
-        {
-            $message = $res . '奖期数据无法生成' . json_encode($this->lotteryEloq->toArray(), JSON_UNESCAPED_UNICODE) . '[' . $this->day . ']'."\n";
+        if ($res !== true) {
+            $eloqDataMsg = json_encode($this->lotteryEloq->toArray(), JSON_UNESCAPED_UNICODE);
+            $message = $res . '奖期数据无法生成' . $eloqDataMsg . '[' . $this->day . ']' . "\n";
             Log::channel('issues')->error($message);
         }
     }

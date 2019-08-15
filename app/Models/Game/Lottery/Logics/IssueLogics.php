@@ -29,8 +29,11 @@ trait IssueLogics
      */
     public static function getNeedOpenIssue($lotteryId)
     {
-        return self::where('lottery_id', $lotteryId)->where('allow_encode_time', '<', time())->where('status_encode',
-            0)->orderBy('id', 'asc')->get();
+        return self::where([
+            ['lottery_id', $lotteryId],
+            ['allow_encode_time', '<', time()],
+            ['status_encode', 0],
+        ])->orderBy('id', 'asc')->get();
     }
 
     /**
@@ -54,8 +57,10 @@ trait IssueLogics
     public static function getCanBetIssue($lotteryId, $count = 50)
     {
         $time = time();
-        return self::where('lottery_id', $lotteryId)->where('end_time', '>', $time)->orderBy('begin_time',
-            'ASC')->skip(0)->take($count)->get();
+        return self::where([
+            ['lottery_id', $lotteryId],
+            ['end_time', '>', $time]
+        ])->orderBy('begin_time', 'ASC')->skip(0)->take($count)->get();
     }
 
     /**
@@ -67,8 +72,10 @@ trait IssueLogics
     public static function getHistoryIssue($lotteryId, $count = 50)
     {
         $time = time();
-        return self::where('lottery_id', $lotteryId)->where('begin_time', '<=', $time)->orderBy('begin_time',
-            'ASC')->skip(0)->take($count)->get();
+        return self::where([
+            ['lottery_id', $lotteryId],
+            ['begin_time', '<=', $time]
+        ])->orderBy('begin_time', 'ASC')->skip(0)->take($count)->get();
     }
 
     /**
@@ -80,6 +87,9 @@ trait IssueLogics
     public static function getPastIssue($lotterySign, $skipNum = 0)
     {
         $time = time();
-        return self::where('lottery_id', $lotterySign)->where('end_time', '<=', $time)->orderBy('begin_time', 'DESC')->skip($skipNum)->first();
+        return self::where([
+            ['lottery_id', $lotterySign],
+            ['end_time', '<=', $time]
+        ])->orderBy('begin_time', 'DESC')->skip($skipNum)->first();
     }
 }

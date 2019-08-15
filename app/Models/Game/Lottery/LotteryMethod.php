@@ -47,11 +47,25 @@ class LotteryMethod extends BaseModel
 
     public function numberButtonRule(): HasOneThrough
     {
-        return $this->hasOneThrough(LotteryMethodsNumberButtonRule::class, LotteryMethodsValidation::class, 'method_id', 'id', 'method_id', 'button_id');
+        return $this->hasOneThrough(
+            LotteryMethodsNumberButtonRule::class,
+            LotteryMethodsValidation::class,
+            'method_id',
+            'id',
+            'method_id',
+            'button_id'
+        );
     }
 
     public function methodLayout()
     {
-        return $this->hasManyThrough(LotteryMethodsLayout::class, LotteryMethodsValidation::class, 'method_id', 'validation_id', 'method_id', 'id');
+        return $this->hasManyThrough(
+            LotteryMethodsLayout::class,
+            LotteryMethodsValidation::class,
+            'method_id',
+            'validation_id',
+            'method_id',
+            'id'
+        );
     }
 }

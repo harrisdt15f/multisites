@@ -72,12 +72,12 @@ trait FrontendUsersAccountsTypeLogics
     public static function getDataListFromCache()
     {
         $key = 'account_change_type';
-        if (self::_hasCache($key)) {
-            return self::_getCacheData($key);
+        if (self::hasCache($key)) {
+            return self::getCacheData($key);
         } else {
             $allCache = self::getDataFromDb();
             if ($allCache) {
-                self::_saveCacheData($key, $allCache);
+                self::saveCacheData($key, $allCache);
             }
             return $allCache;
         }
@@ -118,7 +118,6 @@ trait FrontendUsersAccountsTypeLogics
      */
     public static function getTypeList($field)
     {
-       return self::all($field);
+        return self::all($field);
     }
-
 }

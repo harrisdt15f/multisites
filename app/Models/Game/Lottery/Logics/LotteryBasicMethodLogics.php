@@ -34,7 +34,11 @@ trait LotteryBasicMethodLogics
             case 'k3':
             case 'sd':
             case 'p3p5':
-                $sWnNumber = substr($sFullWinningNumber, (int)$iOffset, $this->digital_count);
+                $sWnNumber = substr(
+                    $sFullWinningNumber,
+                    (int)$iOffset,
+                    $this->digital_count
+                );
                 $sFunction = 'getWinningNumber'.ucfirst($this->series_code);
                 break;
             case 'pk10':
@@ -71,5 +75,4 @@ trait LotteryBasicMethodLogics
         $sFunction = 'prize'.$oBasicWay->function.ucfirst(Str::camel($this->wn_function));
         return $this->$pFunction($sFunction, $sBetNumber, $sWnNumber, $oSeriesWay);
     }
-
 }

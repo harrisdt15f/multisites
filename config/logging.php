@@ -191,6 +191,12 @@ return [
             'level' => 'debug',
             'days' => 14,
         ],
+        'commissions' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/commissions.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
     ],
 
 ];

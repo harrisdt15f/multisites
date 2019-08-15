@@ -6,6 +6,7 @@ use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Http\Requests\Frontend\Homepage\HomepageNoticeRequest;
 use App\Http\Requests\Frontend\Homepage\HomepageReadMessageRequest;
 use App\Http\SingleActions\Frontend\Homepage\HomepageActivityListAction;
+use App\Http\SingleActions\Frontend\Homepage\HomepageGetWebInfoAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageNoticeAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageRankingAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageReadMessageAction;
@@ -143,6 +144,16 @@ class HomepageController extends FrontendApiMainController
      * @return JsonResponse
      */
     public function ranking(HomepageRankingAction $action): JsonResponse
+    {
+        return $action->execute($this);
+    }
+
+    /**
+     * 获取网站基本信息
+     * @param  HomepageGetWebInfoAction $action
+     * @return JsonResponse
+     */
+    public function getWebInfo(HomepageGetWebInfoAction $action): JsonResponse
     {
         return $action->execute($this);
     }
