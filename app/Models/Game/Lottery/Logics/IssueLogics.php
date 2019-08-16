@@ -19,7 +19,7 @@ trait IssueLogics
      */
     public static function getCurrentIssue($lotteryId)
     {
-        return self::where('lottery_id', $lotteryId)->where('end_time', '>', time())->orderBy('id', 'ASC')->first();
+        return self::where('lottery_id', $lotteryId)->where('end_time', '>', time())->orderBy('end_time', 'ASC')->first();
     }
 
     /**
@@ -57,9 +57,11 @@ trait IssueLogics
     public static function getCanBetIssue($lotteryId, $count = 50)
     {
         $time = time();
+        $day = date('Y-m-d');
         return self::where([
             ['lottery_id', $lotteryId],
-            ['end_time', '>', $time]
+            ['end_time', '>', $time],
+            ['day', $day],
         ])->orderBy('begin_time', 'ASC')->skip(0)->take($count)->get();
     }
 
@@ -74,7 +76,7 @@ trait IssueLogics
         $time = time();
         return self::where([
             ['lottery_id', $lotteryId],
-            ['begin_time', '<=', $time]
+            ['begin_time', '<=', $time],
         ])->orderBy('begin_time', 'ASC')->skip(0)->take($count)->get();
     }
 
@@ -89,7 +91,7 @@ trait IssueLogics
         $time = time();
         return self::where([
             ['lottery_id', $lotterySign],
-            ['end_time', '<=', $time]
+            ['end_time', '<=', $time],
         ])->orderBy('begin_time', 'DESC')->skip($skipNum)->first();
     }
 }
