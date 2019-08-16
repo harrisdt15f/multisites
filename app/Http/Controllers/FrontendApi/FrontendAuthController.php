@@ -152,7 +152,6 @@ class FrontendAuthController extends FrontendApiMainController
         if ($type === 1) {
             $field = 'password';
             $oldPassword = $targetUserEloq->password;
-            $targetUserEloq->remember_token = $token;
         } elseif ($type === 2) {
             $field = 'fund_password';
             $oldPassword = $targetUserEloq->fund_password;
@@ -167,6 +166,7 @@ class FrontendAuthController extends FrontendApiMainController
         $targetUserEloq->$field = Hash::make($inputDatas['new_password']);
         if ($targetUserEloq->save()) {
             if ($type === 1) {
+                // $targetUserEloq->remember_token = $token;
                 $token = $this->refresh(); //修改登录密码更新token
             }
             return $this->msgOut(true);
