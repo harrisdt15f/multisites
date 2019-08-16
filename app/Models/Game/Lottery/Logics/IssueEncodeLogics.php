@@ -50,7 +50,7 @@ trait IssueEncodeLogics
                                 ); //wn_number
                             } catch (\Exception $e) {
                                 Log::error('Winning Number Calculation on error');
-                                Log::error($e->getMessage().$e->getTraceAsString());
+                                Log::error($e->getMessage() . $e->getTraceAsString());
                             }
                             if ($oLottery->basicways()->exists()) {
                                 $oBasicWays = $oLottery->basicways;
@@ -95,7 +95,7 @@ trait IssueEncodeLogics
                                                             );
                                                         } catch (\Exception $e) {
                                                             Log::error('Prize Checking on error');
-                                                            Log::error($e->getMessage().$e->getTraceAsString());
+                                                            Log::error($e->getMessage() . $e->getTraceAsString());
                                                         }
                                                         $strlog = 'aPrized is '.json_encode(
                                                             $aPrized,
@@ -110,7 +110,7 @@ trait IssueEncodeLogics
                                                             ); //@todo Trace
                                                         } catch (\Exception $e) {
                                                             Log::error('Set Won on error');
-                                                            Log::error($e->getMessage().$e->getTraceAsString());
+                                                            Log::error($e->getMessage() . $e->getTraceAsString());
                                                         }
                                                         if ($result !== true) {
                                                             Log::channel('issues')->info($result);
@@ -141,9 +141,9 @@ trait IssueEncodeLogics
     }
 
     /**
-     * @param  LotteryList  $oLottery
+     * @param LotteryList $oLottery
      * @param $sFullWnNumber
-     * @param  bool  $bNameKey
+     * @param bool $bNameKey
      * @return array
      */
     public static function getWnNumberOfSeriesMethods(LotteryList $oLottery, $sFullWnNumber, $bNameKey = false): array
@@ -296,16 +296,19 @@ trait IssueEncodeLogics
         $this->encode_time = time();
         $this->official_code = $openCodeStr;
         if ($this->save()) {
+            //趋势分析记录
+            LotteryTrend::trend($this);
+
             dispatch(new IssueEncoder($this->toArray()))->onQueue('open_numbers');
         }
     }
 
     /**
      * 生成一个奖期合法的随机开奖号码
-     * @param  int  $codeLength  [开奖号码的长度]
-     * @param  string  $validCode  [合法开奖号码]
-     * @param  int  $lotteryType  [开奖号码是否可以重复 ？ 1可重复 2不可重复]
-     * @param          $splitter  [该彩种分割开奖号码的方式]
+     * @param int $codeLength [开奖号码的长度]
+     * @param string $validCode [合法开奖号码]
+     * @param int $lotteryType [开奖号码是否可以重复 ？ 1可重复 2不可重复]
+     * @param          $splitter [该彩种分割开奖号码的方式]
      * @return string  $openCodeStr  [开奖号码string]
      */
     public static function getOpenNumber($codeLength, $validCode, $lotteryType, $splitter): string
@@ -329,9 +332,9 @@ trait IssueEncodeLogics
 
     /**
      * 奖期录号
-     * @param  int  $lotteryId
-     * @param  int  $issue
-     * @param  string  $code  开奖号码
+     * @param int $lotteryId
+     * @param int $issue
+     * @param string $code 开奖号码
      * @return void
      */
     public static function enCode($lotteryId, $issue, $code): void
