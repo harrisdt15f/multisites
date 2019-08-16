@@ -2,6 +2,9 @@
 
 namespace App\Models\Game\Lottery\Logics;
 
+use App\Events\IssueGenerateEvent;
+use Illuminate\Support\Carbon;
+
 /**
  * Created by PhpStorm.
  * author: Harris
@@ -49,7 +52,7 @@ trait IssueLogics
     }
 
     /**
-     * 获取所有可投奖期
+     * 获取当天所有可投奖期
      * @param  $lotteryId
      * @param  int         $count
      * @return mixed
@@ -57,7 +60,7 @@ trait IssueLogics
     public static function getCanBetIssue($lotteryId, $count = 50)
     {
         $time = time();
-        $day = date('Y-m-d');
+        $day = date('Ymd');
         return self::where([
             ['lottery_id', $lotteryId],
             ['end_time', '>', $time],
@@ -93,5 +96,18 @@ trait IssueLogics
             ['lottery_id', $lotterySign],
             ['end_time', '<=', $time],
         ])->orderBy('begin_time', 'DESC')->skip($skipNum)->first();
+    }
+
+    //生成彩种今日奖期
+    public static function generateTodayIssue($lottery)
+    {
+        $day = Carbon::today();
+        $generateIssueData = [
+            'lottery_id' => $lottery,
+            'start_time' => $day,
+            'end_time' => $day,
+            'start_issue' => '',
+        ];
+        event(new IssueGenerateEvent($generateIssueData));
     }
 }
