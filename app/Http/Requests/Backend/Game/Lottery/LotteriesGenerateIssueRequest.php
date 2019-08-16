@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Backend\Game\Lottery;
 
 use App\Http\Requests\BaseFormRequest;
-use Illuminate\Support\Facades\Config;
 
 class LotteriesGenerateIssueRequest extends BaseFormRequest
 {

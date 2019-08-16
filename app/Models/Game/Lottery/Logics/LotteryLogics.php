@@ -346,7 +346,7 @@ trait LotteryLogics
                     $groupData[$method->method_group] = [];
                 }
 
-                if (!isset($hasRow[$method->method_group])||
+                if (!isset($hasRow[$method->method_group]) ||
                     !in_array($method->method_row, $hasRow[$method->method_group])) {
                     $groupData[$method->method_group][] = [
                         'name' => $rowName[$method->method_row],
@@ -490,7 +490,7 @@ trait LotteryLogics
                     $groupData[$method->method_group] = [];
                 }
                 if (!isset($hasRow[$method->method_group]) ||
-                !in_array($method->method_row, $hasRow[$method->method_group])) {
+                    !in_array($method->method_row, $hasRow[$method->method_group])) {
                     $groupData[$method->method_group][] = [
                         'name' => $rowName[$method->method_row],
                         'sign' => $method->method_row,
@@ -532,5 +532,11 @@ trait LotteryLogics
         $frontendLotteryInfoCache = 'frontend.lottery.lotteryInfo';
         Cache::put($frontendLotteryInfoCache, $cacheData, $expiresAt);
         return $cacheData;
+    }
+
+    //获取除了六合彩以外的所有开启状态的彩种sign（生成奖期用）
+    public static function generateIssueLotterys()
+    {
+        return self::where('status', 1)->where('en_name', '!=', 'hklhc')->pluck('en_name');
     }
 }
