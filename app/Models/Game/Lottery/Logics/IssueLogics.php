@@ -98,8 +98,12 @@ trait IssueLogics
         ])->orderBy('begin_time', 'DESC')->skip($skipNum)->first();
     }
 
-    //生成彩种今日奖期
-    public static function generateTodayIssue($lottery)
+    /**
+     * 生成彩种今日奖期
+     * @param  string $lottery
+     * @return void
+     */
+    public static function generateTodayIssue($lottery): void
     {
         $day = Carbon::today();
         $generateIssueData = [
