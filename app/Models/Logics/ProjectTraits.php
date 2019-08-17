@@ -182,6 +182,7 @@ trait ProjectTraits
             $aMaxPrize
         );
         $traceMainData = [
+            'trace_serial_number'=>self::getProjectSerialNumber(),
             'user_id' => $user->id,
             'username' => $user->username,
             'top_id' => $user->top_id,
