@@ -94,6 +94,7 @@ trait IssueEncodeLogics
                                                                 $sPostion = null
                                                             );
                                                         } catch (\Exception $e) {
+                                                            $aPrized = [];
                                                             Log::error('Prize Checking on error');
                                                             Log::error($e->getMessage().$e->getTraceAsString());
                                                         }
@@ -296,6 +297,9 @@ trait IssueEncodeLogics
         $this->encode_time = time();
         $this->official_code = $openCodeStr;
         if ($this->save()) {
+            //趋势分析记录
+            LotteryTrend::trend($this);
+
             dispatch(new IssueEncoder($this->toArray()))->onQueue('open_numbers');
         }
     }

@@ -26,7 +26,7 @@ trait SysConfiguresTraits
         if (Cache::has($redisKey)) {
             $generateIssueTime = Cache::get($redisKey);
         } else {
-            $generateIssueTime = self::getConfigValue('generate_issue_time');
+            $generateIssueTime = configure('generate_issue_time');
             Cache::forever($redisKey, $generateIssueTime);
         }
         return $generateIssueTime;

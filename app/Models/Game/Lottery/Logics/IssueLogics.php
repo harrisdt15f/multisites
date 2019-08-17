@@ -2,6 +2,9 @@
 
 namespace App\Models\Game\Lottery\Logics;
 
+use App\Events\IssueGenerateEvent;
+use Illuminate\Support\Carbon;
+
 /**
  * Created by PhpStorm.
  * author: Harris
@@ -19,7 +22,7 @@ trait IssueLogics
      */
     public static function getCurrentIssue($lotteryId)
     {
-        return self::where('lottery_id', $lotteryId)->where('end_time', '>', time())->orderBy('id', 'ASC')->first();
+        return self::where('lottery_id', $lotteryId)->where('end_time', '>', time())->orderBy('end_time', 'ASC')->first();
     }
 
     /**
@@ -49,7 +52,7 @@ trait IssueLogics
     }
 
     /**
-     * 获取所有可投奖期
+     * 获取当天所有可投奖期
      * @param  $lotteryId
      * @param  int         $count
      * @return mixed
@@ -57,9 +60,11 @@ trait IssueLogics
     public static function getCanBetIssue($lotteryId, $count = 50)
     {
         $time = time();
+        $day = date('Ymd');
         return self::where([
             ['lottery_id', $lotteryId],
-            ['end_time', '>', $time]
+            ['end_time', '>', $time],
+            ['day', $day],
         ])->orderBy('begin_time', 'ASC')->skip(0)->take($count)->get();
     }
 
@@ -74,7 +79,7 @@ trait IssueLogics
         $time = time();
         return self::where([
             ['lottery_id', $lotteryId],
-            ['begin_time', '<=', $time]
+            ['begin_time', '<=', $time],
         ])->orderBy('begin_time', 'ASC')->skip(0)->take($count)->get();
     }
 
@@ -89,7 +94,24 @@ trait IssueLogics
         $time = time();
         return self::where([
             ['lottery_id', $lotterySign],
-            ['end_time', '<=', $time]
+            ['end_time', '<=', $time],
         ])->orderBy('begin_time', 'DESC')->skip($skipNum)->first();
+    }
+
+    /**
+     * 生成彩种今日奖期
+     * @param  string $lottery
+     * @return void
+     */
+    public static function generateTodayIssue($lottery): void
+    {
+        $day = Carbon::today();
+        $generateIssueData = [
+            'lottery_id' => $lottery,
+            'start_time' => $day,
+            'end_time' => $day,
+            'start_issue' => '',
+        ];
+        event(new IssueGenerateEvent($generateIssueData));
     }
 }

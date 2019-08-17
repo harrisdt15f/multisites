@@ -152,8 +152,6 @@ class FrontendAuthController extends FrontendApiMainController
         if ($type === 1) {
             $field = 'password';
             $oldPassword = $targetUserEloq->password;
-            $token = $this->refresh();
-            $targetUserEloq->remember_token = $token;
         } elseif ($type === 2) {
             $field = 'fund_password';
             $oldPassword = $targetUserEloq->fund_password;
@@ -167,6 +165,10 @@ class FrontendAuthController extends FrontendApiMainController
         //修改密码
         $targetUserEloq->$field = Hash::make($inputDatas['new_password']);
         if ($targetUserEloq->save()) {
+            if ($type === 1) {
+                // $targetUserEloq->remember_token = $token;
+                $token = $this->refresh(); //修改登录密码更新token
+            }
             return $this->msgOut(true);
         } else {
             return $this->msgOut(false, [], '100011');
@@ -202,7 +204,7 @@ class FrontendAuthController extends FrontendApiMainController
     public function setFundPassword(
         FrontendAuthSetFundPasswordRequest $request,
         FrontendAuthSetFundPasswordAction $action
-    ): JsonResponse {
+    ): JsonResponse{
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -226,7 +228,7 @@ class FrontendAuthController extends FrontendApiMainController
     public function resetSpecificInfos(
         FrontendAuthResetSpecificInfosRequest $request,
         FrontendAuthResetSpecificInfosAction $action
-    ): JsonResponse {
+    ): JsonResponse{
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
