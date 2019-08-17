@@ -8,6 +8,7 @@ use App\Models\User\Fund\FrontendUsersAccountsReport;
 use App\Models\User\Fund\FrontendUsersAccountsType;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 /**
  * 帐变主逻辑
@@ -101,6 +102,7 @@ class AccountChange
         // 资金增减. 需要检测对应
         // 保存记录
         $report = [
+            'serial_number'=> self::getSerialNumber(),
             'activity_sign' => $params['activity_sign'] ?? 0,
             'amount' => $amount,
             'created_at' => date('Y-m-d H:i:s'),
@@ -419,5 +421,14 @@ class AccountChange
             }
         }
         return true;
+    }
+    
+    /**
+     * 生成帐变编号
+     * @return string
+     */
+    public static function getSerialNumber(): string
+    {
+        return Str::orderedUuid()->getHex();
     }
 }

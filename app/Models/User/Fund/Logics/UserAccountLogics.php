@@ -12,6 +12,7 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Str;
 
 /**
  * Created by PhpStorm.
@@ -115,6 +116,7 @@ trait UserAccountLogics
         }
         // 保存记录
         $report = [
+            'serial_number'=> self::getSerialNumber(),
             'user_id' => $user->id,
             'top_id' => $user->top_id,
             'parent_id' => $user->parent_id,
@@ -297,5 +299,14 @@ trait UserAccountLogics
             Log::info('投注-异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine());
             return '对不起, ' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine();
         }
+    }
+
+    /**
+     * 生成帐变编号
+     * @return string
+     */
+    public static function getSerialNumber(): string
+    {
+        return Str::orderedUuid()->getHex();
     }
 }
