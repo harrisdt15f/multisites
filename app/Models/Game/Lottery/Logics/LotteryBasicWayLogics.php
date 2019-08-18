@@ -205,7 +205,7 @@ trait LotteryBasicWayLogics
         $sSplitChar = '|';
         switch ($this->function) {
             case 'MultiOne':
-            case 'LottoMultiOne':
+//            case 'LottoMultiOne'://已拆弹跟以前不一样了
                 $aBetNumbers = explode($sSplitChar, $sBetNumber);
                 $iOffset = $oSeriesMethod->offset >= 0 ?
                     $oSeriesMethod->offset : $oSeriesMethod->offset + $oSeriesWay->digital_count;
