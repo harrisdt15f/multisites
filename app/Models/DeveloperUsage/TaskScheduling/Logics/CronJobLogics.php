@@ -39,10 +39,10 @@ trait CronJobLogics
      * 获取开启状态的cron_job
      * @return  array
      */
-    public static function getOpenCronJob(): array
+    public static function getOpenCronJob($update = 0): array
     {
         $cacheKey = 'open_cron_job';
-        if (Cache::has($cacheKey)) {
+        if (Cache::has($cacheKey) && $update === 0) {
             $data = Cache::get($cacheKey);
         } else {
             $data = self::select('command', 'param', 'schedule')->where('status', 1)->get()->toArray();
