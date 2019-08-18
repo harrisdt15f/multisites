@@ -4,6 +4,7 @@ namespace App\Http\Controllers\BackendApi;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin\BackendAdminAccessGroup;
+use App\Models\Admin\SystemConfiguration;
 use App\Models\DeveloperUsage\Backend\BackendAdminRoute;
 use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
 use App\Models\SystemPlatform;
@@ -25,6 +26,7 @@ class BackEndApiMainController extends Controller
     protected $currentOptRoute; //目前路由
     protected $fullMenuLists; //所有的菜单
     public $currentPlatformEloq; //当前商户存在的平台
+    public $betPrizeGroupArr; //奖金组
     public $currentPartnerAccessGroup; //当前商户的权限组
     protected $partnerMenulists; //目前所有的菜单为前端展示用的
     protected $eloqM = ''; // 当前的eloquent
@@ -67,6 +69,7 @@ class BackEndApiMainController extends Controller
             $this->inputs = Input::all(); //获取所有相关的传参数据
             //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
             $this->adminOperateLog();
+            $this->betPrizeGroupArr = SystemConfiguration::getBetPrizeGroup(); //奖金组
             $this->eloqM = 'App\\Models\\' . $this->eloqM; // 当前的eloquent
             return $next($request);
         });
@@ -162,7 +165,7 @@ class BackEndApiMainController extends Controller
         $message = '',
         $placeholder = null,
         $substituted = null
-    ): JsonResponse {
+    ): JsonResponse{
         /*if ($this->currentAuth->user())
         {
         $data['access_token']=$this->currentAuth->user()->remember_token;
@@ -369,7 +372,8 @@ class BackEndApiMainController extends Controller
         $withSearchCriterias,
         $queryConditions
     ) {
-        if (empty($sizeOfWithInputs)) {//如果with 没有参数可以查询时查询全部
+        if (empty($sizeOfWithInputs)) {
+//如果with 没有参数可以查询时查询全部
             switch ($fixedJoin) {
                 case 1: //有一个连表查询的情况下
                     $queryEloq = $queryEloq->with($withTable);

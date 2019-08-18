@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\FrontendApi;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin\SystemConfiguration;
 use App\Models\DeveloperUsage\Frontend\FrontendAppRoute;
 use App\Models\DeveloperUsage\Frontend\FrontendWebRoute;
 use App\Models\SystemPlatform;
@@ -21,6 +22,7 @@ class FrontendApiMainController extends Controller
     public $partnerUser; //当前的用户
     protected $currentOptRoute; //目前路由
     public $currentPlatformEloq; //当前商户存在的平台
+    public $betPrizeGroupArr; //奖金组
     public $eloqM = ''; // 当前的eloquent
     //当前的route name;
     protected $log_uuid; //当前的logId
@@ -42,6 +44,7 @@ class FrontendApiMainController extends Controller
                     $this->currentPlatformEloq = $this->partnerUser->platform; //获取目前账号用户属于平台的对象
                 }
             }
+            $this->betPrizeGroupArr = SystemConfiguration::getBetPrizeGroup(); //奖金组
             $this->eloqM = 'App\\Models\\' . $this->eloqM; // 当前的eloquent
             return $next($request);
         });
@@ -106,7 +109,7 @@ class FrontendApiMainController extends Controller
         $message = '',
         $placeholder = null,
         $substituted = null
-    ): JsonResponse {
+    ): JsonResponse{
         $defaultSuccessCode = '200';
         $defaultErrorCode = '404';
         if ($success === true) {
@@ -313,7 +316,8 @@ class FrontendApiMainController extends Controller
         $withSearchCriterias,
         $queryConditions
     ) {
-        if (empty($sizeOfWithInputs)) {//如果with 没有参数可以查询时查询全部
+        if (empty($sizeOfWithInputs)) {
+//如果with 没有参数可以查询时查询全部
             switch ($fixedJoin) {
                 case 1: //有一个连表查询的情况下
                     $queryEloq = $queryEloq->with($withTable);

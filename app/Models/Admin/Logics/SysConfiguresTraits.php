@@ -55,4 +55,35 @@ trait SysConfiguresTraits
         }
         return $data;
     }
+
+    public static function getBetPrizeGroup($update = 0)
+    {
+        $redisKey = 'bet_prize_group';
+        $data = [];
+        if (Cache::has($redisKey) && $update === 0) {
+            $data = Cache::get($redisKey);
+        } else {
+            $signArr = ['min_bet_prize_group', 'max_bet_prize_group'];
+            $BetPrizeGroupEloq = self::whereIn('sign', $signArr)->get();
+            foreach ($BetPrizeGroupEloq as $item) {
+                $data[$item->sign] = $item->value;
+            }
+            Cache::forever($redisKey, $data);
+        }
+        return $data;
+    }
+
+    /**
+     * 更新该配置有关的缓存
+     * @param  string $sign
+     * @param  string $value
+     * @return void
+     */
+    public static function updateConfigCache($sign, $value): void
+    {
+        //相关奖金组的缓存更新
+        if ($sign = 'min_bet_prize_group' || $sign = 'max_bet_prize_group') {
+            self::getBetPrizeGroup(1);
+        }
+    }
 }
