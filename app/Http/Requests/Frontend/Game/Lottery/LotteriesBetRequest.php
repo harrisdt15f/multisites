@@ -39,7 +39,7 @@ class LotteriesBetRequest extends BaseFormRequest
             'balls.*.method_name' => 'required',
             'balls.*.codes' =>
                 [
-                    new BallsCodeRule($this->get('lottery_sign'),$this->get('balls'))
+                    new BallsCodeRule($this->get('lottery_sign'), $this->get('balls'))
                 ],
             'balls.*.count' => [
                 'required',
