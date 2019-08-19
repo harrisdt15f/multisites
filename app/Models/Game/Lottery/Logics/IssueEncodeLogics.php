@@ -338,7 +338,7 @@ trait IssueEncodeLogics
      * @param  string  $code  开奖号码
      * @return void
      */
-    public static function enCode($lotteryId, $issue, $code): void
+    public static function encode($lotteryId, $issue, $code): void
     {
         $lotteryIssueEloq = self::where([
             ['lottery_id', $lotteryId],
