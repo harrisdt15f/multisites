@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Backend\Users;
 
 use App\Http\Requests\BaseFormRequest;
+use App\Models\Admin\SystemConfiguration;
 use Illuminate\Support\Facades\Cache;
 
 class UserHandleCreateUserRequest extends BaseFormRequest
@@ -24,9 +25,9 @@ class UserHandleCreateUserRequest extends BaseFormRequest
      */
     public function rules(): array
     {
-        $currentPlatformEloq = Cache::get('currentPlatformEloq');
-        $min = $currentPlatformEloq->prize_group_min;
-        $max = $currentPlatformEloq->prize_group_max;
+        $prizeGroup = SystemConfiguration::getBetPrizeGroup();
+        $min = $prizeGroup['min_bet_prize_group'] ?? 0;
+        $max = $prizeGroup['max_bet_prize_group'] ?? 1960;
         return [
             'username' => 'required|unique:frontend_users',
             'password' => 'required',

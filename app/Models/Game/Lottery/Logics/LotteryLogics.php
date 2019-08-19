@@ -161,16 +161,22 @@ trait LotteryLogics
      * @return array|mixed
      * @throws \Exception
      */
-    public static function getAllLotteryByCache()
+    public static function getAllLotteryByCache($update = 0)
     {
         $key = 'lottery';
-        if (self::hasCache($key)) {
+        if (self::hasCache($key) && $update === 0) {
             return self::getCacheData($key);
         } else {
             $lotteries = self::getAllLotteries();
             self::saveCacheData($key, $lotteries);
             return $lotteries;
         }
+    }
+
+    //更新 所有游戏&玩法 缓存
+    public static function updateAllLotteryByCache()
+    {
+        self::getAllLotteryByCache(1);
     }
 
     /**

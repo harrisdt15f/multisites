@@ -4,6 +4,7 @@ namespace App\Http\Controllers\BackendApi;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin\BackendAdminAccessGroup;
+use App\Models\Admin\SystemConfiguration;
 use App\Models\DeveloperUsage\Backend\BackendAdminRoute;
 use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
 use App\Models\SystemPlatform;
@@ -33,6 +34,8 @@ class BackEndApiMainController extends Controller
     public $log_uuid; //当前的logId
     protected $currentGuard = 'backend';
     public $currentAuth;
+    public $minClassicPrizeGroup; //平台最低投注奖金组
+    public $maxClassicPrizeGroup; //平台最高投注奖金组
     /**
      * @var Agent
      */
@@ -67,6 +70,8 @@ class BackEndApiMainController extends Controller
             $this->inputs = Input::all(); //获取所有相关的传参数据
             //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
             $this->adminOperateLog();
+            $this->minClassicPrizeGroup = configure('min_bet_prize_group', 1800);//平台最低投注奖金组
+            $this->maxClassicPrizeGroup = configure('max_bet_prize_group', 1960);//平台最高投注奖金组
             $this->eloqM = 'App\\Models\\' . $this->eloqM; // 当前的eloquent
             return $next($request);
         });
@@ -369,7 +374,8 @@ class BackEndApiMainController extends Controller
         $withSearchCriterias,
         $queryConditions
     ) {
-        if (empty($sizeOfWithInputs)) {//如果with 没有参数可以查询时查询全部
+        if (empty($sizeOfWithInputs)) {
+//如果with 没有参数可以查询时查询全部
             switch ($fixedJoin) {
                 case 1: //有一个连表查询的情况下
                     $queryEloq = $queryEloq->with($withTable);

@@ -120,5 +120,4 @@ class HomepageBannerController extends BackEndApiMainController
             $cacheRelated->delete('homepage_banner_app');
         }
     }
-
 }

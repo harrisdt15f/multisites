@@ -65,7 +65,6 @@ class ConfiguresController extends BackEndApiMainController
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
-
     }
 
     /**
@@ -74,8 +73,10 @@ class ConfiguresController extends BackEndApiMainController
      * @param  ConfiguresConfigSwitchAction  $action
      * @return JsonResponse
      */
-    public function configSwitch(ConfiguresConfigSwitchRequest $request, ConfiguresConfigSwitchAction $action): JsonResponse
-    {
+    public function configSwitch(
+        ConfiguresConfigSwitchRequest $request,
+        ConfiguresConfigSwitchAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -86,8 +87,10 @@ class ConfiguresController extends BackEndApiMainController
      * @param  ConfiguresGenerateIssueTimeAction  $action
      * @return JsonResponse
      */
-    public function generateIssueTime(ConfiguresGenerateIssueTimeRequest $request, ConfiguresGenerateIssueTimeAction $action): JsonResponse
-    {
+    public function generateIssueTime(
+        ConfiguresGenerateIssueTimeRequest $request,
+        ConfiguresGenerateIssueTimeAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -98,8 +101,10 @@ class ConfiguresController extends BackEndApiMainController
      * @param  ConfiguresGetSysConfigureValueAction  $action
      * @return JsonResponse
      */
-    public function getSysConfigureValue(ConfiguresGetSysConfigureValueRequest $request, ConfiguresGetSysConfigureValueAction $action): JsonResponse
-    {
+    public function getSysConfigureValue(
+        ConfiguresGetSysConfigureValueRequest $request,
+        ConfiguresGetSysConfigureValueAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }

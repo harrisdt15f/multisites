@@ -22,7 +22,10 @@ trait IssueLogics
      */
     public static function getCurrentIssue($lotteryId)
     {
-        return self::where('lottery_id', $lotteryId)->where('end_time', '>', time())->orderBy('end_time', 'ASC')->first();
+        return self::where('lottery_id', $lotteryId)
+            ->where('end_time', '>', time())
+            ->orderBy('end_time', 'ASC')
+            ->first();
     }
 
     /**

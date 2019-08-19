@@ -89,8 +89,10 @@ class LotteriesController extends BackEndApiMainController
      * @param  LotteriesGenerateIssueAction  $action
      * @return JsonResponse
      */
-    public function generateIssue(LotteriesGenerateIssueRequest $request, LotteriesGenerateIssueAction $action): JsonResponse
-    {
+    public function generateIssue(
+        LotteriesGenerateIssueRequest $request,
+        LotteriesGenerateIssueAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -101,8 +103,10 @@ class LotteriesController extends BackEndApiMainController
      * @param  LotteriesLotteriesSwitchAction  $action
      * @return JsonResponse
      */
-    public function lotteriesSwitch(LotteriesLotteriesSwitchRequest $request, LotteriesLotteriesSwitchAction $action): JsonResponse
-    {
+    public function lotteriesSwitch(
+        LotteriesLotteriesSwitchRequest $request,
+        LotteriesLotteriesSwitchAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -113,8 +117,10 @@ class LotteriesController extends BackEndApiMainController
      * @param  LotteriesMethodGroupSwitchAction  $action
      * @return JsonResponse
      */
-    public function methodGroupSwitch(LotteriesMethodGroupSwitchRequest $request, LotteriesMethodGroupSwitchAction $action): JsonResponse
-    {
+    public function methodGroupSwitch(
+        LotteriesMethodGroupSwitchRequest $request,
+        LotteriesMethodGroupSwitchAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -125,8 +131,10 @@ class LotteriesController extends BackEndApiMainController
      * @param  LotteriesMethodRowSwitchAction  $action
      * @return JsonResponse
      */
-    public function methodRowSwitch(LotteriesMethodRowSwitchRequest $request, LotteriesMethodRowSwitchAction $action): JsonResponse
-    {
+    public function methodRowSwitch(
+        LotteriesMethodRowSwitchRequest $request,
+        LotteriesMethodRowSwitchAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -137,8 +145,10 @@ class LotteriesController extends BackEndApiMainController
      * @param  LotteriesMethodSwitchAction  $action
      * @return JsonResponse
      */
-    public function methodSwitch(LotteriesMethodSwitchRequest $request, LotteriesMethodSwitchAction $action): JsonResponse
-    {
+    public function methodSwitch(
+        LotteriesMethodSwitchRequest $request,
+        LotteriesMethodSwitchAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -159,8 +169,10 @@ class LotteriesController extends BackEndApiMainController
      * @param  LotteriesEditMethodAction  $action
      * @return JsonResponse
      */
-    public function editMethod(LotteriesEditMethodRequest $request, LotteriesEditMethodAction $action): JsonResponse
-    {
+    public function editMethod(
+        LotteriesEditMethodRequest $request,
+        LotteriesEditMethodAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -187,9 +199,16 @@ class LotteriesController extends BackEndApiMainController
         return $action->execute($this);
     }
 
-    //奖期重新派奖
-    public function CalculateEncodeAgain(LotteriesCalculateEncodeAgainRequest $request, LotteriesCalculateEncodeAgainAction $action)
-    {
+    /**
+     * 奖期重新派奖
+     * @param LotteriesCalculateEncodeAgainRequest $request
+     * @param LotteriesCalculateEncodeAgainAction
+     * @return JsonResponse
+     */
+    public function calculateEncodeAgain(
+        LotteriesCalculateEncodeAgainRequest $request,
+        LotteriesCalculateEncodeAgainAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -246,8 +265,10 @@ class LotteriesController extends BackEndApiMainController
      * @param  LotteriesDeleteIssuesAction  $action
      * @return JsonResponse
      */
-    public function deleteIssues(LotteriesDeleteIssuesRequest $request, LotteriesDeleteIssuesAction $action): JsonResponse
-    {
+    public function deleteIssues(
+        LotteriesDeleteIssuesRequest $request,
+        LotteriesDeleteIssuesAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }

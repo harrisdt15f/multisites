@@ -18,20 +18,21 @@ class LotteriesLotteryListAction
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
         $lotteries = LotteryList::with(['issueRule:lottery_id,begin_time,end_time'])
-            ->where('status', 1)->get([
-            'id',
-            'cn_name as name',
-            'en_name',
-            'icon_path',
-            'series_id',
-            'min_times',
-            'max_times',
-            'valid_modes',
-            'min_prize_group',
-            'max_prize_group',
-            'max_trace_number',
-            'day_issue',
-        ]);
+            ->where('status', 1)
+            ->get([
+                'id',
+                'cn_name as name',
+                'en_name',
+                'icon_path',
+                'series_id',
+                'min_times',
+                'max_times',
+                'valid_modes',
+                'min_prize_group',
+                'max_prize_group',
+                'max_trace_number',
+                'day_issue',
+            ]);
         $seriesConfig = config('game.main.series');
         $data = [];
         foreach ($lotteries as $lottery) {

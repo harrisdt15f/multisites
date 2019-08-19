@@ -40,8 +40,8 @@ class UserHandleController extends BackEndApiMainController
      */
     public function getUserPrizeGroup(): JsonResponse
     {
-        $data['min'] = $this->currentPlatformEloq->prize_group_min;
-        $data['max'] = $this->currentPlatformEloq->prize_group_max;
+        $data['min'] = $this->minClassicPrizeGroup; //最低奖金组
+        $data['max'] = $this->maxClassicPrizeGroup; //最高奖金组
         return $this->msgOut(true, $data);
     }
 
@@ -72,8 +72,10 @@ class UserHandleController extends BackEndApiMainController
      * @param  UserHandleApplyResetUserPasswordRequest $request
      * @return JsonResponse
      */
-    public function applyResetUserPassword(UserHandleApplyResetUserPasswordRequest $request, UserHandleCommonHandleUserPasswordAction $action): JsonResponse
-    {
+    public function applyResetUserPassword(
+        UserHandleApplyResetUserPasswordRequest $request,
+        UserHandleCommonHandleUserPasswordAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $this->commonHandleUserPassword($inputDatas, $action, 1);
     }
@@ -83,8 +85,10 @@ class UserHandleController extends BackEndApiMainController
      * @param  UserHandleApplyResetUserFundPasswordRequest $request
      * @return JsonResponse
      */
-    public function applyResetUserFundPassword(UserHandleApplyResetUserFundPasswordRequest $request, UserHandleCommonHandleUserPasswordAction $action): JsonResponse
-    {
+    public function applyResetUserFundPassword(
+        UserHandleApplyResetUserFundPasswordRequest $request,
+        UserHandleCommonHandleUserPasswordAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $this->commonHandleUserPassword($inputDatas, $action, 2);
     }
@@ -134,8 +138,10 @@ class UserHandleController extends BackEndApiMainController
      * @param  UserHandleCommonAuditPasswordAction  $action
      * @return JsonResponse
      */
-    public function auditApplyUserPassword(UserHandleCommonAuditPasswordRequest $request, UserHandleCommonAuditPasswordAction $action): JsonResponse
-    {
+    public function auditApplyUserPassword(
+        UserHandleCommonAuditPasswordRequest $request,
+        UserHandleCommonAuditPasswordAction $action
+    ): JsonResponse {
         return $this->commonAuditPassword($request, $action);
     }
 
@@ -144,8 +150,10 @@ class UserHandleController extends BackEndApiMainController
      * @param  UserHandleCommonAuditPasswordAction  $action
      * @return JsonResponse
      */
-    public function auditApplyUserFundPassword(UserHandleCommonAuditPasswordRequest $request, UserHandleCommonAuditPasswordAction $action): JsonResponse
-    {
+    public function auditApplyUserFundPassword(
+        UserHandleCommonAuditPasswordRequest $request,
+        UserHandleCommonAuditPasswordAction $action
+    ): JsonResponse {
         return $this->commonAuditPassword($request, $action);
     }
 
@@ -178,8 +186,10 @@ class UserHandleController extends BackEndApiMainController
      * @param  UserHandleDeactivateDetailAction  $action
      * @return JsonResponse
      */
-    public function deactivateDetail(UserHandleDeactivateDetailRequest $request, UserHandleDeactivateDetailAction $action): JsonResponse
-    {
+    public function deactivateDetail(
+        UserHandleDeactivateDetailRequest $request,
+        UserHandleDeactivateDetailAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -190,8 +200,10 @@ class UserHandleController extends BackEndApiMainController
      * @param  UserHandleUserAccountChangeAction  $action
      * @return JsonResponse
      */
-    public function userAccountChange(UserHandleUserAccountChangeRequest $request, UserHandleUserAccountChangeAction $action): JsonResponse
-    {
+    public function userAccountChange(
+        UserHandleUserAccountChangeRequest $request,
+        UserHandleUserAccountChangeAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -202,8 +214,10 @@ class UserHandleController extends BackEndApiMainController
      * @param  UserHandleUserRechargeHistoryAction  $action
      * @return JsonResponse
      */
-    public function userRechargeHistory(UserHandleUserRechargeHistoryRequest $request, UserHandleUserRechargeHistoryAction $action): JsonResponse
-    {
+    public function userRechargeHistory(
+        UserHandleUserRechargeHistoryRequest $request,
+        UserHandleUserRechargeHistoryAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -214,8 +228,10 @@ class UserHandleController extends BackEndApiMainController
      * @param  UserHandleDeductionBalanceAction  $action
      * @return JsonResponse
      */
-    public function deductionBalance(UserHandleDeductionBalanceRequest $request, UserHandleDeductionBalanceAction $action): JsonResponse
-    {
+    public function deductionBalance(
+        UserHandleDeductionBalanceRequest $request,
+        UserHandleDeductionBalanceAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -226,8 +242,10 @@ class UserHandleController extends BackEndApiMainController
      * @param  UserHandleBankCardListAction  $action
      * @return JsonResponse
      */
-    public function bankCardList(UserHandleBankCardListRequest $request, UserHandleBankCardListAction $action): JsonResponse
-    {
+    public function bankCardList(
+        UserHandleBankCardListRequest $request,
+        UserHandleBankCardListAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -246,8 +264,10 @@ class UserHandleController extends BackEndApiMainController
      * @param  UserHandleSetUserAvatarAction $action
      * @return JsonResponse
      */
-    public function setUserAvatar(UserHandleSetUserAvatarRequest $request, UserHandleSetUserAvatarAction $action): JsonResponse
-    {
+    public function setUserAvatar(
+        UserHandleSetUserAvatarRequest $request,
+        UserHandleSetUserAvatarAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }

@@ -26,8 +26,10 @@ class NoticeMessagesController extends BackEndApiMainController
      * @param  NoticeMessagesSendMessagesAction  $action
      * @return JsonResponse
      */
-    public function sendMessages(NoticeMessagesSendMessagesRequest $request, NoticeMessagesSendMessagesAction $action): JsonResponse
-    {
+    public function sendMessages(
+        NoticeMessagesSendMessagesRequest $request,
+        NoticeMessagesSendMessagesAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }

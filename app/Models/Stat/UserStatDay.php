@@ -1,4 +1,5 @@
-<?php namespace App\Models\Stat;
+<?php
+namespace App\Models\Stat;
 
 use App\Models\BaseModel;
 use Illuminate\Support\Facades\DB;
@@ -66,7 +67,7 @@ class UserStatDay extends BaseModel
      * @param int $pageSize
      * @return array
      */
-    static function getList($c, $pageSize = 15)
+    public static function getList($c, $pageSize = 15)
     {
         $query = self::orderBy('id', 'desc');
 
@@ -91,7 +92,7 @@ class UserStatDay extends BaseModel
         }
 
         // 是否机器人
-        if (isset($c['is_robot']) && in_array( $c['is_robot'], ["0", "1"]) &&  $c['is_robot'] != 'all') {
+        if (isset($c['is_robot']) && in_array($c['is_robot'], ["0", "1"]) && $c['is_robot'] != 'all') {
             $query->where('is_robot', $c['is_robot']);
         }
 
@@ -109,14 +110,19 @@ class UserStatDay extends BaseModel
             $query->where('day', "<=", date("Ymd"));
         }
 
-        $currentPage    = isset($c['pageIndex']) ? intval($c['pageIndex']) : 1;
-        $pageSize       = isset($c['pageSize']) ? intval($c['pageSize']) : $pageSize;
+        $currentPage = isset($c['pageIndex']) ? intval($c['pageIndex']) : 1;
+        $pageSize = isset($c['pageSize']) ? intval($c['pageSize']) : $pageSize;
         $offset = ($currentPage - 1) * $pageSize;
 
         $total = $query->count();
         $menus = $query->skip($offset)->take($pageSize)->get();
 
-        return ['data' => $menus, 'total' => $total, 'currentPage' => $currentPage, 'totalPage' => intval(ceil($total / $pageSize))];
+        return [
+            'data' => $menus,
+            'total' => $total,
+            'currentPage' => $currentPage,
+            'totalPage' => intval(ceil($total / $pageSize)),
+        ];
     }
 
     /**
@@ -124,26 +130,26 @@ class UserStatDay extends BaseModel
      * @param $user
      * @return mixed
      */
-    static function initUserStatData($user) {
-
+    public static function initUserStatData($user)
+    {
         $closeRobotData = configure("system_close_robot_stat", 0);
         if ($closeRobotData && $user->is_robot) {
             return true;
         }
 
-        $startTime  = time();
-        $endTime    = time() + 86400 * 1;
-        $daySet     = self::getDaySet($startTime, $endTime);
+        $startTime = time();
+        $endTime = time() + 86400 * 1;
+        $daySet = self::getDaySet($startTime, $endTime);
 
         $data = [];
         foreach ($daySet as $day) {
             $data[] = [
-                'user_id'   => $user->id,
-                'top_id'    => $user->top_id,
+                'user_id' => $user->id,
+                'top_id' => $user->top_id,
                 'parent_id' => $user->parent_id,
-                'username'  => $user->username,
-                'nickname'  => $user->nickname,
-                'day'       => $day,
+                'username' => $user->username,
+                'nickname' => $user->nickname,
+                'day' => $day,
             ];
         }
 
@@ -151,17 +157,16 @@ class UserStatDay extends BaseModel
 
         // 初始化总
         $dataAll[] = [
-            'user_id'   => $user->id,
-            'top_id'    => $user->top_id,
+            'user_id' => $user->id,
+            'top_id' => $user->top_id,
             'parent_id' => $user->parent_id,
-            'username'  => $user->username,
-            'nickname'  => $user->nickname,
+            'username' => $user->username,
+            'nickname' => $user->nickname,
         ];
 
         UserStat::insert($dataAll);
         return true;
     }
-
 
     /**
      * 获取时间
@@ -169,7 +174,8 @@ class UserStatDay extends BaseModel
      * @param $endTime
      * @return array
      */
-    static function getDaySet($startTime, $endTime) {
+    public static function getDaySet($startTime, $endTime)
+    {
         $daySet = [];
 
         while ($startTime <= $endTime) {
@@ -186,13 +192,14 @@ class UserStatDay extends BaseModel
      * @param $date
      * @return bool|string
      */
-    static function changeTeam($data, $date) {
+    public static function changeTeam($data, $date)
+    {
 
         $date_day = date("Ymd", strtotime($date));
 
         foreach ($data as $userId => $item) {
             $teamUpdate = '';
-            $teamAdd    = '';
+            $teamAdd = '';
             foreach ($item as $field => $v) {
                 if (!in_array($field, self::$teamFilters)) {
                     continue;
@@ -207,22 +214,22 @@ class UserStatDay extends BaseModel
             }
 
             // 更新自身量
-            if($teamUpdate) {
-                $player  = Player::find($userId);
-                $rid     = substr($player->rid, 0, strlen($player->rid) - 1);
-                $ridArr  = explode("|", $rid);
+            if ($teamUpdate) {
+                $player = Player::find($userId);
+                $rid = substr($player->rid, 0, strlen($player->rid) - 1);
+                $ridArr = explode("|", $rid);
 
                 array_pop($ridArr);
 
                 if (!$ridArr) {
                     return true;
                 }
-                $rid     = implode(',', $ridArr);
+                $rid = implode(',', $ridArr);
 
                 $sql = "update `user_stat_day` set {$teamUpdate} where `user_id` in ({$rid})  and `day`='{$date_day}'";
                 $ret = db()->update($sql);
-                if(!$ret) {
-                    Clog::statUser("stat-team-error-" . $player->id  . "-更新-团队-失败-day-{$teamUpdate}");
+                if (!$ret) {
+                    Clog::statUser("stat-team-error-" . $player->id . "-更新-团队-失败-day-{$teamUpdate}");
                     return "更新失败!";
                 }
             }
@@ -237,7 +244,8 @@ class UserStatDay extends BaseModel
      * @param array $robotIds
      * @return array
      */
-    static function changeBatch($changes, $date, $robotIds = []) {
+    public static function changeBatch($changes, $date, $robotIds = [])
+    {
         $closeRobotData = configure("system_close_robot_stat", 0);
         $selfChange = [];
 
@@ -256,7 +264,7 @@ class UserStatDay extends BaseModel
             return ['stat' => 0, 'stat_day' => 0];
         }
 
-        $sqlStat    = "update `user_stat` set ";
+        $sqlStat = "update `user_stat` set ";
         $sqlStatDay = "update `user_stat_day` set ";
 
         // 拼接语句
@@ -264,19 +272,18 @@ class UserStatDay extends BaseModel
             $sqlStat .= "`" . $__f . "` = CASE ";
             $sqlStatDay .= "`" . $__f . "` = CASE ";
             foreach ($_changeData as $__userId => $__v) {
-                $sqlStat .= " WHEN `user_id` = ". $__userId . " THEN `" . $__f . "` + " . $__v;
-                $sqlStatDay .= " WHEN `user_id` = ". $__userId . " THEN `" . $__f . "` + " . $__v;
+                $sqlStat .= " WHEN `user_id` = " . $__userId . " THEN `" . $__f . "` + " . $__v;
+                $sqlStatDay .= " WHEN `user_id` = " . $__userId . " THEN `" . $__f . "` + " . $__v;
             }
             $sqlStat .= " ELSE `$__f` + 0 END,";
             $sqlStatDay .= " ELSE `$__f` + 0 END,";
-
         }
 
-        $sqlStat        = rtrim($sqlStat, ","). " WHERE `id` > 0 ";
-        $sqlStatDay     = rtrim($sqlStatDay, ",") . " WHERE `day` = " . $date;
+        $sqlStat = rtrim($sqlStat, ",") . " WHERE `id` > 0 ";
+        $sqlStatDay = rtrim($sqlStatDay, ",") . " WHERE `day` = " . $date;
 
-        $statCount      = DB::update(DB::raw($sqlStat));
-        $statDayCount   = DB::update(DB::raw($sqlStatDay));
+        $statCount = DB::update(DB::raw($sqlStat));
+        $statDayCount = DB::update(DB::raw($sqlStatDay));
 
         return ['stat' => $statCount, 'stat_day' => $statDayCount];
     }
@@ -288,7 +295,7 @@ class UserStatDay extends BaseModel
      * @param $date
      * @return bool
      */
-    static function change($user, $changes, $date)
+    public static function change($user, $changes, $date)
     {
         // 屏蔽机器人
         $closeRobotData = configure("system_close_robot_stat", 0);
@@ -297,14 +304,14 @@ class UserStatDay extends BaseModel
         }
 
         $changes = array_intersect_key($changes, array_flip(self::$filters));
-        if(empty($changes)) {
+        if (empty($changes)) {
             return "无效的变更类型!";
         }
 
         $selfUpdate = '';
-        $selfAdd    = '';
+        $selfAdd = '';
 
-        foreach($changes as $field => $v) {
+        foreach ($changes as $field => $v) {
             $selfUpdate .= $selfAdd . "`{$field}` = `{$field}` + {$v}";
             $selfAdd = ',';
         }
@@ -312,23 +319,21 @@ class UserStatDay extends BaseModel
         $date_day = date("Ymd", strtotime($date));
 
         // 更新自身量
-        if($selfUpdate) {
+        if ($selfUpdate) {
             $sqlDay = "update `user_stat` set {$selfUpdate}  where `user_id` ='{$user->id}'";
             $ret = db()->update($sqlDay);
-            if(!$ret) {
-                Clog::statUser("Error-" . $user->id  . "-更新失败-all-{$selfUpdate}");
+            if (!$ret) {
+                Clog::statUser("Error-" . $user->id . "-更新失败-all-{$selfUpdate}");
                 return "更新失败!";
             }
 
             $sql = "update `user_stat_day` set {$selfUpdate} where `user_id` ='{$user->id}'  and `day`='{$date_day}'";
             $ret = db()->update($sql);
-            if(!$ret) {
-                Clog::statUser("Error-" . $user->id  . "-更新失败-day-{$selfUpdate}");
+            if (!$ret) {
+                Clog::statUser("Error-" . $user->id . "-更新失败-day-{$selfUpdate}");
                 return "更新失败!";
             }
         }
-
         return true;
     }
-
 }

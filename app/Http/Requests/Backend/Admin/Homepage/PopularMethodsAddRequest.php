@@ -24,7 +24,11 @@ class PopularMethodsAddRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'lotteries_id' => 'required|exists:lottery_lists,en_name|unique:frontend_lottery_fnf_betable_lists,lotteries_id',
+            'lotteries_id' => [
+                'required',
+                'exists:lottery_lists,en_name',
+                'unique:frontend_lottery_fnf_betable_lists,lotteries_id'
+            ],
             'method_id' => 'required|exists:frontend_lottery_fnf_betable_methods,id',
         ];
     }

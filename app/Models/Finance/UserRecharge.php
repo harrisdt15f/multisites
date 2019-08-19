@@ -18,7 +18,7 @@ class UserRecharge extends BaseModel
     const STATUS_MANUAL_FAIL        = -3;
 
     // 状态
-    static $status = [
+    public static $status = [
         0   => "初始化",
         1   => "代发成功",
         2   => "回调成功",
@@ -28,7 +28,7 @@ class UserRecharge extends BaseModel
         -3  => "人工失败",
     ];
 
-    static $handType = [
+    public static $handType = [
         2 => "人工成功",
         1 => "人工失败",
     ];
@@ -40,7 +40,8 @@ class UserRecharge extends BaseModel
      * @param bool $countTotal
      * @return array
      */
-    static function getList($topId, $c, $countTotal = false) {
+    public static function getList($topId, $c, $countTotal = false)
+    {
         $query = self::where('top_id', $topId)->orderBy('id', 'desc');
 
         // 用ID
@@ -95,7 +96,13 @@ class UserRecharge extends BaseModel
         $total  = $query->count();
         $data   = $query->skip($offset)->take($pageSize)->get();
 
-        return ['data' => $data, 'totalRealAmount' => number4($totalRealAmount),  'total' => $total, 'currentPage' => $currentPage, 'totalPage' => intval(ceil($total / $pageSize))];
+        return [
+            'data' => $data,
+            'totalRealAmount' => number4($totalRealAmount),
+            'total' => $total,
+            'currentPage' => $currentPage,
+            'totalPage' => intval(ceil($total / $pageSize))
+        ];
     }
 
     /**
@@ -108,7 +115,7 @@ class UserRecharge extends BaseModel
      * @param string $description
      * @return UserRecharge|bool
      */
-    static public function request($user, $money, $channel, $bankSign, $from = "web", $description = '')
+    public static function request($user, $money, $channel, $bankSign, $from = "web", $description = '')
     {
         $params = Request::all();
         db()->beginTransaction();
@@ -133,7 +140,7 @@ class UserRecharge extends BaseModel
             $request->source        = $from;                // 来源
 
             $ret = $request->save();
-            if(!$ret){
+            if (!$ret) {
                 db()->rollback();
                 return false;
             }
@@ -143,7 +150,7 @@ class UserRecharge extends BaseModel
 
             $request->order_id = "HB" . ($request->id + $rechargeOrderPlus);
             $ret    = $request->save();
-            if(!$ret) {
+            if (!$ret) {
                 db()->rollback();
                 return false;
             }
@@ -182,14 +189,13 @@ class UserRecharge extends BaseModel
 
 
         $locker = new AccountLocker($player->id);
-        if(!$locker->getLock()){
+        if (!$locker->getLock()) {
             db()->rollback();
             return "对不起, 获取用户锁失败!!";
         }
 
         db()->beginTransaction();
         try {
-
             $account    = $player->account();
 
             // 充值上分
@@ -200,7 +206,7 @@ class UserRecharge extends BaseModel
             ];
 
             $accountChange = new AccountChange();
-            $res = $accountChange->change($account, 'recharge',  $params, $player->is_robot);
+            $res = $accountChange->change($account, 'recharge', $params, $player->is_robot);
             if ($res !== true) {
                 $locker->release();
                 db()->rollback();
@@ -233,9 +239,8 @@ class UserRecharge extends BaseModel
         $locker->release();
 
         // 总统计
-        jtq(new Stat('recharge',  ['user_id' => $player->id, 'record_id'  => $this->id]), 'stat_user');
+        jtq(new Stat('recharge', ['user_id' => $player->id, 'record_id'  => $this->id]), 'stat_user');
 
         return true;
     }
-
 }

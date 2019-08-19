@@ -7,8 +7,8 @@ use App\Models\BaseModel;
 
 class FrontendMessageNotice extends BaseModel
 {
-	public const STATUS_UN_READ=0;//未读
-	public const STATUS_READ=1;//已读
+    public const STATUS_UN_READ=0;//未读
+    public const STATUS_READ=1;//已读
 
     protected $guarded = ['id'];
 
@@ -17,6 +17,6 @@ class FrontendMessageNotice extends BaseModel
      */
     public function messageContent()
     {
-    	return $this->hasOne(FrontendMessageNoticesContent::class,'id','notices_content_id');
+        return $this->hasOne(FrontendMessageNoticesContent::class, 'id', 'notices_content_id');
     }
 }

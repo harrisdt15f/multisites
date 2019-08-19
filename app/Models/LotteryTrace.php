@@ -31,6 +31,6 @@ class LotteryTrace extends BaseModel
     
     public function lottery()
     {
-        return $this->belongsTo(LotteryList::class,'lottery_sign','en_name');
+        return $this->belongsTo(LotteryList::class, 'lottery_sign', 'en_name');
     }
 }
