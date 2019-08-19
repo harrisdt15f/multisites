@@ -19,7 +19,7 @@ class Configure
         });
     }
 
-    public function set($key, $value)
+    public static function set($key, $value)
     {
         SystemConfiguration::where('sign', '=', $key)->update(['value' => $value]);
         Cache::tags('configure')->forget($key);

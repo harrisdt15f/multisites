@@ -40,8 +40,8 @@ class UserHandleController extends BackEndApiMainController
      */
     public function getUserPrizeGroup(): JsonResponse
     {
-        $data['min'] = $this->betPrizeGroupArr['min_bet_prize_group'] ?? 0; //最低奖金组
-        $data['max'] = $this->betPrizeGroupArr['max_bet_prize_group'] ?? 1960; //最高奖金组
+        $data['min'] = $this->minClassicPrizeGroup; //最低奖金组
+        $data['max'] = $this->maxClassicPrizeGroup; //最高奖金组
         return $this->msgOut(true, $data);
     }
 
