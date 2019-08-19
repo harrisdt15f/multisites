@@ -2,7 +2,6 @@
 
 namespace App\Models\Logics;
 
-use App\Models\DeveloperUsage\MethodLevel\LotteryMethodsWaysLevel;
 use App\Models\Game\Lottery\LotteryPrizeGroup;
 use App\Models\Game\Lottery\LotteryTraceList;
 use App\Models\LotteryTrace;
@@ -16,6 +15,7 @@ use Illuminate\Support\Str;
 
 trait ProjectTraits
 {
+
     /**
      * @param $user
      * @param $lottery
@@ -101,7 +101,7 @@ trait ProjectTraits
     ) {
         $bresult = LotteryPrizeGroup::makePrizeSettingArray(
             $_item['method_id'],
-            $_item['prize_group'],
+            self::DEFAULT_PRIZE_GROUP,
             $lottery->series_id,
             $aPrizeSettings,
             $aPrizeSettingOfWay,
@@ -175,13 +175,14 @@ trait ProjectTraits
     ): void {
         LotteryPrizeGroup::makePrizeSettingArray(
             $_item['method_id'],
-            $_item['prize_group'],
+            self::DEFAULT_PRIZE_GROUP,
             $lottery->series_id,
             $aPrizeSettings,
             $aPrizeSettingOfWay,
             $aMaxPrize
         );
         $traceMainData = [
+            'trace_serial_number' => self::getProjectSerialNumber(),
             'user_id' => $user->id,
             'username' => $user->username,
             'top_id' => $user->top_id,
@@ -257,6 +258,76 @@ trait ProjectTraits
         }
     }
 
+    public function setWon(
+        $openNumber,
+        $sWnNumber,
+        $aPrized
+    ) {
+        $totalBonus = 0;
+        $totalCount = 0;
+        $finalLevel = 0;
+        $aPrizeSet = json_decode($this->prize_set, true);
+        foreach ($aPrized as $iBasicMethodId => $aPrizeOfBasicMethod) {
+            foreach ($aPrizeOfBasicMethod as $iLevel => $iCount) {
+                if ($iBasicMethodId === 123) {
+                    $win = explode(' ', $sWnNumber);
+                    $tema = end($win);
+                    if ($tema == 49) {
+                        $prizeToClaim = 1;
+                    } else {
+                        $prizeToClaim = $aPrizeSet[$iBasicMethodId][$iLevel];
+                    }
+                } else {
+                    $prizeToClaim = $aPrizeSet[$iBasicMethodId][$iLevel];
+                }
+                if ($prizeToClaim !== null) {
+                    if ($iCount > 0) {
+                        $bonus = $this->bet_prize_group * $prizeToClaim / 1800;
+                        $bonus *= $this->mode * $this->times * $iCount;
+                        if (pack('f', $this->price) === pack('f', 1.0)) {
+                            $bonus /= 2;
+                        }
+                        $totalCount+=$iCount;
+                        $totalBonus += $bonus;
+                        $finalLevel = $iLevel;
+                    } else {
+                        $errorString = 'There have no Count:'.$iBasicMethodId.' level:'.$iLevel.' Count:'.$iCount;
+                        Log::channel('issues')->info($errorString);
+                    }
+                } else {
+                    $levelDataNote = 'leveldata'.json_encode($aPrizeOfBasicMethod);
+                    $errorString = 'There have no prize for  Basic MethodId'.$iBasicMethodId.$levelDataNote;
+                    Log::channel('issues')->error($errorString);
+                }
+            }
+            if ($totalCount > 0) {
+                $data = [
+                    'basic_method_id' => $iBasicMethodId,
+                    'open_number' => $openNumber,
+                    'winning_number' => $this->formatWiningNumber($sWnNumber),
+                    'level' => $finalLevel,//@todo may be with string to concact
+                    'bonus' => $totalBonus,
+                    'is_win' => 1,
+                    'time_count' => now()->timestamp,
+                    'status' => self::STATUS_WON,
+                ];
+                try {
+                    DB::beginTransaction();
+                    $this->update($data);//@todo maybe only a time update
+                    DB::commit();
+                    $this->sendMoney();
+                } catch (Exception $e) {
+                    Log::channel('issues')->info($e->getMessage());
+                    DB::rollBack();
+                    return $e->getMessage();
+                }
+            } else {
+                $this->setFail($openNumber, $sWnNumber, $iBasicMethodId);
+            }
+            return true;
+        }
+    }
+
     /**
      * 开奖
      * @param $openNumber
@@ -264,7 +335,7 @@ trait ProjectTraits
      * @param $aPrized
      * @return bool|string
      */
-    public function setWon(
+    /*public function setWon(
         $openNumber,
         $sWnNumber,
         $aPrized
@@ -328,7 +399,7 @@ trait ProjectTraits
             }
             return true;
         }
-    }
+    }*/
 
     /**
      * @param $sWnNumber
