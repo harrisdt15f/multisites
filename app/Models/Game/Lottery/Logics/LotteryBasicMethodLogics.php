@@ -9,6 +9,7 @@
 namespace App\Models\Game\Lottery\Logics;
 
 use App\Models\Game\Lottery\LotteryBasicWay;
+use App\Models\Game\Lottery\LotteryPrizeLevel;
 use App\Models\Game\Lottery\LotterySeriesWay;
 use Illuminate\Support\Str;
 
@@ -74,5 +75,26 @@ trait LotteryBasicMethodLogics
         $pFunction = 'getPrize'.ucfirst($this->series_code);
         $sFunction = 'prize'.$oBasicWay->function.ucfirst(Str::camel($this->wn_function));
         return $this->$pFunction($sFunction, $sBetNumber, $sWnNumber, $oSeriesWay);
+    }
+
+    /**
+     * 获取奖级列表,键为规则,值为奖级
+     * @return array
+     */
+    public function getPrizeLevels(): array
+    {
+        $oLevels = LotteryPrizeLevel::where('basic_method_id', $this->id)->orderBy('level', 'asc')->get([
+            'id',
+            'level',
+            'rule'
+        ]);
+        $aLevels = [];
+        foreach ($oLevels as $oLevel) {
+            $arrRule = explode(',', $oLevel->rule);
+            foreach ($arrRule as $sRule) {
+                $aLevels[$sRule] = $oLevel->level;
+            }
+        }
+        return $aLevels;
     }
 }

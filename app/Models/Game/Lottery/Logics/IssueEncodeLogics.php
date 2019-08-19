@@ -5,7 +5,6 @@
  * Date: 6/17/2019
  * Time: 9:02 PM
  */
-
 namespace App\Models\Game\Lottery\Logics;
 
 use App\Jobs\Lottery\Encode\IssueEncoder;
@@ -15,6 +14,7 @@ use App\Models\Game\Lottery\LotterySeriesMethod;
 use App\Models\Game\Lottery\LotteryTraceList;
 use App\Models\LotteryTrace;
 use App\Models\Project;
+use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 
@@ -48,7 +48,7 @@ trait IssueEncodeLogics
                                     $oLottery,
                                     $oIssue->official_code
                                 ); //wn_number
-                            } catch (\Exception $e) {
+                            } catch (Exception $e) {
                                 Log::error('Winning Number Calculation on error');
                                 Log::error($e->getMessage().$e->getTraceAsString());
                             }
@@ -90,10 +90,10 @@ trait IssueEncodeLogics
                                                         try {
                                                             $aPrized = $oBasicWay->checkPrize(
                                                                 $oSeriesWay,
-                                                                $project->bet_number,
+                                                                $project,
                                                                 $sPostion = null
                                                             );
-                                                        } catch (\Exception $e) {
+                                                        } catch (Exception $e) {
                                                             $aPrized = [];
                                                             Log::error('Prize Checking on error');
                                                             Log::error($e->getMessage().$e->getTraceAsString());
@@ -109,7 +109,7 @@ trait IssueEncodeLogics
                                                                 $sWnNumber,
                                                                 $aPrized
                                                             ); //@todo Trace
-                                                        } catch (\Exception $e) {
+                                                        } catch (Exception $e) {
                                                             Log::error('Set Won on error');
                                                             Log::error($e->getMessage().$e->getTraceAsString());
                                                         }
