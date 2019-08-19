@@ -18,7 +18,7 @@ class UserStat extends BaseModel
      * @param int $pageSize
      * @return array
      */
-    static function getList($topId, $c, $pageSize = 15)
+    public static function getList($topId, $c, $pageSize = 15)
     {
         $query = self::where('top_id', $topId)->orderBy('id', 'desc');
 
@@ -49,7 +49,11 @@ class UserStat extends BaseModel
         $total = $query->count();
         $data  = $query->skip($offset)->take($pageSize)->get();
 
-        return ['data' => $data, 'total' => $total, 'currentPage' => $currentPage, 'totalPage' => intval(ceil($total / $pageSize))];
+        return [
+            'data' => $data,
+            'total' => $total,
+            'currentPage' => $currentPage,
+            'totalPage' => intval(ceil($total / $pageSize))
+        ];
     }
-
 }

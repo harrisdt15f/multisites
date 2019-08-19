@@ -23,7 +23,8 @@ trait FrontendUserTraits
      * @param $from
      * @return bool|string
      */
-    public function recharge($amount, $channel, $bankSign = "", $from = "web") {
+    public function recharge($amount, $channel, $bankSign = "", $from = "web")
+    {
         $order = UserRecharge::request($this, $amount * 10000, $channel, $bankSign, $from);
 
         if (!$order) {

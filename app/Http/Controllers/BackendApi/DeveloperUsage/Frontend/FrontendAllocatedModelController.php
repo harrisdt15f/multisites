@@ -21,8 +21,10 @@ class FrontendAllocatedModelController extends BackEndApiMainController
      * @param   FrontendAllocatedModelDetailAction  $action
      * @return  JsonResponse
      */
-    public function detail(FrontendAllocatedModelDetailRequest $request, FrontendAllocatedModelDetailAction $action): JsonResponse
-    {
+    public function detail(
+        FrontendAllocatedModelDetailRequest $request,
+        FrontendAllocatedModelDetailAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -33,8 +35,10 @@ class FrontendAllocatedModelController extends BackEndApiMainController
      * @param   FrontendAllocatedModelAddAction  $action
      * @return  JsonResponse
      */
-    public function add(FrontendAllocatedModelAddRequest $request, FrontendAllocatedModelAddAction $action): JsonResponse
-    {
+    public function add(
+        FrontendAllocatedModelAddRequest $request,
+        FrontendAllocatedModelAddAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -45,8 +49,10 @@ class FrontendAllocatedModelController extends BackEndApiMainController
      * @param   FrontendAllocatedModelEditAction  $action
      * @return  JsonResponse
      */
-    public function edit(FrontendAllocatedModelEditRequest $request, FrontendAllocatedModelEditAction $action): JsonResponse
-    {
+    public function edit(
+        FrontendAllocatedModelEditRequest $request,
+        FrontendAllocatedModelEditAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -57,8 +63,10 @@ class FrontendAllocatedModelController extends BackEndApiMainController
      * @param   FrontendAllocatedModelDeleteAction  $action
      * @return  JsonResponse
      */
-    public function delete(FrontendAllocatedModelDeleteRequest $request, FrontendAllocatedModelDeleteAction $action): JsonResponse
-    {
+    public function delete(
+        FrontendAllocatedModelDeleteRequest $request,
+        FrontendAllocatedModelDeleteAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }

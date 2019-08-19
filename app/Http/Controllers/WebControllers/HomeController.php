@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\WebControllers;
 
-
 class HomeController extends AdminMainController
 {
     /*public function __construct()

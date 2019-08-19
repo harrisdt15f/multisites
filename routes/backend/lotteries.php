@@ -41,7 +41,7 @@ Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], function 
     //删除彩种
     Route::match(['post', 'options'], 'delete', ['as' => $namePrefix . 'delete', 'uses' => $controller . 'delete']);
     //奖期重新派奖
-    Route::match(['post', 'options'], 'calculate-encode-again', ['as' => $namePrefix . 'calculate-encode-again', 'uses' => $controller . 'CalculateEncodeAgain']);
+    Route::match(['post', 'options'], 'calculate-encode-again', ['as' => $namePrefix . 'calculate-encode-again', 'uses' => $controller . 'calculateEncodeAgain']);
     //全部的彩种列表
     Route::match(['get', 'options'], 'all-lotteries-list', ['as' => $namePrefix . 'all-lotteries-list', 'uses' => $controller . 'allLotteriesList']);
     //删除奖期

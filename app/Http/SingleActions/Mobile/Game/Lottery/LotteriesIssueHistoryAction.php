@@ -21,7 +21,15 @@ class LotteriesIssueHistoryAction
         $searchAbleFields = ['lottery_id', 'status_encode'];
         $orderFields = 'id';
         $orderFlow = 'desc';
-        $data = $contll->generateSearchQuery($lotteryIssueEloq, $searchAbleFields, 0, null, null, $orderFields, $orderFlow);
+        $data = $contll->generateSearchQuery(
+            $lotteryIssueEloq,
+            $searchAbleFields,
+            0,
+            null,
+            null,
+            $orderFields,
+            $orderFlow
+        );
         return $contll->msgOut(true, $data);
     }
 }

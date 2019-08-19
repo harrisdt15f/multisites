@@ -7,9 +7,9 @@ use App\Models\BaseModel;
 
 class BackendSystemNoticeList extends BaseModel
 {
-	public const ARTIFICIAL = 1;
-	public const AUDIT = 2;
-	public const FUND = 3;
+    public const ARTIFICIAL = 1;
+    public const AUDIT = 2;
+    public const FUND = 3;
 
     protected $guarded = ['id'];
 }

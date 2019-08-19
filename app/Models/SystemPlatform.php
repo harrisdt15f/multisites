@@ -11,5 +11,4 @@ class SystemPlatform extends BaseModel
     {
         return $this->hasMany(BackendAdminUser::class, 'platform_id', 'platform_id');
     }
-
 }

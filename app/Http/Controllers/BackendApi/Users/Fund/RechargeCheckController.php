@@ -34,8 +34,10 @@ class RechargeCheckController extends BackEndApiMainController
      * @param  RechargeCheckAuditSuccessAction  $action
      * @return JsonResponse
      */
-    public function auditSuccess(RechargeCheckAuditSuccessRequest $request, RechargeCheckAuditSuccessAction $action): JsonResponse
-    {
+    public function auditSuccess(
+        RechargeCheckAuditSuccessRequest $request,
+        RechargeCheckAuditSuccessAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -46,8 +48,10 @@ class RechargeCheckController extends BackEndApiMainController
      * @param  RechargeCheckAuditFailureAction  $action
      * @return JsonResponse
      */
-    public function auditFailure(RechargeCheckAuditFailureRequest $request, RechargeCheckAuditFailureAction $action): JsonResponse
-    {
+    public function auditFailure(
+        RechargeCheckAuditFailureRequest $request,
+        RechargeCheckAuditFailureAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }

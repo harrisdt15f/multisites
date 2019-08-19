@@ -13,7 +13,6 @@ use App\Http\SingleActions\Frontend\User\Fund\UserRechargeListAction;
 use App\Http\SingleActions\Frontend\User\Fund\UserChangeTypeList;
 use Illuminate\Http\JsonResponse;
 
-
 class UserFundController extends FrontendApiMainController
 {
     /**
@@ -45,5 +44,4 @@ class UserFundController extends FrontendApiMainController
     {
         return $action->execute($this);
     }
-
 }

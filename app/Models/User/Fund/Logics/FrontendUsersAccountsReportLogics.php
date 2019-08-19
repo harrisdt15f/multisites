@@ -3,6 +3,7 @@
 namespace App\Models\User\Fund\Logics;
 
 use Illuminate\Support\Facades\DB;
+
 /**
  * Created by PhpStorm.
  * author: Harris
@@ -84,7 +85,5 @@ trait FrontendUsersAccountsReportLogics
         }
         $R->groupBy('type_sign');
         return $R->get();
-
     }
-
 }

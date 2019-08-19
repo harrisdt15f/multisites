@@ -6,7 +6,6 @@
 
 namespace App\Http\Requests\Backend\Admin\Help;
 
-
 use App\Http\Requests\BaseFormRequest;
 
 class HelpCenterDeleteRequest extends BaseFormRequest

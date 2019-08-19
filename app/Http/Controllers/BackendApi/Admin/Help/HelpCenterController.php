@@ -63,6 +63,5 @@ class HelpCenterController extends BackEndApiMainController
     {
         $input = $request->validated();
         return $action->execute($this, $input);
-
     }
 }

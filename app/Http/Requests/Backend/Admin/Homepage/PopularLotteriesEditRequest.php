@@ -26,8 +26,18 @@ class PopularLotteriesEditRequest extends BaseFormRequest
     {
         return [
             'id' => 'required|numeric|exists:frontend_lottery_redirect_bet_lists,id',
-            'lotteries_id' => ['required', 'numeric', 'exists:lottery_lists,id', Rule::unique('frontend_lottery_redirect_bet_lists')->ignore($this->get('id'))],
-            'lotteries_sign' => ['required', 'string', 'exists:lottery_lists,en_name', Rule::unique('frontend_lottery_redirect_bet_lists')->ignore($this->get('id'))],
+            'lotteries_id' => [
+                'required',
+                'numeric',
+                'exists:lottery_lists,id',
+                Rule::unique('frontend_lottery_redirect_bet_lists')->ignore($this->get('id'))
+            ],
+            'lotteries_sign' => [
+                'required',
+                'string',
+                'exists:lottery_lists,en_name',
+                Rule::unique('frontend_lottery_redirect_bet_lists')->ignore($this->get('id'))
+            ],
         ];
     }
 

@@ -74,15 +74,18 @@ trait MenuLogics
             if ($firstMenu->pid === 0) {
                 $menuForFE[$firstMenu->id] = $firstMenu->toArray();
                 if ($firstMenu->childs()->exists()) {
-                    $firstChilds = $role == '*' ? $firstMenu->childs->sortBy('sort') : $firstMenu->childs->whereIn('id',
-                        $role)->sortBy('sort');
+                    $firstChilds = $role == '*' ?
+                        $firstMenu->childs->sortBy('sort') :
+                        $firstMenu->childs->whereIn('id', $role)->sortBy('sort');
                     foreach ($firstChilds as $secondMenu) {
                         $menuForFE[$firstMenu->id]['child'][$secondMenu->id] = $secondMenu->toArray();
                         if ($secondMenu->childs()->exists()) {
-                            $secondChilds = $role == '*' ? $secondMenu->childs->sortBy('sort') : $secondMenu->childs->whereIn('id',
-                                $role)->sortBy('sort');
+                            $secondChilds = $role == '*' ?
+                            $secondMenu->childs->sortBy('sort') :
+                            $secondMenu->childs->whereIn('id', $role)->sortBy('sort');
                             foreach ($secondChilds as $thirdMenu) {
-                                $menuForFE[$firstMenu->id]['child'][$secondMenu->id]['child'][$thirdMenu->id] = $thirdMenu->toArray();
+                                $menuForFE[$firstMenu->id]['child']
+                                [$secondMenu->id]['child'][$thirdMenu->id] = $thirdMenu->toArray();
                             }
                         }
                     }

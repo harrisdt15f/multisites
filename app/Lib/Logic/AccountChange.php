@@ -123,6 +123,7 @@ class AccountChange
             'top_id' => $user->top_id,
             'type_name' => $typeConfig['name'],
             'type_sign' => $typeConfig['sign'],
+            'in_out' => $typeConfig['in_out'],
             'user_id' => $user->id,
             'username' => $user->username,
         ];

@@ -16,6 +16,8 @@ class FrontendLotteryFnfBetableList extends BaseModel
 
     public function currentIssue()
     {
-        return $this->hasOne(LotteryIssue::class, 'lottery_id', 'lotteries_id')->where('end_time', '>', time())->orderBy('id', 'ASC');
+        return $this->hasOne(LotteryIssue::class, 'lottery_id', 'lotteries_id')
+            ->where('end_time', '>', time())
+            ->orderBy('id', 'ASC');
     }
 }

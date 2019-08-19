@@ -21,8 +21,10 @@ class FundOperationController extends BackEndApiMainController
      * @param   FundOperationAdminDetailAction   $action
      * @return  JsonResponse
      */
-    public function adminDetail(FundOperationAdminDetailRequest $request, FundOperationAdminDetailAction $action): JsonResponse
-    {
+    public function adminDetail(
+        FundOperationAdminDetailRequest $request,
+        FundOperationAdminDetailAction $action
+    ): JsonResponse {
         return $action->execute($this);
     }
 
@@ -32,8 +34,10 @@ class FundOperationController extends BackEndApiMainController
      * @param   FundOperationAddFundAction  $action
      * @return  JsonResponse
      */
-    public function addFund(FundOperationAddFundRequest $request, FundOperationAddFundAction $action): JsonResponse
-    {
+    public function addFund(
+        FundOperationAddFundRequest $request,
+        FundOperationAddFundAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -44,8 +48,10 @@ class FundOperationController extends BackEndApiMainController
      * @param   FundOperationEveryDayFundAction  $action
      * @return  JsonResponse
      */
-    public function everyDayFund(FundOperationEveryDayFundRequest $request, FundOperationEveryDayFundAction $action): JsonResponse
-    {
+    public function everyDayFund(
+        FundOperationEveryDayFundRequest $request,
+        FundOperationEveryDayFundAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -56,8 +62,10 @@ class FundOperationController extends BackEndApiMainController
      * @param  FundOperationFundChangeLogAction  $action
      * @return JsonResponse
      */
-    public function fundChangeLog(FundOperationFundChangeLogRequest $request, FundOperationFundChangeLogAction $action): JsonResponse
-    {
+    public function fundChangeLog(
+        FundOperationFundChangeLogRequest $request,
+        FundOperationFundChangeLogAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }

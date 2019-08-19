@@ -92,8 +92,10 @@ class AccountChangeTypeController extends BackEndApiMainController
      * @param  AccountChangeTypeFieldAddAction $action
      * @return JsonResponse
      */
-    public function fieldAdd(AccountChangeTypeAddFieldRequest $request, AccountChangeTypeFieldAddAction $action): JsonResponse
-    {
+    public function fieldAdd(
+        AccountChangeTypeAddFieldRequest $request,
+        AccountChangeTypeFieldAddAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -103,8 +105,10 @@ class AccountChangeTypeController extends BackEndApiMainController
      * @param  AccountChangeTypeFieldModAction $action
      * @return JsonResponse
      */
-    public function fieldMod(AccountChangeTypeModFieldRequest $request, AccountChangeTypeFieldModAction $action): JsonResponse
-    {
+    public function fieldMod(
+        AccountChangeTypeModFieldRequest $request,
+        AccountChangeTypeFieldModAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -114,10 +118,11 @@ class AccountChangeTypeController extends BackEndApiMainController
      * @param  AccountChangeTypeFieldDelAction $action
      * @return JsonResponse
      */
-    public function fieldDel(AccountChangeTypeDelFieldRequest $request, AccountChangeTypeFieldDelAction $action): JsonResponse
-    {
+    public function fieldDel(
+        AccountChangeTypeDelFieldRequest $request,
+        AccountChangeTypeFieldDelAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
-
 }

@@ -204,7 +204,7 @@ class FrontendAuthController extends FrontendApiMainController
     public function setFundPassword(
         FrontendAuthSetFundPasswordRequest $request,
         FrontendAuthSetFundPasswordAction $action
-    ): JsonResponse{
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -228,7 +228,7 @@ class FrontendAuthController extends FrontendApiMainController
     public function resetSpecificInfos(
         FrontendAuthResetSpecificInfosRequest $request,
         FrontendAuthResetSpecificInfosAction $action
-    ): JsonResponse{
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }

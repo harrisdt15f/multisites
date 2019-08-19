@@ -45,8 +45,8 @@ class FrontendApiMainController extends Controller
                     $this->currentPlatformEloq = $this->partnerUser->platform; //获取目前账号用户属于平台的对象
                 }
             }
-            $this->minClassicPrizeGroup = configure('min_bet_prize_group',1800);//平台最低投注奖金组
-            $this->maxClassicPrizeGroup = configure('max_bet_prize_group',1960);//平台最高投注奖金组
+            $this->minClassicPrizeGroup = configure('min_bet_prize_group', 1800);//平台最低投注奖金组
+            $this->maxClassicPrizeGroup = configure('max_bet_prize_group', 1960);//平台最高投注奖金组
             $this->eloqM = 'App\\Models\\' . $this->eloqM; // 当前的eloquent
             return $next($request);
         });
@@ -111,7 +111,7 @@ class FrontendApiMainController extends Controller
         $message = '',
         $placeholder = null,
         $substituted = null
-    ): JsonResponse{
+    ): JsonResponse {
         $defaultSuccessCode = '200';
         $defaultErrorCode = '404';
         if ($success === true) {
