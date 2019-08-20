@@ -150,7 +150,7 @@ trait ProjectTraits
      */
     public static function getProjectSerialNumber(): string
     {
-        return Str::orderedUuid()->getHex();
+        return 'XW'.Str::orderedUuid()->getNodeHex();
     }
 
     /**
