@@ -42,7 +42,7 @@ class LotterySchedule extends Command
                 $splitter = $serieArr['encode_splitter']; //该彩种分割开奖号码的方式
                 if ($lotteryIssueEloq !== null) {
                     $openCodeStr = LotteryIssue::getOpenNumber($lotteryIssueEloq->lottery->code_length, $lotteryIssueEloq->lottery->valid_code, $lotteryIssueEloq->lottery->lottery_type, $splitter); //获取一个合法的随机开奖号码string
-                    LotteryIssue::enCode($lotterySign, $lotteryIssueEloq->issue, $openCodeStr);
+                    LotteryIssue::encode($lotterySign, $lotteryIssueEloq->issue, $openCodeStr);
                     // $lotteryIssueEloq->recordEncodeNumber($openCodeStr); //开始录号
                 }
             }
