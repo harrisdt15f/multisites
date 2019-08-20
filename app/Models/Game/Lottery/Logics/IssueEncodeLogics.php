@@ -319,11 +319,11 @@ trait IssueEncodeLogics
         $openCodeStr = ''; //开奖号码string
         $validCodeArr = explode(',', $validCode); //合法开奖号码arr
         if ($lotteryType === 2 || $series === 'pk10') {
-            for ($length = 0; $length < $codeLength; $length++) {
                 $openCodeArr = Arr::random($validCodeArr, $codeLength);
-            }
         } elseif ($lotteryType === 1) {
+            for ($length = 0; $length < $codeLength; $length++) {
                 $openCodeArr[] = Arr::random($validCodeArr);
+            }
         } else {
             return $openCodeStr;
         }
