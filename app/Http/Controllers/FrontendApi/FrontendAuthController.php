@@ -186,20 +186,6 @@ class FrontendAuthController extends FrontendApiMainController
         return $this->commonHandleUserPassword($inputDatas, 2);
     }
 
-    /**
-     * 用户是否设置了资金密码
-     * @return JsonResponse
-     */
-    public function isExistFundPassword(): JsonResponse
-    {
-        if ($this->partnerUser->fund_password !== null) {
-            $status = true;
-        } else {
-            $status = false;
-        }
-        return $this->msgOut(true, $status);
-    }
-
     //用户设置资金密码
     public function setFundPassword(
         FrontendAuthSetFundPasswordRequest $request,
