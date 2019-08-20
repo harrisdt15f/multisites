@@ -41,7 +41,13 @@ class LotterySchedule extends Command
                 $serieArr = $seriesList[$lotteryIssueEloq->lottery->series_id]; //当前彩种的系列Arr
                 $splitter = $serieArr['encode_splitter']; //该彩种分割开奖号码的方式
                 if ($lotteryIssueEloq !== null) {
-                    $openCodeStr = LotteryIssue::getOpenNumber($lotteryIssueEloq->lottery->code_length, $lotteryIssueEloq->lottery->valid_code, $lotteryIssueEloq->lottery->lottery_type, $splitter); //获取一个合法的随机开奖号码string
+                    $openCodeStr = LotteryIssue::getOpenNumber( //获取一个合法的随机开奖号码string
+                        $lotteryIssueEloq->lottery->code_length,
+                        $lotteryIssueEloq->lottery->valid_code,
+                        $lotteryIssueEloq->lottery->lottery_type,
+                        $splitter,
+                        $lotteryIssueEloq->lottery->series_id
+                    );
                     LotteryIssue::encode($lotterySign, $lotteryIssueEloq->issue, $openCodeStr);
                     // $lotteryIssueEloq->recordEncodeNumber($openCodeStr); //开始录号
                 }

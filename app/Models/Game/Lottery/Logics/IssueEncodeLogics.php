@@ -306,23 +306,24 @@ trait IssueEncodeLogics
 
     /**
      * 生成一个奖期合法的随机开奖号码
-     * @param  int  $codeLength  [开奖号码的长度]
-     * @param  string  $validCode  [合法开奖号码]
-     * @param  int  $lotteryType  [开奖号码是否可以重复 ？ 1可重复 2不可重复]
-     * @param          $splitter  [该彩种分割开奖号码的方式]
+     * @param  int     $codeLength   [开奖号码的长度]
+     * @param  string  $validCode    [合法开奖号码]
+     * @param  int     $lotteryType  [开奖号码是否可以重复 ？ 1可重复 2不可重复]
+     * @param          $splitter     [该彩种分割开奖号码的方式]
+     * @param  string  $series       [彩种系列]
      * @return string  $openCodeStr  [开奖号码string]
      */
-    public static function getOpenNumber($codeLength, $validCode, $lotteryType, $splitter): string
+    public static function getOpenNumber($codeLength, $validCode, $lotteryType, $splitter, $series): string
     {
         $openCodeArr = []; //开奖号码array
         $openCodeStr = ''; //开奖号码string
         $validCodeArr = explode(',', $validCode); //合法开奖号码arr
-        if ($lotteryType === 1) {
+        if ($lotteryType === 2 || $series === 'pk10') {
             for ($length = 0; $length < $codeLength; $length++) {
-                $openCodeArr[] = Arr::random($validCodeArr);
+                $openCodeArr = Arr::random($validCodeArr, $codeLength);
             }
-        } elseif ($lotteryType === 2) {
-            $openCodeArr = Arr::random($validCodeArr, $codeLength);
+        } elseif ($lotteryType === 1) {
+                $openCodeArr[] = Arr::random($validCodeArr);
         } else {
             return $openCodeStr;
         }
