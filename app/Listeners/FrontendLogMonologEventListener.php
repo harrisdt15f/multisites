@@ -65,5 +65,4 @@ class FrontendLogMonologEventListener implements ShouldQueue
             );
         }
     }
-
 }

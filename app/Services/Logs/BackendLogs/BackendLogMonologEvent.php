@@ -25,5 +25,4 @@ class BackendLogMonologEvent
     {
         $this->records = $records;
     }
-
 }

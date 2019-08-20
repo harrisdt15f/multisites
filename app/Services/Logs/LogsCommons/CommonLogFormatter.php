@@ -60,5 +60,4 @@ class CommonLogFormatter extends NormalizerFormatter
         }
         return $fills;
     }
-
 }

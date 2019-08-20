@@ -39,13 +39,13 @@ class AccountChange
     public $accounts = [];
 
     // 设置报表保存模式
-    function setReportMode($mode)
+    public function setReportMode($mode)
     {
         $this->reportMode = $mode;
     }
 
     // 设置帐变保存模式
-    function setChangeMode($mode)
+    public function setChangeMode($mode)
     {
         $this->changeMode = $mode;
     }
@@ -366,7 +366,7 @@ class AccountChange
                         case 'unFrozenToPlayer':
                             $frozenAdd -= $amount;
                             break;
-                        default :
+                        default:
                             break;
                     }
                 }

@@ -9,8 +9,8 @@
 namespace App\Services\Logs\BackendLogs;
 
 use App\Services\Logs\LogsCommons\CommonLogFormatter;
-use Monolog\Logger;
 use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\Logger;
 
 class BackendLogHandler extends AbstractProcessingHandler
 {
@@ -32,5 +32,4 @@ class BackendLogHandler extends AbstractProcessingHandler
     {
         return new CommonLogFormatter();
     }
-
 }
