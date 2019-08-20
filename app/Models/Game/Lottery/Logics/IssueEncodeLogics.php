@@ -346,6 +346,7 @@ trait IssueEncodeLogics
             ['status_encode', self::ENCODE_NONE],
         ])->first();
         if ($lotteryIssueEloq !== null) {
+            dd(222);
             $lotteryIssueEloq->recordEncodeNumber($code);
         }
     }
