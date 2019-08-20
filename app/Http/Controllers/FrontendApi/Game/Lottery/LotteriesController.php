@@ -121,7 +121,7 @@ class LotteriesController extends FrontendApiMainController
 
     public function setWinPrize()
     {
-        LotteryIssue::calculateEncodedNumber('cqssc', '190818036');
+        LotteryIssue::calculateEncodedNumber('jssc', '1908201271');
     }
 
     /**
