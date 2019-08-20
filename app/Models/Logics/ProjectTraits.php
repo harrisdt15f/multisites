@@ -42,11 +42,12 @@ trait ProjectTraits
                 }
                 $traceFirstMultiple = Arr::first($inputDatas['trace_issues']);
                 $traceData = array_slice($inputDatas['trace_issues'], 1, null, true);
+                $traceData = $inputDatas['trace_issues'];
             }
         }
         $returnData = [];
         foreach ($data as $_item) {
-            $projectId = self::saveSingleProject(
+            $project = self::saveSingleProject(
                 $user,
                 $lottery,
                 $_item,
@@ -58,18 +59,19 @@ trait ProjectTraits
             );
             if ($traceData) {
                 self::saveTrace(
-                    $projectId,
+                    $project->id,
                     $user,
                     $lottery,
                     $data,
                     $traceData,
                     $_item,
                     $inputDatas,
-                    $from
+                    $from,
+                    $project->serial_number
                 );
             }
             $returnData['project'][] = [
-                'id' => $projectId,
+                'id' => $project->id,
                 'cost' => $_item['total_price'],
                 'lottery_id' => $lottery->en_name,
                 'method_id' => $_item['method_id'],
@@ -141,8 +143,8 @@ trait ProjectTraits
             'bet_from' => $from,
             'time_bought' => time(),
         ];
-        $projectId = Project::create($projectData)->id;
-        return $projectId;
+        $project = Project::create($projectData);
+        return $project;
     }
 
     /**
@@ -162,6 +164,7 @@ trait ProjectTraits
      * @param $_item
      * @param $inputDatas
      * @param $from
+     * @param $serialNumber
      */
     public static function saveTrace(
         $projectId,
@@ -171,7 +174,8 @@ trait ProjectTraits
         $traceData,
         $_item,
         $inputDatas,
-        $from
+        $from,
+        $serialNumber
     ): void {
         LotteryPrizeGroup::makePrizeSettingArray(
             $_item['method_id'],
@@ -222,6 +226,13 @@ trait ProjectTraits
         // 保存追号
         $i = 1;
         foreach ($traceData as $issue => $multiple) {
+            if ($i===1) {
+                $project_serial_number = $serialNumber;
+                $status = LotteryTraceList::STATUS_RUNNING;
+            } else {
+                $project_serial_number = null;
+                $status = LotteryTraceList::STATUS_WAITING;
+            }
             foreach ($data as $dataItem) {
                 $traceListData = [
                     'user_id' => $user->id,
@@ -234,6 +245,7 @@ trait ProjectTraits
                     'is_tester' => $user->is_tester,
                     'series_id' => $lottery->series_id,
                     'project_id' => $projectId,
+                    'project_serial_number' => $project_serial_number,
                     'lottery_sign' => $lottery->en_name,
                     'method_sign' => $dataItem['method_id'],
                     'method_group' => $_item['method_group'],
@@ -250,6 +262,7 @@ trait ProjectTraits
                     'ip' => Request::ip(),
                     'proxy_ip' => json_encode(Request::ip()),
                     'bet_from' => $from,
+                    'status' => $status
                 ];
                 $_item['total_price'] += $traceListData['total_price'];
                 LotteryTraceList::create($traceListData);
