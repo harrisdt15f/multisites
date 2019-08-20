@@ -37,14 +37,13 @@ trait LotteryBasicMethodLogics
             case 'p3p5':
                 $sWnNumber = substr(
                     $sFullWinningNumber,
-                    (int)$iOffset,
+                    $iOffset,
                     $this->digital_count
                 );
-                $sFunction = 'getWinningNumber'.ucfirst($this->series_code);
                 break;
             case 'pk10':
                 $sWnNumber = explode($this->splitCharSumDigital, $sFullWinningNumber);
-                $sWnNumber = array_slice($sWnNumber, (int)$iOffset, $this->digital_count);
+                $sWnNumber = array_slice($sWnNumber,$iOffset, $this->digital_count);
                 break;
             case 'lotto':
                 $aBalls = explode($this->splitCharInArea, $sFullWinningNumber);
@@ -55,9 +54,9 @@ trait LotteryBasicMethodLogics
                     $i++;
                 }
                 $sWnNumber = implode($this->splitCharInArea, $aNeedBalls);
-                $sFunction = 'getWinningNumber'.ucfirst($this->series_code);
                 break;
         }
+        $sFunction = 'getWinningNumber'.ucfirst($this->series_code);
         return $sFunction === '' ? false : $this->$sFunction($sWnNumber);
     }
 
