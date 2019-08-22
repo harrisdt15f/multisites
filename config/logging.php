@@ -197,6 +197,18 @@ return [
             'level' => 'debug',
             'days' => 14,
         ],
+        'pay-recharge' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/pay-recharge.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
+        'pay-withdraw' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/pay-withdraw.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
     ],
 
 ];

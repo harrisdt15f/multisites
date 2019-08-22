@@ -2,9 +2,11 @@
 
 namespace App\Lib\Pay;
 
-use App\Models\Finance\RechargeLog;
+//use App\Models\Finance\RechargeLog;
 use App\Models\Finance\Withdraw;
-use App\Models\Finance\WithdrawLog;
+use App\Models\User\UsersRechargeHistorie;
+
+//use App\Models\Finance\WithdrawLog;
 
 class BasePay
 {
@@ -158,5 +160,58 @@ class BasePay
     public function setWithdrawQueryParams($params)
     {
         $this->withdrawQueryParams = $params;
+    }
+
+    /**
+     * 生成充值订单号
+     * @return string
+     * @throws \Exception
+     */
+    public static function createRechargeOrderNum(): string
+    {
+        return 'R'.date('YmdHis') . random_int(1000, 9999) ;
+    }
+    /**
+     * 生成提现订单号
+     * @return string
+     * @throws \Exception
+     */
+    public static function createWithdrawOrderNum(): string
+    {
+        return 'W'.date('YmdHis') . random_int(1000, 9999) ;
+    }
+
+    /**
+     * 获取回调地址
+     * @param $sign
+     * @return \Illuminate\Config\Repository|mixed
+     */
+    public static function getCallbackUrl($sign)
+    {
+        return config('pay.'.$sign.'.callback_url');
+    }
+
+    /**
+     * 获取通知地址
+     * @param $sign
+     * @return \Illuminate\Config\Repository|mixed
+     */
+    public static function getNotifyUrl($sign)
+    {
+        return config('pay.'.$sign.'.notify_url') ;
+    }
+
+
+    /**
+     * @param array $callBack
+     * @param int $status
+     * @return mixed
+     */
+    public static function setRechargeOrderStatus(array $callBack, int $status = 0)
+    {
+        $data['status'] = $status ;
+        $data['real_amount'] = $callBack['money'] ;
+
+        return UsersRechargeHistorie::where('company_order_num', '=', $callBack['game_order_id'])->update($data);
     }
 }
