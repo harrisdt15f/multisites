@@ -35,6 +35,7 @@ trait LotterySerieLogics
             $listData[$serieItem->series_name]['title'] = $serieItem->title;
             $listData[$serieItem->series_name]['status'] = $serieItem->status;
             $listData[$serieItem->series_name]['encode_splitter'] = $serieItem->encode_splitter;
+            $listData[$serieItem->series_name]['price_difference'] = $serieItem->price_difference;
         }
         Cache::forever($cacheKey, $listData);
         return $listData;
