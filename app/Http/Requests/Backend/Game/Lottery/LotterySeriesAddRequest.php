@@ -28,6 +28,7 @@ class LotterySeriesAddRequest extends BaseFormRequest
             'title' => 'required|string|unique:lottery_series', //系列名称
             'status' => 'required|integer|in:0,1', //状态:0关闭  1开启
             'encode_splitter' => 'nullable', //开奖号码分隔符
+            'price_difference' => 'required|integer', //差价
         ];
     }
 
