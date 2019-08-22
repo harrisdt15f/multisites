@@ -44,7 +44,6 @@ trait CronJobLogics
     {
         $tags = 'job';
         $cacheKey = 'open_cron_job';
-        $data = [];
         $data = CacheRelated::getTagsCache($tags, $cacheKey);
         if ($data === false) {
             $cronJobELoq = self::select('command', 'param', 'schedule')->where('status', self::STATUS_OPEN)->get();
@@ -66,6 +65,7 @@ trait CronJobLogics
             CacheRelated::setTagsCache($tags, $cacheKey, $data);
         }
     }
+    
     /**
      * 获取所有的的cron_job
      * @return  array
