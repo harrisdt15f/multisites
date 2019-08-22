@@ -64,4 +64,9 @@ Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], function 
         'as' => $namePrefix . 'setWinPrize',
         'uses' => $controller . 'setWinPrize'
     ]);
+    //获取走势图接口
+    Route::match(['post', 'options'], 'trend', [
+        'as' => $namePrefix . 'trend',
+        'uses' => $controller . 'trend'
+    ]);
 });

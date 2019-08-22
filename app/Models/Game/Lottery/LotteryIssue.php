@@ -5,12 +5,13 @@ namespace App\Models\Game\Lottery;
 use App\Models\BaseModel;
 use App\Models\Game\Lottery\Logics\IssueEncodeLogics;
 use App\Models\Game\Lottery\Logics\IssueLogics;
+use App\Models\Game\Lottery\Logics\IssueCacheCalcLgics;
 use App\Models\Project;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class LotteryIssue extends BaseModel
 {
-    use IssueLogics,IssueEncodeLogics;
+    use IssueLogics,IssueEncodeLogics,IssueCacheCalcLgics;
 
     /**
      * 中奖号码状态：等待开奖
