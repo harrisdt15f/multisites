@@ -299,7 +299,7 @@ trait IssueEncodeLogics
         if ($this->save()) {
             //趋势分析记录
             LotteryTrend::trend($this);
-
+            FrontendLotteryNoticeList::updateLotteryNotice($this); //开奖公告缓存更新
             dispatch(new IssueEncoder($this->toArray()))->onQueue('open_numbers');
         }
     }
