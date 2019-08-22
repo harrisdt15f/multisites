@@ -19,7 +19,7 @@ class LotteriesIssueHistoryAction
         $contll->inputs['status_encode'] = LotteryIssue::ENCODED;
         $lotteryIssueEloq = new LotteryIssue();
         $searchAbleFields = ['lottery_id', 'status_encode'];
-        $orderFields = 'id';
+        $orderFields = 'issue';
         $orderFlow = 'desc';
         $data = $contll->generateSearchQuery(
             $lotteryIssueEloq,
