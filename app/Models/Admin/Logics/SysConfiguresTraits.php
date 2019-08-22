@@ -20,18 +20,6 @@ trait SysConfiguresTraits
         }
     }
 
-    public static function getGenerateIssueTime()
-    {
-        $redisKey = 'generateIssueTime';
-        if (Cache::has($redisKey)) {
-            $generateIssueTime = Cache::get($redisKey);
-        } else {
-            $generateIssueTime = configure('generate_issue_time');
-            Cache::forever($redisKey, $generateIssueTime);
-        }
-        return $generateIssueTime;
-    }
-
     /**
      * 获取网站基本配置
      * @param  integer $update [不等于0时  更新缓存]

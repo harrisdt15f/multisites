@@ -40,6 +40,8 @@ use Illuminate\Http\JsonResponse;
 class LotteriesController extends BackEndApiMainController
 {
     public $lotteryIssueEloq = 'Game\Lottery\LotteryIssue'; //issueLists
+    public $tags = 'lottery'; // seriesLists  && clearMethodCache
+    public $redisKey = 'backend_lottery_method_list'; // seriesLists  && clearMethodCache
 
     /**
      * 获取系列接口
@@ -159,8 +161,9 @@ class LotteriesController extends BackEndApiMainController
      */
     public function clearMethodCache(): void
     {
-        $cacheRelated = new CacheRelated();
-        $cacheRelated->delete('play_method_list');
+        $tags = $this->tags;
+        $redisKey = $this->redisKey;
+        CacheRelated::deleteTagsCache($tags, $redisKey);
     }
 
     /**

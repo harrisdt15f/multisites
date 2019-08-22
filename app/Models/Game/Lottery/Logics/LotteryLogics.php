@@ -536,7 +536,7 @@ trait LotteryLogics
         $hourToStore = 24;
         $expiresAt = Carbon::now()->addHours($hourToStore);
         $frontendLotteryInfoCache = 'frontend.lottery.lotteryInfo';
-        Cache::put($frontendLotteryInfoCache, $cacheData, $expiresAt);
+        Cache::tags('lottery')->put($frontendLotteryInfoCache, $cacheData, $expiresAt);
         return $cacheData;
     }
 
