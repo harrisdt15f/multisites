@@ -300,9 +300,7 @@ trait IssueEncodeLogics
         if ($this->save()) {
             FrontendLotteryNoticeList::updateLotteryNotice($this); //开奖公告缓存更新
             //趋势分析记录之前three的
-            //LotteryTrend::trend($this);
-            LotteryIssue::cacheRe($this);
-
+            LotteryTrend::trend($this);
             dispatch(new IssueEncoder($this->toArray()))->onQueue('open_numbers');
         }
     }
