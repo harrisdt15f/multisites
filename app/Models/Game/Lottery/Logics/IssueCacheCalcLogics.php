@@ -6,7 +6,6 @@ use App\Models\Game\Lottery\LotteryIssue;
 use App\Models\Game\Lottery\LotteryList;
 use App\Models\Game\Lottery\LotterySerie;
 use Illuminate\Support\Facades\Redis;
-use phpDocumentor\Reflection\Types\Object_;
 
 /**
  * Created by PhpStorm.
@@ -14,9 +13,9 @@ use phpDocumentor\Reflection\Types\Object_;
  * Date: 5/31/2019
  * Time: 5:24 PM
  */
-trait IssueCacheCalcLgics
+trait IssueCacheCalcLogics
 {
-    private static $redis_database = 2; //指定redis使用那个数据库，由于trait无法定义常量，所以为私有变量
+    private static $redis_database = 3; //指定redis使用那个数据库，由于trait无法定义常量，所以为私有变量
     private static $code_range = 100; //指定存储的区间位数，现阶段最大支持100个开奖线路图
     private static $update_limit = 9; //低于此条数进行缓存尝试刷新
     /** =============== 功能函数 ============= */
