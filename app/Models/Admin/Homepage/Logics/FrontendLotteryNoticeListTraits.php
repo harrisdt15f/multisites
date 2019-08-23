@@ -64,6 +64,7 @@ trait FrontendLotteryNoticeListTraits
         if (!isset($lotteryNoticelist[$issue->lottery_id])) {
             $lottery = LotteryList::where('en_name', $issue->lottery_id)->first();
             if ($lottery !== null) {
+                $lotteryNoticelist[$issue->lottery_id]['series'] = $lottery->series_id;
                 $lotteryNoticelist[$issue->lottery_id]['cn_name'] = $lottery->cn_name;
                 $lotteryNoticelist[$issue->lottery_id]['lotteries_id'] = $issue->lottery_id;
                 $lotteryNoticelist[$issue->lottery_id]['icon'] = $lottery->icon_path;
