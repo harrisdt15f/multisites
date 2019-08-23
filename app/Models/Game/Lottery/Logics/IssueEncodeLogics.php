@@ -17,6 +17,7 @@ use App\Models\Project;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
+use App\Models\Admin\Homepage\FrontendLotteryNoticeList;
 
 trait IssueEncodeLogics
 {
