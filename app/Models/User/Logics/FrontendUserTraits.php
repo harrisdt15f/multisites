@@ -4,6 +4,7 @@ namespace App\Models\User\Logics;
 
 use App\Lib\Pay\Pay;
 use App\Models\Finance\UserRecharge;
+use App\Models\Admin\Notice\FrontendMessageNotice;
 
 trait FrontendUserTraits
 {
@@ -48,5 +49,12 @@ trait FrontendUserTraits
         $order->save();
 
         return $data;
+    }
+
+    //用户未读站内信数量
+    public function unreadMessageNum()
+    {
+        $message = $this->message;
+        return $message->where('status',FrontendMessageNotice::STATUS_UNREAD)->count();
     }
 }

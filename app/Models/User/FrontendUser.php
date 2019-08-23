@@ -9,6 +9,7 @@ use App\Models\User\Logics\FrontendUserTraits;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use App\Models\Admin\Notice\FrontendMessageNotice;
 
 class FrontendUser extends Authenticatable implements JWTSubject
 {
@@ -80,5 +81,11 @@ class FrontendUser extends Authenticatable implements JWTSubject
     public function specific()
     {
         return $this->hasOne(FrontendUsersSpecificInfo::class, 'user_id', 'id');
+    }
+
+    //用户站内信
+    public function message()
+    {
+        return $this->hasMany(FrontendMessageNotice::class, 'receive_user_id', 'id');
     }
 }
