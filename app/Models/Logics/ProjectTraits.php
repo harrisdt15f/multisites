@@ -59,7 +59,7 @@ trait ProjectTraits
             );
             if ($traceData) {
                 self::saveTrace(
-                    $project->id,
+                    $project,
                     $user,
                     $lottery,
                     $data,
@@ -67,7 +67,6 @@ trait ProjectTraits
                     $_item,
                     $inputDatas,
                     $from,
-                    $project->serial_number
                 );
             }
             $returnData['project'][] = [
@@ -156,7 +155,7 @@ trait ProjectTraits
     }
 
     /**
-     * @param $projectId
+     * @param $project
      * @param $user
      * @param $lottery
      * @param $data
@@ -164,18 +163,16 @@ trait ProjectTraits
      * @param $_item
      * @param $inputDatas
      * @param $from
-     * @param $serialNumber
      */
     public static function saveTrace(
-        $projectId,
+        $project,
         $user,
         $lottery,
         $data,
         $traceData,
         $_item,
         $inputDatas,
-        $from,
-        $serialNumber
+        $from
     ): void {
         LotteryPrizeGroup::makePrizeSettingArray(
             $_item['method_id'],
@@ -211,7 +208,7 @@ trait ProjectTraits
             'finished_issues' => 0,
             'canceled_issues' => 0,
             'start_issue' => key($traceData),
-            'now_issue' => '',
+            'now_issue' => $project->issue,
             'end_issue' => array_key_last($traceData),
             'stop_issue' => '',
             'issue_process' => json_encode($traceData),
@@ -227,7 +224,7 @@ trait ProjectTraits
         $i = 1;
         foreach ($traceData as $issue => $multiple) {
             if ($i === 1) {
-                $project_serial_number = $serialNumber;
+                $project_serial_number = $project->serial_number;
                 $status = LotteryTraceList::STATUS_RUNNING;
             } else {
                 $project_serial_number = null;
@@ -244,7 +241,7 @@ trait ProjectTraits
                     'parent_id' => $user->parent_id,
                     'is_tester' => $user->is_tester,
                     'series_id' => $lottery->series_id,
-                    'project_id' => $projectId,
+                    'project_id' => $project->id,
                     'project_serial_number' => $project_serial_number,
                     'lottery_sign' => $lottery->en_name,
                     'method_sign' => $dataItem['method_id'],

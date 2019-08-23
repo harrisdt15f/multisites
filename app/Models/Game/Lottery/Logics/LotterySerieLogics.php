@@ -29,7 +29,7 @@ trait LotterySerieLogics
     {
         $cacheKey = self::getCacheKey();
         $listData = [];
-        $serieEloq = self::select('id', 'series_name', 'title', 'status', 'encode_splitter')->get();
+        $serieEloq = self::select('id', 'series_name', 'title', 'status', 'encode_splitter', 'price_difference')->get();
         foreach ($serieEloq as $key => $serieItem) {
             $listData[$serieItem->series_name]['id'] = $serieItem->id;
             $listData[$serieItem->series_name]['series_name'] = $serieItem->series_name;
