@@ -298,8 +298,12 @@ trait IssueEncodeLogics
         $this->official_code = $openCodeStr;
 
         if ($this->save()) {
+            /*
             //趋势分析记录之前three的
-            //LotteryTrend::trend($this);
+              LotteryTrend::trend($this);
+            */
+
+            /*新的*/
             LotteryIssue::cacheRe($this);
 
             dispatch(new IssueEncoder($this->toArray()))->onQueue('open_numbers');
