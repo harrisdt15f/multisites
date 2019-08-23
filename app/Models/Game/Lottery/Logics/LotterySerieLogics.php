@@ -29,8 +29,9 @@ trait LotterySerieLogics
     {
         $cacheKey = self::getCacheKey();
         $listData = [];
-        $serieEloq = self::select('series_name', 'title', 'status', 'encode_splitter')->get();
+        $serieEloq = self::select('id', 'series_name', 'title', 'status', 'encode_splitter')->get();
         foreach ($serieEloq as $key => $serieItem) {
+            $listData[$serieItem->series_name]['id'] = $serieItem->id;
             $listData[$serieItem->series_name]['series_name'] = $serieItem->series_name;
             $listData[$serieItem->series_name]['title'] = $serieItem->title;
             $listData[$serieItem->series_name]['status'] = $serieItem->status;
@@ -47,6 +48,6 @@ trait LotterySerieLogics
      */
     public static function getCacheKey(): string
     {
-        return 'lotterySerieList';
+        return 'lottery_serie_list';
     }
 }
