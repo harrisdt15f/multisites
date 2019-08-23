@@ -8,7 +8,6 @@
     ],
     "license": "MIT",
     "require": {
-        "ext-json": "*",
         "barryvdh/laravel-cors": "^0.11.3",
         "fideloper/proxy": "^4.0",
         "genealabs/laravel-model-caching": "0.4.*",
@@ -25,7 +24,8 @@
         "predis/predis": "^1.1",
         "ricardofontanelli/laravel-telegram": "^1.2",
         "tymon/jwt-auth": "1.0.0-rc.4.1",
-        "waavi/sanitizer": "~1.0"
+        "waavi/sanitizer": "~1.0",
+      "ext-json": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.2",
