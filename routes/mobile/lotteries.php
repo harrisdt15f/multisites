@@ -71,4 +71,9 @@ Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], function 
         'as' => $namePrefix . 'last-issue',
         'uses' => $controller . 'lastIssue',
     ]);
+    //彩种可追号的奖期列表
+    Route::match(['post', 'options'], 'trace-issue-list', [
+        'as' => $namePrefix . 'trace-issue-list',
+        'uses' => $controller . 'traceIssueList',
+    ]);
 });

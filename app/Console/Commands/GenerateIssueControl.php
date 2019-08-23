@@ -33,7 +33,7 @@ class GenerateIssueControl extends Command
      */
     public function handle()
     {
-        $generateIssueTime = SystemConfiguration::getGenerateIssueTime();
+        $generateIssueTime = configure('generate_issue_time');
         $timeNow = date('H:i');
         if ($generateIssueTime == $timeNow) {
             $lotteries = LotteryList::generateIssueLotterys();

@@ -25,5 +25,4 @@ class FrontendLogMonologEvent
     {
         $this->records = $records;
     }
-
 }

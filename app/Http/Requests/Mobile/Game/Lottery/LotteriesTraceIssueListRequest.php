@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Backend\Game\Lottery;
+namespace App\Http\Requests\Mobile\Game\Lottery;
 
 use App\Http\Requests\BaseFormRequest;
 
-class LotterySeriesAddRequest extends BaseFormRequest
+class LotteriesTraceIssueListRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,11 +24,7 @@ class LotterySeriesAddRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'series_name' => 'required|alpha_num|unique:lottery_series', //系列标识
-            'title' => 'required|string|unique:lottery_series', //系列名称
-            'status' => 'required|integer|in:0,1', //状态:0关闭  1开启
-            'encode_splitter' => 'nullable', //开奖号码分隔符
-            'price_difference' => 'required|integer', //差价
+            'lottery_sign' => 'required|string|min:4|max:10|exists:lottery_lists,en_name', //lottery_lists
         ];
     }
 

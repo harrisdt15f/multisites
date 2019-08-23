@@ -2,6 +2,7 @@
 
 namespace App\Models\DeveloperUsage\Frontend\Traits;
 
+use App\Lib\Common\CacheRelated;
 use Illuminate\Support\Facades\Cache;
 
 trait FrontendModelTraits
@@ -39,11 +40,20 @@ trait FrontendModelTraits
             'ico' => 'getIco',
             'logo' => 'getLogo',
             'qrcode' => 'getQrcode',
+            'customer_service' => 'getCustomerService',
         ];
         foreach ($contentFunctions as $key => $function) {
             $data[$key] = $this->$function();
         }
         return $data;
+    }
+
+    //获取客服
+    public function getCustomerService()
+    {
+        $name = 'customer.service';
+        $redisKey = 'homepage_customer_service';
+        return $this->getCacheModuleValue($name, $redisKey);
     }
 
     //获取icon
@@ -72,14 +82,13 @@ trait FrontendModelTraits
 
     public function getCacheModuleValue($name, $redisKey)
     {
-        $data = null;
-        if (Cache::has($redisKey)) {
-            $data = Cache::get($redisKey);
-        } else {
+        $tags = 'homepage';
+        $data = CacheRelated::getTagsCache($tags, $redisKey);
+        if ($data === false) {
             $qrcodeELoq = self::select('value', 'status')->where('en_name', $name)->first();
             if ($qrcodeELoq !== null && $qrcodeELoq->status === 1) {
                 $data = $qrcodeELoq->value;
-                Cache::forever($redisKey, $data);
+                CacheRelated::setTagsCache($tags, $redisKey, $data);
             }
         }
         return $data;

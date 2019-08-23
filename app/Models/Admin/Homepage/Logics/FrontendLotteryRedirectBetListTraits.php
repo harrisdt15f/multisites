@@ -2,9 +2,9 @@
 
 namespace App\Models\Admin\Homepage\Logics;
 
+use App\Lib\Common\CacheRelated;
 use App\Models\DeveloperUsage\Frontend\FrontendAllocatedModel;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
 
 trait FrontendLotteryRedirectBetListTraits
 {
@@ -56,6 +56,7 @@ trait FrontendLotteryRedirectBetListTraits
      */
     public static function updateCache($cacheKey, $showNum): array
     {
+        $tags = 'homepage';
         $dataEloq = self::select('id', 'lotteries_id', 'lotteries_sign')
             ->with(['lotteries:id,day_issue,en_name,cn_name,icon_path', 'issueRule:lottery_id,issue_seconds'])
             ->orderBy('sort', 'asc')
@@ -69,8 +70,8 @@ trait FrontendLotteryRedirectBetListTraits
             $datas[$key]['issue_seconds'] = $dataIthem->issueRule->first->issue_seconds ?? null;
             $datas[$key]['day_issue'] = $dataIthem->lotteries->day_issue ?? null;
         }
-        $expiresAt = Carbon::now()->addHours(24);
-        $aa = Cache::put($cacheKey, $datas, $expiresAt);
+        $minuteToStore = 60 * 24;
+        CacheRelated::setTagsCache($tags, $cacheKey, $datas, $minuteToStore);
         return $datas;
     }
 }

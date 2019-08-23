@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Lib\Common\CacheRelated;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -29,25 +30,27 @@ class DeleteCachePicControl extends Command
      */
     public function handle()
     {
-        if (Cache::has('cache_pic')) {
-            $cachePic = Cache::get('cache_pic');
-            foreach ($cachePic as $key => $pic) {
+        $tags = 'images';
+        $redisKey = 'cleaned_images';
+        $cleanedImages = CacheRelated::getTagsCache($tags, $redisKey);
+        if ($cleanedImages !== false) {
+            foreach ($cleanedImages as $key => $pic) {
                 if (!isset($pic['expire_time']) || $pic['expire_time'] < time()) {
                     $path = 'public/' . $pic['path'];
                     if (file_exists($path)) {
                         if (!is_writable(dirname($path))) {
                         } else {
                             unlink($path);
-                            unset($cachePic[$key]);
+                            unset($cleanedImages[$key]);
                         }
                     } else {
-                        unset($cachePic[$key]);
+                        unset($cleanedImages[$key]);
                     }
                 }
             }
-            $hourToStore = 24 * 2;
-            $expiresAt = Carbon::now()->addHours($hourToStore);
-            Cache::put('cache_pic', $cachePic, $expiresAt);
+            CacheRelated::setTagsCache($tags, $redisKey, $cleanedImages);
+            $minuteToStore = 60 * 24 * 2;
+            Cache::tags($tags)->put($redisKey, $cleanedImages, $expiresAt, $minuteToStore);
         }
     }
 }

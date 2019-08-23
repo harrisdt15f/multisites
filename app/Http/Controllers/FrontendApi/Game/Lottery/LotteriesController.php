@@ -23,6 +23,8 @@ use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryListAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesProjectHistoryAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesStopTraceAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesTracesHistoryAction;
+use App\Http\Requests\Mobile\Game\Lottery\LotteriesTraceIssueListRequest;
+use App\Http\SingleActions\Mobile\Game\Lottery\LotteriesTraceIssueListAction;
 use App\Models\Game\Lottery\LotteryIssue;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -121,7 +123,7 @@ class LotteriesController extends FrontendApiMainController
 
     public function setWinPrize()
     {
-        LotteryIssue::calculateEncodedNumber('cqssc', '190818036');
+        LotteryIssue::calculateEncodedNumber('jssc', '1908201271');
     }
 
     /**
@@ -156,6 +158,20 @@ class LotteriesController extends FrontendApiMainController
      */
     public function lastIssue(LotteriesLastIssuesRequest $request, LotteriesLastIssuesAction $action): JsonResponse
     {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
+    }
+
+    /**
+     * 彩种可追号的奖期列表
+     * @param  LotteriesTraceIssueListRequest $request
+     * @param  LotteriesTraceIssueListAction  $action
+     * @return JsonResponse
+     */
+    public function traceIssueList(
+        LotteriesTraceIssueListRequest $request,
+        LotteriesTraceIssueListAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }

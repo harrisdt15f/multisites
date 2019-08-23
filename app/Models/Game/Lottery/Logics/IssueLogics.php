@@ -72,6 +72,21 @@ trait IssueLogics
     }
 
     /**
+     * 获取彩种可追号的奖期
+     * @param  $lotteryId
+     * @param  int         $count
+     * @return mixed
+     */
+    public static function getCanTraceIssue($lotteryId, $count = 50)
+    {
+        $time = time();
+        return self::where([
+            ['lottery_id', $lotteryId],
+            ['end_time', '>', $time],
+        ])->orderBy('begin_time', 'ASC')->skip(0)->take($count)->get();
+    }
+
+    /**
      * 获取所有历史奖期
      * @param  $lotteryId
      * @param  int         $count

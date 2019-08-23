@@ -28,6 +28,7 @@ use Illuminate\Http\JsonResponse;
 class HomepageController extends FrontendApiMainController
 {
     private $bannerFlag = 1; //网页端banner
+    public $tags = 'homepage';
 
     /**
      * 需要展示的前台模块
@@ -70,16 +71,6 @@ class HomepageController extends FrontendApiMainController
     }
 
     /**
-     * 首页二维码
-     * @param  HompageQrCodeAction $action
-     * @return JsonResponse
-     */
-    public function qrCode(HompageQrCodeAction $action): JsonResponse
-    {
-        return $action->execute($this);
-    }
-
-    /**
      * 热门活动
      * @param  HompageActivityAction $action
      * @return JsonResponse
@@ -87,16 +78,6 @@ class HomepageController extends FrontendApiMainController
     public function activity(HompageActivityAction $action): JsonResponse
     {
         return $action->execute($this, 1);
-    }
-
-    /**
-     * 首页LOGO
-     * @param  HompageLogoAction $action
-     * @return JsonResponse
-     */
-    public function logo(HompageLogoAction $action): JsonResponse
-    {
-        return $action->execute($this);
     }
 
     /**
@@ -120,16 +101,6 @@ class HomepageController extends FrontendApiMainController
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
-    }
-
-    /**
-     * 前台网站头ico
-     * @param  HompageIcoAction $action
-     * @return JsonResponse
-     */
-    public function ico(HompageIcoAction $action): JsonResponse
-    {
-        return $action->execute($this);
     }
 
     /**

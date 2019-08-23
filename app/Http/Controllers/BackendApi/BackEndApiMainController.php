@@ -56,7 +56,6 @@ class BackEndApiMainController extends Controller
                 $this->currentPlatformEloq = new SystemPlatform();
                 if ($this->partnerAdmin->platform()->exists()) {
                     $this->currentPlatformEloq = $this->partnerAdmin->platform; //获取目前账号用户属于平台的对象
-                    Cache::forever('currentPlatformEloq', $this->currentPlatformEloq);
                     if ($this->partnerAdmin->accessGroup()->exists()) {
                         $this->currentPartnerAccessGroup = $this->partnerAdmin->accessGroup;
                     }
@@ -70,8 +69,8 @@ class BackEndApiMainController extends Controller
             $this->inputs = Input::all(); //获取所有相关的传参数据
             //登录注册的时候是没办法获取到当前用户的相关信息所以需要过滤
             $this->adminOperateLog();
-            $this->minClassicPrizeGroup = configure('min_bet_prize_group', 1800);//平台最低投注奖金组
-            $this->maxClassicPrizeGroup = configure('max_bet_prize_group', 1960);//平台最高投注奖金组
+            $this->minClassicPrizeGroup = (int) configure('min_bet_prize_group', 1800); //平台最低投注奖金组
+            $this->maxClassicPrizeGroup = (int) configure('max_bet_prize_group', 1960); //平台最高投注奖金组
             $this->eloqM = 'App\\Models\\' . $this->eloqM; // 当前的eloquent
             return $next($request);
         });

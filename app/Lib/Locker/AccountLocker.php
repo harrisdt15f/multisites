@@ -71,7 +71,7 @@ class AccountLocker
     }
 
     // 释放所有
-    static function releaseAll()
+    public static function releaseAll()
     {
         Cache::tags(self::$tag)->flush();
     }

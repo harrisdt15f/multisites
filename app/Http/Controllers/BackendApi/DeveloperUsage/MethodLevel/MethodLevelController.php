@@ -10,7 +10,6 @@ use App\Http\SingleActions\Backend\DeveloperUsage\MethodLevel\MethodLevelAddActi
 use App\Http\SingleActions\Backend\DeveloperUsage\MethodLevel\MethodLevelDeleteAction;
 use App\Http\SingleActions\Backend\DeveloperUsage\MethodLevel\MethodLevelDetailAction;
 use App\Http\SingleActions\Backend\DeveloperUsage\MethodLevel\MethodLevelEditAction;
-use App\Lib\Common\CacheRelated;
 use Illuminate\Http\JsonResponse;
 
 class MethodLevelController extends BackEndApiMainController
@@ -59,16 +58,5 @@ class MethodLevelController extends BackEndApiMainController
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
-    }
-
-    /**
-     * 删除玩法等级列表缓存
-     * @return void
-     */
-    public function deleteCache(): void
-    {
-        $key = 'methodLeveDetail';
-        $cacheRelated = new CacheRelated();
-        $cacheRelated->delete($key);
     }
 }
