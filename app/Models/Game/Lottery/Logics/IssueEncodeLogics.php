@@ -182,6 +182,9 @@ trait IssueEncodeLogics
             ++$first;
         }
         if ($oTrace !== null) {
+            ++$oTrace->finished_issues; //完成的奖期+1
+            $oTrace->finished_amount += $oProject->total_cost; //完成的金额
+            $oTrace->finished_bonus += $oProject->bonus; //追号中奖总金额
             if ($oProject->status >= Project::STATUS_WON && $oTrace->win_stop === 1) {
                 //Remaining TraceList to stop continuing
                 $oTraceListToUpdate = $oTrace->traceRunningLists();
@@ -197,22 +200,19 @@ trait IssueEncodeLogics
                 $oTrace->stop_time = time();
                 $oTrace->save();
                 //update TraceLists with Project
-                if ($oProject->tracelist()->exists()) {//第一次的时候是没有的
+                if ($oProject->tracelist()->exists()) { //第一次的时候是没有的
                     $oTraceListFromProject = $oProject->tracelist;
                     $oTraceListFromProject->status = LotteryTraceList::STATUS_FINISHED;
                     $oTraceListFromProject->save();
                 }
-            } elseif ($oProject->status > Project::STATUS_NORMAL && $first < 1) {
-//不是第一次的时候
-                ++$oTrace->finished_issues;
-                $oTrace->finished_amount += $oProject->total_cost;
-                $oTrace->finished_bonus += $oProject->bonus;
-                if ($oTrace->end_issue === $oProject->issue) {
+            } elseif ($oProject->status > Project::STATUS_NORMAL && $first < 1) { //不是第一次的时候
+                $waitingNum = $oTrace->traceLists->where('status',LotteryTraceList::STATUS_WAITING)->count();
+                if ($waitingNum === 0) { //如果没有等待追号的数据，则追号完成
                     $oTrace->status = LotteryTrace::STATUS_FINISHED;
                 }
                 $oTrace->save();
                 //update TraceLists with Project
-                if ($oProject->tracelist()->exists()) {//第一次的时候是没有的
+                if ($oProject->tracelist()->exists()) { //第一次的时候是没有的
                     $oTraceListFromProject = $oProject->tracelist;
                     $oTraceListFromProject->status = LotteryTraceList::STATUS_FINISHED;
                     $oTraceListFromProject->project_id = $oProject->id;
