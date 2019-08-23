@@ -34,6 +34,10 @@ trait IssueCacheCalcLogics
         //使用制定的redis库，便于管理
         Redis::command('select', [self::$redis_database]);
         $data = self::changeValue($lotteryIssue);
+        //上海时时乐的期号需要单独过滤
+        if ($key == 'shssl') {
+            $issue = str_replace('-', '', $issue);
+        }
         //记录当前 使用有序集合存储开奖信息，开奖期号作为sort，彩票lottery_id作为集合名称 例如 hljssc 值为开奖号码
         $redisStatus = Redis::zadd($key, $issue, $data);
 
@@ -75,6 +79,10 @@ trait IssueCacheCalcLogics
             $data = self::changeValue($v);
             $key = $v->lottery_id;//key
             $issue = $v->issue;//将期 sort
+            //上海时时乐的期号需要单独过滤
+            if ($lottery_id == 'shssl') {
+                $issue = str_replace('-', '', $issue);
+            }
             Redis::zadd($key, $issue, $data); //数据补齐
         }
         $count = Redis::zcard($lottery_id);
@@ -85,7 +93,7 @@ trait IssueCacheCalcLogics
     }
 
     /**
-     * 刷新指定彩种的缓存 补定到指定条数
+     * 刷新指定彩种的缓存 补定到指定条数 为香港六合彩预留调试缓存方法 防止影响正常数据
      * @param  $lottery_id
      * @return mixed
      */
@@ -105,6 +113,10 @@ trait IssueCacheCalcLogics
             $data = self::changeValue($v);
             $key = $v->lottery_id;//key
             $issue = $v->issue;//将期 sort
+            //上海时时乐的期号需要单独过滤
+            if ($lottery_id == 'shssl') {
+                $issue = str_replace('-', '', $issue);
+            }
             Redis::zadd($key, $issue, $data); //数据补齐
         }
         $count = Redis::zcard($lottery_id);
@@ -159,6 +171,9 @@ trait IssueCacheCalcLogics
          *第三为在这里与第一位相同，用户返回时标记当前是否漏开
          *  */
         $codeRange = explode(',', $lotteryList->valid_code);
+        foreach ($codeRange as $codeRangeKey => $codeRangeValue) {
+            $codeRange[$codeRangeKey] = intval($codeRangeValue);
+        }
         $codeRange = array_flip($codeRange);
         ksort($codeRange);
         $secondData = array();
@@ -213,7 +228,7 @@ trait IssueCacheCalcLogics
         //取出数据
         $redisData = Redis::zrevrange($lottery_id, 0, self::$code_range);
 
-        $resData = array();
+        //01 $resData = array();
         //查找这个彩种的合法数字和他的分割符
         $lotteryList = LotteryList::where('en_name', $lottery_id)->first();
         $lotterySeries = LotterySerie::where('series_name', $lotteryList->series_id)->first();
@@ -228,8 +243,8 @@ trait IssueCacheCalcLogics
         $totalArr = self::createArray($row, $lotteryList);
         $redisCount = count($redisData);
         $trueRange = $redisCount > $range ? $range + 1 : $redisCount;
-        $codeRange = explode(',', $lotteryList->valid_code);
-        $startIndex = $codeRange[0];
+        //01 $codeRange = explode(',', $lotteryList->valid_code);
+        //01 $startIndex = $codeRange[0];
 
         //循环到指定的范围
         foreach ($redisData as $k => $v) {
@@ -244,7 +259,6 @@ trait IssueCacheCalcLogics
             $redisData[$k] = json_decode($v);
             $vdata = $redisData[$k]->data;
 
-
             //循环单列
             foreach ($vdata as $vdataKey => $vdataValue) {
                 $typeFlag = is_object($vdataValue);
@@ -258,15 +272,11 @@ trait IssueCacheCalcLogics
                     $vdata[$vdataKey] = $obj;
                     $redisData[$k]->data[$vdataKey] = $obj;
                 }
-
-                //dd($vdataKey,$redisData[$k]->data);
                 //上一层对应的位置 上一组开奖对应
                 $preSite = $k == 0 ? 0 : $redisData[$k - 1]->data[$vdataKey];
 
-
                 //偏移位 就是当前的中奖号码
                 $moveKey = $vdataValue->{1}[1];
-
 
                 //totalArr 统计数组中对应的位置
                 $totalSite = $vdataKey * $row + $moveKey;
@@ -276,15 +286,10 @@ trait IssueCacheCalcLogics
 
                 foreach ($vdataValue as $vdataItemKey => $vdatavaItemValue) {
                     $site = $vdataKey * $row + $vdataItemKey;
-                    // $vdataItemKey=10;
-                    // dd($preSite->$vdataItemKey,$vdataValue->$vdataItemKey,$vdataItemKey);
-
                     /*最大遗漏*/
                     //记j录的漏号
                     $preMax = $totalArr[2][$site];
                     $preLxMax = $totalArr[3][$site];
-
-                    //dd($vdataValue->$vdataItemKey,$preSite->$vdataItemKey);
                     //是开号 无需累加
                     if ($vdatavaItemValue[0] == 0) {
                         /*最大连出值*/
@@ -309,7 +314,6 @@ trait IssueCacheCalcLogics
                     if ($vdatavaItemValue[0] !== 0) {
                         $totalArr[1][$site]++;
                     }
-
 
                     //不是开号当前遗漏期数等于他加他之前
                     if ($k == 0) {
