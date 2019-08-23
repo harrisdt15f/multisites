@@ -28,6 +28,7 @@ class WithdrawRequest extends BaseFormRequest
             'bank_sign'=> 'required|string',
             'card_number'=> 'required|string',
             'card_username'=> 'required|string',
+            'from'=> 'filled|string',
         ];
     }
 }

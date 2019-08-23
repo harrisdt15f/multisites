@@ -33,11 +33,12 @@ class PayRechargeAction
     {
         $amount = $request->input('amount') ?? 0;
         $channel = $request->input('channel') ?? '';
+        $from = $request->input('from') ?? 'web';
 
-        $order = UsersRechargeHistorie::createRechargeOrder($contll->currentAuth->user(), $amount, $channel);
+        $order = UsersRechargeHistorie::createRechargeOrder($contll->currentAuth->user(), $amount, $channel, $from);
 
         $pandaC = new  Panda() ;
-        $result =  $pandaC->recharge($amount, $order->company_order_num, $channel);
+        $result =  $pandaC->recharge($amount, $order->company_order_num, $channel, $from);
 
         if (array_get($result, 'status') == 'success') {
             return $contll->msgOut(true, $result);

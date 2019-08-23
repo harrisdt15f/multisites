@@ -25,6 +25,8 @@ class PayWithdrawAction
         $data['bank_sign']  = $request->input('bank_sign') ?? '';
         $data['card_number'] = $request->input('card_number') ?? '';
         $data['card_username'] = $request->input('card_username') ?? '';
+        $data['from'] = $request->input('from') ?? 'web';
+
 
         $result = UsersWithdrawHistorie::createWithdrawOrder($contll->currentAuth->user(), $data);
 

@@ -75,11 +75,10 @@ class Panda extends BasePay
      * @param $amount
      * @param $orderId
      * @param $channel
-     * @param string $bankId
      * @param string $source
      * @return array|string
      */
-    public function recharge($amount, $orderId, $channel, $bankId = "", $source = "phone")
+    public function recharge($amount, $orderId, $channel, $source = "web")
     {
         $callbackUrl = parent::getCallbackUrl($this->sign);
         $url = $this->constant['recharge_url'];
@@ -89,7 +88,7 @@ class Panda extends BasePay
         $param['merchant_id'] = $merchantId;
         $param['amount'] = $amount;
         $param['order_id'] = $orderId;
-        $param['source'] = "web";
+        $param['source'] = $source;
         $param['channel'] = $channel;
 
         $param['callback_url'] = $callbackUrl;

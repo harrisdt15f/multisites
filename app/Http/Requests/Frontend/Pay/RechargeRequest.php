@@ -26,6 +26,7 @@ class RechargeRequest extends BaseFormRequest
         return [
             'amount' => 'required|numeric|regex:/^[0-9]+(.[0-9]{1,2})?$/',
             'channel'=> 'required|string',
+            'from'=> 'filled|string',
         ];
     }
 }
