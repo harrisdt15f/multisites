@@ -16,7 +16,7 @@ use phpDocumentor\Reflection\Types\Object_;
  */
 trait IssueCacheCalcLgics
 {
-    private static $redis_database = 2; //指定redis使用那个数据库，由于trait无法定义常量，所以为私有变量
+    private static $redis_database = 3; //指定redis使用那个数据库，由于trait无法定义常量，所以为私有变量
     private static $code_range = 100; //指定存储的区间位数，现阶段最大支持100个开奖线路图
     private static $update_limit = 9; //低于此条数进行缓存尝试刷新
     /** =============== 功能函数 ============= */
