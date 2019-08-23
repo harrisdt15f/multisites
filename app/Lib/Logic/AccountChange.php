@@ -430,6 +430,6 @@ class AccountChange
      */
     public static function getSerialNumber(): string
     {
-        return 'TX'.Str::orderedUuid()->getNodeHex();
+        return 'XWTX'.Str::orderedUuid()->getNodeHex();
     }
 }
