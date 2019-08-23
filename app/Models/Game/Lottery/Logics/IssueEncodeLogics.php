@@ -296,10 +296,13 @@ trait IssueEncodeLogics
         $this->status_encode = LotteryIssue::ENCODED;
         $this->encode_time = time();
         $this->official_code = $openCodeStr;
+
         if ($this->save()) {
-            //趋势分析记录
-            LotteryTrend::trend($this);
             FrontendLotteryNoticeList::updateLotteryNotice($this); //开奖公告缓存更新
+            //趋势分析记录之前three的
+            //LotteryTrend::trend($this);
+            LotteryIssue::cacheRe($this);
+
             dispatch(new IssueEncoder($this->toArray()))->onQueue('open_numbers');
         }
     }

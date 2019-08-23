@@ -235,7 +235,10 @@ class AccountChange
             return true;
         } else {
             $updated_at = date('Y-m-d H:i:s');
-            $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}' and `balance`>='{$money}'") > 0;
+            $ret = DB::update(
+                "update `frontend_users_accounts` set `balance`=`balance`-'{$money}' , 
+`updated_at`='$updated_at'  where `user_id` ='{$account->user_id}' and `balance`>='{$money}'"
+            ) > 0;
             if ($ret) {
                 $account->balance -= $money;
             }
@@ -286,7 +289,10 @@ class AccountChange
         } else {
             $updated_at = date('Y-m-d H:i:s');
 
-            $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`+'{$money}', `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}'") > 0;
+            $ret = DB::update(
+                "update `frontend_users_accounts` set `balance`=`balance`+'{$money}', 
+`frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}'"
+            ) > 0;
 
             if ($ret) {
                 $account->balance += $money;
@@ -319,7 +325,10 @@ class AccountChange
             return true;
         } else {
             $updated_at = date('Y-m-d H:i:s');
-            $ret = DB::update("update `frontend_users_accounts` set  `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}'") > 0;
+            $ret = DB::update(
+                "update `frontend_users_accounts` set  `frozen`=`frozen`- '{$money}' ,
+ `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}'"
+            ) > 0;
             if ($ret) {
                 $account->frozen -= $money;
             }
