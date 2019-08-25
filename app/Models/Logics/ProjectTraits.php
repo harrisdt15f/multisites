@@ -493,7 +493,7 @@ trait ProjectTraits
             ];
             if ($this->update($data)) {
                 DB::commit();
-                $this->sendMoney();
+                // $this->sendMoney();
             } else {
                 $strError = json_encode($this->errors()->first(), JSON_PRETTY_PRINT);
                 Log::channel('issues')->info($strError);
