@@ -41,11 +41,11 @@ trait ProjectTraits
                     return $arr;
                 }
                 $traceFirstMultiple = Arr::first($inputDatas['trace_issues']);
-                $traceData = array_slice($inputDatas['trace_issues'], 1, null, true);
+                // $traceData = array_slice($inputDatas['trace_issues'], 1, null, true);
                 $traceData = $inputDatas['trace_issues'];
             } elseif ($isTrace === 0) {
                 // 投注期号是否正确
-                if ($currentIssue !== Arr::first($inputDatas['trace_issues'])) {
+                if ($currentIssue->issue != key($inputDatas['trace_issues'])) {
                     $arr['error'] = '100310';
                     return $arr;
                 }
