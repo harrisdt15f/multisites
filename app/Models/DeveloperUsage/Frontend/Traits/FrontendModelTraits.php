@@ -2,11 +2,12 @@
 
 namespace App\Models\DeveloperUsage\Frontend\Traits;
 
-use App\Lib\Common\CacheRelated;
 use Illuminate\Support\Facades\Cache;
+use App\Lib\BaseCache;
 
 trait FrontendModelTraits
 {
+    use BaseCache;
 
     /**
      * @param  int    $type
@@ -82,13 +83,12 @@ trait FrontendModelTraits
 
     public function getCacheModuleValue($name, $redisKey)
     {
-        $tags = 'homepage';
-        $data = CacheRelated::getTagsCache($tags, $redisKey);
-        if ($data === false) {
+        $data = self::getCacheData($redisKey);
+        if (empty($data)) {
             $qrcodeELoq = self::select('value', 'status')->where('en_name', $name)->first();
             if ($qrcodeELoq !== null && $qrcodeELoq->status === 1) {
                 $data = $qrcodeELoq->value;
-                CacheRelated::setTagsCache($tags, $redisKey, $data);
+                self::saveCacheData($redisKey, $data);
             }
         }
         return $data;

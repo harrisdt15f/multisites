@@ -34,14 +34,15 @@ use App\Http\SingleActions\Backend\Game\Lottery\LotteriesMethodListsAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesMethodRowSwitchAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesMethodSwitchAction;
 use App\Http\SingleActions\Backend\Game\Lottery\LotteriesSeriesListsAction;
-use App\Lib\Common\CacheRelated;
 use Illuminate\Http\JsonResponse;
+use App\Lib\BaseCache;
 
 class LotteriesController extends BackEndApiMainController
 {
+    use BaseCache;
+
+    public $redisKey = 'backend_lottery_method_list';
     public $lotteryIssueEloq = 'Game\Lottery\LotteryIssue'; //issueLists
-    public $tags = 'lottery'; // seriesLists  && clearMethodCache
-    public $redisKey = 'backend_lottery_method_list'; // seriesLists  && clearMethodCache
 
     /**
      * 获取系列接口
@@ -161,9 +162,7 @@ class LotteriesController extends BackEndApiMainController
      */
     public function clearMethodCache(): void
     {
-        $tags = $this->tags;
-        $redisKey = $this->redisKey;
-        CacheRelated::deleteTagsCache($tags, $redisKey);
+        self::mtsFlushCache($this->redisKey);
     }
 
     /**

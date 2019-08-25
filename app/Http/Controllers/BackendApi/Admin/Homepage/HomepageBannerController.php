@@ -16,12 +16,13 @@ use App\Http\SingleActions\Backend\Admin\Homepage\HomepageBannerEditAction;
 use App\Http\SingleActions\Backend\Admin\Homepage\HomepageBannerPicStandardAction;
 use App\Http\SingleActions\Backend\Admin\Homepage\HomepageBannerSortAction;
 use App\Http\SingleActions\Backend\Admin\Homepage\HomepageReplaceImageAction;
-use Illuminate\Support\Facades\Cache;
-use App\Lib\Common\CacheRelated;
 use Illuminate\Http\JsonResponse;
+use App\Lib\BaseCache;
 
 class HomepageBannerController extends BackEndApiMainController
 {
+    use BaseCache;
+
     public $folderName = 'homepage_banner';
 
     /**
@@ -110,14 +111,13 @@ class HomepageBannerController extends BackEndApiMainController
      */
     public function deleteCache($flag = false): void
     {
-        $cacheRelated = new CacheRelated();
         $cacheName = $flag == 1 ? 'homepage_banner_web' : 'homepage_banner_app';
         if ($flag == 1 || $flag == 2) {
-            $cacheRelated->delete($cacheName);
+            self::mtsFlushCache($cacheName);
         } else {
             //同时清除
-            $cacheRelated->delete('homepage_banner_web');
-            $cacheRelated->delete('homepage_banner_app');
+            self::mtsFlushCache('homepage_banner_web');
+            self::mtsFlushCache('homepage_banner_app');
         }
     }
 }
