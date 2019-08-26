@@ -3,6 +3,8 @@ namespace App\Http\SingleActions\Payment;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Lib\Pay\Panda;
+use App\Models\User\Fund\FrontendUsersAccountsReport;
+use App\Models\User\UserProfits;
 use Illuminate\Http\JsonResponse;
 use App\Models\User\UsersWithdrawHistorie;
 use Illuminate\Support\Facades\Log;
@@ -103,5 +105,55 @@ class PayWithdrawAction
         } else {
             return $contll->msgOut(false, $result);
         }
+    }
+
+    /**
+     * 用户提现申请列表
+     * @param FrontendApiMainController $contll
+     * @param $request
+     * @return JsonResponse
+     */
+    public function withdrawList(FrontendApiMainController $contll, $request) : JsonResponse
+    {
+        $dateTo = $request->input('date_to') ?? '';
+        $dateFrom = $request->input('date_from') ?? '';
+        $count = $request->input('count') ?? 15;
+        $userInfo = $contll->currentAuth->user() ;
+
+        if ($dateFrom && $dateTo) {
+            $where = [['user_id', $userInfo->id], ['created_at', '>=', $dateFrom], ['created_at', '<=', $dateTo]];
+        } else {
+            $where = [['user_id', $userInfo->id]];
+        }
+
+        $rows = UsersWithdrawHistorie::where($where)->paginate($count);
+
+        return $contll->msgOut(true, $rows);
+    }
+
+
+    /**
+     * 提现到账列表
+     * @param FrontendApiMainController $contll
+     * @param $request
+     * @return JsonResponse
+     */
+    public function realWithdrawList(FrontendApiMainController $contll, $request) : JsonResponse
+    {
+        $dateTo = $request->input('date_to') ?? '';
+        $dateFrom = $request->input('date_from') ?? '';
+        $count = $request->input('count') ?? 15;
+        $userInfo = $contll->currentAuth->user() ;
+
+        if ($dateFrom && $dateTo) {
+            $where = [['user_id', $userInfo->id], ['created_at', '>=', $dateFrom], ['created_at', '<=', $dateTo]];
+        } else {
+            $where = [['user_id', $userInfo->id]];
+        }
+
+        $rows = FrontendUsersAccountsReport::where($where)->whereIn('type_sign', UserProfits::TEAM_WITHDRAWAL_SIGN)
+            ->paginate($count);
+
+        return $contll->msgOut(true, $rows);
     }
 }

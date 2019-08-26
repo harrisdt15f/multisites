@@ -4,6 +4,8 @@ namespace App\Http\SingleActions\Payment;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Lib\Pay\Panda;
+use App\Models\User\Fund\FrontendUsersAccountsReport;
+use App\Models\User\UserProfits;
 use Illuminate\Http\JsonResponse;
 use App\Models\User\UsersRechargeHistorie;
 use Illuminate\Support\Facades\Log;
@@ -66,5 +68,55 @@ class PayRechargeAction
         }
 
         $pandaC->renderSuccess();
+    }
+
+
+    /**
+     * 用户充值申请列表
+     * @param FrontendApiMainController $contll
+     * @param $request
+     * @return JsonResponse
+     */
+    public function rechargeList(FrontendApiMainController $contll, $request) : JsonResponse
+    {
+        $dateTo = $request->input('date_to') ?? '';
+        $dateFrom = $request->input('date_from') ?? '';
+        $count = $request->input('count') ?? 15;
+        $userInfo = $contll->currentAuth->user() ;
+
+        if ($dateFrom && $dateTo) {
+            $where = [['user_id', $userInfo->id], ['created_at', '>=', $dateFrom], ['created_at', '<=', $dateTo]];
+        } else {
+            $where = [['user_id', $userInfo->id]];
+        }
+
+        $rows = UsersRechargeHistorie::where($where)->paginate($count);
+
+        return $contll->msgOut(true, $rows);
+    }
+
+    /**
+     * 充值到账列表
+     * @param FrontendApiMainController $contll
+     * @param $request
+     * @return JsonResponse
+     */
+    public function realRechargeList(FrontendApiMainController $contll, $request) : JsonResponse
+    {
+        $dateTo = $request->input('date_to') ?? '';
+        $dateFrom = $request->input('date_from') ?? '';
+        $count = $request->input('count') ?? 15;
+        $userInfo = $contll->currentAuth->user() ;
+
+        if ($dateFrom && $dateTo) {
+            $where = [['user_id', $userInfo->id], ['created_at', '>=', $dateFrom], ['created_at', '<=', $dateTo]];
+        } else {
+            $where = [['user_id', $userInfo->id]];
+        }
+
+        $rows = FrontendUsersAccountsReport::where($where)->whereIn('type_sign', UserProfits::TEAM_DEPOSIT_SIGN)
+            ->paginate($count);
+
+        return $contll->msgOut(true, $rows);
     }
 }

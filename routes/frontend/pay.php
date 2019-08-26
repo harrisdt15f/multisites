@@ -19,4 +19,18 @@ Route::group(['prefix' => 'pay', 'namespace' => 'Pay'], function () {
     //发起提现
     Route::match(['post', 'options'], 'withdraw', ['as' => $namePrefix . 'withdraw',
         'uses' => $controller . 'withdraw']);
+
+    //充值申请列表
+    Route::match(['post', 'options'], 'rechargeList', ['as' => $namePrefix . 'rechargeList',
+        'uses' => $controller . 'rechargeList']);
+    //充值到账列表
+    Route::match(['post', 'options'], 'realRechargeList', ['as' => $namePrefix . 'realRechargeList',
+        'uses' => $controller . 'realRechargeList']);
+    
+    //体现申请列表
+    Route::match(['post', 'options'], 'withdrawList', ['as' => $namePrefix . 'withdrawList',
+        'uses' => $controller . 'withdrawList']);
+    //提现到账列表
+    Route::match(['post', 'options'], 'realWithdrawList', ['as' => $namePrefix . 'realWithdrawList',
+        'uses' => $controller . 'realWithdrawList']);
 });
