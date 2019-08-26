@@ -4,6 +4,8 @@ docker=1
 projectfolder="/var/www/multisites"
 phpcsbin="$projectfolder/vendor/bin"
 phpcslocation="$phpcsbin/phpcs"
+phpstanlocation="$phpcsbin/phpstan"
+autoloadPath="$phpcsbin/autoload.php"
 RULESET=/var/www/multisites/phpcs.xml
 
 STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
@@ -37,6 +39,20 @@ do
 ./phpcs --standard=$RULESET $filelocation"
   EXIT_STATUS=$?
   echo "exist status is $EXIT_STATUS"
+  ##################################################################################
+  echo "Starting To Run Code Quality"
+  docker exec ${container} bash -c "cd $phpcsbin;\
+./phpstan analyze --level=max --error-format=table -a $autoloadPath $filelocation"
+    STAN_STATUS=$?
+  echo "STAN status is $STAN_STATUS"
+    if [ "$STAN_STATUS" -eq "0" ]; then
+      echo 'passed'
+    else
+      echo "$STAN_STATUS"
+      echo "Code Quality Test Failed"
+      exit 1;
+    fi
+ ##################################################################################
     if [ "$EXIT_STATUS" -eq "0" ]; then
     echo "\t\033[32mPHPCS Passed: $FILE\033[0m result"
   else
