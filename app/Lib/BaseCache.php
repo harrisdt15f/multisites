@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Lib;
 
 use Exception;
@@ -18,7 +19,8 @@ trait BaseCache
     {
         $cacheConfig = self::getCacheConfig($key);
         if (isset($cacheConfig['tags'])) {
-            return Cache::tags($cacheConfig['tags'])->get($cacheConfig['key'], []);
+            $result = Cache::tags($cacheConfig['tags'])->get($cacheConfig['key'], []);
+            return json_decode($result, true);
         }
         return Cache::get($cacheConfig['key'], []);
     }
@@ -100,7 +102,7 @@ trait BaseCache
         $redisKey = 'cleaned_images';
         $cleanedImages = self::getCacheData($redisKey);
         if ($delimiter === null) {
-            $picArr = (array) $picStr;
+            $picArr = (array)$picStr;
         } else {
             $picArr = explode($delimiter, $picStr);
         }

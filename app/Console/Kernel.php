@@ -5,6 +5,7 @@ namespace App\Console;
 use App\Models\DeveloperUsage\TaskScheduling\CronJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Log;
 
 class Kernel extends ConsoleKernel
 {
@@ -33,12 +34,22 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $scheduleArr = CronJob::getOpenCronJob();
-        foreach ($scheduleArr as $scheduleItem) {
-            $criterias = json_decode($scheduleItem['param'], true);
-            if (empty($criterias)) {
-                $schedule->command($scheduleItem['command'])->cron($scheduleItem['schedule']); //没有argument的情况
-            } else {
-                $schedule->command($scheduleItem['command'], [$criterias])->cron($scheduleItem['schedule']); //有argument的情况
+        if (!is_string($scheduleArr))
+        {
+            Log::info(json_encode($scheduleArr));
+        }
+        else{
+            Log::info($scheduleArr);
+        }
+        if (!empty($scheduleArr)) {
+            foreach ($scheduleArr as $scheduleItem) {
+                $criterias = json_decode($scheduleItem['param'], true);
+                if (empty($criterias)) {
+                    $schedule->command($scheduleItem['command'])->cron($scheduleItem['schedule']); //没有argument的情况
+                } else {
+                    $schedule->command($scheduleItem['command'],
+                        [$criterias])->cron($scheduleItem['schedule']); //有argument的情况
+                }
             }
         }
     }
@@ -50,7 +61,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__ . '/Commands');
+        $this->load(__DIR__.'/Commands');
 
         require base_path('routes/console.php');
     }

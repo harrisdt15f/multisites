@@ -34,10 +34,9 @@ trait IssueCacheCalcLogics
         //使用制定的redis库，便于管理
         Redis::command('select', [self::$redis_database]);
         $data = self::changeValue($lotteryIssue);
-        //上海时时乐的期号需要单独过滤
-        if ($key == 'shssl') {
-            $issue = str_replace('-', '', $issue);
-        }
+        //将期统一
+        self::changeIssue($issue);
+
         //记录当前 使用有序集合存储开奖信息，开奖期号作为sort，彩票lottery_id作为集合名称 例如 hljssc 值为开奖号码
         $redisStatus = Redis::zadd($key, $issue, $data);
 
@@ -46,7 +45,7 @@ trait IssueCacheCalcLogics
 
         //初始化数据
         if ($count < self::$update_limit) {
-            self::flushIssueCache($lotteryIssue);
+            self::flushIssueCache($key);
         };
 
         //切除多余数据
@@ -58,46 +57,20 @@ trait IssueCacheCalcLogics
     }
 
     /**
+     * 改变issue结构
+     * @param  $issue 地址传递
+     * @return mixed
+     */
+    public static function changeIssue(&$issue)
+    {
+        $issue = str_replace('-', '', $issue);
+    }
+    /**
      * 刷新指定彩种的缓存 补定到指定条数
      * @param  $lotteryIssue
      * @return mixed
      */
-    public static function flushIssueCache($lotteryIssue): bool
-    {
-        $lottery_id = $lotteryIssue->lottery_id;
-        $issues = LotteryIssue::where(['lottery_id' => $lottery_id, 'status_encode' => 1])
-            ->orderBy('issue', 'desc')
-            ->limit(self::$code_range)
-            ->get();
-
-        if (!count($issues)) {
-            return false;
-        };
-
-        //写入缓存
-        foreach ($issues as $lk => $v) {
-            $data = self::changeValue($v);
-            $key = $v->lottery_id;//key
-            $issue = $v->issue;//将期 sort
-            //上海时时乐的期号需要单独过滤
-            if ($lottery_id == 'shssl') {
-                $issue = str_replace('-', '', $issue);
-            }
-            Redis::zadd($key, $issue, $data); //数据补齐
-        }
-        $count = Redis::zcard($lottery_id);
-        if ($count > 100) {
-            self::cutCacheData($lottery_id, $count);
-        }
-        return true;
-    }
-
-    /**
-     * 刷新指定彩种的缓存 补定到指定条数 为香港六合彩预留调试缓存方法 防止影响正常数据
-     * @param  $lottery_id
-     * @return mixed
-     */
-    public static function flushIssueCache2($lottery_id): bool
+    public static function flushIssueCache($lottery_id): bool
     {
         $issues = LotteryIssue::where(['lottery_id' => $lottery_id, 'status_encode' => 1])
             ->orderBy('issue', 'desc')
@@ -113,10 +86,9 @@ trait IssueCacheCalcLogics
             $data = self::changeValue($v);
             $key = $v->lottery_id;//key
             $issue = $v->issue;//将期 sort
-            //上海时时乐的期号需要单独过滤
-            if ($lottery_id == 'shssl') {
-                $issue = str_replace('-', '', $issue);
-            }
+            //奖期统一
+            self::changeIssue($issue);
+
             Redis::zadd($key, $issue, $data); //数据补齐
         }
         $count = Redis::zcard($lottery_id);
@@ -209,7 +181,7 @@ trait IssueCacheCalcLogics
         $count = Redis::zcard($lottery_id);
         //初始化数据
         if ($count < self::$update_limit) {
-            self::flushIssueCache2($lottery_id);
+            self::flushIssueCache($lottery_id);
         };
 
         //切除多余数据
