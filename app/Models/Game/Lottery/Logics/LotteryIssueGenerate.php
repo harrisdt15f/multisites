@@ -139,7 +139,12 @@ trait LotteryIssueGenerate
             $issueTimeInSeconds = $rule['issue_seconds'];
             $index = 1;
             do {
-                if (1 === $index) {
+                if ($rule['issue_count'] === 1) { //奖期只有一期时，结束时间和开奖时间的计算不一样
+                    $issueEndTime = $beginTime->copy();
+                    $issueEndTime = $issueEndTime->addSeconds($issueTimeInSeconds)->subSeconds($adjustTime);
+                    $issueTimeString = $day.' '.$rule['first_time'];
+                    $officialOpenTime = Carbon::parse($issueTimeString);
+                } elseif (1 === $index) {
                     $issueTimeString = $day.' '.$rule['first_time'];
                     $issueTime = Carbon::parse($issueTimeString);
                     $officialOpenTime = $issueTime->copy();
