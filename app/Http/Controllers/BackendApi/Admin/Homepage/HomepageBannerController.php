@@ -113,11 +113,11 @@ class HomepageBannerController extends BackEndApiMainController
     {
         $cacheName = $flag == 1 ? 'homepage_banner_web' : 'homepage_banner_app';
         if ($flag == 1 || $flag == 2) {
-            self::mtsFlushCache($cacheName);
+            self::deleteTagsCache($cacheName);
         } else {
             //同时清除
-            self::mtsFlushCache('homepage_banner_web');
-            self::mtsFlushCache('homepage_banner_app');
+            self::deleteTagsCache('homepage_banner_web');
+            self::deleteTagsCache('homepage_banner_app');
         }
     }
 }

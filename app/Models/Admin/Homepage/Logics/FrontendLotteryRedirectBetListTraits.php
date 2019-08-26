@@ -70,7 +70,7 @@ trait FrontendLotteryRedirectBetListTraits
             $datas[$key]['issue_seconds'] = $dataIthem->issueRule->first->issue_seconds ?? null;
             $datas[$key]['day_issue'] = $dataIthem->lotteries->day_issue ?? null;
         }
-        self::saveCacheData($cacheKey, $datas);
+        self::saveTagsCacheData($cacheKey, $datas);
         return $datas;
     }
 }

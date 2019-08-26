@@ -162,7 +162,7 @@ class LotteriesController extends BackEndApiMainController
      */
     public function clearMethodCache(): void
     {
-        self::mtsFlushCache($this->redisKey);
+        self::deleteTagsCache($this->redisKey);
     }
 
     /**

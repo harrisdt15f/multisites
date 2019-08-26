@@ -30,9 +30,9 @@ class DeleteCachePicControl extends Command
     public function handle()
     {
         $redisKey = 'cleaned_images';
-        $checkCache = self::hasCache($redisKey);
+        $checkCache = self::hasTagsCache($redisKey);
         if ($checkCache !== false) {
-            $cleanedImages = self::getCacheData($redisKey);
+            $cleanedImages = self::getTagsCacheData($redisKey);
             foreach ($cleanedImages as $key => $pic) {
                 if (!isset($pic['expire_time']) || $pic['expire_time'] < time()) {
                     $path = 'public/' . $pic['path'];
@@ -47,7 +47,7 @@ class DeleteCachePicControl extends Command
                     }
                 }
             }
-            self::saveCacheData($redisKey,$cleanedImages);
+            self::saveTagsCacheData($redisKey,$cleanedImages);
         }
     }
 }
