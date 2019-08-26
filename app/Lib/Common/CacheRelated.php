@@ -18,33 +18,6 @@ class CacheRelated
         }
     }
 
-    /**
-     * @param  $picStr
-     * @param  $delimiter
-     * @return void
-     */
-    public static function deleteCachePic($picStr, $delimiter = null): void
-    {
-        $tags = 'images';
-        $redisKey = 'cleaned_images';
-        if ($delimiter === null) {
-            $picArr = (array) $picStr;
-        } else {
-            $picArr = explode($delimiter, $picStr);
-        }
-        if (Cache::tags($tags)->has($redisKey)) {
-            $cachePic = Cache::tags($tags)->get($redisKey);
-            foreach ($picArr as $picName) {
-                if (array_key_exists($picName, $cachePic)) {
-                    unset($cachePic[$picName]);
-                }
-            }
-            $hourToStore = 24 * 2;
-            $expiresAt = Carbon::now()->addHours($hourToStore);
-            Cache::tags($tags)->put($redisKey, $cachePic, $expiresAt);
-        }
-    }
-
     public static function getTagsCache($tags, $key)
     {
         $data = false;

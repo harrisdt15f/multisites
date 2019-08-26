@@ -2,6 +2,7 @@
 
 namespace App\Models\Game\Lottery\Logics;
 
+use App\Lib\BaseCache;
 use App\Lib\Game\Lottery;
 use App\Models\Game\Lottery\LotteryIssue;
 use App\Models\Game\Lottery\LotteryMethod;
@@ -19,6 +20,8 @@ use Illuminate\Support\Facades\Request;
  */
 trait LotteryLogics
 {
+    use BaseCache;
+
     /**
      * 标识获取彩种
      * @param  string $sign
@@ -188,7 +191,11 @@ trait LotteryLogics
     public static function hasCache($key)
     {
         $cacheConfig = self::getCacheConfig($key);
-        return Cache::has($cacheConfig['key']);
+        if (isset($cacheConfig['tags'])) {
+            return Cache::tags($cacheConfig['tags'])->has($cacheConfig['key']);
+        } else {
+            return Cache::has($cacheConfig['key']);
+        }
     }
 
     /**
@@ -211,7 +218,11 @@ trait LotteryLogics
     public static function getCacheData($key)
     {
         $cacheConfig = self::getCacheConfig($key);
-        return Cache::get($cacheConfig['key'], []);
+        if (isset($cacheConfig['tags'])) {
+            return Cache::tags($cacheConfig['tags'])->get($cacheConfig['key'], []);
+        } else {
+            return Cache::get($cacheConfig['key'], []);
+        }
     }
 
     /**
@@ -256,11 +267,20 @@ trait LotteryLogics
     public static function saveCacheData($key, $value): void
     {
         $cacheConfig = self::getCacheConfig($key);
-        if ($cacheConfig['expire_time'] <= 0) {
-            Cache::forever($cacheConfig['key'], $value);
+        if (isset($cacheConfig['tags'])) {
+            if ($cacheConfig['expire_time'] <= 0) {
+                Cache::tags($cacheConfig['tags'])->forever($cacheConfig['key'], $value);
+            } else {
+                $expireTime = Carbon::now()->addSeconds($cacheConfig['expire_time']);
+                Cache::tags($cacheConfig['tags'])->put($cacheConfig['key'], $value, $expireTime);
+            }
         } else {
-            $expireTime = Carbon::now()->addSeconds($cacheConfig['expire_time']);
-            Cache::put($cacheConfig['key'], $value, $expireTime);
+            if ($cacheConfig['expire_time'] <= 0) {
+                Cache::forever($cacheConfig['key'], $value);
+            } else {
+                $expireTime = Carbon::now()->addSeconds($cacheConfig['expire_time']);
+                Cache::put($cacheConfig['key'], $value, $expireTime);
+            }
         }
     }
 
@@ -272,7 +292,6 @@ trait LotteryLogics
      */
     public function getMethodObject($methodId)
     {
-
         $data = self::getAllMethodObject($this->series_id);
         return $data[$methodId] ?? [];
     }
@@ -533,10 +552,8 @@ trait LotteryLogics
                 'defaultMethod' => $defaultMethod,
             ];
         }
-        $hourToStore = 24;
-        $expiresAt = Carbon::now()->addHours($hourToStore);
-        $frontendLotteryInfoCache = 'frontend.lottery.lotteryInfo';
-        Cache::tags('lottery')->put($frontendLotteryInfoCache, $cacheData, $expiresAt);
+        $frontendLotteryInfoCache = 'frontend_lottery_lotteryInfo';
+        self::saveCacheData($frontendLotteryInfoCache, $cacheData);
         return $cacheData;
     }
 

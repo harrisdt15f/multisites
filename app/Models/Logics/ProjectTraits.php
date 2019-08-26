@@ -31,9 +31,9 @@ trait ProjectTraits
         $isTrace = 0;
         $traceData = [];
         if (isset($inputDatas['is_trace'])) {
-            $isTrace = (int)$inputDatas['is_trace'];
+            $isTrace = (int) $inputDatas['is_trace'];
             if ($isTrace === 1 && count($inputDatas['trace_issues']) > 1) {
-                // 投注追号期号
+                // 追号期号
                 $arrTraceKeys = array_keys($inputDatas['trace_issues']);
                 $traceDataCollection = $lottery->checkTraceData($arrTraceKeys);
                 if (count($arrTraceKeys) !== $traceDataCollection->count()) {
@@ -41,8 +41,14 @@ trait ProjectTraits
                     return $arr;
                 }
                 $traceFirstMultiple = Arr::first($inputDatas['trace_issues']);
-                $traceData = array_slice($inputDatas['trace_issues'], 1, null, true);
+                // $traceData = array_slice($inputDatas['trace_issues'], 1, null, true);
                 $traceData = $inputDatas['trace_issues'];
+            } elseif ($isTrace === 0) {
+                // 投注期号是否正确
+                if ($currentIssue->issue != key($inputDatas['trace_issues'])) {
+                    $arr['error'] = '100310';
+                    return $arr;
+                }
             }
         }
         $returnData = [];
@@ -151,7 +157,7 @@ trait ProjectTraits
      */
     public static function getProjectSerialNumber(): string
     {
-        return 'XW'.Str::orderedUuid()->getNodeHex();
+        return 'XW' . Str::orderedUuid()->getNodeHex();
     }
 
     /**
@@ -259,7 +265,7 @@ trait ProjectTraits
                     'ip' => Request::ip(),
                     'proxy_ip' => json_encode(Request::ip()),
                     'bet_from' => $from,
-                    'status' => $status
+                    'status' => $status,
                 ];
                 $_item['total_price'] += $traceListData['total_price'];
                 LotteryTraceList::create($traceListData);
@@ -301,12 +307,12 @@ trait ProjectTraits
                         $totalBonus += $bonus;
                         $finalLevel = $iLevel;
                     } else {
-                        $errorString = 'There have no Count:'.$iBasicMethodId.' level:'.$iLevel.' Count:'.$iCount;
+                        $errorString = 'There have no Count:' . $iBasicMethodId . ' level:' . $iLevel . ' Count:' . $iCount;
                         Log::channel('issues')->info($errorString);
                     }
                 } else {
-                    $levelDataNote = 'leveldata'.json_encode($aPrizeOfBasicMethod);
-                    $errorString = 'There have no prize for  Basic MethodId'.$iBasicMethodId.$levelDataNote;
+                    $levelDataNote = 'leveldata' . json_encode($aPrizeOfBasicMethod);
+                    $errorString = 'There have no prize for  Basic MethodId' . $iBasicMethodId . $levelDataNote;
                     Log::channel('issues')->error($errorString);
                 }
             }
@@ -315,7 +321,7 @@ trait ProjectTraits
                     'basic_method_id' => $iBasicMethodId,
                     'open_number' => $openNumber,
                     'winning_number' => $this->formatWiningNumber($sWnNumber),
-                    'level' => $finalLevel,//@todo may be with string to concact
+                    'level' => $finalLevel, //@todo may be with string to concact
                     'bonus' => $totalBonus,
                     'is_win' => 1,
                     'time_count' => now()->timestamp,
@@ -323,7 +329,7 @@ trait ProjectTraits
                 ];
                 try {
                     DB::beginTransaction();
-                    $this->update($data);//@todo maybe only a time update
+                    $this->update($data); //@todo maybe only a time update
                     DB::commit();
                     $this->sendMoney();
                 } catch (Exception $e) {
@@ -346,69 +352,69 @@ trait ProjectTraits
      * @return bool|string
      */
     /*public function setWon(
-        $openNumber,
-        $sWnNumber,
-        $aPrized
+    $openNumber,
+    $sWnNumber,
+    $aPrized
     ) {
-        $totalBonus = 0;
-        $totalCount = 0;
-        $totalLevel = 0;
-        $finalLevel = 0;
-        foreach ($aPrized as $iBasicMethodId => $aPrizeOfBasicMethod) {
-            foreach ($aPrizeOfBasicMethod as $iLevel => $iCount) {
-                $totalCount += $iCount;
-                $PrizeEloq = LotteryMethodsWaysLevel::where([
-                    ['basic_method_id', '=', $iBasicMethodId],
-                    ['level', '=', $iLevel],
-                    ['method_id', '=', $this->method_sign]
-                ])->first();
-                if ($PrizeEloq !== null) {
-                    if ($iCount > 0) {
-                        $bonus = $this->bet_prize_group * $PrizeEloq->prize / 1800;
-                        $bonus *= $this->mode * $this->times * $iCount;
-                        if (pack('f', $this->price) === pack('f', 1.0)) {
-                            $bonus /= 2;
-                        }
-                        $totalBonus += $bonus;
-                        $finalLevel = $iLevel;
-                        $totalLevel++;
-                    } else {
-                        $errorString = 'There have no Count:'.$iBasicMethodId.' level:'.$iLevel.' Count:'.$iCount;
-                        Log::channel('issues')->info($errorString);
-                    }
-                } else {
-                    $levelDataNote = 'leveldata'.json_encode($aPrizeOfBasicMethod);
-                    $errorString = 'There have no prize for  Basic MethodId'.$iBasicMethodId.$levelDataNote;
-                    Log::channel('issues')->error($errorString);
-                }
-            }
-            if ($totalCount > 0) {
-                $data = [
-                    'basic_method_id' => $iBasicMethodId,
-                    'open_number' => $openNumber,
-                    'winning_number' => $this->formatWiningNumber($sWnNumber),
-                    'level' => $finalLevel,//@todo may be with string to concact
-                    'bonus' => $totalBonus,
-                    'is_win' => 1,
-                    'time_count' => now()->timestamp,
-                    'status' => self::STATUS_WON,
-                ];
-                try {
-                    DB::beginTransaction();
-//                    $lockProject = $this->lockForUpdate()->find($this->id);
-                    $this->update($data);//@todo maybe only a time update
-                    DB::commit();
-                    $this->sendMoney();
-                } catch (Exception $e) {
-                    Log::channel('issues')->info($e->getMessage());
-                    DB::rollBack();
-                    return $e->getMessage();
-                }
-            } else {
-                $this->setFail($openNumber, $sWnNumber, $iBasicMethodId);
-            }
-            return true;
-        }
+    $totalBonus = 0;
+    $totalCount = 0;
+    $totalLevel = 0;
+    $finalLevel = 0;
+    foreach ($aPrized as $iBasicMethodId => $aPrizeOfBasicMethod) {
+    foreach ($aPrizeOfBasicMethod as $iLevel => $iCount) {
+    $totalCount += $iCount;
+    $PrizeEloq = LotteryMethodsWaysLevel::where([
+    ['basic_method_id', '=', $iBasicMethodId],
+    ['level', '=', $iLevel],
+    ['method_id', '=', $this->method_sign]
+    ])->first();
+    if ($PrizeEloq !== null) {
+    if ($iCount > 0) {
+    $bonus = $this->bet_prize_group * $PrizeEloq->prize / 1800;
+    $bonus *= $this->mode * $this->times * $iCount;
+    if (pack('f', $this->price) === pack('f', 1.0)) {
+    $bonus /= 2;
+    }
+    $totalBonus += $bonus;
+    $finalLevel = $iLevel;
+    $totalLevel++;
+    } else {
+    $errorString = 'There have no Count:'.$iBasicMethodId.' level:'.$iLevel.' Count:'.$iCount;
+    Log::channel('issues')->info($errorString);
+    }
+    } else {
+    $levelDataNote = 'leveldata'.json_encode($aPrizeOfBasicMethod);
+    $errorString = 'There have no prize for  Basic MethodId'.$iBasicMethodId.$levelDataNote;
+    Log::channel('issues')->error($errorString);
+    }
+    }
+    if ($totalCount > 0) {
+    $data = [
+    'basic_method_id' => $iBasicMethodId,
+    'open_number' => $openNumber,
+    'winning_number' => $this->formatWiningNumber($sWnNumber),
+    'level' => $finalLevel,//@todo may be with string to concact
+    'bonus' => $totalBonus,
+    'is_win' => 1,
+    'time_count' => now()->timestamp,
+    'status' => self::STATUS_WON,
+    ];
+    try {
+    DB::beginTransaction();
+    //                    $lockProject = $this->lockForUpdate()->find($this->id);
+    $this->update($data);//@todo maybe only a time update
+    DB::commit();
+    $this->sendMoney();
+    } catch (Exception $e) {
+    Log::channel('issues')->info($e->getMessage());
+    DB::rollBack();
+    return $e->getMessage();
+    }
+    } else {
+    $this->setFail($openNumber, $sWnNumber, $iBasicMethodId);
+    }
+    return true;
+    }
     }*/
 
     /**
@@ -417,11 +423,11 @@ trait ProjectTraits
      */
     public function formatWiningNumber(
         $sWnNumber = null
-    ): ?string {
+    ):  ? string {
         return is_array($sWnNumber) ? implode('', $sWnNumber) : $sWnNumber;
     }
 
-    public function sendMoney(): void
+    public function sendMoney() : void
     {
         $params = [
             'amount' => $this->bonus,
@@ -446,7 +452,7 @@ trait ProjectTraits
                     $oProject->save();
                     if (!empty($this->errors()->first())) {
                         $res = false;
-                        $info = '更新状态出错'.json_encode($this->errors()->first(), JSON_PRETTY_PRINT);
+                        $info = '更新状态出错' . json_encode($this->errors()->first(), JSON_PRETTY_PRINT);
                         Log::channel('calculate-prize')->info($info);
                     } else {
                         $res = true;
@@ -459,8 +465,8 @@ trait ProjectTraits
             }
         } catch (Exception $e) {
             $res = false;
-            $info = '投注-异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine();
-            Log::channel('calculate-prize')->info($info);//Clog::userBet
+            $info = '投注-异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine();
+            Log::channel('calculate-prize')->info($info); //Clog::userBet
         }
         if ($res === true) {
             DB::commit();
@@ -493,7 +499,7 @@ trait ProjectTraits
             ];
             if ($this->update($data)) {
                 DB::commit();
-                $this->sendMoney();
+                // $this->sendMoney();
             } else {
                 $strError = json_encode($this->errors()->first(), JSON_PRETTY_PRINT);
                 Log::channel('issues')->info($strError);

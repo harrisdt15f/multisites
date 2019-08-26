@@ -13,7 +13,6 @@ use App\Http\SingleActions\Backend\Admin\Homepage\PopularLotteriesDetailAction;
 use App\Http\SingleActions\Backend\Admin\Homepage\PopularLotteriesEditAction;
 use App\Http\SingleActions\Backend\Admin\Homepage\PopularLotteriesLotteriesListAction;
 use App\Http\SingleActions\Backend\Admin\Homepage\PopularLotteriesSortAction;
-use App\Lib\Common\CacheRelated;
 use Illuminate\Http\JsonResponse;
 
 class PopularLotteriesController extends BackEndApiMainController
