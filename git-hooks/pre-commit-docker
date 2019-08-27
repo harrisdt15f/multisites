@@ -41,8 +41,8 @@ do
   echo "exist status is $EXIT_STATUS"
   ##################################################################################
   echo "Starting To Run Code Quality"
-  docker exec ${container} bash -c "cd $phpcsbin;\
-./phpstan analyze --level=max --error-format=table -a $autoloadPath $filelocation"
+  docker exec ${container} bash -c "cd $projectfolder;\
+  php artisan code:analyse --level=max --error-format=table -a $autoloadPath --paths=$filelocation"
     STAN_STATUS=$?
   echo "STAN status is $STAN_STATUS"
     if [ "$STAN_STATUS" -eq "0" ]; then
