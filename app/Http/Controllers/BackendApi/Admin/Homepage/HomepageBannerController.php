@@ -106,18 +106,18 @@ class HomepageBannerController extends BackEndApiMainController
 
     /**
      * 清除首页banner缓存
-     * @param   $Flag Int/Bool 指定清除缓存或者同时清除 默认值为false
+     * @param  int|bool $flag  指定清除缓存或者同时清除 默认值为false
      * @return void
      */
     public function deleteCache($flag = false): void
     {
         $cacheName = $flag == 1 ? 'homepage_banner_web' : 'homepage_banner_app';
         if ($flag == 1 || $flag == 2) {
-            self::mtsFlushCache($cacheName);
+            self::deleteTagsCache($cacheName);
         } else {
             //同时清除
-            self::mtsFlushCache('homepage_banner_web');
-            self::mtsFlushCache('homepage_banner_app');
+            self::deleteTagsCache('homepage_banner_web');
+            self::deleteTagsCache('homepage_banner_app');
         }
     }
 }

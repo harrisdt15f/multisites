@@ -25,8 +25,8 @@ class UserHandleCreateUserRequest extends BaseFormRequest
      */
     public function rules(): array
     {
-        $min = Configure('min_bet_prize_group') ?? 1800;
-        $max = Configure('max_bet_prize_group') ?? 1960;
+        $min = configure('min_bet_prize_group') ?? 1800;
+        $max = configure('max_bet_prize_group') ?? 1960;
         return [
             'username' => 'required|unique:frontend_users',
             'password' => 'required',

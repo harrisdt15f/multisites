@@ -1,0 +1,15 @@
+[submodule "app/Http/SingleActions/Backend"]
+	path = app/Http/SingleActions/Backend
+	url = ssh://git@9170ttt.com:2289/lottery_backend_php/backendsingleaction.git
+[submodule "app/Http/SingleActions/Frontend"]
+	path = app/Http/SingleActions/Frontend
+	url = ssh://git@9170ttt.com:2289/lottery_frontend_php/frontendsingleaction.git
+[submodule "app/Lib/Game"]
+	path = app/Lib/Game
+	url = ssh://git@9170ttt.com:2289/lottery_backend_php/game.git
+[submodule "app/Models/Game/Lottery/Logics/SeriesLogic"]
+	path = app/Models/Game/Lottery/Logics/SeriesLogic
+	url = ssh://git@9170ttt.com:2289/lottery_backend_php/serieslogic.git
+[submodule "app/Http/SingleActions/Payment"]
+	path = app/Http/SingleActions/Payment
+	url = ssh://git@9170ttt.com:2289/lottery_backend_php/paymentsingleaction.git

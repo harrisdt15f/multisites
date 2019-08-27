@@ -95,9 +95,9 @@ class UserHandleController extends BackEndApiMainController
 
     /**
      * 申请资金密码跟密码共用功能
-     * @param  $inputDatas
-     * @param  $action
-     * @param  $type todo if type new added then should notice on error message
+     * @param  array  $inputDatas
+     * @param  object $action
+     * @param  int    $type todo if type new added then should notice on error message
      * @return JsonResponse
      */
     public function commonHandleUserPassword($inputDatas, $action, $type): JsonResponse
@@ -158,8 +158,8 @@ class UserHandleController extends BackEndApiMainController
     }
 
     /**
-     * @param  $request
-     * @param  $action
+     * @param  object $request
+     * @param  object $action
      * @return JsonResponse
      */
     public function commonAuditPassword($request, $action): JsonResponse
@@ -247,7 +247,7 @@ class UserHandleController extends BackEndApiMainController
         UserHandleBankCardListAction $action
     ): JsonResponse {
         $inputDatas = $request->validated();
-        return $action->execute($this, $inputDatas);
+        return $action->execute($this);
     }
     /**
      * 获取系统公共头像列表

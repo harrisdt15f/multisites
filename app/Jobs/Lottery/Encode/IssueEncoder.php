@@ -4,10 +4,10 @@ namespace App\Jobs\Lottery\Encode;
 
 use App\Models\Game\Lottery\LotteryIssue;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class IssueEncoder implements ShouldQueue
 {
@@ -17,9 +17,9 @@ class IssueEncoder implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param $datas
+     * @param array $datas
      */
-    public function __construct($datas)
+    public function __construct(array $datas)
     {
         $this->datas = $datas;
     }
@@ -33,6 +33,6 @@ class IssueEncoder implements ShouldQueue
     {
         $lotteryId = $this->datas['lottery_id'];
         $issueNo = $this->datas['issue'];
-        LotteryIssue::calculateEncodedNumber($lotteryId,$issueNo);
+        LotteryIssue::calculateEncodedNumber($lotteryId, $issueNo);
     }
 }

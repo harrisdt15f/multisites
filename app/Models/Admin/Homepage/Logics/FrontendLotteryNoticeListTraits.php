@@ -45,7 +45,7 @@ trait FrontendLotteryNoticeListTraits
             ->orderBy('sort', 'asc')
             ->limit($count)
             ->pluck('lotteries_id');
-        $lotteryNoticelist = self::getCacheData('lottery_notice_list');
+        $lotteryNoticelist = self::getTagsCacheData('lottery_notice_list');
         $data = [];
         foreach ($lotterys as $sign) {
             if (isset($lotteryNoticelist[$sign])) {
@@ -58,7 +58,7 @@ trait FrontendLotteryNoticeListTraits
     //更新开奖公告的缓存
     public static function updateLotteryNotice($issue)
     {
-        $lotteryNoticelist = self::getCacheData('lottery_notice_list');
+        $lotteryNoticelist = self::getTagsCacheData('lottery_notice_list');
         if (!isset($lotteryNoticelist[$issue->lottery_id])) {
             $lottery = LotteryList::where('en_name', $issue->lottery_id)->first();
             if ($lottery !== null) {
@@ -71,7 +71,7 @@ trait FrontendLotteryNoticeListTraits
         $lotteryNoticelist[$issue->lottery_id]['issue'] = $issue->issue;
         $lotteryNoticelist[$issue->lottery_id]['official_code'] = $issue->official_code;
         $lotteryNoticelist[$issue->lottery_id]['encode_time'] = $issue->encode_time;
-        self::saveCacheData('lottery_notice_list', $lotteryNoticelist);
+        self::saveTagsCacheData('lottery_notice_list', $lotteryNoticelist);
         return $lotteryNoticelist[$issue->lottery_id];
     }
 }

@@ -167,11 +167,11 @@ trait LotteryLogics
     public static function getAllLotteryByCache($update = 0)
     {
         $key = 'lottery';
-        if (self::hasCache($key) && $update === 0) {
-            return self::getCacheData($key);
+        if (self::hasTagsCache($key) && $update === 0) {
+            return self::getTagsCacheData($key);
         } else {
             $lotteries = self::getAllLotteries();
-            self::saveCacheData($key, $lotteries);
+            self::saveTagsCacheData($key, $lotteries);
             return $lotteries;
         }
     }
@@ -188,13 +188,13 @@ trait LotteryLogics
      * @return bool
      * @throws \Exception
      */
-    public static function hasCache($key)
+    public static function hasTagsCache($key)
     {
         $cacheConfig = self::getCacheConfig($key);
-        if (isset($cacheConfig['tags'])) {
+        if (!empty($cacheConfig) && isset($cacheConfig['tags'], $cacheConfig['key'])) {
             return Cache::tags($cacheConfig['tags'])->has($cacheConfig['key']);
         } else {
-            return Cache::has($cacheConfig['key']);
+            return false;
         }
     }
 
@@ -206,7 +206,7 @@ trait LotteryLogics
     public static function getCacheConfig($key)
     {
         $cacheConfig = Config::get('web.main.cache');
-        return $cacheConfig[$key] ?? $cacheConfig['common'];
+        return $cacheConfig[$key] ?? [];
     }
 
     /**
@@ -215,14 +215,14 @@ trait LotteryLogics
      * @return Repository
      * @throws \Exception
      */
-    public static function getCacheData($key)
+    public static function getTagsCacheData($key)
     {
         $cacheConfig = self::getCacheConfig($key);
-        if (isset($cacheConfig['tags'])) {
-            return Cache::tags($cacheConfig['tags'])->get($cacheConfig['key'], []);
-        } else {
-            return Cache::get($cacheConfig['key'], []);
+        $data = [];
+        if (!empty($cacheConfig) && isset($cacheConfig['tags'], $cacheConfig['key'])) {
+            $data = Cache::tags($cacheConfig['tags'])->get($cacheConfig['key'], []);
         }
+        return $data;
     }
 
     /**
@@ -264,22 +264,15 @@ trait LotteryLogics
      * @param $value
      * @throws \Exception
      */
-    public static function saveCacheData($key, $value): void
+    public static function saveTagsCacheData($key, $value): void
     {
         $cacheConfig = self::getCacheConfig($key);
-        if (isset($cacheConfig['tags'])) {
+        if (isset($cacheConfig['tags'], $cacheConfig['key'])) {
             if ($cacheConfig['expire_time'] <= 0) {
                 Cache::tags($cacheConfig['tags'])->forever($cacheConfig['key'], $value);
             } else {
                 $expireTime = Carbon::now()->addSeconds($cacheConfig['expire_time']);
                 Cache::tags($cacheConfig['tags'])->put($cacheConfig['key'], $value, $expireTime);
-            }
-        } else {
-            if ($cacheConfig['expire_time'] <= 0) {
-                Cache::forever($cacheConfig['key'], $value);
-            } else {
-                $expireTime = Carbon::now()->addSeconds($cacheConfig['expire_time']);
-                Cache::put($cacheConfig['key'], $value, $expireTime);
             }
         }
     }
@@ -305,8 +298,8 @@ trait LotteryLogics
     public static function getAllMethodObject($seriesId)
     {
         $data = [];
-        if (self::hasCache('method_object')) {
-            $data = self::getCacheData('method_object');
+        if (self::hasTagsCache('method_object')) {
+            $data = self::getTagsCacheData('method_object');
             if (isset($data[$seriesId])) {
                 return $data[$seriesId];
             }
@@ -322,7 +315,7 @@ trait LotteryLogics
             $_data[$item->method_id] = $methodObject;
         }
         $data[$seriesId] = $_data;
-        self::saveCacheData('method_object', $data);
+        self::saveTagsCacheData('method_object', $data);
         return $_data;
     }
 
@@ -344,8 +337,8 @@ trait LotteryLogics
      */
     public static function getAllLotteryToFrontEnd()
     {
-        if (self::hasCache('lottery_for_frontend')) {
-            return self::getCacheData('lottery_for_frontend');
+        if (self::hasTagsCache('lottery_for_frontend')) {
+            return self::getTagsCacheData('lottery_for_frontend');
         }
         $lotteries = self::where('status', 1)->get();
         $cacheData = [];
@@ -408,7 +401,7 @@ trait LotteryLogics
                 'defaultMethod' => $defaultMethod,
             ];
         }
-        self::saveCacheData('lottery_for_frontend', $cacheData);
+        self::saveTagsCacheData('lottery_for_frontend', $cacheData);
         return $cacheData;
     }
 
@@ -553,7 +546,7 @@ trait LotteryLogics
             ];
         }
         $frontendLotteryInfoCache = 'frontend_lottery_lotteryInfo';
-        self::saveCacheData($frontendLotteryInfoCache, $cacheData);
+        self::saveTagsCacheData($frontendLotteryInfoCache, $cacheData);
         return $cacheData;
     }
 

@@ -9,6 +9,8 @@ use App\Models\User\UserProfits;
 use Illuminate\Http\JsonResponse;
 use App\Models\User\UsersRechargeHistorie;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
+use App\Http\Requests\Frontend\Pay\RechargeList;
 
 class PayRechargeAction
 {
@@ -27,35 +29,36 @@ class PayRechargeAction
     /**
      * 发起充值
      * @param FrontendApiMainController $contll
-     * @param $request
+     * @param Request  $request
      * @return JsonResponse
      * @throws \Exception
      */
-    public function dorRecharge(FrontendApiMainController $contll, $request) : JsonResponse
+    public function dorRecharge(FrontendApiMainController $contll, Request $request) : JsonResponse
     {
         $amount = $request->input('amount') ?? 0;
         $channel = $request->input('channel') ?? '';
         $from = $request->input('from') ?? 'web';
 
         $order = UsersRechargeHistorie::createRechargeOrder($contll->currentAuth->user(), $amount, $channel, $from);
+        if ($order !== false) {
+            $pandaC = new Panda() ;
+            $result =  $pandaC->recharge($amount,(string) $order->company_order_num, $channel, $from);
 
-        $pandaC = new  Panda() ;
-        $result =  $pandaC->recharge($amount, $order->company_order_num, $channel, $from);
-
-        if (array_get($result, 'status') == 'success') {
-            return $contll->msgOut(true, $result);
+            if (array_get((array) $result, 'status') == 'success') {
+                return $contll->msgOut(true, [], '', $result);
+            } else {
+                return $contll->msgOut(false, [], '',  $result);
+            }
         } else {
-            return $contll->msgOut(false, $result);
+             return $contll->msgOut(false);
         }
     }
 
     /**
      * 处理回调
-     * @param Controller $contll
-     * @param $request
-     * @return void
+     * @param Request $request
      */
-    public function rechageCallback(Controller $contll, $request)
+    public function rechageCallback(Request $request)
     {
         Log::channel('pay-recharge')->info('callBackInfo:'.json_encode($request->all()));
         $data = $request->all() ;
@@ -74,10 +77,10 @@ class PayRechargeAction
     /**
      * 用户充值申请列表
      * @param FrontendApiMainController $contll
-     * @param $request
+     * @param Request $request
      * @return JsonResponse
      */
-    public function rechargeList(FrontendApiMainController $contll, $request) : JsonResponse
+    public function rechargeList(FrontendApiMainController $contll, Request $request) : JsonResponse
     {
         $dateTo = $request->input('date_to') ?? '';
         $dateFrom = $request->input('date_from') ?? '';
@@ -92,16 +95,16 @@ class PayRechargeAction
 
         $rows = UsersRechargeHistorie::where($where)->paginate($count);
 
-        return $contll->msgOut(true, $rows);
+        return $contll->msgOut(true, [], '', $rows);
     }
 
     /**
      * 充值到账列表
-     * @param FrontendApiMainController $contll
-     * @param $request
+     * @param  FrontendApiMainController $contll
+     * @param  RechargeList $request
      * @return JsonResponse
      */
-    public function realRechargeList(FrontendApiMainController $contll, $request) : JsonResponse
+    public function realRechargeList(FrontendApiMainController $contll, RechargeList $request) : JsonResponse
     {
         $dateTo = $request->input('date_to') ?? '';
         $dateFrom = $request->input('date_from') ?? '';
@@ -117,6 +120,6 @@ class PayRechargeAction
         $rows = FrontendUsersAccountsReport::where($where)->whereIn('type_sign', UserProfits::TEAM_DEPOSIT_SIGN)
             ->paginate($count);
 
-        return $contll->msgOut(true, $rows);
+        return $contll->msgOut(true, [], '', $rows);
     }
 }

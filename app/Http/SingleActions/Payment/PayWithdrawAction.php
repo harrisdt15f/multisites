@@ -10,6 +10,8 @@ use App\Models\User\UsersWithdrawHistorie;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
 use Illuminate\Support\Facades\Request;
+use App\Http\Requests\Frontend\Pay\WithdrawRequest;
+use App\Http\Requests\Frontend\Pay\RechargeList;
 
 class PayWithdrawAction
 {
@@ -17,11 +19,11 @@ class PayWithdrawAction
     /**
      * 发起提现
      * @param FrontendApiMainController $contll
-     * @param $request
+     * @param WithdrawRequest $request
      * @return JsonResponse
      * @throws \Exception
      */
-    public function applyWithdraw(FrontendApiMainController $contll, $request) : JsonResponse
+    public function applyWithdraw(FrontendApiMainController $contll, WithdrawRequest $request) : JsonResponse
     {
         $data['amount'] = $request->input('amount') ?? 0;
         $data['bank_sign']  = $request->input('bank_sign') ?? '';
@@ -33,9 +35,9 @@ class PayWithdrawAction
         $result = UsersWithdrawHistorie::createWithdrawOrder($contll->currentAuth->user(), $data);
 
         if ($result) {
-            return $contll->msgOut(true, $result);
+            return $contll->msgOut(true, [], '', $result);
         } else {
-            return $contll->msgOut(false, $result);
+            return $contll->msgOut(false, [], '', $result);
         }
     }
 
@@ -49,10 +51,10 @@ class PayWithdrawAction
     {
         $id = Request::input('id') ?? '';
         $result = UsersWithdrawHistorie::find($id);
-        if ($result) {
-            return $contll->msgOut(true, $result);
+        if (!empty($result)) {
+            return $contll->msgOut(true, [], '', $result);
         } else {
-            return $contll->msgOut(false, $result);
+            return $contll->msgOut(false, [], '', $result);
         }
     }
 
@@ -70,7 +72,7 @@ class PayWithdrawAction
         $datas['status'] = UsersWithdrawHistorie::AUDITSUCCESS ;
 
         $result = UsersWithdrawHistorie::setWithdrawOrder($datas);
-        Log::channel('pay-withdraw')->info('withdraw:【后台审核通过】' . json_encode($datas, true));
+        Log::channel('pay-withdraw')->info('withdraw:【后台审核通过】' . json_encode($datas));
         if ($result) {
             //发起提现请求到panda
             $pandaC = new  Panda() ;
@@ -79,11 +81,11 @@ class PayWithdrawAction
 
             if ($result[0] == false) {
                 $datas['status'] = UsersWithdrawHistorie::UNDERWAYAUDIT ;
-                $withDrawInfo->update($datas);
+                $withDrawInfo->save($datas);
             }
-            return $contll->msgOut($result[0], '', '', $result[1]);
+            return $contll->msgOut($result[0], [], '', $result[1]);
         } else {
-            return $contll->msgOut(false, $result);
+            return $contll->msgOut(false, [], '', $result);
         }
     }
 
@@ -101,19 +103,19 @@ class PayWithdrawAction
 
         $result = UsersWithdrawHistorie::setWithdrawOrder($datas);
         if ($result) {
-            return $contll->msgOut(true, $result);
+            return $contll->msgOut(true, [], '', $result);
         } else {
-            return $contll->msgOut(false, $result);
+            return $contll->msgOut(false, [], '', $result);
         }
     }
 
     /**
      * 用户提现申请列表
      * @param FrontendApiMainController $contll
-     * @param $request
+     * @param RechargeList $request
      * @return JsonResponse
      */
-    public function withdrawList(FrontendApiMainController $contll, $request) : JsonResponse
+    public function withdrawList(FrontendApiMainController $contll, RechargeList $request) : JsonResponse
     {
         $dateTo = $request->input('date_to') ?? '';
         $dateFrom = $request->input('date_from') ?? '';
@@ -135,10 +137,10 @@ class PayWithdrawAction
     /**
      * 提现到账列表
      * @param FrontendApiMainController $contll
-     * @param $request
+     * @param RechargeList $request
      * @return JsonResponse
      */
-    public function realWithdrawList(FrontendApiMainController $contll, $request) : JsonResponse
+    public function realWithdrawList(FrontendApiMainController $contll, RechargeList $request) : JsonResponse
     {
         $dateTo = $request->input('date_to') ?? '';
         $dateFrom = $request->input('date_from') ?? '';

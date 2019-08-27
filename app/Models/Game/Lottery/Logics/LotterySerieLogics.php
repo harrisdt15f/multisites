@@ -15,7 +15,7 @@ trait LotterySerieLogics
     public static function getList(): array
     {
         $cacheKey = self::getCacheKey();
-        $data = self::getCacheData($cacheKey);
+        $data = self::getTagsCacheData($cacheKey);
         if (empty($data)) {
             $data = self::updateSerieCache();
         }
@@ -39,7 +39,7 @@ trait LotterySerieLogics
             $listData[$serieItem->series_name]['encode_splitter'] = $serieItem->encode_splitter;
             $listData[$serieItem->series_name]['price_difference'] = $serieItem->price_difference;
         }
-        self::saveCacheData($cacheKey, $listData);
+        self::saveTagsCacheData($cacheKey, $listData);
         return $listData;
     }
 

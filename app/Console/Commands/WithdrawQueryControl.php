@@ -33,7 +33,7 @@ class WithdrawQueryControl extends Command
         $rows = UsersWithdrawHistorie::where('status', '=', UsersWithdrawHistorie::AUDITSUCCESS)
             ->select('id', 'order_id')
             ->get();
-        if ($rows) {
+        if (!empty($rows)) {
             foreach ($rows as $v) {
                 dispatch(new WithdrawQuery($v));
             }

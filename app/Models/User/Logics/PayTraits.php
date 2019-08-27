@@ -15,7 +15,7 @@ trait PayTraits
      * @param $amount
      * @param $channel
      * @param $from
-     * @return bool|string
+     * @return mixed
      */
     public static function createRechargeOrder($user, $amount, $channel, $from = "web")
     {

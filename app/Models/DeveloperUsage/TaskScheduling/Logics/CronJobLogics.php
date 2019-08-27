@@ -44,12 +44,12 @@ trait CronJobLogics
     public static function getOpenCronJob(): array
     {
         $cacheKey = 'cron_job_open';
-        $data = self::getCacheData($cacheKey);
+        $data = self::getTagsCacheData($cacheKey);
         if (empty($data)) {
             $cronJobELoq = self::select('command', 'param', 'schedule')->where('status', self::STATUS_OPEN)->get();
-            if ($cronJobELoq->count() !== 0) {
+            if ($cronJobELoq->count() > 0) {
                 $data = $cronJobELoq->toArray();
-                self::saveCacheData($cacheKey, $data);
+                self::saveTagsCacheData($cacheKey, $data);
             }
         }
         return $data;
@@ -59,9 +59,9 @@ trait CronJobLogics
     {
         $cacheKey = 'cron_job_open';
         $cronJobELoq = self::select('command', 'param', 'schedule')->where('status', self::STATUS_OPEN)->get();
-        if ($cronJobELoq->count() !== 0) {
+        if ($cronJobELoq->count() > 0) {
             $data = $cronJobELoq->toArray();
-            self::saveCacheData($cacheKey, $data);
+            self::saveTagsCacheData($cacheKey, $data);
         }
     }
     

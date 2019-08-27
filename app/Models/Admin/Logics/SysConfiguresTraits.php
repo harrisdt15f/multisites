@@ -29,7 +29,7 @@ trait SysConfiguresTraits
     public static function getWebInfo($update = 0) : array
     {
         $redisKey = 'frontend_web_info';
-        $data = self::getCacheData($redisKey);
+        $data = self::getTagsCacheData($redisKey);
         if (empty($data)) {
             $sysConfigEloq = self::where('sign', 'web_info')->first();
             if ($sysConfigEloq !== null) {
@@ -38,7 +38,7 @@ trait SysConfiguresTraits
                     $data[$webConfigItem->sign] = $webConfigItem->value;
                 }
             }
-            self::saveCacheData($redisKey, $data);
+            self::saveTagsCacheData($redisKey, $data);
         }
         return $data;
     }

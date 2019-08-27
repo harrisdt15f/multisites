@@ -11,9 +11,8 @@ class InternalNoticeMessage
     protected $articlesMessage = '有新的文章需要审核';
     /**
      * 生成backend_system_notice_lists表
-     * @param $type     1手动发送 2审核相关 3充值体现相关
-     * @param $message     消息内容
-     * @return int $id
+     * @param  int     $type      1手动发送 2审核相关 3充值体现相关
+     * @param  string  $message   消息内容
      */
     public function createNoticeMessages($type, $message)
     {
@@ -29,9 +28,9 @@ class InternalNoticeMessage
 
     /**
      * 生成interna_notice表
-     * @param $adminEloq   接收信息的管理员Eloq
-     * @param $message_id  backend_system_notice_lists表id
-     * @param $operate_admin_id  发送人id  系统null
+     * @param  array    $adminsArr   接收信息的管理员Eloq
+     * @param  int      $message_id  backend_system_notice_lists表id
+     * @param  int|bool $operate_admin_id  发送人id,系统null
      * @return void
      */
     public function createInternalNotice($adminsArr, $message_id, $operate_admin_id = null)
