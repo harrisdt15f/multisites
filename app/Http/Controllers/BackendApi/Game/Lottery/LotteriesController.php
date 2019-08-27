@@ -203,8 +203,8 @@ class LotteriesController extends BackEndApiMainController
 
     /**
      * 奖期重新派奖
-     * @param LotteriesCalculateEncodeAgainRequest $request
-     * @param LotteriesCalculateEncodeAgainAction
+     * @param  LotteriesCalculateEncodeAgainRequest $request
+     * @param  LotteriesCalculateEncodeAgainAction $action
      * @return JsonResponse
      */
     public function calculateEncodeAgain(

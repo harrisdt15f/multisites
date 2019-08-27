@@ -106,7 +106,7 @@ class HomepageBannerController extends BackEndApiMainController
 
     /**
      * 清除首页banner缓存
-     * @param   $Flag Int/Bool 指定清除缓存或者同时清除 默认值为false
+     * @param  int|bool $flag  指定清除缓存或者同时清除 默认值为false
      * @return void
      */
     public function deleteCache($flag = false): void

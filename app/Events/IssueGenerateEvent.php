@@ -11,10 +11,11 @@ class IssueGenerateEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $inputs;
     /**
      * Create a new event instance.
      *
-     * @param $inputs
+     * @param array $inputs
      */
     public function __construct($inputs)
     {

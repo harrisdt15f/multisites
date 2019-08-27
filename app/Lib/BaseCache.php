@@ -25,11 +25,11 @@ trait BaseCache
 
     /**
      * 获取tags缓存
-     * @param $key
-     * @return Repository
+     * @param  string $key
+     * @return array
      * @throws Exception
      */
-    public static function getTagsCacheData($key)
+    public static function getTagsCacheData(string $key): array
     {
         $cacheConfig = self::getCacheConfig($key);
         $data = [];
@@ -67,11 +67,11 @@ trait BaseCache
 
     /**
      * 保存tags缓存
-     * @param $key
-     * @param $value
+     * @param  string $key
+     * @param  mixed $value
      * @throws Exception
      */
-    public static function saveTagsCacheData($key, $value)
+    public static function saveTagsCacheData(string $key, $value)
     {
         $cacheConfig = self::getCacheConfig($key);
         if (!empty($cacheConfig) && isset($cacheConfig['tags'], $cacheConfig['key'])) {
@@ -102,11 +102,11 @@ trait BaseCache
 
     /**
      * 删除tags缓存
-     * @param $key
+     * @param  string $key
      * @return bool
      * @throws Exception
      */
-    public static function deleteTagsCache($key): bool
+    public static function deleteTagsCache(string $key): bool
     {
         $cacheConfig = self::getCacheConfig($key);
         if (!empty($cacheConfig) && isset($cacheConfig['tags'], $cacheConfig['key'])) {
@@ -118,10 +118,10 @@ trait BaseCache
 
     /**
      * 获取缓存配置
-     * @param $key
+     * @param  string $key
      * @return mixed
      */
-    public static function getCacheConfig($key)
+    public static function getCacheConfig(string $key)
     {
         $cacheConfig = config('web.main.cache');
         return $cacheConfig[$key] ?? [];
@@ -144,11 +144,11 @@ trait BaseCache
 
     /**
      * 检查是否存在tags缓存
-     * @param $key
+     * @param  string $key
      * @return bool
      * @throws Exception
      */
-    public static function hasTagsCache($key): bool
+    public static function hasTagsCache(string $key): bool
     {
         $cacheConfig = self::getCacheConfig($key);
         if (!empty($cacheConfig) && isset($cacheConfig['tags'], $cacheConfig['key'])) {
@@ -159,24 +159,26 @@ trait BaseCache
     }
 
     /**
-     * @param  $picStr
-     * @param  $delimiter
+     * @param  string  $picStr
+     * @param  string  $delimiter
      * @return void
      */
-    public static function deleteCachePic($picStr, $delimiter = null): void
+    public static function deleteCachePic(string $picStr, string $delimiter = ''): void
     {
         $redisKey = 'cleaned_images';
-        $cleanedImages = self::getCacheData($redisKey);
-        if ($delimiter === null) {
-            $picArr = (array) $picStr;
+        $cleanedImages = self::getTagsCacheData($redisKey);
+        if ($delimiter === '') {
+            $picArr = $picStr;
         } else {
             $picArr = explode($delimiter, $picStr);
         }
-        foreach ($picArr as $picName) {
+        foreach ((array) $picArr as $picName) {
+            $picName = (string) $picName;
+            $cleanedImages = (array) $cleanedImages;
             if (array_key_exists($picName, $cleanedImages)) {
                 unset($cleanedImages[$picName]);
             }
         }
-        self::saveCacheData($redisKey, $cleanedImages);
+        self::saveTagsCacheData($redisKey, $cleanedImages);
     }
 }

@@ -86,5 +86,6 @@ return [
     '102200' => '该玩法等级已存在',
     //AccountChangeType
     '102300' => '字段ID错误,字段不存在',
-
+    //LotteryNoticeController
+    '102400' => '该信息不存在',
 ];

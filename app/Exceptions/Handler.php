@@ -66,7 +66,7 @@ class Handler extends ExceptionHandler
                 'TraceAsString' => $exception->getTraceAsString(),
             ];
             $telegram = new Telegram(config('telegram.token'), config('telegram.botusername'));
-            $telegram->sendMessage(config('telegram.chats.'.$appEnvironment), e(json_encode($error, JSON_PRETTY_PRINT)));
+            $telegram->sendMessage(config('telegram.chats.'.$appEnvironment), e((string) json_encode($error, JSON_PRETTY_PRINT)));
         }
         Log::channel('daily')->error(
             $exception->getMessage(),
@@ -79,7 +79,7 @@ class Handler extends ExceptionHandler
     {
         if ($request->expectsJson()) {
             $msg = $exception->getMessage();
-            if ($msg = 'Unauthenticated.') {
+            if ($msg == 'Unauthenticated.') {
                 $result = [
                     'success' => false,
                     'code' => $exception->getCode(),

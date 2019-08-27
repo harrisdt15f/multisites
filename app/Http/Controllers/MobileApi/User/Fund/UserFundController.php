@@ -32,7 +32,7 @@ class UserFundController extends FrontendApiMainController
 
     /**
      * 帐变类型列表
-     * @param   AccountChangeTypeDetailAction $action
+     * @param   UserChangeTypeList $action
      * @return  JsonResponse
      */
     public function changeTypeList(UserChangeTypeList $action): JsonResponse

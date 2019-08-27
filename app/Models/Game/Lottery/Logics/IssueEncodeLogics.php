@@ -337,8 +337,8 @@ trait IssueEncodeLogics
 
     /**
      * 奖期录号
-     * @param  int  $lotteryId
-     * @param  int  $issue
+     * @param  string  $lotteryId
+     * @param  int     $issue
      * @param  string  $code  开奖号码
      * @return void
      */
