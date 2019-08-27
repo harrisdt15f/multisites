@@ -4,6 +4,7 @@ namespace App\Http\Controllers\MobileApi\Pay;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 
+use App\Http\Requests\Frontend\Pay\RechargeList;
 use App\Http\Requests\Frontend\Pay\RechargeRequest;
 use App\Http\Requests\Frontend\Pay\WithdrawRequest;
 use Illuminate\Http\JsonResponse;
@@ -44,5 +45,38 @@ class PayController extends FrontendApiMainController
     public function withdraw(PayWithdrawAction $action, WithdrawRequest $request) : JsonResponse
     {
         return $action->applyWithdraw($this, $request) ;
+    }
+
+
+    /**
+     * 用户充值申请列表
+     * @param PayRechargeAction $action
+     * @param RechargeList $request
+     * @return JsonResponse
+     */
+    public function rechargeList(PayRechargeAction $action, RechargeList $request): JsonResponse
+    {
+        return $action->rechargeList($this, $request);
+    }
+
+    public function realRechargeList(PayRechargeAction $action, RechargeList $request): JsonResponse
+    {
+        return $action->realRechargeList($this, $request);
+    }
+
+    /**
+     * 用户提现申请列表
+     * @param PayWithdrawAction $action
+     * @param RechargeList $request
+     * @return JsonResponse
+     */
+    public function withdrawList(PayWithdrawAction $action, RechargeList $request): JsonResponse
+    {
+        return $action->withdrawList($this, $request);
+    }
+
+    public function realWithdrawList(PayWithdrawAction $action, RechargeList $request): JsonResponse
+    {
+        return $action->realWithdrawList($this, $request);
     }
 }
