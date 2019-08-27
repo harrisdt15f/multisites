@@ -6,6 +6,7 @@ use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Http\Requests\Frontend\Homepage\HomepageNoticeRequest;
 use App\Http\Requests\Frontend\Homepage\HomepageReadMessageRequest;
 use App\Http\SingleActions\Frontend\Homepage\HomepageActivityListAction;
+use App\Http\SingleActions\Frontend\Homepage\HomepageGetBasicContentAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageGetWebInfoAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageNoticeAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageRankingAction;
@@ -23,6 +24,7 @@ use Illuminate\Http\JsonResponse;
 class HomepageController extends FrontendApiMainController
 {
     private $bannerFlag = 2; //网页端banner
+    public $tags = 'homepage';
 
     /**
      * 需要展示的前台模块
@@ -65,16 +67,6 @@ class HomepageController extends FrontendApiMainController
     }
 
     /**
-     * 首页二维码
-     * @param  HompageQrCodeAction $action
-     * @return JsonResponse
-     */
-    public function qrCode(HompageQrCodeAction $action): JsonResponse
-    {
-        return $action->execute($this);
-    }
-
-    /**
      * 热门活动
      * @param  HompageActivityAction $action
      * @return JsonResponse
@@ -93,16 +85,6 @@ class HomepageController extends FrontendApiMainController
     {
         $inputDatas['type'] = '2';
         return $action->execute($this, $inputDatas);
-    }
-
-    /**
-     * 首页LOGO
-     * @param  HompageLogoAction $action
-     * @return JsonResponse
-     */
-    public function logo(HompageLogoAction $action): JsonResponse
-    {
-        return $action->execute($this);
     }
 
     /**
@@ -129,16 +111,6 @@ class HomepageController extends FrontendApiMainController
     }
 
     /**
-     * 前台网站头ico
-     * @param  HompageIcoAction $action
-     * @return JsonResponse
-     */
-    public function ico(HompageIcoAction $action): JsonResponse
-    {
-        return $action->execute($this);
-    }
-
-    /**
      * 首页中奖排行榜
      * @param  HomepageRankingAction $action
      * @return JsonResponse
@@ -154,6 +126,16 @@ class HomepageController extends FrontendApiMainController
      * @return JsonResponse
      */
     public function getWebInfo(HomepageGetWebInfoAction $action): JsonResponse
+    {
+        return $action->execute($this);
+    }
+
+    /**
+     * 获取首页基本内容
+     * @param  HomepageGetBasicContentAction $action
+     * @return JsonResponse
+     */
+    public function getBasicContent(HomepageGetBasicContentAction $action): JsonResponse
     {
         return $action->execute($this);
     }

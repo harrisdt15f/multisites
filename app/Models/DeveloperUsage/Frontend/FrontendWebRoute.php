@@ -26,6 +26,5 @@ class FrontendWebRoute extends BaseModel
         } else {
             return 1;
         }
-
     }
 }

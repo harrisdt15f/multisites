@@ -30,14 +30,14 @@ abstract class BaseFormRequest extends FormRequest
      *
      * @return array
      */
-    abstract public function rules(): array ;
+    abstract public function rules(): array;
 
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    abstract public function authorize(): bool ;
+    abstract public function authorize(): bool;
 
     /**
      * @param  Validator  $validator
@@ -54,5 +54,4 @@ abstract class BaseFormRequest extends FormRequest
             response()->json($datas)
         );
     }
-
 }

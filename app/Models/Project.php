@@ -16,6 +16,8 @@ class Project extends BaseModel
 
     protected $guarded = ['id'];
 
+    private const DEFAULT_PRIZE_GROUP = 1800;//默认奖金组
+
     public const STATUS_NORMAL = 0;
     public const STATUS_DROPED = 1;
     public const STATUS_LOST = 2;

@@ -15,7 +15,6 @@ use App\Http\SingleActions\Backend\Admin\Notice\NoticeDetailAction;
 use App\Http\SingleActions\Backend\Admin\Notice\NoticeEditAction;
 use App\Http\SingleActions\Backend\Admin\Notice\NoticeSortAction;
 use App\Http\SingleActions\Backend\Admin\Notice\NoticeTopAction;
-use App\Lib\Common\CacheRelated;
 use Illuminate\Http\JsonResponse;
 
 class NoticeController extends BackEndApiMainController

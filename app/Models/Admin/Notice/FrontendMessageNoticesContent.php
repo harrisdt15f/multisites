@@ -6,8 +6,8 @@ use App\Models\BaseModel;
 
 class FrontendMessageNoticesContent extends BaseModel
 {
-	public const TYPE_NOTICE = 1;
-	public const TYPE_MESSAGE = 2;
+    public const TYPE_NOTICE = 1;
+    public const TYPE_MESSAGE = 2;
 
     protected $guarded = ['id'];
 

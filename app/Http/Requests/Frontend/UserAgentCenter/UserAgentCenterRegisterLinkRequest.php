@@ -27,7 +27,7 @@ class UserAgentCenterRegisterLinkRequest extends BaseFormRequest
             'expire' => 'required|integer',
             'channel'=>'required',
             'prize_group'=>'required|integer',
+            'is_agent'=>'required|in:0,1',
         ];
     }
-
 }

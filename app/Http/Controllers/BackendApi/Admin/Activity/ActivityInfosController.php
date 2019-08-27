@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\BackendApi\Admin\Activity;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
@@ -13,12 +12,12 @@ use App\Http\SingleActions\Backend\Admin\Activity\ActivityInfosDeleteAction;
 use App\Http\SingleActions\Backend\Admin\Activity\ActivityInfosDetailAction;
 use App\Http\SingleActions\Backend\Admin\Activity\ActivityInfosEditAction;
 use App\Http\SingleActions\Backend\Admin\Activity\ActivityInfosSortAction;
-use App\Lib\Common\CacheRelated;
 use Illuminate\Http\JsonResponse;
 
 class ActivityInfosController extends BackEndApiMainController
 {
     public $folderName = 'mobile_activity'; //活动图片存放的文件夹名称  (add,edit)
+    public $redisKey = 'homepage_activity'; //缓存key (add,edit,delete,sort)
 
     /**
      * 活动列表
@@ -78,15 +77,5 @@ class ActivityInfosController extends BackEndApiMainController
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
-    }
-
-    /**
-     * 删除前台首页缓存
-     * @return void
-     */
-    public function deleteCache(): void
-    {
-        $cacheRelated = new CacheRelated();
-        $cacheRelated->delete('homepageActivity');
     }
 }

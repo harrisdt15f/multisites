@@ -3,11 +3,11 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
+use App\Lib\BaseCache;
 
 class DeleteCachePicControl extends Command
 {
+    use BaseCache;
     /**
      * The name and signature of the console command.
      *
@@ -29,25 +29,25 @@ class DeleteCachePicControl extends Command
      */
     public function handle()
     {
-        if (Cache::has('cache_pic')) {
-            $cachePic = Cache::get('cache_pic');
-            foreach ($cachePic as $key => $pic) {
+        $redisKey = 'cleaned_images';
+        $checkCache = self::hasCache($redisKey);
+        if ($checkCache !== false) {
+            $cleanedImages = self::getCacheData($redisKey);
+            foreach ($cleanedImages as $key => $pic) {
                 if (!isset($pic['expire_time']) || $pic['expire_time'] < time()) {
                     $path = 'public/' . $pic['path'];
                     if (file_exists($path)) {
                         if (!is_writable(dirname($path))) {
                         } else {
                             unlink($path);
-                            unset($cachePic[$key]);
+                            unset($cleanedImages[$key]);
                         }
                     } else {
-                        unset($cachePic[$key]);
+                        unset($cleanedImages[$key]);
                     }
                 }
             }
-            $hourToStore = 24 * 2;
-            $expiresAt = Carbon::now()->addHours($hourToStore);
-            Cache::put('cache_pic', $cachePic, $expiresAt);
+            self::saveCacheData($redisKey,$cleanedImages);
         }
     }
 }

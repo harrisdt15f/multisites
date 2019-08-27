@@ -54,7 +54,7 @@ class LotteriesAddRequest extends BaseFormRequest
             'issue_rule.0.lottery_name' => 'required|same:lottery.cn_name', //中文名
             'issue_rule.0.begin_time' => 'required|date_format:H:i:s', //开始时间
             'issue_rule.0.end_time' => 'required|date_format:H:i:s', //结束时间
-            'issue_rule.0.issue_seconds' => 'required|integer', //奖期周期（秒）
+            'issue_rule.0.issue_seconds' => 'required|integer|gte:60', //奖期周期（秒）
             'issue_rule.0.first_time' => 'required|date_format:H:i:s', //首期结束时间
             'issue_rule.0.adjust_time' => 'required|integer', //调整截止时间（秒）
             'issue_rule.0.encode_time' => 'required|integer',

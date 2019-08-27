@@ -29,20 +29,10 @@ Route::group(['prefix' => 'homepage', 'namespace' => 'Homepage'], function () {
         'as' => $namePrefix . 'popular-methods',
         'uses' => $controller . 'popularMethods',
     ]);
-    //二维码
-    Route::match(['get', 'options'], 'qrcode', [
-        'as' => $namePrefix . 'qrcode',
-        'uses' => $controller . 'qrCode',
-    ]);
     //热门活动
     Route::match(['get', 'options'], 'activity', [
         'as' => $namePrefix . 'activity',
         'uses' => $controller . 'activity',
-    ]);
-    //LOGO
-    Route::match(['get', 'options'], 'logo', [
-        'as' => $namePrefix . 'logo',
-        'uses' => $controller . 'logo',
     ]);
     //公告|站内信 列表
     Route::match(['post', 'options'], 'notice', [
@@ -53,11 +43,6 @@ Route::group(['prefix' => 'homepage', 'namespace' => 'Homepage'], function () {
     Route::match(['post', 'options'], 'read-message', [
         'as' => $namePrefix . 'read-message',
         'uses' => $controller . 'readMessage',
-    ]);
-    //ico
-    Route::match(['get', 'options'], 'ico', [
-        'as' => $namePrefix . 'ico',
-        'uses' => $controller . 'ico',
     ]);
     //中奖排行
     Route::match(['get', 'options'], 'ranking', [
@@ -84,9 +69,19 @@ Route::group(['prefix' => 'homepage', 'namespace' => 'Homepage'], function () {
         'as' => $namePrefix . 'activity-list',
         'uses' => $controller . 'activityList',
     ]);
-    //获取网站基本配置
+    //获取网站基本信息
     Route::match(['get', 'options'], 'get-web-info', [
         'as' => $namePrefix . 'get-web-info',
         'uses' => $controller . 'getWebInfo',
+    ]);
+    //获取网站基本内容
+    Route::match(['get', 'options'], 'get-basic-content', [
+        'as' => $namePrefix . 'get-basic-content',
+        'uses' => $controller . 'getBasicContent',
+    ]);
+    //热门游戏
+    Route::match(['get', 'options'], 'get-popular-game', [
+        'as' => $namePrefix . 'get-popular-game',
+        'uses' => $controller . 'getPopularGame',
     ]);
 });

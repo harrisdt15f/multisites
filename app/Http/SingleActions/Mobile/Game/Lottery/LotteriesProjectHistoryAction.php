@@ -24,7 +24,15 @@ class LotteriesProjectHistoryAction
         $withSearchAbleFields = [];
         $orderFields = 'id';
         $orderFlow = 'desc';
-        $data = $contll->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields, $orderFields, $orderFlow);
+        $data = $contll->generateSearchQuery(
+            $eloqM,
+            $searchAbleFields,
+            $fixedJoin,
+            $withTable,
+            $withSearchAbleFields,
+            $orderFields,
+            $orderFlow
+        );
         return $contll->msgOut(true, $data);
     }
 }

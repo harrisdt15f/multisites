@@ -59,9 +59,19 @@ Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], function 
         'as' => $namePrefix . 'last-issue',
         'uses' => $controller . 'lastIssue'
     ]);
+    //彩种可追号的奖期列表
+    Route::match(['post', 'options'], 'trace-issue-list', [
+        'as' => $namePrefix . 'trace-issue-list',
+        'uses' => $controller . 'traceIssueList',
+    ]);
     //临时测试接口
     Route::match(['post', 'options'], 'setWinPrize', [
         'as' => $namePrefix . 'setWinPrize',
         'uses' => $controller . 'setWinPrize'
+    ]);
+    //获取走势图接口
+    Route::match(['post', 'options'], 'trend', [
+        'as' => $namePrefix . 'trend',
+        'uses' => $controller . 'trend'
     ]);
 });

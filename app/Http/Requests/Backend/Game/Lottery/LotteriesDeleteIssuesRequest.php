@@ -21,7 +21,7 @@ class LotteriesDeleteIssuesRequest extends BaseFormRequest
      *
      * @return array
      */
-    public function rules(): array 
+    public function rules(): array
     {
         return [
             'type' => 'required|integer|in:1,2', // 1：按id删除     2：删除某个彩种一天的所有奖期

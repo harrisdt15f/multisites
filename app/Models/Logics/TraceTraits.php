@@ -22,6 +22,11 @@ trait TraceTraits
         $offset = ($currentPage - 1) * $pageSize;
         $total = $query->count();
         $menus = $query->skip($offset)->take($pageSize)->get();
-        return ['data' => $menus, 'total' => $total, 'currentPage' => $currentPage, 'totalPage' => (int) ceil($total / $pageSize)];
+        return [
+            'data' => $menus,
+            'total' => $total,
+            'currentPage' => $currentPage,
+            'totalPage' => (int) ceil($total / $pageSize)
+        ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\FrontendApi\Game\Lottery;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesAvailableIssuesRequest;
+use App\Http\Requests\Frontend\Game\Lottery\LotteriesTrendRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesBetRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesCancelBetRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesIssueHistoryRequest;
@@ -16,11 +17,14 @@ use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesBetAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesCancelBetAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesIssueHistoryAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLastIssuesAction;
+use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesTrendAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryInfoAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesLotteryListAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesProjectHistoryAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesStopTraceAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesTracesHistoryAction;
+use App\Http\Requests\Mobile\Game\Lottery\LotteriesTraceIssueListRequest;
+use App\Http\SingleActions\Mobile\Game\Lottery\LotteriesTraceIssueListAction;
 use App\Models\Game\Lottery\LotteryIssue;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -119,7 +123,7 @@ class LotteriesController extends FrontendApiMainController
 
     public function setWinPrize()
     {
-        LotteryIssue::calculateEncodedNumber('zx3d', '201908101048');
+        LotteryIssue::calculateEncodedNumber('jsft', '1908221002');
     }
 
     /**
@@ -153,6 +157,32 @@ class LotteriesController extends FrontendApiMainController
      * @return JsonResponse
      */
     public function lastIssue(LotteriesLastIssuesRequest $request, LotteriesLastIssuesAction $action): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
+    }
+
+    /**
+     * 彩种可追号的奖期列表
+     * @param  LotteriesTraceIssueListRequest $request
+     * @param  LotteriesTraceIssueListAction  $action
+     * @return JsonResponse
+     */
+    public function traceIssueList(
+        LotteriesTraceIssueListRequest $request,
+        LotteriesTraceIssueListAction $action
+    ): JsonResponse {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
+    }
+
+    /**
+     * 获取走势图接口
+     * @param  LotteriesTrendRequest $request
+     * @param  LotteriesTrendAction  $action
+     * @return JsonResponse
+     */
+    public function trend(LotteriesTrendRequest $request, LotteriesTrendAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);

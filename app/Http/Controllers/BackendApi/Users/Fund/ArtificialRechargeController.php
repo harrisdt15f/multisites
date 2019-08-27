@@ -17,8 +17,10 @@ class ArtificialRechargeController extends BackEndApiMainController
      * @param  ArtificialRechargeRechargeAction  $action
      * @return JsonResponse
      */
-    public function recharge(ArtificialRechargeRechargeRequest $request, ArtificialRechargeRechargeAction $action): JsonResponse
-    {
+    public function recharge(
+        ArtificialRechargeRechargeRequest $request,
+        ArtificialRechargeRechargeAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }

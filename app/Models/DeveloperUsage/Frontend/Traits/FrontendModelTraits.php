@@ -3,9 +3,11 @@
 namespace App\Models\DeveloperUsage\Frontend\Traits;
 
 use Illuminate\Support\Facades\Cache;
+use App\Lib\BaseCache;
 
 trait FrontendModelTraits
 {
+    use BaseCache;
 
     /**
      * @param  int    $type
@@ -18,7 +20,7 @@ trait FrontendModelTraits
         } elseif ($type == 3) {
             $typeArr = [1, 3];
         }
-        $parentFrontendModel = self::ParentModel($typeArr);
+        $parentFrontendModel = self::parentModel($typeArr);
         $frontendModelList = [];
         foreach ($parentFrontendModel as $id => $frontendModel) {
             $frontendModelList[$id] = $frontendModel;
@@ -31,11 +33,71 @@ trait FrontendModelTraits
         return $frontendModelList;
     }
 
+    //获取首页基本内容
+    public function getWebBasicContent()
+    {
+        $data = [];
+        $contentFunctions = [ // key=>方法名
+            'ico' => 'getIco',
+            'logo' => 'getLogo',
+            'qrcode' => 'getQrcode',
+            'customer_service' => 'getCustomerService',
+        ];
+        foreach ($contentFunctions as $key => $function) {
+            $data[$key] = $this->$function();
+        }
+        return $data;
+    }
+
+    //获取客服
+    public function getCustomerService()
+    {
+        $name = 'customer.service';
+        $redisKey = 'homepage_customer_service';
+        return $this->getCacheModuleValue($name, $redisKey);
+    }
+
+    //获取icon
+    public function getIco()
+    {
+        $name = 'frontend.ico';
+        $redisKey = 'homepage_ico';
+        return $this->getCacheModuleValue($name, $redisKey);
+    }
+
+    //获取logo
+    public function getLogo()
+    {
+        $name = 'logo';
+        $redisKey = 'homepage_logo';
+        return $this->getCacheModuleValue($name, $redisKey);
+    }
+
+    //获取二维码
+    public function getQrcode()
+    {
+        $name = 'qr.code';
+        $redisKey = 'homepage_qrcode';
+        return $this->getCacheModuleValue($name, $redisKey);
+    }
+
+    public function getCacheModuleValue($name, $redisKey)
+    {
+        $data = self::getCacheData($redisKey);
+        if (empty($data)) {
+            $qrcodeELoq = self::select('value', 'status')->where('en_name', $name)->first();
+            if ($qrcodeELoq !== null && $qrcodeELoq->status === 1) {
+                $data = $qrcodeELoq->value;
+                self::saveCacheData($redisKey, $data);
+            }
+        }
+        return $data;
+    }
+
     /**
      * @param  array    $typeArr
-     * @return mixed
      */
-    public function ParentModel($typeArr)
+    public function parentModel($typeArr)
     {
         return self::where('level', 1)->whereIn('type', $typeArr)->get();
     }

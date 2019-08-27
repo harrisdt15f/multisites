@@ -25,5 +25,4 @@ class BackendLogMonolog
         $logger->pushProcessor(new BackendLogProcessor());
         return $logger;
     }
-
 }

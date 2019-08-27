@@ -30,8 +30,6 @@ class FrontendAuthRegisterRequest extends BaseFormRequest
             'keyword' => 'alpha_num',
             'register_type' => 'integer',
             'prize_group' => 'integer',//奖金组
-            'platform_id' => 'integer',//平台id
-            'platform_sign' => 'string',//平台sign
         ];
     }
 }

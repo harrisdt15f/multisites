@@ -144,7 +144,6 @@ class Panda extends BasePay
         return [false, $result['msg']];
     }
 
-
     /**
      * 体现单查询
      * @param $orderId
@@ -177,7 +176,7 @@ class Panda extends BasePay
         return [false, $result['msg']];
     }
 
-    public function encrypt(Array $data, $signKey)
+    public function encrypt(array $data, $signKey)
     {
         $str = "";
         ksort($data);

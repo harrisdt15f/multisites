@@ -18,29 +18,44 @@ class CacheRelated
         }
     }
 
+    public static function getTagsCache($tags, $key)
+    {
+        $data = false;
+        if (Cache::tags($tags)->has($key)) {
+            $data = Cache::tags($tags)->get($key);
+        }
+        return $data;
+    }
+
     /**
-     * @param  $picStr
-     * @param  $delimiter
+     * 设置标签缓存
+     * @param   string $tags     [标签]
+     * @param   string $key      [缓存键名]
+     * @param          $data     [缓存的数据]
+     * @param   int    $minute   [缓存的时间（分钟）0永久]
+     * @return  void
+     */
+    public static function setTagsCache($tags, $key, $data, $minute = 0): void
+    {
+        $minute = (int) $minute;
+        if ($minute === 0) {
+            Cache::tags($tags)->forever($key, $data);
+        } else {
+            $expiresAt = Carbon::now()->addMinute($minute);
+            Cache::tags($tags)->put($key, $data, $expiresAt);
+        }
+    }
+
+    /**
+     * 删除标签缓存
+     * @param  string $tags     [标签]
+     * @param  string $key      [缓存键名]
      * @return void
      */
-    public static function deleteCachePic($picStr, $delimiter = null): void
+    public static function deleteTagsCache($tags, $key): void
     {
-        $cacheKey = 'cache_pic';
-        if ($delimiter === null) {
-            $picArr = (array) $picStr;
-        } else {
-            $picArr = explode($delimiter, $picStr);
-        }
-        if (Cache::has($cacheKey)) {
-            $cachePic = Cache::get($cacheKey);
-            foreach ($picArr as $picName) {
-                if (array_key_exists($picName, $cachePic)) {
-                    unset($cachePic[$picName]);
-                }
-            }
-            $hourToStore = 24 * 2;
-            $expiresAt = Carbon::now()->addHours($hourToStore);
-            Cache::put($cacheKey, $cachePic, $expiresAt);
+        if (Cache::tags($tags)->has($key)) {
+            $data = Cache::tags($tags)->forget($key);
         }
     }
 }

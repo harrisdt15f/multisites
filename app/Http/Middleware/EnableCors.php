@@ -27,15 +27,31 @@ class EnableCors
         Log::info(json_encode($request->method()));
         Log::info(json_encode($request->all()));
         $response = $next($request);
-        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, X-Socket-ID, X-HTTP-Method-Override,X-Requested-With');
+        $response->headers->set(
+            'Access-Control-Allow-Headers',
+            'Content-Type,
+            Authorization,
+            Accept,
+            X-Socket-ID,
+            X-HTTP-Method-Override,
+            X-Requested-With'
+        );
         $response->headers->set('Access-Control-Allow-Origin', '*');
         $response->headers->set('Access-Control-Allow-Credentials', 'true');
 //        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        $response->headers->set('Access-Control-Allow-Headers', 'Origin, Content-Type, Cookie, X-CSRF-TOKEN, Accept, Authorization, X-XSRF-TOKEN');
+        $response->headers->set(
+            'Access-Control-Allow-Headers',
+            'Origin,
+            Content-Type,
+            Cookie,
+            X-CSRF-TOKEN,
+            Accept,
+            Authorization,
+            X-XSRF-TOKEN'
+        );
         $response->headers->set('Access-Control-Expose-Headers', 'Authorization, authenticated');
         $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, OPTIONS');
 //        $response->headers->set('Access-Control-Allow-Credentials', 'true');
         return $response;
     }
-
 }

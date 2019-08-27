@@ -63,5 +63,4 @@ class BackendLogMonologEventListener implements ShouldQueue
             );
         }
     }
-
 }

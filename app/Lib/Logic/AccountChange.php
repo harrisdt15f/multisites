@@ -8,6 +8,7 @@ use App\Models\User\Fund\FrontendUsersAccountsReport;
 use App\Models\User\Fund\FrontendUsersAccountsType;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 /**
  * 帐变主逻辑
@@ -38,13 +39,13 @@ class AccountChange
     public $accounts = [];
 
     // 设置报表保存模式
-    function setReportMode($mode)
+    public function setReportMode($mode)
     {
         $this->reportMode = $mode;
     }
 
     // 设置帐变保存模式
-    function setChangeMode($mode)
+    public function setChangeMode($mode)
     {
         $this->changeMode = $mode;
     }
@@ -101,6 +102,7 @@ class AccountChange
         // 资金增减. 需要检测对应
         // 保存记录
         $report = [
+            'serial_number'=> self::getSerialNumber(),
             'activity_sign' => $params['activity_sign'] ?? 0,
             'amount' => $amount,
             'created_at' => date('Y-m-d H:i:s'),
@@ -121,6 +123,7 @@ class AccountChange
             'top_id' => $user->top_id,
             'type_name' => $typeConfig['name'],
             'type_sign' => $typeConfig['sign'],
+            'in_out' => $typeConfig['in_out'],
             'user_id' => $user->id,
             'username' => $user->username,
         ];
@@ -232,7 +235,10 @@ class AccountChange
             return true;
         } else {
             $updated_at = date('Y-m-d H:i:s');
-            $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}' and `balance`>='{$money}'") > 0;
+            $ret = DB::update(
+                "update `frontend_users_accounts` set `balance`=`balance`-'{$money}' , 
+`updated_at`='$updated_at'  where `user_id` ='{$account->user_id}' and `balance`>='{$money}'"
+            ) > 0;
             if ($ret) {
                 $account->balance -= $money;
             }
@@ -283,7 +289,10 @@ class AccountChange
         } else {
             $updated_at = date('Y-m-d H:i:s');
 
-            $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`+'{$money}', `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}'") > 0;
+            $ret = DB::update(
+                "update `frontend_users_accounts` set `balance`=`balance`+'{$money}', 
+`frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}'"
+            ) > 0;
 
             if ($ret) {
                 $account->balance += $money;
@@ -316,7 +325,10 @@ class AccountChange
             return true;
         } else {
             $updated_at = date('Y-m-d H:i:s');
-            $ret = DB::update("update `frontend_users_accounts` set  `frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}'") > 0;
+            $ret = DB::update(
+                "update `frontend_users_accounts` set  `frozen`=`frozen`- '{$money}' ,
+ `updated_at`='$updated_at'  where `user_id` ='{$account->user_id}'"
+            ) > 0;
             if ($ret) {
                 $account->frozen -= $money;
             }
@@ -363,7 +375,7 @@ class AccountChange
                         case 'unFrozenToPlayer':
                             $frozenAdd -= $amount;
                             break;
-                        default :
+                        default:
                             break;
                     }
                 }
@@ -419,5 +431,14 @@ class AccountChange
             }
         }
         return true;
+    }
+    
+    /**
+     * 生成帐变编号
+     * @return string
+     */
+    public static function getSerialNumber(): string
+    {
+        return 'XWTX'.Str::orderedUuid()->getNodeHex();
     }
 }

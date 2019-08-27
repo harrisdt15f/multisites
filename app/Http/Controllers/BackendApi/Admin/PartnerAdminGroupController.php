@@ -72,8 +72,10 @@ class PartnerAdminGroupController extends BackEndApiMainController
      * @param  PartnerAdminGroupDestroyAction  $action
      * @return JsonResponse
      */
-    public function destroy(PartnerAdminGroupDestroyRequest $request, PartnerAdminGroupDestroyAction $action):  ? JsonResponse
-    {
+    public function destroy(
+        PartnerAdminGroupDestroyRequest $request,
+        PartnerAdminGroupDestroyAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -84,8 +86,10 @@ class PartnerAdminGroupController extends BackEndApiMainController
      * @param  PartnerAdminGroupSpecificGroupUsersAction  $action
      * @return JsonResponse
      */
-    public function specificGroupUsers(PartnerAdminGroupSpecificGroupUsersRequest $request, PartnerAdminGroupSpecificGroupUsersAction $action) : JsonResponse
-    {
+    public function specificGroupUsers(
+        PartnerAdminGroupSpecificGroupUsersRequest $request,
+        PartnerAdminGroupSpecificGroupUsersAction $action
+    ) : JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }

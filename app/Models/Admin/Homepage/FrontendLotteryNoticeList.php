@@ -2,24 +2,16 @@
 
 namespace App\Models\Admin\Homepage;
 
+use App\Models\Admin\Homepage\Logics\FrontendLotteryNoticeListTraits;
 use App\Models\BaseModel;
 use App\Models\Game\Lottery\LotteryIssue;
 use App\Models\Game\Lottery\LotteryList;
 
 class FrontendLotteryNoticeList extends BaseModel
 {
-    protected $guarded = ['id'];
+    use FrontendLotteryNoticeListTraits;
 
-    //各个彩种最新一期的开奖
-    public function specificNewestOpenedIssue()
-    {
-        return $this->hasOne(LotteryIssue::class, 'lottery_id', 'lotteries_id')->select(
-            'lottery_id',
-            'issue',
-            'official_code',
-            'encode_time'
-        )->where('status_encode', 1)->orderBy('official_open_time', 'desc');
-    }
+    protected $guarded = ['id'];
 
     public function lottery()
     {

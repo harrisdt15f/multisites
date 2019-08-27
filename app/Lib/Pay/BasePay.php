@@ -11,18 +11,18 @@ use App\Models\User\UsersRechargeHistorie;
 class BasePay
 {
     // 充值参数
-    public $rechargeCallbackParams  = [];
-    public $rechargeParams          = [];
-    public $rechargeOrder           = null;
-    public $rechargeUser            = null;
-    public $rechargeLog             = null;
+    public $rechargeCallbackParams = [];
+    public $rechargeParams = [];
+    public $rechargeOrder = null;
+    public $rechargeUser = null;
+    public $rechargeLog = null;
 
     // 提现参数
-    public $withdrawQueryParams  = [];
-    public $withdrawParams          = [];
-    public $withdrawOrder           = null;
-    public $withdrawUser            = null;
-    public $withdrawLog             = null;
+    public $withdrawQueryParams = [];
+    public $withdrawParams = [];
+    public $withdrawOrder = null;
+    public $withdrawUser = null;
+    public $withdrawLog = null;
 
     /**
      * 保存日志

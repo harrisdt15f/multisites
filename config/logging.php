@@ -209,6 +209,12 @@ return [
             'level' => 'debug',
             'days' => 14,
         ],
+        'calculate-prize' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/calculate_prize.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
     ],
 
 ];

@@ -47,8 +47,7 @@ class IssueInserter implements ShouldQueue
                         $message = 'Finished >>>>'.json_encode($data, JSON_UNESCAPED_UNICODE)."\n";
                         Log::channel('issues')->info($message);
                     } else {
-                        $message = 'Avoided Comflic data generation >>>>'.json_encode($data,
-                                JSON_UNESCAPED_UNICODE)."\n";
+                        $message = 'Avoided Comflic data generation >>>>'.json_encode($data,JSON_UNESCAPED_UNICODE)."\n";
                         Log::channel('issues')->info($message);
                     }
                 }

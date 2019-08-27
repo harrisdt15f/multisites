@@ -11,7 +11,6 @@ use App\Http\SingleActions\Backend\Admin\Homepage\HomepageNavOneAction;
 use App\Http\SingleActions\Backend\Admin\Homepage\HomepagePageModelAction;
 use App\Http\SingleActions\Backend\Admin\Homepage\HomepageUploadIcoAction;
 use App\Http\SingleActions\Backend\Admin\Homepage\HomepageUploadPicAction;
-use App\Lib\Common\CacheRelated;
 use Illuminate\Http\JsonResponse;
 
 class HomepageController extends BackEndApiMainController
@@ -71,25 +70,5 @@ class HomepageController extends BackEndApiMainController
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
-    }
-
-    /**
-     * 删除前台首页缓存
-     * @param  string $key
-     * @return void
-     */
-    public function deleteCache($key): void
-    {
-        $homepageCache = [
-            'qr.code' => 'homepage_qrcode',
-            'notice' => 'homepage_notice',
-            'activity' => 'homepage_activity',
-            'logo' => 'homepage_logo',
-            'frontend.ico' => 'homepage_ico',
-        ];
-        if (isset($homepageCache[$key])) {
-            $cacheRelated = new CacheRelated();
-            $cacheRelated->delete($homepageCache[$key]);
-        }
     }
 }

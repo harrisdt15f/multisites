@@ -25,5 +25,4 @@ class FrontendLogMonolog
         $logger->pushProcessor(new FrontendLogProcessor());
         return $logger;
     }
-
 }

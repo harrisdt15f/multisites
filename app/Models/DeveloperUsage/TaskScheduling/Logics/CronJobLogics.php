@@ -2,10 +2,12 @@
 
 namespace App\Models\DeveloperUsage\TaskScheduling\Logics;
 
-use Illuminate\Support\Facades\Cache;
+use App\Lib\BaseCache;
 
 trait CronJobLogics
 {
+    use BaseCache;
+
     /**
      * 插入cronJob数据
      * @param  array   $cronData
@@ -41,16 +43,28 @@ trait CronJobLogics
      */
     public static function getOpenCronJob(): array
     {
-        $cacheKey = 'open_cron_job';
-        if (Cache::has($cacheKey)) {
-            $data = Cache::get($cacheKey);
-        } else {
-            $data = self::select('command', 'param', 'schedule')->where('status', 1)->get()->toArray();
-            Cache::forever($cacheKey, $data);
+        $cacheKey = 'cron_job_open';
+        $data = self::getCacheData($cacheKey);
+        if (empty($data)) {
+            $cronJobELoq = self::select('command', 'param', 'schedule')->where('status', self::STATUS_OPEN)->get();
+            if ($cronJobELoq->count() !== 0) {
+                $data = $cronJobELoq->toArray();
+                self::saveCacheData($cacheKey, $data);
+            }
         }
         return $data;
     }
 
+    public static function updateOPenCronJob()
+    {
+        $cacheKey = 'cron_job_open';
+        $cronJobELoq = self::select('command', 'param', 'schedule')->where('status', self::STATUS_OPEN)->get();
+        if ($cronJobELoq->count() !== 0) {
+            $data = $cronJobELoq->toArray();
+            self::saveCacheData($cacheKey, $data);
+        }
+    }
+    
     /**
      * 获取所有的的cron_job
      * @return  array

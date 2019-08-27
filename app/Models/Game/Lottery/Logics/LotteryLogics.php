@@ -2,6 +2,7 @@
 
 namespace App\Models\Game\Lottery\Logics;
 
+use App\Lib\BaseCache;
 use App\Lib\Game\Lottery;
 use App\Models\Game\Lottery\LotteryIssue;
 use App\Models\Game\Lottery\LotteryMethod;
@@ -19,6 +20,8 @@ use Illuminate\Support\Facades\Request;
  */
 trait LotteryLogics
 {
+    use BaseCache;
+
     /**
      * 标识获取彩种
      * @param  string $sign
@@ -161,16 +164,22 @@ trait LotteryLogics
      * @return array|mixed
      * @throws \Exception
      */
-    public static function getAllLotteryByCache()
+    public static function getAllLotteryByCache($update = 0)
     {
         $key = 'lottery';
-        if (self::hasCache($key)) {
+        if (self::hasCache($key) && $update === 0) {
             return self::getCacheData($key);
         } else {
             $lotteries = self::getAllLotteries();
             self::saveCacheData($key, $lotteries);
             return $lotteries;
         }
+    }
+
+    //更新 所有游戏&玩法 缓存
+    public static function updateAllLotteryByCache()
+    {
+        self::getAllLotteryByCache(1);
     }
 
     /**
@@ -182,7 +191,11 @@ trait LotteryLogics
     public static function hasCache($key)
     {
         $cacheConfig = self::getCacheConfig($key);
-        return Cache::has($cacheConfig['key']);
+        if (isset($cacheConfig['tags'])) {
+            return Cache::tags($cacheConfig['tags'])->has($cacheConfig['key']);
+        } else {
+            return Cache::has($cacheConfig['key']);
+        }
     }
 
     /**
@@ -205,7 +218,11 @@ trait LotteryLogics
     public static function getCacheData($key)
     {
         $cacheConfig = self::getCacheConfig($key);
-        return Cache::get($cacheConfig['key'], []);
+        if (isset($cacheConfig['tags'])) {
+            return Cache::tags($cacheConfig['tags'])->get($cacheConfig['key'], []);
+        } else {
+            return Cache::get($cacheConfig['key'], []);
+        }
     }
 
     /**
@@ -250,11 +267,20 @@ trait LotteryLogics
     public static function saveCacheData($key, $value): void
     {
         $cacheConfig = self::getCacheConfig($key);
-        if ($cacheConfig['expire_time'] <= 0) {
-            Cache::forever($cacheConfig['key'], $value);
+        if (isset($cacheConfig['tags'])) {
+            if ($cacheConfig['expire_time'] <= 0) {
+                Cache::tags($cacheConfig['tags'])->forever($cacheConfig['key'], $value);
+            } else {
+                $expireTime = Carbon::now()->addSeconds($cacheConfig['expire_time']);
+                Cache::tags($cacheConfig['tags'])->put($cacheConfig['key'], $value, $expireTime);
+            }
         } else {
-            $expireTime = Carbon::now()->addSeconds($cacheConfig['expire_time']);
-            Cache::put($cacheConfig['key'], $value, $expireTime);
+            if ($cacheConfig['expire_time'] <= 0) {
+                Cache::forever($cacheConfig['key'], $value);
+            } else {
+                $expireTime = Carbon::now()->addSeconds($cacheConfig['expire_time']);
+                Cache::put($cacheConfig['key'], $value, $expireTime);
+            }
         }
     }
 
@@ -266,7 +292,6 @@ trait LotteryLogics
      */
     public function getMethodObject($methodId)
     {
-
         $data = self::getAllMethodObject($this->series_id);
         return $data[$methodId] ?? [];
     }
@@ -346,7 +371,7 @@ trait LotteryLogics
                     $groupData[$method->method_group] = [];
                 }
 
-                if (!isset($hasRow[$method->method_group])||
+                if (!isset($hasRow[$method->method_group]) ||
                     !in_array($method->method_row, $hasRow[$method->method_group])) {
                     $groupData[$method->method_group][] = [
                         'name' => $rowName[$method->method_row],
@@ -490,7 +515,7 @@ trait LotteryLogics
                     $groupData[$method->method_group] = [];
                 }
                 if (!isset($hasRow[$method->method_group]) ||
-                !in_array($method->method_row, $hasRow[$method->method_group])) {
+                    !in_array($method->method_row, $hasRow[$method->method_group])) {
                     $groupData[$method->method_group][] = [
                         'name' => $rowName[$method->method_row],
                         'sign' => $method->method_row,
@@ -527,10 +552,14 @@ trait LotteryLogics
                 'defaultMethod' => $defaultMethod,
             ];
         }
-        $hourToStore = 24;
-        $expiresAt = Carbon::now()->addHours($hourToStore);
-        $frontendLotteryInfoCache = 'frontend.lottery.lotteryInfo';
-        Cache::put($frontendLotteryInfoCache, $cacheData, $expiresAt);
+        $frontendLotteryInfoCache = 'frontend_lottery_lotteryInfo';
+        self::saveCacheData($frontendLotteryInfoCache, $cacheData);
         return $cacheData;
+    }
+
+    //获取除了六合彩以外的所有开启状态的彩种sign（生成奖期用）
+    public static function generateIssueLotterys()
+    {
+        return self::where('status', 1)->where('en_name', '!=', 'hklhc')->pluck('en_name');
     }
 }

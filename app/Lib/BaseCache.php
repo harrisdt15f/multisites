@@ -1,4 +1,5 @@
-<?php namespace App\Lib;
+<?php
+namespace App\Lib;
 
 use Exception;
 use Illuminate\Contracts\Cache\Repository;
@@ -16,6 +17,9 @@ trait BaseCache
     public static function getCacheData($key)
     {
         $cacheConfig = self::getCacheConfig($key);
+        if (isset($cacheConfig['tags'])) {
+            return Cache::tags($cacheConfig['tags'])->get($cacheConfig['key'], []);
+        }
         return Cache::get($cacheConfig['key'], []);
     }
 
@@ -28,16 +32,25 @@ trait BaseCache
     public static function saveCacheData($key, $value)
     {
         $cacheConfig = self::getCacheConfig($key);
-        if ($cacheConfig['expire_time'] <= 0) {
-            return Cache::forever($cacheConfig['key'], $value);
+        if (isset($cacheConfig['tags'])) {
+            if ($cacheConfig['expire_time'] <= 0) {
+                Cache::tags($cacheConfig['tags'])->forever($cacheConfig['key'], $value);
+            } else {
+                $expireTime = Carbon::now()->addSeconds($cacheConfig['expire_time']);
+                Cache::tags($cacheConfig['tags'])->put($cacheConfig['key'], $value, $expireTime);
+            }
         } else {
-            $expireTime = Carbon::now()->addSeconds($cacheConfig['expire_time']);
-            return Cache::put($cacheConfig['key'], $value, $expireTime);
+            if ($cacheConfig['expire_time'] <= 0) {
+                Cache::forever($cacheConfig['key'], $value);
+            } else {
+                $expireTime = Carbon::now()->addSeconds($cacheConfig['expire_time']);
+                Cache::put($cacheConfig['key'], $value, $expireTime);
+            }
         }
     }
 
     /**
-     * 刷新缓存
+     * 删除缓存
      * @param $key
      * @return bool
      * @throws Exception
@@ -45,6 +58,9 @@ trait BaseCache
     public static function mtsFlushCache($key): bool
     {
         $cacheConfig = self::getCacheConfig($key);
+        if (isset($cacheConfig['tags'])) {
+            return Cache::tags($cacheConfig['tags'])->forget($cacheConfig['key'], []);
+        }
         return Cache::forget($cacheConfig['key'], []);
     }
 
@@ -68,6 +84,31 @@ trait BaseCache
     public static function hasCache($key): bool
     {
         $cacheConfig = self::getCacheConfig($key);
+        if (isset($cacheConfig['tags'])) {
+            return Cache::tags($cacheConfig['tags'])->has($cacheConfig['key']);
+        }
         return Cache::has($cacheConfig['key']);
+    }
+
+    /**
+     * @param  $picStr
+     * @param  $delimiter
+     * @return void
+     */
+    public static function deleteCachePic($picStr, $delimiter = null): void
+    {
+        $redisKey = 'cleaned_images';
+        $cleanedImages = self::getCacheData($redisKey);
+        if ($delimiter === null) {
+            $picArr = (array) $picStr;
+        } else {
+            $picArr = explode($delimiter, $picStr);
+        }
+        foreach ($picArr as $picName) {
+            if (array_key_exists($picName, $cleanedImages)) {
+                unset($cleanedImages[$picName]);
+            }
+        }
+        self::saveCacheData($redisKey, $cleanedImages);
     }
 }

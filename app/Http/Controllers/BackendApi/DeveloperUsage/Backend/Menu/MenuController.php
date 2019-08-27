@@ -33,8 +33,10 @@ class MenuController extends BackEndApiMainController
      * @param  MenuAllRequireInfosAction  $action
      * @return JsonResponse
      */
-    public function allRequireInfos(MenuAllRequireInfosRequest $request, MenuAllRequireInfosAction $action): JsonResponse
-    {
+    public function allRequireInfos(
+        MenuAllRequireInfosRequest $request,
+        MenuAllRequireInfosAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }
@@ -70,7 +72,7 @@ class MenuController extends BackEndApiMainController
      * @param   MenuEditAction  $action
      * @return  JsonResponse
      */
-    public function edit(MenuEditRequest $request, MenuEditAction $action):  ? JsonResponse
+    public function edit(MenuEditRequest $request, MenuEditAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
@@ -80,9 +82,8 @@ class MenuController extends BackEndApiMainController
      * @param   MenuChangeParentAction  $action
      * @return  JsonResponse
      */
-    public function changeParent(MenuChangeParentAction $action) :  ? JsonResponse
+    public function changeParent(MenuChangeParentAction $action): JsonResponse
     {
         return $action->execute($this, $this->inputs);
     }
-
 }

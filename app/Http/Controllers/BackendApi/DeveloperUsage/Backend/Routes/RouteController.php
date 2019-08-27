@@ -79,9 +79,10 @@ class RouteController extends BackEndApiMainController
     /**
      * 解密前台参数接口
      * @param  RouteDecryptRequest $request
+     * @param  RouteDecryptAction  $action
      * @return JsonResponse
      */
-    public function decryptFront(RouteDecryptRequest $request,RouteDecryptAction $action):JsonResponse
+    public function decryptFront(RouteDecryptRequest $request, RouteDecryptAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);

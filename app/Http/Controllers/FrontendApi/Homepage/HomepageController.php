@@ -6,6 +6,8 @@ use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Http\Requests\Frontend\Homepage\HomepageNoticeRequest;
 use App\Http\Requests\Frontend\Homepage\HomepageReadMessageRequest;
 use App\Http\SingleActions\Frontend\Homepage\HomepageActivityListAction;
+use App\Http\SingleActions\Frontend\Homepage\HomepageGetBasicContentAction;
+use App\Http\SingleActions\Frontend\Homepage\HomepageGetPopularGameAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageGetWebInfoAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageNoticeAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepagePopularChessCardsListsAction;
@@ -26,6 +28,8 @@ use Illuminate\Http\JsonResponse;
 class HomepageController extends FrontendApiMainController
 {
     private $bannerFlag = 1; //网页端banner
+    public $tags = 'homepage';
+
     /**
      * 需要展示的前台模块
      * @param  HomepageShowHomepageModelAction $action
@@ -67,16 +71,6 @@ class HomepageController extends FrontendApiMainController
     }
 
     /**
-     * 首页二维码
-     * @param  HompageQrCodeAction $action
-     * @return JsonResponse
-     */
-    public function qrCode(HompageQrCodeAction $action): JsonResponse
-    {
-        return $action->execute($this);
-    }
-
-    /**
      * 热门活动
      * @param  HompageActivityAction $action
      * @return JsonResponse
@@ -84,16 +78,6 @@ class HomepageController extends FrontendApiMainController
     public function activity(HompageActivityAction $action): JsonResponse
     {
         return $action->execute($this, 1);
-    }
-
-    /**
-     * 首页LOGO
-     * @param  HompageLogoAction $action
-     * @return JsonResponse
-     */
-    public function logo(HompageLogoAction $action): JsonResponse
-    {
-        return $action->execute($this);
     }
 
     /**
@@ -117,16 +101,6 @@ class HomepageController extends FrontendApiMainController
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
-    }
-
-    /**
-     * 前台网站头ico
-     * @param  HompageIcoAction $action
-     * @return JsonResponse
-     */
-    public function ico(HompageIcoAction $action): JsonResponse
-    {
-        return $action->execute($this);
     }
 
     /**
@@ -185,6 +159,22 @@ class HomepageController extends FrontendApiMainController
      * @return JsonResponse
      */
     public function getWebInfo(HomepageGetWebInfoAction $action): JsonResponse
+    {
+        return $action->execute($this);
+    }
+
+    /**
+     * 获取首页基本内容
+     * @param  HomepageGetBasicContentAction $action
+     * @return JsonResponse
+     */
+    public function getBasicContent(HomepageGetBasicContentAction $action): JsonResponse
+    {
+        return $action->execute($this);
+    }
+
+    //获取热门游戏列表
+    public function getPopularGame(HomepageGetPopularGameAction $action): JsonResponse
     {
         return $action->execute($this);
     }

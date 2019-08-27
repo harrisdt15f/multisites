@@ -29,5 +29,4 @@ class UserRechargeController extends FrontendApiMainController
     {
         return $action->execute($this);
     }
-
 }

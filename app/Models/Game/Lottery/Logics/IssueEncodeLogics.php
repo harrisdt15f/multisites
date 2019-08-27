@@ -5,7 +5,6 @@
  * Date: 6/17/2019
  * Time: 9:02 PM
  */
-
 namespace App\Models\Game\Lottery\Logics;
 
 use App\Jobs\Lottery\Encode\IssueEncoder;
@@ -15,8 +14,10 @@ use App\Models\Game\Lottery\LotterySeriesMethod;
 use App\Models\Game\Lottery\LotteryTraceList;
 use App\Models\LotteryTrace;
 use App\Models\Project;
+use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
+use App\Models\Admin\Homepage\FrontendLotteryNoticeList;
 
 trait IssueEncodeLogics
 {
@@ -48,7 +49,7 @@ trait IssueEncodeLogics
                                     $oLottery,
                                     $oIssue->official_code
                                 ); //wn_number
-                            } catch (\Exception $e) {
+                            } catch (Exception $e) {
                                 Log::error('Winning Number Calculation on error');
                                 Log::error($e->getMessage().$e->getTraceAsString());
                             }
@@ -90,10 +91,11 @@ trait IssueEncodeLogics
                                                         try {
                                                             $aPrized = $oBasicWay->checkPrize(
                                                                 $oSeriesWay,
-                                                                $project->bet_number,
+                                                                $project,
                                                                 $sPostion = null
                                                             );
-                                                        } catch (\Exception $e) {
+                                                        } catch (Exception $e) {
+                                                            $aPrized = [];
                                                             Log::error('Prize Checking on error');
                                                             Log::error($e->getMessage().$e->getTraceAsString());
                                                         }
@@ -108,7 +110,7 @@ trait IssueEncodeLogics
                                                                 $sWnNumber,
                                                                 $aPrized
                                                             ); //@todo Trace
-                                                        } catch (\Exception $e) {
+                                                        } catch (Exception $e) {
                                                             Log::error('Set Won on error');
                                                             Log::error($e->getMessage().$e->getTraceAsString());
                                                         }
@@ -180,6 +182,9 @@ trait IssueEncodeLogics
             ++$first;
         }
         if ($oTrace !== null) {
+            ++$oTrace->finished_issues; //完成的奖期+1
+            $oTrace->finished_amount += $oProject->total_cost; //完成的金额
+            $oTrace->finished_bonus += $oProject->bonus; //追号中奖总金额
             if ($oProject->status >= Project::STATUS_WON && $oTrace->win_stop === 1) {
                 //Remaining TraceList to stop continuing
                 $oTraceListToUpdate = $oTrace->traceRunningLists();
@@ -195,22 +200,19 @@ trait IssueEncodeLogics
                 $oTrace->stop_time = time();
                 $oTrace->save();
                 //update TraceLists with Project
-                if ($oProject->tracelist()->exists()) {//第一次的时候是没有的
+                if ($oProject->tracelist()->exists()) { //第一次的时候是没有的
                     $oTraceListFromProject = $oProject->tracelist;
                     $oTraceListFromProject->status = LotteryTraceList::STATUS_FINISHED;
                     $oTraceListFromProject->save();
                 }
-            } elseif ($oProject->status > Project::STATUS_NORMAL && $first < 1) {
-//不是第一次的时候
-                ++$oTrace->finished_issues;
-                $oTrace->finished_amount += $oProject->total_cost;
-                $oTrace->finished_bonus += $oProject->bonus;
-                if ($oTrace->end_issue === $oProject->issue) {
+            } elseif ($oProject->status > Project::STATUS_NORMAL && $first < 1) { //不是第一次的时候
+                $waitingNum = $oTrace->traceLists->where('status',LotteryTraceList::STATUS_WAITING)->count();
+                if ($waitingNum === 0) { //如果没有等待追号的数据，则追号完成
                     $oTrace->status = LotteryTrace::STATUS_FINISHED;
                 }
                 $oTrace->save();
                 //update TraceLists with Project
-                if ($oProject->tracelist()->exists()) {//第一次的时候是没有的
+                if ($oProject->tracelist()->exists()) { //第一次的时候是没有的
                     $oTraceListFromProject = $oProject->tracelist;
                     $oTraceListFromProject->status = LotteryTraceList::STATUS_FINISHED;
                     $oTraceListFromProject->project_id = $oProject->id;
@@ -295,30 +297,36 @@ trait IssueEncodeLogics
         $this->status_encode = LotteryIssue::ENCODED;
         $this->encode_time = time();
         $this->official_code = $openCodeStr;
+
         if ($this->save()) {
+            FrontendLotteryNoticeList::updateLotteryNotice($this); //开奖公告缓存更新
+            //趋势分析记录
+            LotteryIssue::cacheRe($this);
+
             dispatch(new IssueEncoder($this->toArray()))->onQueue('open_numbers');
         }
     }
 
     /**
      * 生成一个奖期合法的随机开奖号码
-     * @param  int  $codeLength  [开奖号码的长度]
-     * @param  string  $validCode  [合法开奖号码]
-     * @param  int  $lotteryType  [开奖号码是否可以重复 ？ 1可重复 2不可重复]
-     * @param          $splitter  [该彩种分割开奖号码的方式]
+     * @param  int     $codeLength   [开奖号码的长度]
+     * @param  string  $validCode    [合法开奖号码]
+     * @param  int     $lotteryType  [开奖号码是否可以重复 ？ 1可重复 2不可重复]
+     * @param          $splitter     [该彩种分割开奖号码的方式]
+     * @param  string  $series       [彩种系列]
      * @return string  $openCodeStr  [开奖号码string]
      */
-    public static function getOpenNumber($codeLength, $validCode, $lotteryType, $splitter): string
+    public static function getOpenNumber($codeLength, $validCode, $lotteryType, $splitter, $series): string
     {
         $openCodeArr = []; //开奖号码array
         $openCodeStr = ''; //开奖号码string
         $validCodeArr = explode(',', $validCode); //合法开奖号码arr
-        if ($lotteryType === 1) {
+        if ($lotteryType === 2 || $series === 'pk10') {
+                $openCodeArr = Arr::random($validCodeArr, $codeLength);
+        } elseif ($lotteryType === 1) {
             for ($length = 0; $length < $codeLength; $length++) {
                 $openCodeArr[] = Arr::random($validCodeArr);
             }
-        } elseif ($lotteryType === 2) {
-            $openCodeArr = Arr::random($validCodeArr, $codeLength);
         } else {
             return $openCodeStr;
         }
@@ -334,7 +342,7 @@ trait IssueEncodeLogics
      * @param  string  $code  开奖号码
      * @return void
      */
-    public static function enCode($lotteryId, $issue, $code): void
+    public static function encode($lotteryId, $issue, $code): void
     {
         $lotteryIssueEloq = self::where([
             ['lottery_id', $lotteryId],

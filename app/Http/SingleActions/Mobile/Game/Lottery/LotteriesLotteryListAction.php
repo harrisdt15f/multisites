@@ -3,10 +3,9 @@
 namespace App\Http\SingleActions\Mobile\Game\Lottery;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Lib\Common\configurationsRelated;
-use App\Models\Admin\SystemConfiguration;
 use App\Models\Game\Lottery\LotteryList;
 use Illuminate\Http\JsonResponse;
+use App\Models\Game\Lottery\LotterySerie;
 
 class LotteriesLotteryListAction
 {
@@ -18,27 +17,30 @@ class LotteriesLotteryListAction
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
         $lotteries = LotteryList::with(['issueRule:lottery_id,begin_time,end_time'])
-            ->where('status', 1)->get([
-            'id',
-            'cn_name as name',
-            'en_name',
-            'icon_path',
-            'series_id',
-            'min_times',
-            'max_times',
-            'valid_modes',
-            'min_prize_group',
-            'max_prize_group',
-            'max_trace_number',
-            'day_issue',
-        ]);
-        $seriesConfig = config('game.main.series');
+            ->where('status', 1)
+            ->get([
+                'id',
+                'cn_name as name',
+                'en_name',
+                'icon_path',
+                'series_id',
+                'min_times',
+                'max_times',
+                'valid_modes',
+                'min_prize_group',
+                'max_prize_group',
+                'max_trace_number',
+                'day_issue',
+            ]);
+        $seriesConfig = LotterySerie::getList();
         $data = [];
         foreach ($lotteries as $lottery) {
             if (!isset($data[$lottery->series_id])) {
                 $data[$lottery->series_id] = [
-                    'name' => $seriesConfig[$lottery->series_id],
+                    'name' => $seriesConfig[$lottery->series_id]['title'],
                     'sign' => $lottery->series_id,
+                    'encode_splitter' => $seriesConfig[$lottery->series_id]['encode_splitter'],
+                    'price_difference' => $seriesConfig[$lottery->series_id]['price_difference'],
                     'list' => [],
                 ];
             }

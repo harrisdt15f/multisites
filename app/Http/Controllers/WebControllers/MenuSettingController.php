@@ -23,14 +23,21 @@ class MenuSettingController extends AdminMainController
                 }
             }
         }
-        return view('superadmin.menu-setting.index', ['firstlevelmenus' => $firstlevelmenus, 'rname' => $rname, 'editMenu' => $editMenu, 'routeMatchingName' => $routeMatchingName]);
+        return view(
+            'superadmin.menu-setting.index',
+            [
+                'firstlevelmenus' => $firstlevelmenus,
+                'rname' => $rname,
+                'editMenu' => $editMenu,
+                'routeMatchingName' => $routeMatchingName
+            ]
+        );
     }
 
     public function add()
     {
         $menuEloq = new BackendSystemMenu();
         if (isset($this->inputs['isParent']) && $this->inputs['isParent'] === 'on') {
-
             $menuEloq->label = $this->inputs['menulabel'];
         } else {
             $menuEloq->label = $this->inputs['menulabel'];
@@ -50,7 +57,6 @@ class MenuSettingController extends AdminMainController
         $menuEloq = new BackendSystemMenu();
         $toDelete = json_decode($this->inputs['toDelete'], true);
         if (!empty($toDelete)) {
-
             try {
                 $menuEloq->find($toDelete)->each(function ($product, $key) {
                     $product->delete();
@@ -67,7 +73,6 @@ class MenuSettingController extends AdminMainController
     {
         $menuEloq = BackendSystemMenu::find($this->inputs['menuid']);
         if (isset($this->inputs['eisParent']) && $this->inputs['eisParent'] === 'on') {
-
             $menuEloq->label = $this->inputs['emenulabel'];
             $menuEloq->route = '#';
             $menuEloq->pid = 0;
@@ -82,7 +87,6 @@ class MenuSettingController extends AdminMainController
         } else {
             return response()->json(['success' => false, 'menuedited' => 0]);
         }
-
     }
 
     public function changeParent()
@@ -95,6 +99,5 @@ class MenuSettingController extends AdminMainController
             $itemProcess = $menuELoq->changeParent($parseDatas);
             return response()->json(['success' => true, $itemProcess]);
         }
-
     }
 }

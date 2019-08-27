@@ -6,10 +6,9 @@
 
 namespace App\Http\Requests\Backend\Admin\Help;
 
-
 use App\Http\Requests\BaseFormRequest;
 
-class HelpCenterEditRequest  extends BaseFormRequest
+class HelpCenterEditRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
