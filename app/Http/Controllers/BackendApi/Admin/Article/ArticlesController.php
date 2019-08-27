@@ -18,7 +18,6 @@ use App\Http\SingleActions\Backend\Admin\Article\ArticlesSortAction;
 use App\Http\SingleActions\Backend\Admin\Article\ArticlesTopAction;
 use App\Http\SingleActions\Backend\Admin\Article\ArticlesUploadPicAction;
 use App\Lib\Common\AuditFlow;
-use App\Lib\Common\CacheRelated;
 use App\Lib\Common\ImageArrange;
 use App\Lib\Common\InternalNoticeMessage;
 use Illuminate\Http\JsonResponse;
@@ -105,17 +104,6 @@ class ArticlesController extends BackEndApiMainController
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
-    }
-
-    /**
-     * 删除图片缓存
-     * @param   array $picNames [图片名称]
-     * @return  void
-     */
-    public function deleteCachePic(array $picNames): void
-    {
-        $cacheRelated = new CacheRelated();
-        $cacheRelated->deleteCachePic($picNames);
     }
 
     /**

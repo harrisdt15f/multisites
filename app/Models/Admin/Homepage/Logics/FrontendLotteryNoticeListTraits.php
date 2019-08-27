@@ -2,13 +2,15 @@
 
 namespace App\Models\Admin\Homepage\Logics;
 
-use App\Lib\Common\CacheRelated;
 use App\Models\DeveloperUsage\Frontend\FrontendAllocatedModel;
 use App\Models\Game\Lottery\LotteryIssue;
 use App\Models\Game\Lottery\LotteryList;
+use App\Lib\BaseCache;
 
 trait FrontendLotteryNoticeListTraits
 {
+    use BaseCache;
+
     //获取pc端开奖公告列表
     public static function getWebLotteryNoticeList()
     {
@@ -43,9 +45,7 @@ trait FrontendLotteryNoticeListTraits
             ->orderBy('sort', 'asc')
             ->limit($count)
             ->pluck('lotteries_id');
-        $tags = 'lottery';
-        $redisKey = 'lottery_notice';
-        $lotteryNoticelist = CacheRelated::getTagsCache($tags, $redisKey);
+        $lotteryNoticelist = self::getCacheData('lottery_notice_list');
         $data = [];
         foreach ($lotterys as $sign) {
             if (isset($lotteryNoticelist[$sign])) {
@@ -58,12 +58,11 @@ trait FrontendLotteryNoticeListTraits
     //更新开奖公告的缓存
     public static function updateLotteryNotice($issue)
     {
-        $tags = 'lottery';
-        $redisKey = 'lottery_notice';
-        $lotteryNoticelist = CacheRelated::getTagsCache($tags, $redisKey);
+        $lotteryNoticelist = self::getCacheData('lottery_notice_list');
         if (!isset($lotteryNoticelist[$issue->lottery_id])) {
             $lottery = LotteryList::where('en_name', $issue->lottery_id)->first();
             if ($lottery !== null) {
+                $lotteryNoticelist[$issue->lottery_id]['series'] = $lottery->series_id;
                 $lotteryNoticelist[$issue->lottery_id]['cn_name'] = $lottery->cn_name;
                 $lotteryNoticelist[$issue->lottery_id]['lotteries_id'] = $issue->lottery_id;
                 $lotteryNoticelist[$issue->lottery_id]['icon'] = $lottery->icon_path;
@@ -72,7 +71,7 @@ trait FrontendLotteryNoticeListTraits
         $lotteryNoticelist[$issue->lottery_id]['issue'] = $issue->issue;
         $lotteryNoticelist[$issue->lottery_id]['official_code'] = $issue->official_code;
         $lotteryNoticelist[$issue->lottery_id]['encode_time'] = $issue->encode_time;
-        CacheRelated::setTagsCache($tags, $redisKey, $lotteryNoticelist);
+        self::saveCacheData('lottery_notice_list', $lotteryNoticelist);
         return $lotteryNoticelist[$issue->lottery_id];
     }
 }

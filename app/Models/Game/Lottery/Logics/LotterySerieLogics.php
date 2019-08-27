@@ -2,10 +2,12 @@
 
 namespace App\Models\Game\Lottery\Logics;
 
-use Illuminate\Support\Facades\Cache;
+use App\Lib\BaseCache;
 
 trait LotterySerieLogics
 {
+    use BaseCache;
+
     /**
      * 获取彩种系列缓存
      * @return array
@@ -13,12 +15,11 @@ trait LotterySerieLogics
     public static function getList(): array
     {
         $cacheKey = self::getCacheKey();
-        if (Cache::has($cacheKey)) {
-            $listData = Cache::get($cacheKey);
-        } else {
-            $listData = self::updateSerieCache();
+        $data = self::getCacheData($cacheKey);
+        if (empty($data)) {
+            $data = self::updateSerieCache();
         }
-        return $listData;
+        return $data;
     }
 
     /**
@@ -29,7 +30,7 @@ trait LotterySerieLogics
     {
         $cacheKey = self::getCacheKey();
         $listData = [];
-        $serieEloq = self::select('id', 'series_name', 'title', 'status', 'encode_splitter')->get();
+        $serieEloq = self::select('id', 'series_name', 'title', 'status', 'encode_splitter', 'price_difference')->get();
         foreach ($serieEloq as $key => $serieItem) {
             $listData[$serieItem->series_name]['id'] = $serieItem->id;
             $listData[$serieItem->series_name]['series_name'] = $serieItem->series_name;
@@ -38,7 +39,7 @@ trait LotterySerieLogics
             $listData[$serieItem->series_name]['encode_splitter'] = $serieItem->encode_splitter;
             $listData[$serieItem->series_name]['price_difference'] = $serieItem->price_difference;
         }
-        Cache::forever($cacheKey, $listData);
+        self::saveCacheData($cacheKey, $listData);
         return $listData;
     }
 

@@ -13,7 +13,6 @@ use App\Http\SingleActions\Backend\Admin\Homepage\PopularMethodsDetailAction;
 use App\Http\SingleActions\Backend\Admin\Homepage\PopularMethodsEditAction;
 use App\Http\SingleActions\Backend\Admin\Homepage\PopularMethodsMethodsListAction;
 use App\Http\SingleActions\Backend\Admin\Homepage\PopularMethodsSortAction;
-use App\Lib\Common\CacheRelated;
 use Illuminate\Http\JsonResponse;
 
 class PopularMethodsController extends BackEndApiMainController
@@ -84,15 +83,5 @@ class PopularMethodsController extends BackEndApiMainController
     public function methodsList(PopularMethodsMethodsListAction $action): JsonResponse
     {
         return $action->execute($this);
-    }
-
-    /**
-     * 清除首页热门玩法缓存
-     * @return void
-     */
-    public function deleteCache(): void
-    {
-        $cacheRelated = new CacheRelated();
-        $cacheRelated->delete('popularMethods');
     }
 }

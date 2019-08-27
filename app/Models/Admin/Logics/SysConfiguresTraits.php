@@ -2,10 +2,11 @@
 
 namespace App\Models\Admin\Logics;
 
-use Illuminate\Support\Facades\Cache;
+use App\Lib\BaseCache;
 
 trait SysConfiguresTraits
 {
+    use BaseCache;
 
     /**
      * @param  string  $key
@@ -27,11 +28,9 @@ trait SysConfiguresTraits
      */
     public static function getWebInfo($update = 0) : array
     {
-        $redisKey = 'web_info';
-        $data = [];
-        if (Cache::has($redisKey) && $update === 0) {
-            $data = Cache::get($redisKey);
-        } else {
+        $redisKey = 'frontend_web_info';
+        $data = self::getCacheData($redisKey);
+        if (empty($data)) {
             $sysConfigEloq = self::where('sign', 'web_info')->first();
             if ($sysConfigEloq !== null) {
                 $webConfigELoq = $sysConfigEloq->childs;
@@ -39,7 +38,7 @@ trait SysConfiguresTraits
                     $data[$webConfigItem->sign] = $webConfigItem->value;
                 }
             }
-            Cache::forever($redisKey, $data);
+            self::saveCacheData($redisKey, $data);
         }
         return $data;
     }

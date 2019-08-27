@@ -55,7 +55,7 @@ trait IssueLogics
     }
 
     /**
-     * 获取当天所有可投奖期
+     * 获取可投奖期
      * @param  $lotteryId
      * @param  int         $count
      * @return mixed
@@ -63,11 +63,9 @@ trait IssueLogics
     public static function getCanBetIssue($lotteryId, $count = 50)
     {
         $time = time();
-        $day = date('Ymd');
         return self::where([
             ['lottery_id', $lotteryId],
             ['end_time', '>', $time],
-            ['day', $day],
         ])->orderBy('begin_time', 'ASC')->skip(0)->take($count)->get();
     }
 

@@ -2,11 +2,11 @@
 
 namespace App\Models\DeveloperUsage\MethodLevel\Traits;
 
-use App\Lib\Common\CacheRelated;
+use App\Lib\BaseCache;
 
 trait MethodLevelLogics
 {
-
+    use BaseCache;
     /**
      * 后台玩法等级列表缓存
      * @param  integer $update
@@ -14,22 +14,20 @@ trait MethodLevelLogics
      */
     public static function methodLevelDetail($update = 0): array
     {
-        $tags = 'lottery';
         $redisKey = 'lottery_method_leve_detail';
-        $data = false;
+        $data = [];
         if ($update === 0) {
-            $data = CacheRelated::getTagsCache($tags, $redisKey);
+            $data = self::getCacheData($redisKey);
         }
-        if ($data === false) {
+        if (empty($data)) {
             $methodtype = self::groupBy('method_id')->orderBy('id', 'asc')->get();
-            $data = [];
             foreach ($methodtype as $method) {
                 $data[$method->method_id] = self::select('id', 'method_id', 'series_id', 'level', 'position', 'count', 'prize')
                     ->where('method_id', $method->method_id)
                     ->get()
                     ->toArray();
             }
-            CacheRelated::setTagsCache($tags, $redisKey, $data);
+            self::saveCacheData($redisKey, $data);
         }
         return $data;
     }

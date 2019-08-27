@@ -2,12 +2,13 @@
 
 namespace App\Models\Admin\Homepage\Logics;
 
-use App\Lib\Common\CacheRelated;
+use App\Lib\BaseCache;
 use App\Models\DeveloperUsage\Frontend\FrontendAllocatedModel;
-use Illuminate\Support\Carbon;
 
 trait FrontendLotteryRedirectBetListTraits
 {
+    use BaseCache;
+    
     /**
      * 更新首页热门彩票缓存
      */
@@ -23,7 +24,7 @@ trait FrontendLotteryRedirectBetListTraits
      */
     public static function webPopularLotteriesCache(): array
     {
-        $cacheKey = 'popular_lotteries';
+        $cacheKey = 'lottery_popular_lotteries_web';
         $lotteriesEloq = FrontendAllocatedModel::select('show_num', 'status')
             ->where('en_name', 'popular.lotteries.one')
             ->first();
@@ -39,7 +40,7 @@ trait FrontendLotteryRedirectBetListTraits
      */
     public static function mobilePopularLotteriesCache(): array
     {
-        $cacheKey = 'mobile_popular_lotteries';
+        $cacheKey = 'lottery_popular_lotteries_app';
         $lotteriesEloq = FrontendAllocatedModel::select('show_num', 'status')
             ->where('en_name', 'mobile.popular.lotteries.one')
             ->first();
@@ -56,7 +57,6 @@ trait FrontendLotteryRedirectBetListTraits
      */
     public static function updateCache($cacheKey, $showNum): array
     {
-        $tags = 'homepage';
         $dataEloq = self::select('id', 'lotteries_id', 'lotteries_sign')
             ->with(['lotteries:id,day_issue,en_name,cn_name,icon_path', 'issueRule:lottery_id,issue_seconds'])
             ->orderBy('sort', 'asc')
@@ -70,8 +70,7 @@ trait FrontendLotteryRedirectBetListTraits
             $datas[$key]['issue_seconds'] = $dataIthem->issueRule->first->issue_seconds ?? null;
             $datas[$key]['day_issue'] = $dataIthem->lotteries->day_issue ?? null;
         }
-        $minuteToStore = 60 * 24;
-        CacheRelated::setTagsCache($tags, $cacheKey, $datas, $minuteToStore);
+        self::saveCacheData($cacheKey, $datas);
         return $datas;
     }
 }

@@ -33,9 +33,9 @@ trait LotteryBasicWayLogics
         foreach ($oSeriesWay->WinningNumber as $iSeriesMethodId => $sWnNumber) {
             $oSeriesMethod = LotterySeriesMethod::find($iSeriesMethodId);
             $oBasicMethod = $oSeriesMethod->basicMethod;
-            $iOffset = $oSeriesMethod->offset >= 0 ?
-                $oSeriesMethod->offset : $oSeriesMethod->offset + $oSeriesWay->digital_count;
-            $this->sPosition = $sPosition ?? $iOffset;
+//            $iOffset = $oSeriesMethod->offset >= 0 ?
+//                $oSeriesMethod->offset : $oSeriesMethod->offset + $oSeriesWay->digital_count;
+//            $this->sPosition = $sPosition ?? $iOffset;
 //            $oBasicMethod->sPosition = $sPosition;
             $sBetNumberFinal = $this->formatBetNumber($sBetNumber, $oSeriesMethod, $oSeriesWay, $sWnNumber);
             $iCount = $oBasicMethod->getPrizeCount($oSeriesWay, $this, $sWnNumber, $sBetNumberFinal);
