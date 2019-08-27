@@ -72,9 +72,7 @@ class FrontendAuthController extends FrontendApiMainController
                 ];
                 return $this->msgOut(true, $data);
             } catch (Exception $e) {
-                $errorObj = $e->getPrevious()->getPrevious();
-                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-                return $this->msgOut(false, [], $sqlState, $msg);
+                return $this->msgOut(false, [], $e->getCode(), $e->getMessage());
             }
         }
     }
