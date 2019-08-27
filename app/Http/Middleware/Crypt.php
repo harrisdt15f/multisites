@@ -26,57 +26,49 @@ class Crypt
             return $next($request);
         }
         //本地模式关闭参数唯一性判断
-        if (Config::get('app.env') !== "local") {
+        if (config('app.env') !== "local") {
             //检验参数是否符合规范 系统只允许接入一个名为DATA的参数
             if ($requestNum!==1 || !isset($request['data'])) {
                 $con = new FrontendApiMainController();
-                return $con->msgOut(false, [], 100507);
-                die;
+                return $con->msgOut(false, [], '100507');
             }
         }
         $inData = $request->input('data');
         //带DATA数据却为null
         if (is_null($inData)) {
             $con = new FrontendApiMainController();
-            return $con->msgOut(false, [], 100506);
-            die;
+            return $con->msgOut(false, [], '100506');
         }
         //错误返回
         if (!is_string($inData)) {
             $con = new FrontendApiMainController();
-            return $con->msgOut(false, [], 100500);
-            die;
+            return $con->msgOut(false, [], '100500');
         }
         $requestCryptData = explode(self::LIMIT, $inData);
         if (count($requestCryptData)!=3) {
             $con = new FrontendApiMainController();
-            return  $con->msgOut(false, [], 100501);
-            die;
+            return  $con->msgOut(false, [], '100501');
         }
         $data = $requestCryptData[0];//固定位 数组 自生成
         $iv =self::rsaDeCrypt($requestCryptData[1]);
-        if (!$iv) {
+        if ($iv==false) {
             $con = new FrontendApiMainController();
-            return $con->msgOut(false, [], 100502);
-            die;
+            return $con->msgOut(false, [], '100502');
         }
         $key =self::rsaDeCrypt($requestCryptData[2]);
-        if (!$key) {
+        if ($key==false) {
             $con = new FrontendApiMainController();
-            return $con->msgOut(false, [], 100503);
-            die;
+            return $con->msgOut(false, [], '100503');
         }
         $deAesData = self::deAesCrypt($data, $key, $iv) ;
-        if (!$deAesData) {
+        if ($deAesData==false) {
             $con = new FrontendApiMainController();
-            return $con->msgOut(false, [], 100505);
-            die;
+            return $con->msgOut(false, [], '100505');
         }
-        $deData = json_decode($deAesData);
+        $deData = json_decode((string)$deAesData);
         if (is_null($deData)) {
             $con = new FrontendApiMainController();
-            return $con->msgOut(false, [], 100504);
-            die;
+            return $con->msgOut(false, [], '100504');
         }
         foreach ($deData as $k => $v) {
             $request[$k]=$v;
@@ -86,8 +78,8 @@ class Crypt
     }
     /**
      * RSA解密 自带私钥
-     * @param  $rsaData rsa加密后的数据串
-     * @return Sting/Bool 解密后的字符串或false
+     * @param  mixed $rsaData
+     * @return String|false
      */
     private function rsaDeCrypt($rsaData)
     {
@@ -108,22 +100,24 @@ VUrzdZKeuW5UHV0aS2KJBdQge3uzRKxWvaM7qsGpSGIlQQzIO055AkBvkOcvyrkV
 s+RmDzYuKUoG0zIjmIZidcaTP1p2ngqCl/RXl1evVAmXet26uDPkFtmOGvFTngZM
 Web+LMihoBTa
 -----END PRIVATE KEY-----";
-          $flag = openssl_private_decrypt(base64_decode($rsaData), $deRsaCryptData, $pkcs8_private);
-        if (!$flag) {
+        $baseRsa = base64_decode($rsaData);
+        $flag = openssl_private_decrypt((string)$baseRsa, $deRsaCryptData, $pkcs8_private);
+        if ($flag==false) {
             return false;
         }
           return $deRsaCryptData;
     }
     /**
      * AES解密 加密方式 AES-128-CBC
-     * @param  $enAes AES加密后的字符串
-     * @param  $key AES加密时使用的key
-     * @param  $iv AES加密时使用的偏移量
-     * @return Sting/Bool 解密后的字符串或false
+     * @param  mixed $enAes
+     * @param  mixed $key
+     * @param  mixed $iv
+     * @return String|false
      */
     private function deAesCrypt($enAes, $key, $iv)
     {
-        $str =  openssl_decrypt(base64_decode($enAes), "AES-128-CBC", $key, OPENSSL_RAW_DATA, $iv);
+        $baseEnAes = base64_decode($enAes);
+        $str =  openssl_decrypt((string)$baseEnAes, "AES-128-CBC", $key, OPENSSL_RAW_DATA, $iv);
         return $str;
     }
 }
