@@ -71,7 +71,10 @@ class UserDaysalaryControl extends Command
 
                 //上供给上级
                 if ($child->parent_id > 0) {
-                    $parent_info = FrontendUser::where([['id',$child->parent_id]])->first()->toArray();
+                    $parent_info = FrontendUser::where([['id',$child->parent_id]])->first();
+                    if (is_object($parent_info)) {
+                        $parent_info = $parent_info->toArray();
+                    }
                     $parent_data['user_id'] = $child->parent_id ;
                     $parent_data['date'] = $today;
                     $parent_data['daysalary_percentage'] = array_get($parent_info, 'daysalary_percentage') ;

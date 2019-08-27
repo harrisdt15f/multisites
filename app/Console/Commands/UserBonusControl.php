@@ -38,8 +38,8 @@ class UserBonusControl extends Command
 
         switch (date('d')) {
             case '1':
-                $dateFrom = date('Y-m-15', strtotime('-1 months -1 day')) ;
-                $dateTo = date('Y-m-d', strtotime(date('Y-m-1').'-1 day')) ;
+                $dateFrom = date('Y-m-15', (int)strtotime('-1 months -1 day')) ;
+                $dateTo = date('Y-m-d', (int)strtotime(date('Y-m-1').'-1 day')) ;
                 break;
 
             case '15':
