@@ -59,7 +59,7 @@ class Panda extends BasePay
             'user_level' => 1
         ];
 
-        Log::channel('pay-recharge')->info('recharge-channel:【充值通道，参数传递】' . json_encode($params, true));
+        Log::channel('pay-recharge')->info('recharge-channel:【充值通道，参数传递】' . json_encode($params));
         $params['sign'] = $this->encrypt($params, $this->constant["key"]);
         $result = json_decode(curl_post($this->constant["recharge_channel_url"], $params), true);
 
@@ -99,9 +99,9 @@ class Panda extends BasePay
 
         $param['sign'] = $this->encrypt($param, $key);
 
-        Log::channel('pay-recharge')->info('recharge:【发起充值，参数传递】' . json_encode($param, true));
+        Log::channel('pay-recharge')->info('recharge:【发起充值，参数传递】' . json_encode($param));
         $result = json_decode(curl_post($url, $param), true);
-        Log::channel('pay-recharge')->info('recharge:【充值请求返回】' . json_encode($result, true));
+        Log::channel('pay-recharge')->info('recharge:【充值请求返回】' . json_encode($result));
 
         return $result;
     }
@@ -134,9 +134,9 @@ class Panda extends BasePay
 
         $params['sign'] = $this->encrypt($params, $key);
 
-        Log::channel('pay-withdraw')->info('withdraw:【发起提现，参数传递】' . json_encode($params, true));
+        Log::channel('pay-withdraw')->info('withdraw:【发起提现，参数传递】' . json_encode($params));
         $result = json_decode(curl_post($url, $params), true);
-        Log::channel('pay-withdraw')->info('withdraw:【提现请求返回】' . json_encode($result, true));
+        Log::channel('pay-withdraw')->info('withdraw:【提现请求返回】' . json_encode($result));
         if ($result['status'] == 'success') {
             return [true, $result['msg']];
         }
@@ -165,10 +165,10 @@ class Panda extends BasePay
 
         $params['sign'] = $this->encrypt($params, $key);
 
-        Log::channel('pay-withdraw')->info('withdraw-query:【发送请求】' . json_encode($params, true));
+        Log::channel('pay-withdraw')->info('withdraw-query:【发送请求】' . json_encode($params));
         $result = json_decode(curl_post($url, $params), true);
 
-        Log::channel('pay-withdraw')->info('withdraw-query:【请求结果】' . json_encode($result, true));
+        Log::channel('pay-withdraw')->info('withdraw-query:【请求结果】' . json_encode($result));
 
         if ($result['status'] == 'success') {
             return [true, $result['msg']];
