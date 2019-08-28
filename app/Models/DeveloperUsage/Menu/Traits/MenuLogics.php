@@ -63,7 +63,7 @@ trait MenuLogics
 
     /**
      * @param  string  $redisKey
-     * @param  string  $role
+     * @param  mixed   $role
      * @return array
      */
     public function createMenuDatas($redisKey = '*', $role = '*'): array
@@ -75,8 +75,8 @@ trait MenuLogics
                 $menuForFE[$firstMenu->id] = $firstMenu->toArray();
                 if ($firstMenu->childs()->exists()) {
                     $firstChilds = $role == '*' ?
-                        $firstMenu->childs->sortBy('sort') :
-                        $firstMenu->childs->whereIn('id', $role)->sortBy('sort');
+                    $firstMenu->childs->sortBy('sort') :
+                    $firstMenu->childs->whereIn('id', $role)->sortBy('sort');
                     foreach ($firstChilds as $secondMenu) {
                         $menuForFE[$firstMenu->id]['child'][$secondMenu->id] = $secondMenu->toArray();
                         if ($secondMenu->childs()->exists()) {
