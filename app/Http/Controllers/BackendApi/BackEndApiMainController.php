@@ -151,10 +151,10 @@ class BackEndApiMainController extends Controller
     }
 
     /**
-     * @param  bool  $success
-     * @param  array  $data
+     * @param  bool    $success
+     * @param  mixed   $data
      * @param  string  $code
-     * @param  mixed  $message
+     * @param  mixed   $message
      * @param  string  $placeholder
      * @param  string  $substituted
      * @return JsonResponse

@@ -12,8 +12,8 @@ class FundOperation
      * @param int     $in_out  0减少   1增加
      * @param mixed   $OperationAdminId     操作人ID
      * @param mixed   $OperationAdminName   操作人NAME
-     * @param int     $OperationId          被操作人ID
-     * @param string  $OperationName        被操作人NAME
+     * @param mixed   $OperationId          被操作人ID
+     * @param mixed   $OperationName        被操作人NAME
      * @param float   $amount               操作金额
      * @param string  $comment              具体描述
      * @param mixed   $AuditFlow0ID         审核表id

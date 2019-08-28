@@ -74,4 +74,20 @@ trait FrontendLotteryNoticeListTraits
         self::saveTagsCacheData('lottery_notice_list', $lotteryNoticelist);
         return $lotteryNoticelist[$issue->lottery_id];
     }
+
+    public function sortIncrement($startSort, $endSort)
+    {
+        self::where('sort', '>=', $startSort)
+            ->where('sort', '<', $endSort)
+            ->increment('sort');
+    }
+
+    public function sortDecrement($startSort, $endSort = null)
+    {
+        $data = self::where('sort', '>', $startSort);
+        if ($endSort !==null) {
+            $data->where('sort', '<=', $endSort);
+        }
+        $data->decrement('sort');
+    }
 }
