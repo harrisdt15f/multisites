@@ -11,6 +11,6 @@ class PayRechargeCallbackController extends Controller
 
     public function rechargeCallback(PayRechargeAction $action, RechargeCallbackRequest $request)
     {
-        $action->rechageCallback($request);
+        return $action->rechageCallback($this, $request) ;
     }
 }
