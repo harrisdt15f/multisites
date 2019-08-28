@@ -7,5 +7,6 @@ parameters:
         - '#Call to an undefined method App\\Http\\Resources\\DemoResource::DemoMethod\(\)\.#'
         - '#Call to method [a-zA-Z0-9_]+\(\)\ on an unknown class LaravelArdent\\Ardent\\Collection\.#'
         - '#Call to an undefined method Illuminate\\Contracts\\Auth\\Authenticatable::accessGroup\(\)\.#'
+        - '#Call to static method where\(\) on an unknown class App\\Models\\[a-zA-Z0-9_]+\.#'
     excludes_analyse:
         #- /*/*/FileToBeExcluded.php
