@@ -25,11 +25,10 @@ trait BaseCache
 
     /**
      * 获取tags缓存
-     * @param  string $key
-     * @return array
+     * @param  string  $key
      * @throws Exception
      */
-    public static function getTagsCacheData(string $key): array
+    public static function getTagsCacheData(string $key)
     {
         $cacheConfig = self::getCacheConfig($key);
         $data = [];
