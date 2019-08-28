@@ -153,10 +153,10 @@ class BackEndApiMainController extends Controller
     /**
      * @param  bool  $success
      * @param  array  $data
-     * @param  string  $message
      * @param  string  $code
-     * @param  null  $placeholder
-     * @param  null  $substituted
+     * @param  mixed  $message
+     * @param  string  $placeholder
+     * @param  string  $substituted
      * @return JsonResponse
      */
     public function msgOut(
@@ -164,8 +164,8 @@ class BackEndApiMainController extends Controller
         $data = [],
         $code = '',
         $message = '',
-        $placeholder = null,
-        $substituted = null
+        $placeholder = '',
+        $substituted = ''
     ): JsonResponse {
         /*if ($this->currentAuth->user())
         {
@@ -178,7 +178,7 @@ class BackEndApiMainController extends Controller
         } else {
             $code = $code == '' ? $defaultErrorCode : $code;
         }
-        if ($placeholder === null || $substituted === null) {
+        if ($placeholder === '' || $substituted === '') {
             $message = $message == '' ? __('codes-map.' . $code) : $message;
         } else {
             $message = $message == '' ? __('codes-map.' . $code, [$placeholder => $substituted]) : $message;
@@ -199,11 +199,11 @@ class BackEndApiMainController extends Controller
 
     /**
      * Generate Search Query
-     * @param $eloqM
-     * @param $searchAbleFields
-     * @param  int  $fixedJoin
-     * @param $withTable
-     * @param $withSearchAbleFields
+     * @param  object  $eloqM
+     * @param  array   $searchAbleFields
+     * @param  int     $fixedJoin
+     * @param  string  $withTable
+     * @param  array   $withSearchAbleFields
      * @param  string  $orderFields
      * @param  string  $orderFlow
      * @return mixed
@@ -213,7 +213,7 @@ class BackEndApiMainController extends Controller
         $searchAbleFields,
         $fixedJoin = 0,
         $withTable = null,
-        $withSearchAbleFields = null,
+        $withSearchAbleFields = [],
         $orderFields = 'updated_at',
         $orderFlow = 'desc'
     ) {
@@ -357,12 +357,12 @@ class BackEndApiMainController extends Controller
 
     /**
      * Join Table with Eloquent
-     * @param $queryEloq
-     * @param $fixedJoin
-     * @param $withTable
-     * @param $sizeOfWithInputs
-     * @param $withSearchCriterias
-     * @param $queryConditions
+     * @param  object  $queryEloq
+     * @param  int     $fixedJoin
+     * @param  mixed   $withTable
+     * @param  int     $sizeOfWithInputs
+     * @param  array   $withSearchCriterias
+     * @param  array   $queryConditions
      * @return mixed
      */
     public function eloqToJoin(
@@ -388,6 +388,7 @@ class BackEndApiMainController extends Controller
                         function ($query) use ($sizeOfWithInputs, $withSearchCriterias, $queryConditions) {
                             if ($sizeOfWithInputs > 1) {
                                 if (!empty($withSearchCriterias)) {
+                                    $whereData = [];
                                     foreach ($withSearchCriterias as $key => $value) {
                                         $whereCriteria = [];
                                         $whereCriteria[] = $key;
@@ -422,7 +423,7 @@ class BackEndApiMainController extends Controller
     }
 
     /**
-     * @param $eloqM
+     * @param  object $eloqM
      * @param  array  $datas
      */
     public function editAssignment($eloqM, $datas)
