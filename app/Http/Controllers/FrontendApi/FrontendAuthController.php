@@ -28,11 +28,11 @@ class FrontendAuthController extends FrontendApiMainController
     /**
      * Login user and create token
      *
-     * @param Request $request
      * @param FrontendAuthLoginAction $action
+     * @param Request $request
      * @return JsonResponse [string]    access_token
      */
-    public function login(Request $request, FrontendAuthLoginAction $action): JsonResponse
+    public function login(FrontendAuthLoginAction $action, Request $request): JsonResponse
     {
         return $action->execute($this, $request);
     }

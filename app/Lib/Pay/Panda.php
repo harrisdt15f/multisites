@@ -15,9 +15,9 @@ class Panda extends BasePay
     public function __construct()
     {
 
-        $merchantId = config('pay.panda.merchant_id');//商户号
-        $key = config('pay.panda.key');//商户密匙
-        $gateway = config('pay.panda.gateway');//接口地址
+        $merchantId = config('pay.panda.merchant_id'); //商户号
+        $key = config('pay.panda.key'); //商户密匙
+        $gateway = config('pay.panda.gateway'); //接口地址
 
         $this->constant = [
             'callback' => parent::getNotifyUrl($this->sign),
@@ -45,11 +45,11 @@ class Panda extends BasePay
 
     /**
      * 获取支付渠道
+     * @param object $user
      * @param string $source
-     * @param $user
      * @return array
      */
-    public function getRechargeChannel($source = "phone", $user = [obj])
+    public function getRechargeChannel(object $user, $source = "phone")
     {
         $params = [
             'merchant_id' => $this->constant["merchantId"],
@@ -72,11 +72,11 @@ class Panda extends BasePay
 
     /**
      * 充值
-     * @param $amount
-     * @param $orderId
-     * @param $channel
+     * @param int $amount
+     * @param string $orderId
+     * @param string $channel
      * @param string $source
-     * @return array|string
+     * @return mixed
      */
     public function recharge($amount, $orderId, $channel, $source = "web")
     {
@@ -144,13 +144,12 @@ class Panda extends BasePay
         return [false, $result['msg']];
     }
 
-
     /**
      * 体现单查询
-     * @param $orderId
+     * @param  string $orderId
      * @return array
      */
-    public function queryWithdrawOrderStatus($orderId)
+    public function queryWithdrawOrderStatus(string $orderId)
     {
 
         $key = $this->constant['key'];
@@ -177,7 +176,7 @@ class Panda extends BasePay
         return [false, $result['msg']];
     }
 
-    public function encrypt(Array $data, $signKey)
+    public function encrypt(array $data, $signKey)
     {
         $str = "";
         ksort($data);

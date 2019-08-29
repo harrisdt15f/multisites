@@ -18,9 +18,9 @@ class IssueSeparateGenJob implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param $day
-     * @param $rules
-     * @param $lotteryEloq
+     * @param mixed $day
+     * @param mixed $rules
+     * @param object $lotteryEloq
      */
     public function __construct($day, $rules, $lotteryEloq)
     {

@@ -156,7 +156,7 @@ class BackEndApiMainController extends Controller
      * @param  string  $code
      * @param  mixed   $message
      * @param  string  $placeholder
-     * @param  string  $substituted
+     * @param  mixed   $substituted
      * @return JsonResponse
      */
     public function msgOut(
@@ -202,7 +202,7 @@ class BackEndApiMainController extends Controller
      * @param  object  $eloqM
      * @param  array   $searchAbleFields
      * @param  int     $fixedJoin
-     * @param  string  $withTable
+     * @param  mixed   $withTable
      * @param  array   $withSearchAbleFields
      * @param  string  $orderFields
      * @param  string  $orderFlow

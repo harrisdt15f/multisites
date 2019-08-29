@@ -26,7 +26,7 @@ class LotteriesIssueHistoryAction
             $searchAbleFields,
             0,
             null,
-            null,
+            [],
             $orderFields,
             $orderFlow
         );
