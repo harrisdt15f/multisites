@@ -3,12 +3,13 @@
 namespace App\Lib\Pay;
 
 use App\Lib\Clog;
+use App\Models\User\FrontendUser;
 use Illuminate\Support\Facades\Log;
 
 class Panda extends BasePay
 {
 
-    public $sign = "panda";
+    public $sign = 'panda';
 
     public $constant = [];
 
@@ -23,7 +24,7 @@ class Panda extends BasePay
             'callback' => parent::getNotifyUrl($this->sign),
             'url' => $gateway,
             'key' => $key,
-            'merchantId' => $merchantId
+            'merchantId' => $merchantId,
         ];
         $this->constant['recharge_channel_url'] = $this->constant['url'] . 'recharge_channel';
         $this->constant['recharge_url'] = $this->constant['url'] . 'recharge';
@@ -33,35 +34,35 @@ class Panda extends BasePay
 
     public function renderSuccess()
     {
-        echo "success";
+        echo 'success';
         die;
     }
 
     public function renderFail()
     {
-        echo "fail";
+        echo 'fail';
         die;
     }
 
     /**
      * 获取支付渠道
-     * @param object $user
+     * @param FrontendUser $user
      * @param string $source
      * @return array
      */
-    public function getRechargeChannel(object $user, $source = "phone")
+    public function getRechargeChannel(FrontendUser $user, $source = 'phone')
     {
         $params = [
-            'merchant_id' => $this->constant["merchantId"],
+            'merchant_id' => $this->constant['merchantId'],
             'client_ip' => real_ip(),
             'source' => $source,
             'username' => $user->username,
-            'user_level' => 1
+            'user_level' => 1,
         ];
 
         Log::channel('pay-recharge')->info('recharge-channel:【充值通道，参数传递】' . json_encode($params));
-        $params['sign'] = $this->encrypt($params, $this->constant["key"]);
-        $result = json_decode(curl_post($this->constant["recharge_channel_url"], $params), true);
+        $params['sign'] = $this->encrypt($params, $this->constant['key']);
+        $result = json_decode(curl_post($this->constant['recharge_channel_url'], $params), true);
 
         Log::channel('pay-recharge')->info('recharge-channel:【充值通道请求返回】', $result);
         if ($result['status']) {
@@ -78,7 +79,7 @@ class Panda extends BasePay
      * @param string $source
      * @return mixed
      */
-    public function recharge($amount, $orderId, $channel, $source = "web")
+    public function recharge($amount, $orderId, $channel, $source = 'web')
     {
         $callbackUrl = parent::getCallbackUrl($this->sign);
         $url = $this->constant['recharge_url'];
@@ -178,15 +179,15 @@ class Panda extends BasePay
 
     public function encrypt(array $data, $signKey)
     {
-        $str = "";
+        $str = '';
         ksort($data);
         foreach ($data as $key => $value) {
             if ('sign' == $key || self::isEmpty($value)) {
                 continue;
             }
-            $str .= $key . "=" . $value . "&";
+            $str .= $key . '=' . $value . '&';
         }
-        $str .= "key={$signKey}";
+        $str .= 'key=' . $signKey;
 
         return md5($str);
     }
