@@ -22,6 +22,8 @@
 <rule ref="Generic.PHP.Syntax"/>
 <rule ref="Generic.VersionControl.GitMergeConflict"/>
 <rule ref="Squiz.Strings.DoubleQuoteUsage"/>
+<rule ref="ImportDetection.Imports.RequireImports.Symbol"/>
+<rule ref="ImportDetection.Imports.RequireImports.Import"/>
 <!-- -->
 <rule ref="Generic.Commenting.Todo"/>
 <rule ref="Generic.Commenting.Fixme"/>
