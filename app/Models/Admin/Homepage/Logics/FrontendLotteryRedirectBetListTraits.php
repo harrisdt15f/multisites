@@ -52,15 +52,15 @@ trait FrontendLotteryRedirectBetListTraits
 
     /**
      * @param  string $cacheKey
-     * @param  string $showNum
+     * @param  int $showNum
      * @return array
      */
-    public static function updateCache(string $cacheKey, string $showNum): array
+    public static function updateCache(string $cacheKey, $showNum): array
     {
         $dataEloq = self::select('id', 'lotteries_id', 'lotteries_sign')
             ->with(['lotteries:id,day_issue,en_name,cn_name,icon_path', 'issueRule:lottery_id,issue_seconds'])
             ->orderBy('sort', 'asc')
-            ->limit((int) $showNum)
+            ->limit($showNum)
             ->get();
         $datas = [];
         foreach ($dataEloq as $key => $dataIthem) {

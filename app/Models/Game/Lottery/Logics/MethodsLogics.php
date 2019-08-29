@@ -2,6 +2,7 @@
 
 namespace App\Models\Game\Lottery\Logics;
 
+use App\Models\Game\Lottery\LotteryList;
 use App\Models\Game\Lottery\LotteryMethodsStandard;
 
 /**
@@ -59,10 +60,10 @@ trait MethodsLogics
 
     /**
      * 克隆彩种的玩法
-     * @param  $lotteryEloq
+     * @param  LotteryList $lotteryEloq
      * @return array
      */
-    public function cloneLotteryMethods($lotteryEloq): array
+    public function cloneLotteryMethods(LotteryList $lotteryEloq): array
     {
         $examplesEloq = LotteryMethodsStandard::where('series_id', $lotteryEloq->series_id)->get();
         foreach ($examplesEloq as $exampleEloq) {
