@@ -2,11 +2,12 @@
 
 namespace App\Models\User\Logics;
 
+use App\Models\User\Fund\FrontendUsersAccount;
 use App\Models\User\UsersRechargeHistorie;
 use App\Models\User\UsersWithdrawHistorie;
 use Illuminate\Support\Facades\Log;
 use App\Lib\Pay\BasePay;
-
+use Illuminate\Support\Facades\DB;
 trait PayTraits
 {
 
@@ -66,9 +67,26 @@ trait PayTraits
             $data['status'] = UsersWithdrawHistorie::WAIT ;
             $data['source'] =  $datas['from'] ?? 'web';
 
+            DB::beginTransaction();
             $resule = UsersWithdrawHistorie::create($data);
+            try {
+                $params = [
+                    'user_id' => $user->id,
+                    'amount' =>  $datas['amount'],
+                ];
+                $account  = FrontendUsersAccount::where('user_id', $user->id)->first();
+
+                $res = $account->operateAccount($params, 'withdraw_frozen');
+                if ($res !== true) {
+                    DB::rollBack();
+                }
+                DB::commit();
+            } catch (Exception $e) {
+                DB::rollBack();
+                Log::channel('pay-withdraw')->info('异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine());
+            }
         } catch (\Exception $e) {
-            Log::channel('pay-recharge')->error('error-'.$e->getMessage().'|'.$e->getLine().'|'.$e->getFile());
+            Log::channel('pay-withdraw')->error('error-'.$e->getMessage().'|'.$e->getLine().'|'.$e->getFile());
             return false;
         }
         return $resule;
