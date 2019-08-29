@@ -90,4 +90,7 @@ return [
     '102300' => '字段ID错误,字段不存在',
     //LotteryNoticeController
     '102400' => '该信息不存在',
+    //DomainController
+    '102500' => '该域名已经存在',
+    '102501' => '需要携带要修改的参数'
 ];
