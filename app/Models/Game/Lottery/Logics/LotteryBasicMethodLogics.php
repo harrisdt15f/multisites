@@ -43,7 +43,9 @@ trait LotteryBasicMethodLogics
                 break;
             case 'pk10':
                 $sWnNumber = explode($this->splitCharSumDigital, $sFullWinningNumber);
-                $sWnNumber = array_slice($sWnNumber,$iOffset, $this->digital_count);
+                if (is_array($sWnNumber)) {
+                    $sWnNumber = array_slice($sWnNumber, $iOffset, $this->digital_count);
+                }
                 break;
             case 'lotto':
                 $aBalls = explode($this->splitCharInArea, $sFullWinningNumber);
@@ -56,7 +58,7 @@ trait LotteryBasicMethodLogics
                 $sWnNumber = implode($this->splitCharInArea, $aNeedBalls);
                 break;
         }
-        $sFunction = 'getWinningNumber'.ucfirst($this->series_code);
+        $sFunction = 'getWinningNumber' . ucfirst($this->series_code);
         return $sFunction === '' ? false : $this->$sFunction($sWnNumber);
     }
 
@@ -65,14 +67,14 @@ trait LotteryBasicMethodLogics
     /**
      * @param  LotterySeriesWay  $oSeriesWay
      * @param  LotteryBasicWay  $oBasicWay
-     * @param $sWnNumber
-     * @param $sBetNumber
+     * @param  string $sWnNumber
+     * @param  LotterySeriesWay $sBetNumber
      * @return float|int
      */
     public function getPrizeCount(LotterySeriesWay $oSeriesWay, LotteryBasicWay $oBasicWay, $sWnNumber, $sBetNumber)
     {
-        $pFunction = 'getPrize'.ucfirst($this->series_code);
-        $sFunction = 'prize'.$oBasicWay->function.ucfirst(Str::camel($this->wn_function));
+        $pFunction = 'getPrize' . ucfirst($this->series_code);
+        $sFunction = 'prize' . $oBasicWay->function . ucfirst(Str::camel($this->wn_function));
         return $this->$pFunction($sFunction, $sBetNumber, $sWnNumber, $oSeriesWay);
     }
 
@@ -85,7 +87,7 @@ trait LotteryBasicMethodLogics
         $oLevels = LotteryPrizeLevel::where('basic_method_id', $this->id)->orderBy('level', 'asc')->get([
             'id',
             'level',
-            'rule'
+            'rule',
         ]);
         $aLevels = [];
         foreach ($oLevels as $oLevel) {
