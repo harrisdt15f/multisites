@@ -24,9 +24,8 @@ class RechargeList extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'date_to'=>'filled|date',
-            'date_from'=>'filled|date',
             'type'  =>'filled|string',
+            'time_condtions'=>'filled|string',
         ];
     }
 }

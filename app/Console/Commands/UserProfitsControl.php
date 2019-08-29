@@ -187,6 +187,8 @@ class UserProfitsControl extends Command
             } else {
                 return (bool)$row->update($data);
             }
+        } else {
+            return  false;
         }
     }
 }
