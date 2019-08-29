@@ -14,8 +14,8 @@ use App\Models\Game\Lottery\LotterySeriesWay;
 trait LotteryPrizeGroupLogic
 {
     /**
-     * @param $iClassicPrize
-     * @param $series_id
+     * @param string $iClassicPrize
+     * @param string $series_id
      * @return bool
      */
     public static function getPrizeGroupByClassicPrizeAndSeries($iClassicPrize, $series_id)
@@ -23,28 +23,33 @@ trait LotteryPrizeGroupLogic
         if (!$iClassicPrize || !$series_id) {
             return false;
         } else {
-            return self::where('classic_prize', '=', $iClassicPrize)
+            $prizeGroup = self::where('classic_prize', '=', $iClassicPrize)
                 ->where('series_code', '=', $series_id)
                 ->withCacheCooldownSeconds(86400)
-                ->first()->id;
+                ->first();
+            if ($prizeGroup === null) {
+                return false;
+            } else {
+                return $prizeGroup->id;
+            }
         }
     }
 
     /**
-     * @param $methodId
-     * @param $iClassicPrize
-     * @param $seriesCode
-     * @param $aPrizeSettings
-     * @param $aPrizeSettingOfWay
-     * @param $aMaxPrize
+     * @param string $methodId
+     * @param int $iClassicPrize
+     * @param string $seriesCode
+     * @param mixed $aPrizeSettings
+     * @param mixed $aPrizeSettingOfWay
+     * @param mixed $aMaxPrize
      */
     public static function makePrizeSettingArray(
         $methodId,
         $iClassicPrize,
         $seriesCode,
-        & $aPrizeSettings,
-        & $aPrizeSettingOfWay,
-        & $aMaxPrize
+        &$aPrizeSettings,
+        &$aPrizeSettingOfWay,
+        &$aMaxPrize
     ) {
         $oSeriesWay = LotterySeriesWay::getSeriesWayByMethodId($methodId, $seriesCode);
         $iPrizeGroupId = self::getPrizeGroupByClassicPrizeAndSeries($iClassicPrize, $seriesCode);

@@ -77,8 +77,8 @@ trait LotteryIssueGenerate
 
     /**
      * 生成 某天的奖期
-     * @param $day
-     * @param $rules
+     * @param string $day
+     * @param object $rules
      * @return bool|string
      */
     public function genOneDayIssue($day, $rules)
@@ -87,7 +87,11 @@ trait LotteryIssueGenerate
             return '对不起, 彩种' . $this->cn_name . '未配置奖期规则!!';
         }
         // 整数形式的日期
-        $intDay = date('Ymd', strtotime($day));
+        $time = strtotime($day);
+        if ($time === false) {
+            return '日期格式不正确';
+        }
+        $intDay = date('Ymd', $time);
         // 检查是否存在奖期
         $issueCount = LotteryIssue::where('lottery_id', $this->en_name)->where('day', $intDay)->count();
         if ($issueCount > 0 && $issueCount < $this->day_issue) {
@@ -200,9 +204,10 @@ trait LotteryIssueGenerate
 
     /**
      * 获取下一期的
-     * @param $issueNo
-     * @param $lottery
-     * @param $day
+     * @param string|int $issueNo
+     * @param object $lottery
+     * @param object $rule
+     * @param string $day
      * @return mixed
      */
     public function getNextIssueNo($issueNo, $lottery, $rule, $day)
@@ -214,10 +219,10 @@ trait LotteryIssueGenerate
         if (count($formats) == 1 and strpos($formats[0], 'C') !== false) {
             $currentIssueNo = (int) $issueNo;
             $nextIssue = $currentIssueNo + 1;
-            if (strlen($currentIssueNo) == strlen($issueNo)) {
+            if (strlen((string) $currentIssueNo) == strlen((string) $issueNo)) {
                 return $nextIssue;
             } else {
-                return str_pad($nextIssue, strlen($issueNo), '0', STR_PAD_LEFT);
+                return str_pad((string) $nextIssue, strlen($issueNo), '0', STR_PAD_LEFT);
             }
         }
         // 日期型
@@ -229,7 +234,7 @@ trait LotteryIssueGenerate
                 if ($issueNo) {
                     return $suffix . $this->getNextNumber($issueNo, $numberLength);
                 } else {
-                    return $suffix . str_pad(1, $numberLength, '0', STR_PAD_LEFT);
+                    return $suffix . str_pad('1', (int) $numberLength, '0', STR_PAD_LEFT);
                 }
             }
             // 特殊号
@@ -238,7 +243,7 @@ trait LotteryIssueGenerate
                 if ($issueNo) {
                     return $suffix . $this->getNextNumber($issueNo, $numberLength);
                 } else {
-                    return $suffix . str_pad(1, $numberLength, '0', STR_PAD_LEFT);
+                    return $suffix . str_pad('1', (int) $numberLength, '0', STR_PAD_LEFT);
                 }
             }
         }
@@ -246,14 +251,14 @@ trait LotteryIssueGenerate
 
     /**
      * 获取下一个
-     * @param $issueNo
-     * @param $count
+     * @param string|int $issueNo
+     * @param string $count
      * @return string
      */
     public function getNextNumber($issueNo, $count): string
     {
-        $currentNo = substr($issueNo, -$count);
+        $currentNo = substr($issueNo, -(int) $count);
         $nextNo = (int) $currentNo + 1;
-        return str_pad($nextNo, $count, '0', STR_PAD_LEFT);
+        return str_pad((string) $nextNo, $count, '0', STR_PAD_LEFT);
     }
 }
