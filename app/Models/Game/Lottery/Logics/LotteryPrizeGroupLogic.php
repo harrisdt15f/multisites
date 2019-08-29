@@ -42,6 +42,7 @@ trait LotteryPrizeGroupLogic
      * @param mixed $aPrizeSettings
      * @param mixed $aPrizeSettingOfWay
      * @param mixed $aMaxPrize
+     * @return  void
      */
     public static function makePrizeSettingArray(
         $methodId,
@@ -53,23 +54,22 @@ trait LotteryPrizeGroupLogic
     ) {
         $oSeriesWay = LotterySeriesWay::getSeriesWayByMethodId($methodId, $seriesCode);
         $iPrizeGroupId = self::getPrizeGroupByClassicPrizeAndSeries($iClassicPrize, $seriesCode);
-        if ($iPrizeGroupId === null) {
-            return false;
-        }
-        $iSeriesWayId = $oSeriesWay->id;
-        if (isset($aPrizeSettings[$iSeriesWayId])) {
-            $aPrizeSettingOfWay = $aPrizeSettings[$iSeriesWayId];
-        } else {
-            $aMethodIds = explode(',', $oSeriesWay->basic_methods);
-            $aPrizeSettingOfMethods = [];
-            $fMaxPrize = 0;
-            foreach ($aMethodIds as $iMethodId) {
-                $aPrizeSettingOfMethods[$iMethodId] = LotteryPrizeDetail::getPrizeSetting($iPrizeGroupId, $iMethodId);
-                $fMaxPrize >= $aPrizeSettingOfMethods[$iMethodId][1] or
-                $fMaxPrize = $aPrizeSettingOfMethods[$iMethodId][1];
+        if ($iPrizeGroupId !== null) {
+            $iSeriesWayId = $oSeriesWay->id;
+            if (isset($aPrizeSettings[$iSeriesWayId])) {
+                $aPrizeSettingOfWay = $aPrizeSettings[$iSeriesWayId];
+            } else {
+                $aMethodIds = explode(',', $oSeriesWay->basic_methods);
+                $aPrizeSettingOfMethods = [];
+                $fMaxPrize = 0;
+                foreach ($aMethodIds as $iMethodId) {
+                    $aPrizeSettingOfMethods[$iMethodId] = LotteryPrizeDetail::getPrizeSetting($iPrizeGroupId, $iMethodId);
+                    $fMaxPrize >= $aPrizeSettingOfMethods[$iMethodId][1] or
+                    $fMaxPrize = $aPrizeSettingOfMethods[$iMethodId][1];
+                }
+                $aPrizeSettingOfWay = $aPrizeSettings[$iSeriesWayId] = $aPrizeSettingOfMethods;
+                $aMaxPrize[$iSeriesWayId] = $fMaxPrize;
             }
-            $aPrizeSettingOfWay = $aPrizeSettings[$iSeriesWayId] = $aPrizeSettingOfMethods;
-            $aMaxPrize[$iSeriesWayId] = $fMaxPrize;
         }
     }
 }

@@ -29,7 +29,7 @@ class MenuSettingController extends AdminMainController
                 'firstlevelmenus' => $firstlevelmenus,
                 'rname' => $rname,
                 'editMenu' => $editMenu,
-                'routeMatchingName' => $routeMatchingName
+                'routeMatchingName' => $routeMatchingName,
             ]
         );
     }
@@ -66,6 +66,8 @@ class MenuSettingController extends AdminMainController
             } catch (Exception $e) {
                 return response()->json(['success' => false, 'menudeleted' => 0]);
             }
+        } else {
+            return response()->json(['success' => false, 'menudeleted' => 0]);
         }
     }
 
@@ -98,6 +100,8 @@ class MenuSettingController extends AdminMainController
             $menuELoq = new $this->eloqM;
             $itemProcess = $menuELoq->changeParent($parseDatas);
             return response()->json(['success' => true, $itemProcess]);
+        } else {
+            return response()->json(['success' => false, 'menudeleted' => 0]);
         }
     }
 }
