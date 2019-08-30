@@ -8,7 +8,6 @@ Route::group(['prefix' => 'withdraw-check', 'namespace' => 'Users\Fund'], functi
         'uses' => $controller . 'auditSuccess']);
     Route::match(['post', 'options'], 'audit-failure', ['as' => $namePrefix . 'audit-failure',
         'uses' => $controller . 'auditFailure']);
-
     Route::match(['post', 'options'], 'withdraw-list', ['as' => $namePrefix . 'withdraw-list',
         'uses' => $controller . 'withdrawList']);
 });

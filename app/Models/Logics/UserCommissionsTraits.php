@@ -50,18 +50,18 @@ trait UserCommissionsTrait
         //所有上级array
         $aFores = $betUser->rid ? array_reverse(explode('|', $betUser->rid)) : [];
 
-        $diffForePrize = 0;
+//        $diffForePrize = 0;
 
         foreach ($aFores as $i => $iForeId) {
             $oFores[$iForeId] =  FrontendUser::find($iForeId);
-            if ($i == 0) {
+            if ($i === 0) {
                 $iLastId = $projectInfo->user_id;
             }
 
             //上级比自己高出的奖金组
-            if ($i == (count($aFores) -1)) {
-                $diffForePrize = $oFores[$iForeId]->prize_group - $betUser->prize_group;
-            }
+//            if ($i === (count($aFores) -1)) {
+//                $diffForePrize = $oFores[$iForeId]->prize_group - $betUser->prize_group;
+//            }
         }
 
 
@@ -69,7 +69,7 @@ trait UserCommissionsTrait
 
         foreach ($oFores as $iForeId => $oFore) {
             if ($oFore->prize_group > $betUser->prize_group) {
-                if ($iLastId == $projectInfo->user_id) {
+                if ($iLastId === $projectInfo->user_id) {
                     $iLastPrizeGroup = $betUser->prize_group;
                 } else {
                     $iLastPrizeGroup =  $oFores[$iLastId]->prize_group;
@@ -85,7 +85,7 @@ trait UserCommissionsTrait
                         'amount' => $projectInfo->total_cost * ($oFore->prize_group - $iLastPrizeGroup)/$iClassicAmount,
                     ];
 
-                if ($oFore->prize_group == $iLastPrizeGroup) {
+                if ($oFore->prize_group === $iLastPrizeGroup) {
                     break;
                 }
 
@@ -278,7 +278,7 @@ trait UserCommissionsTrait
 
         $account  = FrontendUsersAccount::where('user_id', $commissionInfo->user_id)->first();
 
-        $accountType = $commissionInfo->user_id == $projectInfo->user_id ? 'bet_commission' : 'commission' ;
+        $accountType = $commissionInfo->user_id === $projectInfo->user_id ? 'bet_commission' : 'commission' ;
 
         if ($account->operateAccount($params, $accountType)) {
             return self::setToSent($commissionId);
