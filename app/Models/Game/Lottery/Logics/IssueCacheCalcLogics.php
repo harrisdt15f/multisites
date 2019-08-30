@@ -38,7 +38,7 @@ trait IssueCacheCalcLogics
         self::changeIssue($issue);
 
         //记录当前 使用有序集合存储开奖信息，开奖期号作为sort，彩票lottery_id作为集合名称 例如 hljssc 值为开奖号码
-        $redisStatus = Redis::zadd($key, $issue, $data);
+        Redis::zadd($key, $issue, $data);
 
         //判断缓存容积，若单个彩种信息条数 = 1,代表第一次记录 进行缓存初始化，增加容错率 设定为>5 redis
         $count = Redis::zcard($key);
@@ -46,7 +46,7 @@ trait IssueCacheCalcLogics
         //初始化数据
         if ($count < self::$update_limit) {
             self::flushIssueCache($key);
-        };
+        }
 
         //切除多余数据
         if ($count > self::$code_range) {
@@ -65,9 +65,10 @@ trait IssueCacheCalcLogics
     {
         $issue = str_replace('-', '', $issue);
     }
+
     /**
      * 刷新指定彩种的缓存 补定到指定条数
-     * @param  $lotteryIssue
+     * @param  $lottery_id
      * @return mixed
      */
     public static function flushIssueCache($lottery_id): bool
@@ -79,7 +80,7 @@ trait IssueCacheCalcLogics
 
         if (!count($issues)) {
             return false;
-        };
+        }
 
         //写入缓存
         foreach ($issues as $lk => $v) {
@@ -90,6 +91,7 @@ trait IssueCacheCalcLogics
             self::changeIssue($issue);
 
             Redis::zadd($key, $issue, $data); //数据补齐
+            unset($lk);
         }
         $count = Redis::zcard($lottery_id);
         if ($count > 100) {
@@ -106,8 +108,7 @@ trait IssueCacheCalcLogics
     public static function cutCacheData($lottery_id, $count): bool
     {
         $sliceFlag = $count - self::$code_range - 1;
-        $cutData = Redis::zremrangebyrank($lottery_id, 0, $sliceFlag);
-        return $cutData;
+        return Redis::zremrangebyrank($lottery_id, 0, $sliceFlag);
     }
 
     /**
@@ -132,7 +133,7 @@ trait IssueCacheCalcLogics
         $lotteryList = LotteryList::where('en_name', $lottery_id)->first();
         $lotterySeries = LotterySerie::where('series_name', $lotteryList->series_id)->first();
 
-        if ($lotterySeries->encode_splitter != null) {
+        if ($lotterySeries->encode_splitter !== null) {
             $arrCode = explode($lotterySeries->encode_splitter, $returnData['code']);
         } else {
             $arrCode = str_split($returnData['code']);
@@ -149,18 +150,21 @@ trait IssueCacheCalcLogics
         $codeRange = array_flip($codeRange);
         ksort($codeRange);
         $secondData = array();
+      //  foreach ($codeRange as $cr => $cv) {
         foreach ($codeRange as $cr => $cv) {
             $secondData[$cr] = [1, 0, 1];
+            unset($cv);
         }
         $resData = array();
         foreach ($arrCode as $k => $v) {
             $v = (int)$v;
             $resData[$k] = $secondData;
             foreach ($resData[$k] as $rd => $rv) {
-                $resData[$k][$rd][0] = $v == $rd ? 0 : 1;
+                $resData[$k][$rd][0] = $v === $rd ? 0 : 1;
                 $resData[$k][$rd][1] = $v;
                 $resData[$k][$rd][2] = $resData[$k][$rd][0];
-                $resData[$k][$rd][3] = $resData[$k][$rd][0] == 0 ? 1 : 0;//记录连号
+                $resData[$k][$rd][3] = $resData[$k][$rd][0] === 0 ? 1 : 0;//记录连号
+                unset($rv);
             }
         }
         $returnData['data'] = $resData;
@@ -182,7 +186,7 @@ trait IssueCacheCalcLogics
         //初始化数据
         if ($count < self::$update_limit) {
             self::flushIssueCache($lottery_id);
-        };
+        }
 
         //切除多余数据
         if ($count > self::$code_range) {
@@ -205,7 +209,7 @@ trait IssueCacheCalcLogics
         $lotteryList = LotteryList::where('en_name', $lottery_id)->first();
         $lotterySeries = LotterySerie::where('series_name', $lotteryList->series_id)->first();
 
-        if ($lotterySeries->encode_splitter != null) {
+        if ($lotterySeries->encode_splitter !== null) {
             $arrCode = explode($lotterySeries->encode_splitter, json_decode($redisData[0])->code);
         } else {
             $arrCode = str_split(json_decode($redisData[0])->code);
@@ -245,7 +249,7 @@ trait IssueCacheCalcLogics
                     $redisData[$k]->data[$vdataKey] = $obj;
                 }
                 //上一层对应的位置 上一组开奖对应
-                $preSite = $k == 0 ? 0 : $redisData[$k - 1]->data[$vdataKey];
+                $preSite = $k === 0 ? 0 : $redisData[$k - 1]->data[$vdataKey];
 
                 //偏移位 就是当前的中奖号码
                 $moveKey = $vdataValue->{1}[1];
@@ -263,17 +267,17 @@ trait IssueCacheCalcLogics
                     $preMax = $totalArr[2][$site];
                     $preLxMax = $totalArr[3][$site];
                     //是开号 无需累加
-                    if ($vdatavaItemValue[0] == 0) {
+                    if ($vdatavaItemValue[0] === 0) {
                         /*最大连出值*/
                         //最大连出值
                         $openFlag = $vdataValue->$vdataItemKey[2]; //当前是否开号
 
-                        if ($openFlag == 0) {
+                        if ($openFlag === 0) {
                             //记录的最大值
-                            $lkMax = $totalArr[3][$site];
+                            $totalArr[3][$site];
                             //如果开号
                             //$currentLcz =  $vdataValue->$vdataItemKey[3]; //当前的连开值加上上一个的值
-                            if ($k != 0) {
+                            if ($k !== 0) {
                                 $vdataValue->$vdataItemKey[3] = $vdataValue->$vdataItemKey[3] + $preSite->$vdataItemKey[3];
                                 if ($vdataValue->$vdataItemKey[3] > $preLxMax) {
                                     $totalArr[3][$site] = $vdataValue->$vdataItemKey[3];
@@ -288,7 +292,7 @@ trait IssueCacheCalcLogics
                     }
 
                     //不是开号当前遗漏期数等于他加他之前
-                    if ($k == 0) {
+                    if ($k === 0) {
                         $beData = 0;
                     } else {
                         // dd($preSite);
@@ -317,6 +321,7 @@ trait IssueCacheCalcLogics
                     $totalArr[1][$tk] = round($totalArr[1][$tk], 2);
                 }
             }
+            unset($v);
         }
 
         $redisDataCount = count($redisData);
