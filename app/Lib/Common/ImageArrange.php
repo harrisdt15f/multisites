@@ -65,6 +65,9 @@ class ImageArrange
         //拼接打开图片的函数
         $open_fn = 'imagecreatefrom' . $picType;
         //打开源图
+        if (!is_callable($open_fn)) {
+            return '';
+        }
         $src = $open_fn($srcPath);
         //源图的宽
         $src_w = imagesx($src);
@@ -96,9 +99,12 @@ class ImageArrange
         $dst_x = 0;
         $dst_y = 0;
         //创建目标图
-        $dst = imagecreatetruecolor($dst_w, $dst_h);
+        $dst = imagecreatetruecolor((int) $dst_w, (int) $dst_h);
+        if ($dst === false) {
+            return '';
+        }
         //生成缩略图
-        $fool = imagecopyresampled($dst, $src, $dst_x, $dst_y, 0, 0, $dst_w, $dst_h, $src_w, $src_h);
+        imagecopyresampled($dst, $src, $dst_x, $dst_y, 0, 0, (int) $dst_w, (int) $dst_h, $src_w, $src_h);
         //文件名
         $filename = basename($srcPath);
         //文件夹名

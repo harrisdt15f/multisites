@@ -78,12 +78,16 @@ trait PayTraits
                     'amount' => $datas['amount'],
                 ];
                 $account = FrontendUsersAccount::where('user_id', $user->id)->first();
-
-                $res = $account->operateAccount($params, 'withdraw_frozen');
-                if ($res !== true) {
+                if ($account !== null) {
+                    $res = $account->operateAccount($params, 'withdraw_frozen');
+                    if ($res !== true) {
+                        DB::rollBack();
+                    }
+                    DB::commit();
+                } else {
                     DB::rollBack();
+                    Log::channel('pay-withdraw')->info('用户account表不存在');
                 }
-                DB::commit();
             } catch (Exception $e) {
                 DB::rollBack();
                 Log::channel('pay-withdraw')->info('异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine());

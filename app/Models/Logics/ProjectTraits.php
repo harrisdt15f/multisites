@@ -290,7 +290,7 @@ trait ProjectTraits
                 if ($iBasicMethodId === 123) {
                     $win = explode(' ', $sWnNumber);
                     $tema = end($win);
-                    if ($tema === 49) {
+                    if ((int) $tema === 49) {
                         $prizeToClaim = 1;
                     } else {
                         $prizeToClaim = $aPrizeSet[$iBasicMethodId][$iLevel];
