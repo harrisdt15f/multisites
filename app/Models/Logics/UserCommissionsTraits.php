@@ -162,7 +162,7 @@ trait UserCommissionsTrait
 
             DB::beginTransaction();
 
-            if (self::send(($oCommission->id))) {
+            if (self::send($oCommission->id)) {
                 DB::commit();
             } else {
                 $bSuccess = false;

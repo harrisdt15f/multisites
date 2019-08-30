@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Log;
 
 class Panda extends BasePay
 {
-
     public $sign = "panda";
 
     public $constant = [];
@@ -20,7 +19,7 @@ class Panda extends BasePay
         $gateway = config('pay.panda.gateway');//接口地址
 
         $this->constant = [
-            'callback' => parent::getNotifyUrl($this->sign),
+            'callback' => self::getNotifyUrl($this->sign),
             'url' => $gateway,
             'key' => $key,
             'merchantId' => $merchantId
@@ -80,7 +79,7 @@ class Panda extends BasePay
      */
     public function recharge($amount, $orderId, $channel, $source = "web")
     {
-        $callbackUrl = parent::getCallbackUrl($this->sign);
+        $callbackUrl = self::getCallbackUrl($this->sign);
         $url = $this->constant['recharge_url'];
         $merchantId = $this->constant['merchantId'];
 
