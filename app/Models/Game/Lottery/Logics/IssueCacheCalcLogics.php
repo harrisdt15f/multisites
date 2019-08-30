@@ -83,7 +83,7 @@ trait IssueCacheCalcLogics
         }
 
         //写入缓存
-        foreach ($issues as $lk => $v) {
+        foreach ($issues as $v) {
             $data = self::changeValue($v);
             $key = $v->lottery_id;//key
             $issue = $v->issue;//将期 sort
@@ -91,7 +91,6 @@ trait IssueCacheCalcLogics
             self::changeIssue($issue);
 
             Redis::zadd($key, $issue, $data); //数据补齐
-            unset($lk);
         }
         $count = Redis::zcard($lottery_id);
         if ($count > 100) {
@@ -150,7 +149,6 @@ trait IssueCacheCalcLogics
         $codeRange = array_flip($codeRange);
         ksort($codeRange);
         $secondData = array();
-      //  foreach ($codeRange as $cr => $cv) {
         foreach ($codeRange as $cr => $cv) {
             $secondData[$cr] = [1, 0, 1];
             unset($cv);
