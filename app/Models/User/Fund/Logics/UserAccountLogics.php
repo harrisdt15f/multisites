@@ -9,9 +9,9 @@ use App\Lib\Logic\AccountChange;
 use App\Models\Account\FrontendUsersAccountsType;
 use App\Models\User\FrontendUsersAccount;
 use Exception;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 
 /**
@@ -75,8 +75,8 @@ trait UserAccountLogics
         $typeConfig = FrontendUsersAccountsType::getTypeBySign($typeSign);
         //　1. 获取帐变配置
         if (empty($typeConfig)) {
-            Clog::account("error-{$user->id}-{$typeSign}不存在!");
-            return "对不起, {$typeSign}不存在!";
+            Clog::account('error-' . $user->id . '-' . $typeSign . '不存在!');
+            return '对不起, ' . $typeSign . '不存在!';
         }
         // 2. 参数检测
         foreach ($typeConfig as $key => $value) {
@@ -85,7 +85,7 @@ trait UserAccountLogics
             }
             if ($value == 1) {
                 if (!isset($params[$key])) {
-                    return "对不起, 参数{$key}没有传递!";
+                    return '对不起, 参数' . $key . '没有传递!';
                 }
             }
         }
@@ -116,7 +116,7 @@ trait UserAccountLogics
         }
         // 保存记录
         $report = [
-            'serial_number'=> self::getSerialNumber(),
+            'serial_number' => self::getSerialNumber(),
             'user_id' => $user->id,
             'top_id' => $user->top_id,
             'parent_id' => $user->parent_id,
@@ -131,7 +131,7 @@ trait UserAccountLogics
             'project_id' => $params['project_id'] ?? 0,
             'froze_type' => $typeConfig['froze_type'],
             'desc' => $params['desc'] ?? 0,
-            'day' => date("Ymd"),
+            'day' => date('Ymd'),
             'amount' => $amount,
             'created_at' => date('Y-m-d H:i:s'),
         ];
@@ -151,7 +151,7 @@ trait UserAccountLogics
             case self::FROZEN_STATUS_TO_PLAYER:
             case self::FROZEN_STATUS_TO_SYSTEM:
                 if ($params['amount'] > $this->frozen) {
-                    Clog::account("error-{$user->id}-{$amount}-{$this->frozen}-冻结金额不足!");
+                    Clog::account('error-' . $user->id . '-' . $amount . '-' . $this->frozen . '-冻结金额不足!');
                     return '对不起, 用户冻结金额不足!';
                 }
                 $ret = $this->unFrozenToPlayer($amount);
@@ -188,9 +188,9 @@ trait UserAccountLogics
         if ($this->changes) {
             $ret = DB::table('account_change_report')->insert($this->changes);
             info($this->changes);
-            if (!$ret) {
-                return false;
-            }
+            // if (!$ret) {
+            //     return false;
+            // }
             $this->changes = [];
         }
     }
@@ -212,8 +212,8 @@ trait UserAccountLogics
     public function add($money): bool
     {
         $updated_at = date('Y-m-d H:i:s');
-        $sql = "update `frontend_users_accounts` set `balance`=`balance`+'{$money}' , 
-`updated_at`='$updated_at'  where `user_id` ='{$this->user_id}'";
+        $sql = 'update `frontend_users_accounts` set `balance`=`balance`+"' . $money . '" ,
+`updated_at`="' . $updated_at . '"  where `user_id` ="' . $this->user_id . '"';
         $ret = DB::update($sql) > 0;
         if ($ret) {
             $this->balance += $money;
@@ -225,8 +225,8 @@ trait UserAccountLogics
     public function cost($money): bool
     {
         $updated_at = date('Y-m-d H:i:s');
-        $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}' , 
-`updated_at`='$updated_at'  where `user_id` ='{$this->user_id}' and `balance`>='{$money}'") > 0;
+        $ret = DB::update('update `frontend_users_accounts` set `balance`=`balance`-"' . $money . '" ,
+`updated_at`="' . $updated_at . '"  where `user_id` ="' . $this->user_id . '" and `balance`>="' . $money . '"') > 0;
         if ($ret) {
             $this->balance -= $money;
         }
@@ -237,9 +237,9 @@ trait UserAccountLogics
     public function frozen($money)
     {
         $updated_at = date('Y-m-d H:i:s');
-        $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`-'{$money}', 
-`frozen`=`frozen`+ '{$money}'  , 
-`updated_at`='$updated_at' where `user_id` ='{$this->user_id}' and `balance`>='{$money}'") > 0;
+        $ret = DB::update('update `frontend_users_accounts` set `balance`=`balance`-"' . $money . '",
+`frozen`=`frozen`+ "' . $money . '"  ,
+`updated_at`="' . $updated_at . '" where `user_id` ="' . $this->user_id . '" and `balance`>="' . $money . '"') > 0;
         if ($ret) {
             $this->balance -= $money;
             $this->frozen += $money;
@@ -251,8 +251,8 @@ trait UserAccountLogics
     public function unFrozen($money)
     {
         $updated_at = date('Y-m-d H:i:s');
-        $ret = DB::update("update `frontend_users_accounts` set `balance`=`balance`+'{$money}', 
-`frozen`=`frozen`- '{$money}' , `updated_at`='$updated_at'  where `user_id` ='{$this->user_id}'") > 0;
+        $ret = DB::update('update `frontend_users_accounts` set `balance`=`balance`+"' . $money . '",
+`frozen`=`frozen`- "' . $money . '" , `updated_at`="' . $updated_at . '"  where `user_id` ="' . $this->user_id . '"') > 0;
         if ($ret) {
             $this->balance += $money;
             $this->frozen -= $money;
@@ -264,8 +264,8 @@ trait UserAccountLogics
     public function unFrozenToPlayer($money)
     {
         $updated_at = date('Y-m-d H:i:s');
-        $ret = DB::update("update `frontend_users_accounts` set  `frozen`=`frozen`- '{$money}' , 
-`updated_at`='$updated_at'  where `user_id` ='{$this->user_id}'") > 0;
+        $ret = DB::update('update `frontend_users_accounts` set  `frozen`=`frozen`- "' . $money . '" ,
+`updated_at`="' . $updated_at . '"  where `user_id` ="' . $this->user_id . '"') > 0;
         if ($ret) {
             $this->frozen -= $money;
         }

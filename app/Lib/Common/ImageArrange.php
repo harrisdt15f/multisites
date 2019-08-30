@@ -5,7 +5,12 @@ namespace App\Lib\Common;
 class ImageArrange
 {
 
-    //图片上传
+    /**
+     * 图片上传
+     * @param  object $file
+     * @param  string $path
+     * @return array
+     */
     public function uploadImg($file, $path)
     {
         // 检验一下上传的文件是否有效.
@@ -18,6 +23,8 @@ class ImageArrange
                     if (!is_writable($path)) {
                         mkdir($path, 0777, true);
                         chmod($path, 0777);
+                    } else {
+                        return ['success' => false, 'msg' => '没有操作权限'];
                     }
                 }
             } else {
@@ -27,22 +34,24 @@ class ImageArrange
             $clientName = $file->getClientOriginalName();
             // 上传文件的后缀.
             $entension = $file->getClientOriginalExtension();
-            $newName = md5(date("Y-m-d H:i:s") . $clientName) . "." . $entension;
+            $newName = md5(date('Y-m-d H:i:s') . $clientName) . '.' . $entension;
             $file->move($path, $newName);
             //文件名
             $namePath = $path . '/' . $newName;
             return ['success' => true, 'name' => $newName, 'path' => $namePath];
+        } else {
+            return ['success' => false];
         }
     }
 
     /**
      *
      * 制作缩略图
-     * @param $srcPath string 原图路径
-     * @param $maxWidth int 画布的宽度
-     * @param $maxHight int 画布的高度
-     * @param $flag bool 是否是等比缩略图  默认为true
-     * @param $prefix string 缩略图的前缀  默认为'sm_'
+     * @param string $srcPath  原图路径
+     * @param int $maxWidth 画布的宽度
+     * @param int $maxHight 画布的高度
+     * @param bool $flag 是否是等比缩略图  默认为true
+     * @param string $prefix 缩略图的前缀  默认为'sm_'
      *
      */
     public function creatThumbnail($srcPath, $maxWidth, $maxHight, $prefix = 'sm_', $flag = true)

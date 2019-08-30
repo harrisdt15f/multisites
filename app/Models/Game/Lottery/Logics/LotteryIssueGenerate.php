@@ -246,6 +246,8 @@ trait LotteryIssueGenerate
                     return $suffix . str_pad('1', (int) $numberLength, '0', STR_PAD_LEFT);
                 }
             }
+        } else {
+            return null;
         }
     }
 

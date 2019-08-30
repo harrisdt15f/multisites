@@ -4,8 +4,8 @@ namespace App\Console\Commands;
 
 use App\Models\User\FrontendUser;
 use App\Models\User\FrontendUsersSpecificInfo;
-use Illuminate\Console\Command;
 use Config;
+use Illuminate\Console\Command;
 
 class SysUserAndSpecificIdControl extends Command
 {
@@ -26,7 +26,7 @@ class SysUserAndSpecificIdControl extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return void
      */
     public function handle()
     {
@@ -44,19 +44,19 @@ class SysUserAndSpecificIdControl extends Command
                     $spec->user_id = $v->id;
                     $spec->save();
                     $v->update([
-                        'user_specific_id' => $spec->id
+                        'user_specific_id' => $spec->id,
                     ]);
                 }
                 //已经有了回写user
                 $v->update([
-                    'user_specific_id' => $spec->id
+                    'user_specific_id' => $spec->id,
                 ]);
             } else {
                 //有spc_id 将spec表中的user_id 进行更改
                 $spec = FrontendUsersSpecificInfo::find($spec_id);
 
                 $spec->update([
-                    'user_id' => $v->id
+                    'user_id' => $v->id,
                 ]);
             }
         }
