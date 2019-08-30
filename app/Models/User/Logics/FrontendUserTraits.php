@@ -3,8 +3,8 @@
 namespace App\Models\User\Logics;
 
 use App\Lib\Pay\Pay;
-use App\Models\Finance\UserRecharge;
 use App\Models\Admin\Notice\FrontendMessageNotice;
+use App\Models\Finance\UserRecharge;
 
 trait FrontendUserTraits
 {
@@ -18,13 +18,13 @@ trait FrontendUserTraits
 
     /**
      * 发起充值
-     * @param $amount
-     * @param $channel
-     * @param $bankSign
-     * @param $from
+     * @param int $amount
+     * @param int $channel
+     * @param string $bankSign
+     * @param string $from
      * @return bool|string
      */
-    public function recharge($amount, $channel, $bankSign = "", $from = "web")
+    public function recharge($amount, $channel, $bankSign = '', $from = 'web')
     {
         $order = UserRecharge::request($this, $amount * 10000, $channel, $bankSign, $from);
 
@@ -33,16 +33,16 @@ trait FrontendUserTraits
         }
 
         // 发起充值
-        $pay    = Pay::getHandle();
+        $pay = Pay::getHandle();
         $pay->setRechargeOrder($order);
         $pay->setRechargeUser($this);
 
-        $data   = $pay->recharge($amount, $order->order_id, $channel, $bankSign);
+        $data = $pay->recharge($amount, $order->order_id, $channel, $bankSign);
         if (!is_array($data)) {
-            $order->status      = -1;
-            $order->fail_reason = $data??'';
+            $order->status = -1;
+            $order->fail_reason = $data ?? '';
             $order->save();
-            return"对不起, 充值失败-{$data}!";
+            return '对不起, 充值失败-'.$data;
         }
 
         $order->request_time = time();
@@ -55,6 +55,6 @@ trait FrontendUserTraits
     public function unreadMessageNum()
     {
         $message = $this->message;
-        return $message->where('status',FrontendMessageNotice::STATUS_UNREAD)->count();
+        return $message->where('status', FrontendMessageNotice::STATUS_UNREAD)->count();
     }
 }

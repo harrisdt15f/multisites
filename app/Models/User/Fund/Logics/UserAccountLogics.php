@@ -7,7 +7,6 @@ use App\Lib\Clog;
 use App\Lib\Locker\AccountLocker;
 use App\Lib\Logic\AccountChange;
 use App\Models\Account\FrontendUsersAccountsType;
-use App\Models\User\FrontendUsersAccount;
 use Exception;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +24,7 @@ trait UserAccountLogics
 
     public static function getList($c): array
     {
-        $query = FrontendUsersAccount::select(
+        $query = self::select(
             DB::raw('frontend_users_accounts.*'),
             DB::raw('users.username'),
             DB::raw('users.prize_group')
@@ -83,7 +82,7 @@ trait UserAccountLogics
             if (in_array($key, ['id', 'name', 'sign', 'type', 'froze_type'])) {
                 continue;
             }
-            if ($value == 1) {
+            if ($value === 1) {
                 if (!isset($params[$key])) {
                     return '对不起, 参数' . $key . '没有传递!';
                 }
@@ -91,7 +90,7 @@ trait UserAccountLogics
         }
         // 3. 检测金额
         $amount = abs($params['amount']);
-        if ($amount == 0) {
+        if ($amount === 0) {
             return true;
         }
         // 4. 关联用户是否存在
@@ -104,7 +103,7 @@ trait UserAccountLogics
         }
         // 冻结类型 1 冻结自己金额 2 冻结退还　3 冻结给玩家　4 冻结给系统　5 中奖
         // 资金增减. 需要检测对应
-        if ($typeConfig['froze_type'] == 5) {
+        if ($typeConfig['froze_type'] === 5) {
             if (!$relatedUser) {
                 return '对不起, 必须存在关联用户!';
             }
@@ -157,7 +156,7 @@ trait UserAccountLogics
                 $ret = $this->unFrozenToPlayer($amount);
                 break;
             default:
-                if ($typeConfig['type'] == 1) {
+                if ($typeConfig['type'] === 1) {
                     $ret = $this->add($params['amount']);
                 } else {
                     if ($params['amount'] > $this->balance) {
@@ -177,7 +176,7 @@ trait UserAccountLogics
         $report['before_frozen_balance'] = $beforeFrozen;
         $change['updated_at'] = date('Y-m-d H:i:s');
         $this->saveData($report);
-        if ($beforeBalance != $balance) {
+        if ($beforeBalance !== $balance) {
             event(new \App\Events\Broadcast\User($this->user_id, 'fundChange', ['balance' => number2($this->balance)]));
         }
         return true;
@@ -186,7 +185,8 @@ trait UserAccountLogics
     public function triggerSave()
     {
         if ($this->changes) {
-            $ret = DB::table('account_change_report')->insert($this->changes);
+            DB::table('account_change_report')->insert($this->changes);
+            // $ret = DB::table('account_change_report')->insert($this->changes);
             info($this->changes);
             // if (!$ret) {
             //     return false;
@@ -197,7 +197,7 @@ trait UserAccountLogics
 
     public function saveData($report)
     {
-        if ($this->mode == self::MODE_CHANGE_AFTER) {
+        if ($this->mode === self::MODE_CHANGE_AFTER) {
             $this->changes[] = $report;
         } else {
             $ret = DB::table('account_change_report')->insert($report);

@@ -2,8 +2,6 @@
 
 namespace App\Models\Logics;
 
-use App\Models\LotteryTrace;
-
 trait TraceTraits
 {
     /**
@@ -13,7 +11,7 @@ trait TraceTraits
      */
     public static function getList($condition): array
     {
-        $query = Trace::orderBy('id', 'desc');
+        $query = self::orderBy('id', 'desc');
         if (isset($condition['en_name'])) {
             $query->where('en_name', '=', $condition['en_name']);
         }
@@ -26,7 +24,7 @@ trait TraceTraits
             'data' => $menus,
             'total' => $total,
             'currentPage' => $currentPage,
-            'totalPage' => (int) ceil($total / $pageSize)
+            'totalPage' => (int) ceil($total / $pageSize),
         ];
     }
 }
