@@ -36,7 +36,6 @@ trait LotteryPrizeGroupLogic
      * @param $aPrizeSettings
      * @param $aPrizeSettingOfWay
      * @param $aMaxPrize
-     * @return bool|null
      */
     public static function makePrizeSettingArray(
         $methodId,
@@ -45,7 +44,7 @@ trait LotteryPrizeGroupLogic
         & $aPrizeSettings,
         & $aPrizeSettingOfWay,
         & $aMaxPrize
-    ): ?bool {
+    ) {
         $oSeriesWay = LotterySeriesWay::getSeriesWayByMethodId($methodId, $seriesCode);
         $iPrizeGroupId = self::getPrizeGroupByClassicPrizeAndSeries($iClassicPrize, $seriesCode);
         if ($iPrizeGroupId === null) {
