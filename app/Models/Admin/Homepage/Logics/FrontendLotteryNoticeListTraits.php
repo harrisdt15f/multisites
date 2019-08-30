@@ -11,7 +11,10 @@ trait FrontendLotteryNoticeListTraits
 {
     use BaseCache;
 
-    //获取pc端开奖公告列表
+    /**
+     * 获取pc端开奖公告列表
+     * @return array
+     */
     public static function getWebLotteryNoticeList()
     {
         $lotteryNoticeEloq = FrontendAllocatedModel::select('status', 'show_num')
@@ -20,12 +23,17 @@ trait FrontendLotteryNoticeListTraits
         if ($lotteryNoticeEloq === null) {
             $lotteryNoticeEloq = FrontendAllocatedModel::createMobileLotteryNotice();
         }
+        $data = [];
         if ($lotteryNoticeEloq->status === 1) {
-            return self::getLotteryNoticeList($lotteryNoticeEloq->show_num);
+            $data = self::getLotteryNoticeList($lotteryNoticeEloq->show_num);
         }
+        return $data;
     }
 
-    //获取手机端开奖公告列表
+    /**
+     * 获取手机端开奖公告列表
+     * @return array
+     */
     public static function getMobileLotteryNoticeList()
     {
         $lotteryNoticeEloq = FrontendAllocatedModel::select('status', 'show_num')
@@ -34,11 +42,17 @@ trait FrontendLotteryNoticeListTraits
         if ($lotteryNoticeEloq === null) {
             $lotteryNoticeEloq = FrontendAllocatedModel::createMobileLotteryNotice();
         }
+        $data = [];
         if ($lotteryNoticeEloq->status === 1) {
-            return self::getLotteryNoticeList($lotteryNoticeEloq->show_num);
+            $data = self::getLotteryNoticeList($lotteryNoticeEloq->show_num);
         }
+        return $data;
     }
 
+    /**
+     * @param  int $count
+     * @return array
+     */
     public static function getLotteryNoticeList($count)
     {
         $lotterys = self::where('status', 1)
@@ -73,5 +87,21 @@ trait FrontendLotteryNoticeListTraits
         $lotteryNoticelist[$issue->lottery_id]['encode_time'] = $issue->encode_time;
         self::saveTagsCacheData('lottery_notice_list', $lotteryNoticelist);
         return $lotteryNoticelist[$issue->lottery_id];
+    }
+
+    public function sortIncrement($startSort, $endSort)
+    {
+        self::where('sort', '>=', $startSort)
+            ->where('sort', '<', $endSort)
+            ->increment('sort');
+    }
+
+    public function sortDecrement($startSort, $endSort = null)
+    {
+        $data = self::where('sort', '>', $startSort);
+        if ($endSort !==null) {
+            $data->where('sort', '<=', $endSort);
+        }
+        $data->decrement('sort');
     }
 }

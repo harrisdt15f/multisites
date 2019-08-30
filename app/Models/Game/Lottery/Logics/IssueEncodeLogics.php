@@ -8,6 +8,7 @@
 namespace App\Models\Game\Lottery\Logics;
 
 use App\Jobs\Lottery\Encode\IssueEncoder;
+use App\Models\Admin\Homepage\FrontendLotteryNoticeList;
 use App\Models\Game\Lottery\LotteryIssue;
 use App\Models\Game\Lottery\LotteryList;
 use App\Models\Game\Lottery\LotterySeriesMethod;
@@ -18,15 +19,15 @@ use App\Models\User\UserCommissions;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
-use App\Models\Admin\Homepage\FrontendLotteryNoticeList;
 
 trait IssueEncodeLogics
 {
     /**
-     * @param $lottery_id
-     * @param $issue_no
+     * @param string $lottery_id
+     * @param string $issue_no
+     * @return void
      */
-    public static function calculateEncodedNumber($lottery_id, $issue_no): void
+    public static function calculateEncodedNumber(string $lottery_id, string $issue_no): void
     {
         $oIssue = self::where([
             ['issue', '=', $issue_no],
@@ -45,6 +46,7 @@ trait IssueEncodeLogics
                     if ($oIssue->projects()->exists()) {
                         if ($oIssue->official_code !== null) {
                             $oProjects = $oIssue->projects->where('lottery_sign', $lottery_id)->fresh();
+                            $aWnNumberOfMethods = [];
                             try {
                                 $aWnNumberOfMethods = self::getWnNumberOfSeriesMethods(
                                     $oLottery,
@@ -52,7 +54,7 @@ trait IssueEncodeLogics
                                 ); //wn_number
                             } catch (Exception $e) {
                                 Log::error('Winning Number Calculation on error');
-                                Log::error($e->getMessage().$e->getTraceAsString());
+                                Log::error($e->getMessage() . $e->getTraceAsString());
                             }
                             if ($oLottery->basicways()->exists()) {
                                 $oBasicWays = $oLottery->basicways;
@@ -99,13 +101,14 @@ trait IssueEncodeLogics
                                                         } catch (Exception $e) {
                                                             $aPrized = [];
                                                             Log::error('Prize Checking on error');
-                                                            Log::error($e->getMessage().$e->getTraceAsString());
+                                                            Log::error($e->getMessage() . $e->getTraceAsString());
                                                         }
-                                                        $strlog = 'aPrized is '.json_encode(
+                                                        $strlog = 'aPrized is ' . json_encode(
                                                             $aPrized,
                                                             JSON_PRETTY_PRINT
                                                         );
                                                         Log::channel('issues')->info($strlog);
+                                                        $result = false;
                                                         try {
                                                             $result = $project->setWon(
                                                                 $oIssue->official_code,
@@ -114,7 +117,7 @@ trait IssueEncodeLogics
                                                             ); //@todo Trace
                                                         } catch (Exception $e) {
                                                             Log::error('Set Won on error');
-                                                            Log::error($e->getMessage().$e->getTraceAsString());
+                                                            Log::error($e->getMessage() . $e->getTraceAsString());
                                                         }
                                                         if ($result !== true) {
                                                             Log::channel('issues')->info($result);
@@ -147,11 +150,11 @@ trait IssueEncodeLogics
 
     /**
      * @param  LotteryList  $oLottery
-     * @param $sFullWnNumber
+     * @param  string $sFullWnNumber
      * @param  bool  $bNameKey
      * @return array
      */
-    public static function getWnNumberOfSeriesMethods(LotteryList $oLottery, $sFullWnNumber, $bNameKey = false): array
+    public static function getWnNumberOfSeriesMethods(LotteryList $oLottery, string $sFullWnNumber, $bNameKey = false): array
     {
         $oSeriesMethods = LotterySeriesMethod::where('series_code', '=', $oLottery->series_id)->get();
         $aWnNumbers = [];
@@ -163,10 +166,10 @@ trait IssueEncodeLogics
     }
 
     /**
-     * @param $oLottery
-     * @param $project
+     * @param object $oLottery
+     * @param object $project
      */
-    public static function startTrace($oLottery, $project): void
+    public static function startTrace(object $oLottery, object $project): void
     {
         $oProject = $project->fresh();
         $first = 0;
@@ -203,19 +206,23 @@ trait IssueEncodeLogics
                 $oTrace->stop_time = time();
                 $oTrace->save();
                 //update TraceLists with Project
-                if ($oProject->tracelist()->exists()) { //第一次的时候是没有的
+                if ($oProject->tracelist()->exists()) {
+                    //第一次的时候是没有的
                     $oTraceListFromProject = $oProject->tracelist;
                     $oTraceListFromProject->status = LotteryTraceList::STATUS_FINISHED;
                     $oTraceListFromProject->save();
                 }
-            } elseif ($oProject->status > Project::STATUS_NORMAL && $first < 1) { //不是第一次的时候
-                $waitingNum = $oTrace->traceLists->where('status',LotteryTraceList::STATUS_WAITING)->count();
-                if ($waitingNum === 0) { //如果没有等待追号的数据，则追号完成
+            } elseif ($oProject->status > Project::STATUS_NORMAL && $first < 1) {
+                //不是第一次的时候
+                $waitingNum = $oTrace->traceLists->where('status', LotteryTraceList::STATUS_WAITING)->count();
+                if ($waitingNum === 0) {
+                    //如果没有等待追号的数据，则追号完成
                     $oTrace->status = LotteryTrace::STATUS_FINISHED;
                 }
                 $oTrace->save();
                 //update TraceLists with Project
-                if ($oProject->tracelist()->exists()) { //第一次的时候是没有的
+                if ($oProject->tracelist()->exists()) {
+                    //第一次的时候是没有的
                     $oTraceListFromProject = $oProject->tracelist;
                     $oTraceListFromProject->status = LotteryTraceList::STATUS_FINISHED;
                     $oTraceListFromProject->project_id = $oProject->id;
@@ -293,9 +300,9 @@ trait IssueEncodeLogics
     }
 
     /**
-     * @param $openCodeStr
+     * @param string $openCodeStr
      */
-    public function recordEncodeNumber($openCodeStr): void
+    public function recordEncodeNumber(string $openCodeStr): void
     {
         $this->status_encode = LotteryIssue::ENCODED;
         $this->encode_time = time();
@@ -315,7 +322,7 @@ trait IssueEncodeLogics
      * @param  int     $codeLength   [开奖号码的长度]
      * @param  string  $validCode    [合法开奖号码]
      * @param  int     $lotteryType  [开奖号码是否可以重复 ？ 1可重复 2不可重复]
-     * @param          $splitter     [该彩种分割开奖号码的方式]
+     * @param  string|null  $splitter     [该彩种分割开奖号码的方式]
      * @param  string  $series       [彩种系列]
      * @return string  $openCodeStr  [开奖号码string]
      */
@@ -325,7 +332,7 @@ trait IssueEncodeLogics
         $openCodeStr = ''; //开奖号码string
         $validCodeArr = explode(',', $validCode); //合法开奖号码arr
         if ($lotteryType === 2 || $series === 'pk10') {
-                $openCodeArr = Arr::random($validCodeArr, $codeLength);
+            $openCodeArr = Arr::random($validCodeArr, $codeLength);
         } elseif ($lotteryType === 1) {
             for ($length = 0; $length < $codeLength; $length++) {
                 $openCodeArr[] = Arr::random($validCodeArr);

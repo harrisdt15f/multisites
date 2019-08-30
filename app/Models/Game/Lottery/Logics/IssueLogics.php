@@ -17,7 +17,7 @@ trait IssueLogics
 
     /**
      * 获取当前的奖期
-     * @param  $lotteryId
+     * @param  string $lotteryId
      * @return mixed
      */
     public static function getCurrentIssue($lotteryId)
@@ -30,7 +30,7 @@ trait IssueLogics
 
     /**
      * 获取当前的奖期
-     * @param  $lotteryId
+     * @param  string $lotteryId
      * @return mixed
      */
     public static function getNeedOpenIssue($lotteryId)
@@ -44,20 +44,18 @@ trait IssueLogics
 
     /**
      * 获取所有的奖期
-     * @param  $issueArr
+     * @param  array $issueArr
      * @return void
      */
-    public function getIssues($issueArr): void
+    public function getIssues(array $issueArr): void
     {
-        if (is_array($issueArr)) {
-            self::whereIn('issue', $issueArr)->get();
-        }
+        self::whereIn('issue', $issueArr)->get();
     }
 
     /**
      * 获取可投奖期
-     * @param  $lotteryId
-     * @param  int         $count
+     * @param  string $lotteryId
+     * @param  int $count
      * @return mixed
      */
     public static function getCanBetIssue($lotteryId, $count = 50)
@@ -71,8 +69,8 @@ trait IssueLogics
 
     /**
      * 获取彩种可追号的奖期
-     * @param  $lotteryId
-     * @param  int         $count
+     * @param  string $lotteryId
+     * @param  int $count
      * @return mixed
      */
     public static function getCanTraceIssue($lotteryId, $count = 50)
@@ -86,8 +84,8 @@ trait IssueLogics
 
     /**
      * 获取所有历史奖期
-     * @param  $lotteryId
-     * @param  int         $count
+     * @param  string $lotteryId
+     * @param  int $count
      * @return mixed
      */
     public static function getHistoryIssue($lotteryId, $count = 50)

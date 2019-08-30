@@ -107,7 +107,7 @@ trait LotteryLogics
 
     /**
      * 合法的倍数
-     * @param $times
+     * @param int $times
      * @return bool
      */
     public function isValidTimes($times): bool
@@ -123,7 +123,7 @@ trait LotteryLogics
 
     /**
      * 是否是彩种合法的奖金组
-     * @param $prizeGroup
+     * @param int $prizeGroup
      * @return bool
      */
     public function isValidPrizeGroup($prizeGroup): bool
@@ -149,11 +149,11 @@ trait LotteryLogics
 
     /**
      * 获取 单个彩种
-     * @param $sign
+     * @param string $sign
      * @return array|mixed
      * @throws \Exception
      */
-    public static function getLottery($sign)
+    public static function getLottery(string $sign)
     {
         $lotteries = self::getAllLotteryByCache();
         return $lotteries[$sign] ?? [];
@@ -184,11 +184,11 @@ trait LotteryLogics
 
     /**
      * 检查是否存在缓存
-     * @param $key
+     * @param string $key
      * @return bool
      * @throws \Exception
      */
-    public static function hasTagsCache($key)
+    public static function hasTagsCache(string $key)
     {
         $cacheConfig = self::getCacheConfig($key);
         if (!empty($cacheConfig) && isset($cacheConfig['tags'], $cacheConfig['key'])) {
@@ -200,10 +200,10 @@ trait LotteryLogics
 
     /**
      * 获取缓存配置
-     * @param $key
+     * @param string $key
      * @return mixed
      */
-    public static function getCacheConfig($key)
+    public static function getCacheConfig(string $key)
     {
         $cacheConfig = Config::get('web.main.cache');
         return $cacheConfig[$key] ?? [];
@@ -211,11 +211,10 @@ trait LotteryLogics
 
     /**
      * 获取缓存
-     * @param $key
-     * @return Repository
+     * @param string $key
      * @throws \Exception
      */
-    public static function getTagsCacheData($key)
+    public static function getTagsCacheData(string $key)
     {
         $cacheConfig = self::getCacheConfig($key);
         $data = [];
@@ -260,8 +259,8 @@ trait LotteryLogics
 
     /**
      * 保存
-     * @param $key
-     * @param $value
+     * @param string $key
+     * @param mixed $value
      * @throws \Exception
      */
     public static function saveTagsCacheData($key, $value): void
@@ -279,11 +278,11 @@ trait LotteryLogics
 
     /**
      * 获取 单个玩法 对象
-     * @param $methodId
+     * @param string $methodId
      * @return array|mixed
      * @throws \Exception
      */
-    public function getMethodObject($methodId)
+    public function getMethodObject(string $methodId)
     {
         $data = self::getAllMethodObject($this->series_id);
         return $data[$methodId] ?? [];
@@ -291,11 +290,11 @@ trait LotteryLogics
 
     /**
      * 获取 系列 玩法对象 缓存
-     * @param $seriesId
+     * @param string $seriesId
      * @return mixed
      * @throws \Exception
      */
-    public static function getAllMethodObject($seriesId)
+    public static function getAllMethodObject(string $seriesId)
     {
         $data = [];
         if (self::hasTagsCache('method_object')) {
@@ -321,10 +320,10 @@ trait LotteryLogics
 
     /**
      * 获取 玩法配置 - 配置 + 对象
-     * @param $methodId
+     * @param string $methodId
      * @return array
      */
-    public function getMethod($methodId)
+    public function getMethod(string $methodId)
     {
         $methods = $this->method_config;
         return $methods[$methodId] ?? [];
@@ -333,7 +332,6 @@ trait LotteryLogics
     /**
      * 只用于前端展示
      * @return array
-     * @throws
      */
     public static function getAllLotteryToFrontEnd()
     {
@@ -407,8 +405,7 @@ trait LotteryLogics
 
     /**
      * 检查录入的号码
-     * @param $series
-     * @param $code
+     * @param string $codeStr
      * @return bool
      */
     public function checkCodeFormat($codeStr)

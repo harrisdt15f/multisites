@@ -10,13 +10,13 @@ class FundOperation
      * @param object  $eloqM
      * @param int     $type  0系统对管理操作   1超管对管理操作  2管理对用户操作  3超管对用户操作
      * @param int     $in_out  0减少   1增加
-     * @param int     $OperationAdminId     操作人ID
-     * @param string  $OperationAdminName   操作人NAME
-     * @param int     $OperationId          被操作人ID
-     * @param string  $OperationName        被操作人NAME
+     * @param mixed   $OperationAdminId     操作人ID
+     * @param mixed   $OperationAdminName   操作人NAME
+     * @param mixed   $OperationId          被操作人ID
+     * @param mixed   $OperationName        被操作人NAME
      * @param float   $amount               操作金额
      * @param string  $comment              具体描述
-     * @param int     $AuditFlow0ID         审核表id
+     * @param mixed   $AuditFlow0ID         审核表id
      */
     public function insertOperationDatas(
         $eloqM,

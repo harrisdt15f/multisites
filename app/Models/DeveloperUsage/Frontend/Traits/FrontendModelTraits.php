@@ -2,8 +2,8 @@
 
 namespace App\Models\DeveloperUsage\Frontend\Traits;
 
-use Illuminate\Support\Facades\Cache;
 use App\Lib\BaseCache;
+use Illuminate\Support\Facades\Cache;
 
 trait FrontendModelTraits
 {
@@ -15,6 +15,7 @@ trait FrontendModelTraits
      */
     public function allFrontendModel($type): array
     {
+        $typeArr = [];
         if ($type == 2) {
             $typeArr = [1, 2];
         } elseif ($type == 3) {

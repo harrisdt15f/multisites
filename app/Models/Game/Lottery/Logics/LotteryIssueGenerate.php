@@ -24,16 +24,16 @@ trait LotteryIssueGenerate
      * type:day 每日增加型
      * type:increase 递增型 需要初始奖期
      * type:random 日期随机型　需要开奖时间
-     * @param $startDay 开始时间 2019-05-21
-     * @param $endDay   结束时间 2019-05-29
-     * @param $openTime 开奖时间 六合彩专用
+     * @param string $startDay 开始时间 2019-05-21
+     * @param string $endDay   结束时间 2019-05-29
+     * @param mixed $openTime 开奖时间 六合彩专用
      * @return array|string
      */
     public function genIssue($startDay, $endDay, $openTime = null)
     {
         // 是否开启
         if ($this->status != 1) {
-            return "对不起,彩种{$this->cn_name}未开启!!";
+            return '对不起,彩种' . $this->cn_name . '未开启!!';
         }
         // 时间范围
         if (strtotime($startDay) > strtotime($endDay)) {
@@ -53,8 +53,8 @@ trait LotteryIssueGenerate
 
     /**
      * 获取时间集合
-     * @param $startDay
-     * @param $endDay
+     * @param string $startDay
+     * @param string $endDay
      * @return array
      */
     public function getDaySet($startDay, $endDay): array
@@ -75,20 +75,23 @@ trait LotteryIssueGenerate
         return $data;
     }
 
-
     /**
      * 生成 某天的奖期
-     * @param $day
-     * @param $rules
+     * @param string $day
+     * @param object $rules
      * @return bool|string
      */
     public function genOneDayIssue($day, $rules)
     {
         if (!$rules) {
-            return "对不起, 彩种{$this->cn_name}未配置奖期规则!!";
+            return '对不起, 彩种' . $this->cn_name . '未配置奖期规则!!';
         }
         // 整数形式的日期
-        $intDay = date('Ymd', strtotime($day));
+        $time = strtotime($day);
+        if ($time === false) {
+            return '日期格式不正确';
+        }
+        $intDay = date('Ymd', $time);
         // 检查是否存在奖期
         $issueCount = LotteryIssue::where('lottery_id', $this->en_name)->where('day', $intDay)->count();
         if ($issueCount > 0 && $issueCount < $this->day_issue) {
@@ -96,7 +99,7 @@ trait LotteryIssueGenerate
             LotteryIssue::where('lottery_id', $this->en_name)->where('day', $intDay)->delete();
         } else {
             if ($issueCount == $this->day_issue) {
-                return "对不起, 彩种{$this->cn_name}-{$intDay}-已经生成!!";
+                return '对不起, 彩种' . $this->cn_name . '-' . $intDay . '-已经生成!!';
             }
         }
         $firstIssueNo = '';
@@ -110,8 +113,8 @@ trait LotteryIssueGenerate
                 $configTime = Carbon::parse($_config['day']);
                 $_day = $dayTime->diff($configTime)->days;
                 if (isset($_config['zero_start'])) {
-                    $firstIssueNo = (int)$_config['start_issue'] + $_day * $this->day_issue;
-                    $firstIssueNo = $_config['zero_start'].$firstIssueNo;
+                    $firstIssueNo = (int) $_config['start_issue'] + $_day * $this->day_issue;
+                    $firstIssueNo = $_config['zero_start'] . $firstIssueNo;
                 } else {
                     $firstIssueNo = $_config['start_issue'] + $_day * $this->day_issue;
                 }
@@ -122,10 +125,10 @@ trait LotteryIssueGenerate
         $issueNo = $firstIssueNo ?: '';
         foreach ($rules as $rule) {
             $adjustTime = $rule->adjust_time;
-            $beginTimeString = $day.' '.$rule['begin_time'];
+            $beginTimeString = $day . ' ' . $rule['begin_time'];
             $beginTime = Carbon::parse($beginTimeString);
             // 结束时间的修正
-            $endTimeString = $day.' '.$rule['end_time'];
+            $endTimeString = $day . ' ' . $rule['end_time'];
             $endTimeOrigin = Carbon::parse($endTimeString);
             $endTime = $endTimeOrigin->copy();
             if ($rule['end_time'] == '00:00:00') {
@@ -139,13 +142,14 @@ trait LotteryIssueGenerate
             $issueTimeInSeconds = $rule['issue_seconds'];
             $index = 1;
             do {
-                if ($rule['issue_count'] === 1) { //奖期只有一期时，结束时间和开奖时间的计算不一样
+                if ($rule['issue_count'] === 1) {
+                    //奖期只有一期时，结束时间和开奖时间的计算不一样
                     $issueEndTime = $beginTime->copy();
                     $issueEndTime = $issueEndTime->addSeconds($issueTimeInSeconds)->subSeconds($adjustTime);
-                    $issueTimeString = $day.' '.$rule['first_time'];
+                    $issueTimeString = $day . ' ' . $rule['first_time'];
                     $officialOpenTime = Carbon::parse($issueTimeString);
                 } elseif (1 === $index) {
-                    $issueTimeString = $day.' '.$rule['first_time'];
+                    $issueTimeString = $day . ' ' . $rule['first_time'];
                     $issueTime = Carbon::parse($issueTimeString);
                     $officialOpenTime = $issueTime->copy();
                     $issueEndTime = $issueTime->copy();
@@ -182,7 +186,7 @@ trait LotteryIssueGenerate
         }
         $totalGenCount = count($data);
         if ($totalGenCount != $this->day_issue) {
-            return "生成的期数不正确, 应该：{$this->day_issue} - 实际:{$totalGenCount}";
+            return '生成的期数不正确, 应该：' . $this->day_issue . ' - 实际:{$totalGenCount';
         }
 
         try {
@@ -194,15 +198,16 @@ trait LotteryIssueGenerate
             }
             return true;
         } catch (Exception $e) {
-            return '插入数据失败!!'.$e->getMessage();
+            return '插入数据失败!!' . $e->getMessage();
         }
     }
 
     /**
      * 获取下一期的
-     * @param $issueNo
-     * @param $lottery
-     * @param $day
+     * @param string|int $issueNo
+     * @param object $lottery
+     * @param object $rule
+     * @param string $day
      * @return mixed
      */
     public function getNextIssueNo($issueNo, $lottery, $rule, $day)
@@ -212,12 +217,12 @@ trait LotteryIssueGenerate
         $formats = explode('|', $issueFormat);
         // C 开头
         if (count($formats) == 1 and strpos($formats[0], 'C') !== false) {
-            $currentIssueNo = (int)$issueNo;
+            $currentIssueNo = (int) $issueNo;
             $nextIssue = $currentIssueNo + 1;
-            if (strlen($currentIssueNo) == strlen($issueNo)) {
+            if (strlen((string) $currentIssueNo) == strlen((string) $issueNo)) {
                 return $nextIssue;
             } else {
-                return str_pad($nextIssue, strlen($issueNo), '0', STR_PAD_LEFT);
+                return str_pad((string) $nextIssue, strlen($issueNo), '0', STR_PAD_LEFT);
             }
         }
         // 日期型
@@ -227,33 +232,35 @@ trait LotteryIssueGenerate
             if (strpos($formats[1], 'N') !== false) {
                 $suffix = $dayTime->format($formats[0]);
                 if ($issueNo) {
-                    return $suffix.$this->getNextNumber($issueNo, $numberLength);
+                    return $suffix . $this->getNextNumber($issueNo, $numberLength);
                 } else {
-                    return $suffix.str_pad(1, $numberLength, '0', STR_PAD_LEFT);
+                    return $suffix . str_pad('1', (int) $numberLength, '0', STR_PAD_LEFT);
                 }
             }
             // 特殊号
             if (strpos($formats[1], 'T') !== false) {
                 $suffix = $dayTime->format($formats[0]);
                 if ($issueNo) {
-                    return $suffix.$this->getNextNumber($issueNo, $numberLength);
+                    return $suffix . $this->getNextNumber($issueNo, $numberLength);
                 } else {
-                    return $suffix.str_pad(1, $numberLength, '0', STR_PAD_LEFT);
+                    return $suffix . str_pad('1', (int) $numberLength, '0', STR_PAD_LEFT);
                 }
             }
+        } else {
+            return null;
         }
     }
 
     /**
      * 获取下一个
-     * @param $issueNo
-     * @param $count
+     * @param string|int $issueNo
+     * @param string $count
      * @return string
      */
     public function getNextNumber($issueNo, $count): string
     {
-        $currentNo = substr($issueNo, -$count);
-        $nextNo = (int)$currentNo + 1;
-        return str_pad($nextNo, $count, '0', STR_PAD_LEFT);
+        $currentNo = substr($issueNo, -(int) $count);
+        $nextNo = (int) $currentNo + 1;
+        return str_pad((string) $nextNo, $count, '0', STR_PAD_LEFT);
     }
 }

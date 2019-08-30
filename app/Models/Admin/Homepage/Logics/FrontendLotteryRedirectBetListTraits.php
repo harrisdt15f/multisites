@@ -8,7 +8,7 @@ use App\Models\DeveloperUsage\Frontend\FrontendAllocatedModel;
 trait FrontendLotteryRedirectBetListTraits
 {
     use BaseCache;
-    
+
     /**
      * 更新首页热门彩票缓存
      */
@@ -51,11 +51,11 @@ trait FrontendLotteryRedirectBetListTraits
     }
 
     /**
-     * @param  $cacheKey
-     * @param  $showNum
+     * @param  string $cacheKey
+     * @param  int $showNum
      * @return array
      */
-    public static function updateCache($cacheKey, $showNum): array
+    public static function updateCache(string $cacheKey, $showNum): array
     {
         $dataEloq = self::select('id', 'lotteries_id', 'lotteries_sign')
             ->with(['lotteries:id,day_issue,en_name,cn_name,icon_path', 'issueRule:lottery_id,issue_seconds'])

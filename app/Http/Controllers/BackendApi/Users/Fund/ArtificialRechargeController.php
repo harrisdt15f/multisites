@@ -9,8 +9,6 @@ use Illuminate\Http\JsonResponse;
 
 class ArtificialRechargeController extends BackEndApiMainController
 {
-    public $message = '有新的人工充值需要审核';
-
     /**
      * 给用户人工充值
      * @param  ArtificialRechargeRechargeRequest $request

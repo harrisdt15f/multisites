@@ -96,12 +96,12 @@ class FrontendApiMainController extends Controller
     }
 
     /**
-     * @param  bool  $success
-     * @param  array  $data
+     * @param  bool    $success
+     * @param  mixed   $data
      * @param  string  $code
-     * @param  string  $message
-     * @param  null  $placeholder
-     * @param  null  $substituted
+     * @param  mixed   $message
+     * @param  string  $placeholder
+     * @param  mixed   $substituted
      * @return JsonResponse
      */
     public function msgOut(
@@ -109,8 +109,8 @@ class FrontendApiMainController extends Controller
         $data = [],
         $code = '',
         $message = '',
-        $placeholder = null,
-        $substituted = null
+        $placeholder = '',
+        $substituted = ''
     ): JsonResponse {
         $defaultSuccessCode = '200';
         $defaultErrorCode = '404';
@@ -119,7 +119,7 @@ class FrontendApiMainController extends Controller
         } else {
             $code = $code == '' ? $defaultErrorCode : $code;
         }
-        if ($placeholder === null || $substituted === null) {
+        if ($placeholder === '' || $substituted === '') {
             $message = $message == '' ? __('frontend-codes-map.' . $code) : $message;
         } else {
             $message = $message == '' ? __('frontend-codes-map.' . $code, [$placeholder => $substituted]) : $message;
@@ -140,11 +140,11 @@ class FrontendApiMainController extends Controller
 
     /**
      * Generate Search Query
-     * @param $eloqM
-     * @param $searchAbleFields
-     * @param  int  $fixedJoin
-     * @param $withTable
-     * @param $withSearchAbleFields
+     * @param  object  $eloqM
+     * @param  array   $searchAbleFields
+     * @param  int     $fixedJoin
+     * @param  mixed   $withTable
+     * @param  array   $withSearchAbleFields
      * @param  string  $orderFields
      * @param  string  $orderFlow
      * @return mixed
@@ -154,7 +154,7 @@ class FrontendApiMainController extends Controller
         $searchAbleFields,
         $fixedJoin = 0,
         $withTable = null,
-        $withSearchAbleFields = null,
+        $withSearchAbleFields = [],
         $orderFields = 'updated_at',
         $orderFlow = 'desc'
     ) {
@@ -175,6 +175,7 @@ class FrontendApiMainController extends Controller
         if ($sizeOfInputs == 1) {
             //for single where condition searching
             if (!empty($searchCriterias)) {
+                $whereData = [];
                 foreach ($searchCriterias as $key => $value) {
                     if ($value !== '*') {
                         $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
@@ -302,12 +303,12 @@ class FrontendApiMainController extends Controller
 
     /**
      * Join Table with Eloquent
-     * @param $queryEloq
-     * @param $fixedJoin
-     * @param $withTable
-     * @param $sizeOfWithInputs
-     * @param $withSearchCriterias
-     * @param $queryConditions
+     * @param  object  $queryEloq
+     * @param  int     $fixedJoin
+     * @param  mixed   $withTable
+     * @param  int     $sizeOfWithInputs
+     * @param  array   $withSearchCriterias
+     * @param  array   $queryConditions
      * @return mixed
      */
     public function eloqToJoin(
@@ -337,6 +338,7 @@ class FrontendApiMainController extends Controller
                         ) {
                             if ($sizeOfWithInputs > 1) {
                                 if (!empty($withSearchCriterias)) {
+                                    $whereData = [];
                                     foreach ($withSearchCriterias as $key => $value) {
                                         if ($value !== '*') {
                                             $whereCriteria = [];
@@ -379,7 +381,7 @@ class FrontendApiMainController extends Controller
     }
 
     /**
-     * @param $eloqM
+     * @param  object $eloqM
      * @param  array  $datas
      */
     public function editAssignment($eloqM, $datas)
