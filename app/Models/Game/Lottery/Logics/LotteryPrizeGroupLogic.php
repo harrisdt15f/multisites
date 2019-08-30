@@ -18,7 +18,7 @@ trait LotteryPrizeGroupLogic
      * @param string $series_id
      * @return bool
      */
-    public static function getPrizeGroupByClassicPrizeAndSeries($iClassicPrize, $series_id)
+    public static function getPrizeGroupByClassicPrizeAndSeries($iClassicPrize, $series_id): ?bool
     {
         if (!$iClassicPrize || !$series_id) {
             return false;
@@ -36,13 +36,13 @@ trait LotteryPrizeGroupLogic
     }
 
     /**
-     * @param string $methodId
-     * @param int $iClassicPrize
-     * @param string $seriesCode
-     * @param mixed $aPrizeSettings
-     * @param mixed $aPrizeSettingOfWay
-     * @param mixed $aMaxPrize
-     * @return  void
+     * @param  string  $methodId
+     * @param  int  $iClassicPrize
+     * @param  string  $seriesCode
+     * @param  mixed  $aPrizeSettings
+     * @param  mixed  $aPrizeSettingOfWay
+     * @param  mixed  $aMaxPrize
+     * @return bool|null
      */
     public static function makePrizeSettingArray(
         $methodId,
@@ -51,25 +51,26 @@ trait LotteryPrizeGroupLogic
         &$aPrizeSettings,
         &$aPrizeSettingOfWay,
         &$aMaxPrize
-    ) {
+    ): ?bool {
         $oSeriesWay = LotterySeriesWay::getSeriesWayByMethodId($methodId, $seriesCode);
         $iPrizeGroupId = self::getPrizeGroupByClassicPrizeAndSeries($iClassicPrize, $seriesCode);
-        if ($iPrizeGroupId !== null) {
-            $iSeriesWayId = $oSeriesWay->id;
-            if (isset($aPrizeSettings[$iSeriesWayId])) {
-                $aPrizeSettingOfWay = $aPrizeSettings[$iSeriesWayId];
-            } else {
-                $aMethodIds = explode(',', $oSeriesWay->basic_methods);
-                $aPrizeSettingOfMethods = [];
-                $fMaxPrize = 0;
-                foreach ($aMethodIds as $iMethodId) {
-                    $aPrizeSettingOfMethods[$iMethodId] = LotteryPrizeDetail::getPrizeSetting($iPrizeGroupId, $iMethodId);
-                    $fMaxPrize >= $aPrizeSettingOfMethods[$iMethodId][1] or
-                    $fMaxPrize = $aPrizeSettingOfMethods[$iMethodId][1];
-                }
-                $aPrizeSettingOfWay = $aPrizeSettings[$iSeriesWayId] = $aPrizeSettingOfMethods;
-                $aMaxPrize[$iSeriesWayId] = $fMaxPrize;
+        if ($iPrizeGroupId === null) {
+            return false;
+        }
+        $iSeriesWayId = $oSeriesWay->id;
+        if (isset($aPrizeSettings[$iSeriesWayId])) {
+            $aPrizeSettingOfWay = $aPrizeSettings[$iSeriesWayId];
+        } else {
+            $aMethodIds = explode(',', $oSeriesWay->basic_methods);
+            $aPrizeSettingOfMethods = [];
+            $fMaxPrize = 0;
+            foreach ($aMethodIds as $iMethodId) {
+                $aPrizeSettingOfMethods[$iMethodId] = LotteryPrizeDetail::getPrizeSetting($iPrizeGroupId, $iMethodId);
+                $fMaxPrize >= $aPrizeSettingOfMethods[$iMethodId][1] or
+                $fMaxPrize = $aPrizeSettingOfMethods[$iMethodId][1];
             }
+            $aPrizeSettingOfWay = $aPrizeSettings[$iSeriesWayId] = $aPrizeSettingOfMethods;
+            $aMaxPrize[$iSeriesWayId] = $fMaxPrize;
         }
     }
 }
