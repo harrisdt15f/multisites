@@ -85,7 +85,7 @@ class BackEndApiMainController extends Controller
         if ($this->userAgent->isDesktop()) {
             $open_route = BackendAdminRoute::where('is_open', 1)->pluck('method')->toArray();
             $result = true;
-        } elseif (Request::header('from') == 'Lottery Center System v3.0.0.0') {
+        } elseif (Request::header('from') === 'Lottery Center System v3.0.0.0') {
             $open_route = BackendAdminRoute::where('is_open', 1)->pluck('method')->toArray();
             $result = true;
         } else {
@@ -121,7 +121,7 @@ class BackEndApiMainController extends Controller
             $partnerMenuEloq = $partnerAdREloq->menu;
             //set if it is accissable or not
             if (!empty($this->currentPartnerAccessGroup->role)) {
-                if ($this->currentPartnerAccessGroup->role == '*') {
+                if ($this->currentPartnerAccessGroup->role === '*') {
                     $this->routeAccessable = true;
                 } else {
                     $currentRouteGroup = json_decode($this->currentPartnerAccessGroup->role, true);
@@ -172,14 +172,14 @@ class BackEndApiMainController extends Controller
         $defaultSuccessCode = '200';
         $defaultErrorCode = '404';
         if ($success === true) {
-            $code = $code == '' ? $defaultSuccessCode : $code;
+            $code = $code === '' ? $defaultSuccessCode : $code;
         } else {
-            $code = $code == '' ? $defaultErrorCode : $code;
+            $code = $code === '' ? $defaultErrorCode : $code;
         }
         if ($placeholder === '' || $substituted === '') {
-            $message = $message == '' ? __('codes-map.' . $code) : $message;
+            $message = $message === '' ? __('codes-map.' . $code) : $message;
         } else {
-            $message = $message == '' ? __('codes-map.' . $code, [$placeholder => $substituted]) : $message;
+            $message = $message === '' ? __('codes-map.' . $code, [$placeholder => $substituted]) : $message;
         }
         $datas = [
             'success' => $success,
@@ -222,19 +222,19 @@ class BackEndApiMainController extends Controller
         $timeConditions = Arr::wrap(json_decode($timeConditionField, true));
         $extraWhereContitions = $this->inputs['extra_where'] ?? [];
         $extraContitions = $this->inputs['extra_column'] ?? [];
-        $queryEloq = new $eloqM;
+        $queryEloq = new $eloqM();
         $sizeOfInputs = count($searchCriterias);
         //with Criterias
         $withSearchCriterias = Arr::only($this->inputs, $withSearchAbleFields);
         $sizeOfWithInputs = count($withSearchCriterias);
 
         $pageSize = $this->inputs['page_size'] ?? 20;
-        if ($sizeOfInputs == 1) {
+        if ($sizeOfInputs === 1) {
             //for single where condition searching
             if (!empty($searchCriterias)) {
                 foreach ($searchCriterias as $key => $value) {
                     $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
-                    if ($sign == 'LIKE') {
+                    if ($sign === 'LIKE') {
                         $sign = strtolower($sign);
                         $value = '%' . $value . '%';
                     }
@@ -281,7 +281,7 @@ class BackEndApiMainController extends Controller
                     $whereData = [];
                     foreach ($searchCriterias as $key => $value) {
                         $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
-                        if ($sign == 'LIKE') {
+                        if ($sign === 'LIKE') {
                             $sign = strtolower($sign);
                             $value = '%' . $value . '%';
                         }
@@ -349,8 +349,7 @@ class BackEndApiMainController extends Controller
             $method = $extraWhereContitions['method'];
             $queryEloq = $queryEloq->$method($extraWhereContitions['key'], $extraWhereContitions['value']);
         }
-        $data = $queryEloq->orderBy($orderFields, $orderFlow)->paginate($pageSize);
-        return $data;
+        return $queryEloq->orderBy($orderFields, $orderFlow)->paginate($pageSize);
     }
 
     /**
@@ -383,7 +382,7 @@ class BackEndApiMainController extends Controller
                 case 1: //有一个连表查询的情况下
                     $queryEloq = $queryEloq->with($withTable)->whereHas(
                         $withTable,
-                        function ($query) use ($sizeOfWithInputs, $withSearchCriterias, $queryConditions) {
+                        static function ($query) use ($sizeOfWithInputs, $withSearchCriterias, $queryConditions) {
                             if ($sizeOfWithInputs > 1) {
                                 if (!empty($withSearchCriterias)) {
                                     $whereData = [];
@@ -398,12 +397,12 @@ class BackEndApiMainController extends Controller
                                     $query->where($whereData);
                                 }
                             } else {
-                                if ($sizeOfWithInputs == 1) {
+                                if ($sizeOfWithInputs === 1) {
                                     if (!empty($withSearchCriterias)) {
                                         foreach ($withSearchCriterias as $key => $value) {
                                             $sign = array_key_exists($key, $queryConditions) ?
                                             $queryConditions[$key] : '=';
-                                            if ($sign == 'LIKE') {
+                                            if ($sign === 'LIKE') {
                                                 $sign = strtolower($sign);
                                                 $value = '%' . $value . '%';
                                             }
