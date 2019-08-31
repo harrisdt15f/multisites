@@ -11,17 +11,21 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class StatUser implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
-    protected $data         = null;
-    protected $type         = null;
-    protected $player       = null;
-    protected $dateTime     = null;
-    protected $recordId     = null;
+    protected $data = null;
+    protected $type = null;
+    protected $player = null;
+    protected $dateTime = null;
+    protected $recordId = null;
 
     public function __construct($type, array $data)
     {
@@ -35,18 +39,19 @@ class StatUser implements ShouldQueue
     public function handle()
     {
         // 日期验证
-        $date = isset($this->data['date']) ?? date("Y-m-d H:i:s");
-        if (!$this->checkDateTime($date)) {
-            Log::channel('stat')->error("stat-user-invalid-date", ['data' => $this->data]);
+        $date = isset($this->data['date']) ?? date('Y-m-d H:i:s');
+        //if (!$this->checkDateTime($date)) {
+        if (!$this->checkDateTime()) {
+            Log::channel('stat')->error('stat-user-invalid-date', ['data' => $this->data]);
             return true;
         }
 
         $this->dateTime = $date;
 
         // 记录ID
-        $recordId = isset($this->data['record_id']) ??0;
+        $recordId = isset($this->data['record_id']) ?? 0;
         if (!$recordId) {
-            Log::channel('stat')->error("stat-user-empty-record_id", ['data' => $this->data]);
+            Log::channel('stat')->error('stat-user-empty-record_id', ['data' => $this->data]);
             return true;
         }
 
@@ -55,22 +60,22 @@ class StatUser implements ShouldQueue
         // 用户验证
         $playerId = isset($this->data['player_id']) ?? 0;
         if ($playerId) {
-            Log::channel('stat')->error("stat-user-empty-id", ['data' => $this->data]);
+            Log::channel('stat')->error('stat-user-empty-id', ['data' => $this->data]);
             return true;
         }
 
         // 获取玩家
         $player = FrontendUser::find($playerId);
         if (!$player) {
-            Log::channel('stat')->error("stat-user-empty-player", ['data' => $this->data]);
+            Log::channel('stat')->error('stat-user-empty-player', ['data' => $this->data]);
             return true;
         }
 
         $this->player = $player;
 
         $type = $this->type;
-
-        db()->beginTransaction();
+        $res = '';
+        DB::beginTransaction();
         try {
             switch ($type) {
                 case 'bet':
@@ -83,10 +88,10 @@ class StatUser implements ShouldQueue
                     $res = $this->doStatBonus();
                     break;
                 case 'self_points':
-                    $res = $this->doStatPoints('self');
+                    $res = $this->doStatPoints(); // ('self')   暂时没使用到   代码规范   先注释
                     break;
                 case 'child_points':
-                    $res = $this->doStatPoints('child');
+                    $res = $this->doStatPoints(); // ('child')   暂时没使用到   代码规范   先注释
                     break;
                 case 'gift':
                     $res = $this->doStatGift();
@@ -112,88 +117,96 @@ class StatUser implements ShouldQueue
             }
 
             if ($res !== true) {
-                Log::channel('stat')->error("stat-user-error-type:{$this->type}-" .$res, ['data' => $this->data]);
-                db()->rollback();
+                Log::channel('stat')->error('stat-user-error-type:'.$this->type.'-' . $res, ['data' => $this->data]);
+                DB::rollback();
             }
 
-            db()->commit();
+            DB::commit();
         } catch (\Exception $e) {
-            Log::channel('stat')->error("stat-user-exception-type:{$this->type}-" . "|" . $e->getFile() . "|" . $e->getLine() . "|" . $e->getMessage(), ['data' => $this->data]);
+            Log::channel('stat')->error('stat-user-exception-type:'.$this->type.'-' . '|' . $e->getFile() . '|' . $e->getLine() . '|' . $e->getMessage(), ['data' => $this->data]);
         }
     }
 
     // 统计投注
-    protected function doStatBet() {
-
+    protected function doStatBet()
+    {
     }
 
     // 统计撤单
-    protected function doStatCancel() {
-
+    protected function doStatCancel()
+    {
     }
 
     // 统计奖金
-    protected function doStatBonus() {
-
+    protected function doStatBonus()
+    {
     }
 
     // 统计返点
-    protected function doStatPoints($type = 'child') {
-
+    protected function doStatPoints()//$type = 'child' 暂时没使用到   代码规范   先注释
+    {
     }
 
     // 统计礼金
-    protected function doStatGift() {
-
+    protected function doStatGift()
+    {
     }
 
     // 统计分红
-    protected function doStatDividend() {
-
+    protected function doStatDividend()
+    {
     }
 
     // 统计日工资
-    protected function doStatSalary() {
-
+    protected function doStatSalary()
+    {
     }
 
     // 统计上级转账
-    protected function doStatParentTransfer() {
-
+    protected function doStatParentTransfer()
+    {
     }
 
     // 统计系统转账
-    protected function doStatSystemTransfer() {
-
+    protected function doStatSystemTransfer()
+    {
     }
 
     // 统计系统提现
-    protected function doStatWithdraw() {
-
+    protected function doStatWithdraw()
+    {
     }
 
     // 统计充值
-    protected function doStatRecharge() {
+    protected function doStatRecharge()
+    {
 
-        $record = UserRecharge::find($recordId);
-
-        $dateDay    = date("Ymd", strtotime($this->dateTime));
-        $player     = $this->player;
-
-        $change     = [
-            'recharge_count'    => 1,
-            'recharge_amount'   => isset($this->data['amount']) ?? 0,
+        // $record = UserRecharge::find($recordId);
+        $player = $this->player;
+        $change = [
+            'recharge_count' => 1,
+            'recharge_amount' => isset($this->data['amount']) ?? 0,
         ];
-
-        $userStat = UserStat::where("user_id", $player->id)->first();
+        $userStat = UserStat::where('user_id', $player->id)->first();
+        if ($userStat === null) {
+            $res = '数据不存在';
+        }
         if ($userStat->recharge_amount <= 0) {
-            $change['recharge_first']       = 1;
+            $change['recharge_first'] = 1;
         }
 
-        $res = UserStatDay::change($player, $change, $dateDay);
+        $date = strtotime($this->dateTime);
+        if ($date !== false) {
+            $dateDay = date('Ymd', $date);
+
+            $res = UserStatDay::change($player, $change, $dateDay);
+        } else {
+            $res = '日期不正确';
+        }
 
         if ($res !== true) {
-            Clog::statUser("stat-user-recharge-error-" . $player->id  . "-充值-统计失败", ['params' => $change, 'res' => $res]);
+            //Clog不知道哪里来的  暂时注释掉
+            //Clog::statUser("stat-user-recharge-error-" . $player->id . "-充值-统计失败", ['params' => $change, 'res' => $res]);
             return $res;
         }
 
@@ -201,7 +214,7 @@ class StatUser implements ShouldQueue
     }
 
     // @TODO
-    protected function checkDateTime() {
-
+    protected function checkDateTime()
+    {
     }
 }

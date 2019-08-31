@@ -30,11 +30,12 @@ trait BaseCache
      */
     public static function getTagsCacheData(string $key)
     {
-        $cacheConfig = self::getCacheConfig($key);
         $data = [];
-        if (!empty($cacheConfig) && isset($cacheConfig['tags'], $cacheConfig['key'])) {
+        if (self::hasTagsCache($key)) {
+            $cacheConfig = self::getCacheConfig($key);
             $data = Cache::tags($cacheConfig['tags'])->get($cacheConfig['key'], []);
         }
+
         return $data;
     }
 
