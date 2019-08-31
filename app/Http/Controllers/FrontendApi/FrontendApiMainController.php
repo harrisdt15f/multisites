@@ -292,8 +292,7 @@ class FrontendApiMainController extends Controller
             $method = $extraWhereContitions['method'];
             $queryEloq = $queryEloq->$method($extraWhereContitions['key'], $extraWhereContitions['value']);
         }
-        $data = $queryEloq->orderBy($orderFields, $orderFlow)->paginate($pageSize);
-        return $data;
+        return $queryEloq->orderBy($orderFields, $orderFlow)->paginate($pageSize);
     }
 
     /**
@@ -357,7 +356,7 @@ class FrontendApiMainController extends Controller
                                                     $key,
                                                     $queryConditions
                                                 ) ? $queryConditions[$key] : '=';
-                                                if ($sign == 'LIKE') {
+                                                if ($sign === 'LIKE') {
                                                     $sign = strtolower($sign);
                                                     $value = '%' . $value . '%';
                                                 }
