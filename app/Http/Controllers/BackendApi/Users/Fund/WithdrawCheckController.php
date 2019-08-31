@@ -3,11 +3,7 @@
 namespace App\Http\Controllers\BackendApi\Users\Fund;
 
 use App\Http\Controllers\BackendApi\BackEndApiMainController;
-use App\Http\Requests\Backend\Users\Fund\RechargeCheckAuditFailureRequest;
-use App\Http\Requests\Backend\Users\Fund\RechargeCheckAuditSuccessRequest;
-use App\Http\SingleActions\Backend\Users\Fund\RechargeCheckAuditFailureAction;
-use App\Http\SingleActions\Backend\Users\Fund\RechargeCheckAuditSuccessAction;
-use App\Http\SingleActions\Backend\Users\Fund\RechargeCheckDetailAction;
+use App\Http\Requests\Backend\Users\Fund\WithdrawListRequest;
 use App\Http\SingleActions\Payment\PayWithdrawAction;
 use Illuminate\Http\JsonResponse;
 
@@ -41,5 +37,16 @@ class WithdrawCheckController extends BackEndApiMainController
     public function auditFailure(PayWithdrawAction $action): JsonResponse
     {
         return $action->auditFailure($this);
+    }
+
+
+    /**
+     * 提现列表
+     * @param PayWithdrawAction $action
+     * @return JsonResponse
+     */
+    public function withdrawList(PayWithdrawAction $action, WithdrawListRequest $request) : JsonResponse
+    {
+        return $action->backWithdrawList($this, $request);
     }
 }

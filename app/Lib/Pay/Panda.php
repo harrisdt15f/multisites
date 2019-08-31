@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Log;
 
 class Panda extends BasePay
 {
-
     public $sign = 'panda';
 
     public $constant = [];
@@ -21,7 +20,7 @@ class Panda extends BasePay
         $gateway = config('pay.panda.gateway'); //接口地址
 
         $this->constant = [
-            'callback' => parent::getNotifyUrl($this->sign),
+            'callback' => self::getNotifyUrl($this->sign),
             'url' => $gateway,
             'key' => $key,
             'merchantId' => $merchantId,
@@ -59,7 +58,6 @@ class Panda extends BasePay
             'username' => $user->username,
             'user_level' => 1,
         ];
-
         Log::channel('pay-recharge')->info('recharge-channel:【充值通道，参数传递】' . json_encode($params));
         $params['sign'] = $this->encrypt($params, $this->constant['key']);
         $result = json_decode(curl_post($this->constant['recharge_channel_url'], $params), true);
@@ -81,7 +79,7 @@ class Panda extends BasePay
      */
     public function recharge($amount, $orderId, $channel, $source = 'web')
     {
-        $callbackUrl = parent::getCallbackUrl($this->sign);
+        $callbackUrl = self::getCallbackUrl($this->sign);
         $url = $this->constant['recharge_url'];
         $merchantId = $this->constant['merchantId'];
 
@@ -138,7 +136,7 @@ class Panda extends BasePay
         Log::channel('pay-withdraw')->info('withdraw:【发起提现，参数传递】' . json_encode($params));
         $result = json_decode(curl_post($url, $params), true);
         Log::channel('pay-withdraw')->info('withdraw:【提现请求返回】' . json_encode($result));
-        if ($result['status'] == 'success') {
+        if ($result['status'] === 'success') {
             return [true, $result['msg']];
         }
 
@@ -170,7 +168,7 @@ class Panda extends BasePay
 
         Log::channel('pay-withdraw')->info('withdraw-query:【请求结果】' . json_encode($result));
 
-        if ($result['status'] == 'success') {
+        if ($result['status'] === 'success') {
             return [true, $result['msg']];
         }
 
@@ -182,7 +180,7 @@ class Panda extends BasePay
         $str = '';
         ksort($data);
         foreach ($data as $key => $value) {
-            if ('sign' == $key || self::isEmpty($value)) {
+            if ('sign' === $key || self::isEmpty($value)) {
                 continue;
             }
             $str .= $key . '=' . $value . '&';
@@ -197,7 +195,7 @@ class Panda extends BasePay
     {
         $key = $this->constant['key'];
         $mySign = $this->encrypt($data, $key);
-        if (isset($data[$keySign]) && !empty($data[$keySign]) && $data[$keySign] == $mySign) {
+        if (isset($data[$keySign]) && !empty($data[$keySign]) && $data[$keySign] === $mySign) {
             return true;
         }
         return false;
