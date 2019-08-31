@@ -48,7 +48,7 @@ trait ProjectTraits
                 $traceData = $inputDatas['trace_issues'];
             } elseif ($isTrace === 0) {
                 // 投注期号是否正确
-                if ((int) $currentIssue->issue !== key($inputDatas['trace_issues'])) {
+                if ($currentIssue->issue !== (string) key($inputDatas['trace_issues'])) {
                     $arr['error'] = '100310';
                     return $arr;
                 }
@@ -281,8 +281,8 @@ trait ProjectTraits
         $sWnNumber,
         $aPrized
     ) {
-        $arrBasicMethodId=[];
-        $arrLevel=[];
+        $arrBasicMethodId = [];
+        $arrLevel = [];
         $totalBonus = 0;
         $totalCount = 0;
         $aPrizeSet = json_decode($this->prize_set, true);
@@ -309,7 +309,7 @@ trait ProjectTraits
                         $totalCount += $iCount;
                         $totalBonus += $bonus;
                         $arrLevel[] = $iLevel;
-                        $arrBasicMethodId[]= $iBasicMethodId;
+                        $arrBasicMethodId[] = $iBasicMethodId;
                     } else {
                         $errorString = 'There have no Count:' . $iBasicMethodId . ' level:' . $iLevel . ' Count:' . $iCount;
                         Log::channel('issues')->info($errorString);
