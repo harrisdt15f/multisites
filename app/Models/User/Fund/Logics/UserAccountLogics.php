@@ -7,7 +7,6 @@ use App\Lib\Clog;
 use App\Lib\Locker\AccountLocker;
 use App\Lib\Logic\AccountChange;
 use App\Models\Account\FrontendUsersAccountsType;
-use App\Models\User\FrontendUsersAccount;
 use Exception;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +24,7 @@ trait UserAccountLogics
 
     public static function getList($c): array
     {
-        $query = FrontendUsersAccount::select(
+        $query = self::select(
             DB::raw('frontend_users_accounts.*'),
             DB::raw('users.username'),
             DB::raw('users.prize_group')
@@ -42,7 +41,7 @@ trait UserAccountLogics
         $pageSize = $c['page_size'] ?? 15;
         $offset = ($currentPage - 1) * $pageSize;
         $total = $query->count();
-        $data = $query->skip($offset)->take($pageSize)->get();
+        $data = $query->skip((int) $offset)->take($pageSize)->get();
         return [
             'data' => $data,
             'total' => $total,
@@ -63,7 +62,8 @@ trait UserAccountLogics
         try {
             return $this->doChange($type, $params);
         } catch (\Exception $e) {
-            Clog::account('error-' . $e->getMessage() . '|' . $e->getLine() . '|' . $e->getFile());
+            //没有Clog类   暂时注释
+            // Clog::account('error-' . $e->getMessage() . '|' . $e->getLine() . '|' . $e->getFile());
             return $e->getMessage();
         }
     }
@@ -75,7 +75,8 @@ trait UserAccountLogics
         $typeConfig = FrontendUsersAccountsType::getTypeBySign($typeSign);
         //　1. 获取帐变配置
         if (empty($typeConfig)) {
-            Clog::account('error-' . $user->id . '-' . $typeSign . '不存在!');
+            //没有Clog类   暂时注释
+            // Clog::account('error-' . $user->id . '-' . $typeSign . '不存在!');
             return '对不起, ' . $typeSign . '不存在!';
         }
         // 2. 参数检测
@@ -83,7 +84,7 @@ trait UserAccountLogics
             if (in_array($key, ['id', 'name', 'sign', 'type', 'froze_type'])) {
                 continue;
             }
-            if ($value == 1) {
+            if ($value === 1) {
                 if (!isset($params[$key])) {
                     return '对不起, 参数' . $key . '没有传递!';
                 }
@@ -91,20 +92,21 @@ trait UserAccountLogics
         }
         // 3. 检测金额
         $amount = abs($params['amount']);
-        if ($amount == 0) {
+        if ($amount === 0) {
             return true;
         }
         // 4. 关联用户是否存在
         $relatedUser = null;
         if (isset($params['related_id'])) {
-            $relatedUser = User::findByCache($params['related_id']);
-            if (!$relatedUser) {
-                return '对不起, 无效的关联用户!';
-            }
+            // 没有User类   暂时注释
+            // $relatedUser = User::findByCache($params['related_id']);
+            // if (!$relatedUser) {
+            //     return '对不起, 无效的关联用户!';
+            // }
         }
         // 冻结类型 1 冻结自己金额 2 冻结退还　3 冻结给玩家　4 冻结给系统　5 中奖
         // 资金增减. 需要检测对应
-        if ($typeConfig['froze_type'] == 5) {
+        if ($typeConfig['froze_type'] === 5) {
             if (!$relatedUser) {
                 return '对不起, 必须存在关联用户!';
             }
@@ -151,13 +153,14 @@ trait UserAccountLogics
             case self::FROZEN_STATUS_TO_PLAYER:
             case self::FROZEN_STATUS_TO_SYSTEM:
                 if ($params['amount'] > $this->frozen) {
-                    Clog::account('error-' . $user->id . '-' . $amount . '-' . $this->frozen . '-冻结金额不足!');
+                    // 没有User类   暂时注释
+                    //Clog::account('error-' . $user->id . '-' . $amount . '-' . $this->frozen . '-冻结金额不足!');
                     return '对不起, 用户冻结金额不足!';
                 }
                 $ret = $this->unFrozenToPlayer($amount);
                 break;
             default:
-                if ($typeConfig['type'] == 1) {
+                if ($typeConfig['type'] === 1) {
                     $ret = $this->add($params['amount']);
                 } else {
                     if ($params['amount'] > $this->balance) {
@@ -177,27 +180,30 @@ trait UserAccountLogics
         $report['before_frozen_balance'] = $beforeFrozen;
         $change['updated_at'] = date('Y-m-d H:i:s');
         $this->saveData($report);
-        if ($beforeBalance != $balance) {
-            event(new \App\Events\Broadcast\User($this->user_id, 'fundChange', ['balance' => number2($this->balance)]));
+        if ($beforeBalance !== $balance) {
+            // 没有\App\Events\Broadcast\User   没有number2方法    暂时注释
+            //event(new \App\Events\Broadcast\User($this->user_id, 'fundChange', ['balance' => number2($this->balance)]));
         }
         return true;
     }
 
-    public function triggerSave()
+    //没有用到的函数  规范整理 暂时注释
+    /* public function triggerSave()
     {
-        if ($this->changes) {
-            $ret = DB::table('account_change_report')->insert($this->changes);
-            info($this->changes);
-            // if (!$ret) {
-            //     return false;
-            // }
-            $this->changes = [];
-        }
+    if ($this->changes) {
+    DB::table('account_change_report')->insert($this->changes);
+    // $ret = DB::table('account_change_report')->insert($this->changes);
+    info($this->changes);
+    // if (!$ret) {
+    //     return false;
+    // }
+    $this->changes = [];
     }
+    }*/
 
     public function saveData($report)
     {
-        if ($this->mode == self::MODE_CHANGE_AFTER) {
+        if ($this->mode === self::MODE_CHANGE_AFTER) {
             $this->changes[] = $report;
         } else {
             $ret = DB::table('account_change_report')->insert($report);

@@ -13,9 +13,7 @@ use Illuminate\Queue\SerializesModels;
 class BackendLogMonologEvent
 {
     use SerializesModels;
-    /**
-     * @var
-     */
+
     public $records;
 
     /**

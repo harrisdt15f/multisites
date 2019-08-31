@@ -22,10 +22,18 @@ class EnableCors
      */
     public function handle($request, Closure $next)
     {
-        Log::info(json_encode($request->headers->all()));
-        Log::info(json_encode($request->path()));
-        Log::info(json_encode($request->method()));
-        Log::info(json_encode($request->all()));
+        if (($headers = json_encode($request->headers->all())) !== false) {
+            Log::info($headers);
+        }
+        if (($path = json_encode($request->path())) !== false) {
+            Log::info($path);
+        }
+        if (($method = json_encode($request->method())) !== false) {
+            Log::info($method);
+        }
+        if (($all = json_encode($request->all())) !== false) {
+            Log::info($all);
+        }
         $response = $next($request);
         $response->headers->set(
             'Access-Control-Allow-Headers',

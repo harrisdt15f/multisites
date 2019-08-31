@@ -157,6 +157,27 @@ return [
             'name'          => '首页二维码缓存',
             'tags'          => 'homepage'
         ],
+
+        'homepage_popular_lotteries'    => [
+            'key'           => 'homepage_popular_lotteries',
+            'expire_time'   => 0,
+            'name'          => '首页热门彩种',
+            'tags'          => 'homepage'
+        ],
+
+        'homepage_chess_cards'    => [
+            'key'           => 'homepage_chess_cards',
+            'expire_time'   => 0,
+            'name'          => '首页热门棋牌',
+            'tags'          => 'homepage'
+        ],
+
+        'homepage_e_game'    => [
+            'key'           => 'homepage_e_game',
+            'expire_time'   => 0,
+            'name'          => '首页热门电子',
+            'tags'          => 'homepage'
+        ],
         //============================首页相关 END============================
         
         'cron_job_open'    => [
