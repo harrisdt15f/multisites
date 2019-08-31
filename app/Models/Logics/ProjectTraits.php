@@ -279,16 +279,17 @@ trait ProjectTraits
         $sWnNumber,
         $aPrized
     ) {
+        $arrBasicMethodId=[];
+        $arrLevel=[];
         $totalBonus = 0;
         $totalCount = 0;
-        $finalLevel = 0;
         $aPrizeSet = json_decode($this->prize_set, true);
         foreach ($aPrized as $iBasicMethodId => $aPrizeOfBasicMethod) {
             foreach ($aPrizeOfBasicMethod as $iLevel => $iCount) {
                 if ($iBasicMethodId === 123) {
                     $win = explode(' ', $sWnNumber);
                     $tema = end($win);
-                    if ($tema == 49) {
+                    if ($tema === '49') {
                         $prizeToClaim = 1;
                     } else {
                         $prizeToClaim = $aPrizeSet[$iBasicMethodId][$iLevel];
@@ -305,7 +306,8 @@ trait ProjectTraits
                         }
                         $totalCount += $iCount;
                         $totalBonus += $bonus;
-                        $finalLevel = $iLevel;
+                        $arrLevel[] = $iLevel;
+                        $arrBasicMethodId[]= $iBasicMethodId;
                     } else {
                         $errorString = 'There have no Count:' . $iBasicMethodId . ' level:' . $iLevel . ' Count:' . $iCount;
                         Log::channel('issues')->info($errorString);
@@ -316,31 +318,31 @@ trait ProjectTraits
                     Log::channel('issues')->error($errorString);
                 }
             }
-            if ($totalCount > 0) {
-                $data = [
-                    'basic_method_id' => $iBasicMethodId,
-                    'open_number' => $openNumber,
-                    'winning_number' => $this->formatWiningNumber($sWnNumber),
-                    'level' => $finalLevel, //@todo may be with string to concact
-                    'bonus' => $totalBonus,
-                    'is_win' => 1,
-                    'time_count' => now()->timestamp,
-                    'status' => self::STATUS_WON,
-                ];
-                try {
-                    DB::beginTransaction();
-                    $this->update($data); //@todo maybe only a time update
-                    DB::commit();
-                    $this->sendMoney();
-                } catch (Exception $e) {
-                    Log::channel('issues')->info($e->getMessage());
-                    DB::rollBack();
-                    return $e->getMessage();
-                }
-            } else {
-                $this->setFail($openNumber, $sWnNumber, $iBasicMethodId);
+        }
+        if ($totalCount > 0) {
+            $data = [
+                'basic_method_id' => implode(',', $arrBasicMethodId),
+                'open_number' => $openNumber,
+                'winning_number' => $this->formatWiningNumber($sWnNumber),
+                'level' => implode(',', $arrLevel), //@todo may be with string to concact
+                'bonus' => $totalBonus,
+                'is_win' => 1,
+                'time_count' => now()->timestamp,
+                'status' => self::STATUS_WON,
+            ];
+            try {
+                DB::beginTransaction();
+                $this->update($data); //@todo maybe only a time update
+                DB::commit();
+                $this->sendMoney();
+                return true;
+            } catch (Exception $e) {
+                Log::channel('issues')->info($e->getMessage());
+                DB::rollBack();
+                return $e->getMessage();
             }
-            return true;
+        } else {
+            return $this->setFail($openNumber, $sWnNumber);
         }
     }
 
@@ -478,20 +480,18 @@ trait ProjectTraits
     /**
      * @param $openNumber
      * @param $sWnNumber
-     * @param $iBasicMethodId
      * @return bool
      */
     public function setFail(
         $openNumber,
-        $sWnNumber = null,
-        $iBasicMethodId = null
+        $sWnNumber = null
     ): bool {
         try {
             DB::beginTransaction();
 //            $lockProject = $this->lockForUpdate()->find($this->id);
             $this->status = self::STATUS_LOST;
             $data = [
-                'basic_method_id' => $iBasicMethodId,
+//                'basic_method_id' => $iBasicMethodId,
                 'open_number' => $openNumber,
                 'winning_number' => $this->formatWiningNumber($sWnNumber),
                 'time_count' => now()->timestamp,
