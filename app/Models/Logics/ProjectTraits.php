@@ -45,7 +45,7 @@ trait ProjectTraits
                 $traceData = $inputDatas['trace_issues'];
             } elseif ($isTrace === 0) {
                 // 投注期号是否正确
-                if ($currentIssue->issue != key($inputDatas['trace_issues'])) {
+                if ($currentIssue->issue !== key($inputDatas['trace_issues'])) {
                     $arr['error'] = '100310';
                     return $arr;
                 }
@@ -148,8 +148,7 @@ trait ProjectTraits
             'bet_from' => $from,
             'time_bought' => time(),
         ];
-        $project = Project::create($projectData);
-        return $project;
+        return Project::create($projectData);
     }
 
     /**

@@ -33,7 +33,8 @@ class LotteriesBetRequest extends BaseFormRequest
     {
         return [
             'lottery_sign' => 'required|string|min:4|max:10|exists:lottery_lists,en_name',
-            'trace_issues.*' => 'required|integer|between:1,1000',
+            'trace_issues' => 'required|array|between:1,100',
+            'trace_issues.*' => 'required|numeric',
             'balls.*.method_id' => 'required|exists:lottery_methods,method_id',
             'balls.*.method_group' => 'required|exists:lottery_methods,method_group',
             'balls.*.method_name' => 'required',
