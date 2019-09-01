@@ -37,6 +37,7 @@
         "mockery/mockery": "^1.0",
         "nunomaduro/collision": "^2.0",
         "nunomaduro/larastan": "^0.3.17",
+        "object-calisthenics/phpcs-calisthenics-rules": "^3.5",
         "phpunit/phpunit": "^7.0",
         "sirbrillig/phpcs-import-detection": "^1.1",
         "slevomat/coding-standard": "^5.0",
