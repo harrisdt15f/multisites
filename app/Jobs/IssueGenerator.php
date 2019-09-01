@@ -19,9 +19,9 @@ class IssueGenerator implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param $datas
+     * @param array $datas
      */
-    public function __construct($datas)
+    public function __construct(array $datas)
     {
         $this->datas = $datas;
     }

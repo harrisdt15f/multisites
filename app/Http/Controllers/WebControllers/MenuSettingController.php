@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\WebControllers;
 
 use App\Models\DeveloperUsage\Menu\BackendSystemMenu;
-use function GuzzleHttp\json_decode;
+use Exception;
 use Illuminate\Support\Facades\Route;
 
 class MenuSettingController extends AdminMainController
@@ -19,7 +19,7 @@ class MenuSettingController extends AdminMainController
         foreach ($routeCollection as $key => $r) {
             if (isset($r->action['as'])) {
                 if ($r->action['prefix'] !== '_debugbar') {
-                    $rname[$r->action['as']] = $r->uri;
+                    $rname[$r->action['as']] = $r->uri ?? '';
                 }
             }
         }
@@ -29,7 +29,7 @@ class MenuSettingController extends AdminMainController
                 'firstlevelmenus' => $firstlevelmenus,
                 'rname' => $rname,
                 'editMenu' => $editMenu,
-                'routeMatchingName' => $routeMatchingName
+                'routeMatchingName' => $routeMatchingName,
             ]
         );
     }
@@ -63,9 +63,11 @@ class MenuSettingController extends AdminMainController
                 });
                 $menuEloq->refreshStar();
                 return response()->json(['success' => true, 'menudeleted' => 1]);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 return response()->json(['success' => false, 'menudeleted' => 0]);
             }
+        } else {
+            return response()->json(['success' => false, 'menudeleted' => 0]);
         }
     }
 
@@ -98,6 +100,8 @@ class MenuSettingController extends AdminMainController
             $menuELoq = new $this->eloqM;
             $itemProcess = $menuELoq->changeParent($parseDatas);
             return response()->json(['success' => true, $itemProcess]);
+        } else {
+            return response()->json(['success' => false, 'menudeleted' => 0]);
         }
     }
 }

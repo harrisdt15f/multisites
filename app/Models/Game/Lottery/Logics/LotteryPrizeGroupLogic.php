@@ -16,7 +16,6 @@ trait LotteryPrizeGroupLogic
     /**
      * @param $iClassicPrize
      * @param $series_id
-     * @return bool
      */
     public static function getPrizeGroupByClassicPrizeAndSeries($iClassicPrize, $series_id)
     {

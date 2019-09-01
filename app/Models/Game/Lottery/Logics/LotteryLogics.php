@@ -107,7 +107,7 @@ trait LotteryLogics
 
     /**
      * 合法的倍数
-     * @param $times
+     * @param int $times
      * @return bool
      */
     public function isValidTimes($times): bool
@@ -123,7 +123,7 @@ trait LotteryLogics
 
     /**
      * 是否是彩种合法的奖金组
-     * @param $prizeGroup
+     * @param int $prizeGroup
      * @return bool
      */
     public function isValidPrizeGroup($prizeGroup): bool
@@ -149,11 +149,11 @@ trait LotteryLogics
 
     /**
      * 获取 单个彩种
-     * @param $sign
+     * @param string $sign
      * @return array|mixed
      * @throws \Exception
      */
-    public static function getLottery($sign)
+    public static function getLottery(string $sign)
     {
         $lotteries = self::getAllLotteryByCache();
         return $lotteries[$sign] ?? [];
@@ -167,11 +167,11 @@ trait LotteryLogics
     public static function getAllLotteryByCache($update = 0)
     {
         $key = 'lottery';
-        if (self::hasCache($key) && $update === 0) {
-            return self::getCacheData($key);
+        if (self::hasTagsCache($key) && $update === 0) {
+            return self::getTagsCacheData($key);
         } else {
             $lotteries = self::getAllLotteries();
-            self::saveCacheData($key, $lotteries);
+            self::saveTagsCacheData($key, $lotteries);
             return $lotteries;
         }
     }
@@ -184,45 +184,44 @@ trait LotteryLogics
 
     /**
      * 检查是否存在缓存
-     * @param $key
+     * @param string $key
      * @return bool
      * @throws \Exception
      */
-    public static function hasCache($key)
+    public static function hasTagsCache(string $key)
     {
         $cacheConfig = self::getCacheConfig($key);
-        if (isset($cacheConfig['tags'])) {
+        if (!empty($cacheConfig) && isset($cacheConfig['tags'], $cacheConfig['key'])) {
             return Cache::tags($cacheConfig['tags'])->has($cacheConfig['key']);
         } else {
-            return Cache::has($cacheConfig['key']);
+            return false;
         }
     }
 
     /**
      * 获取缓存配置
-     * @param $key
+     * @param string $key
      * @return mixed
      */
-    public static function getCacheConfig($key)
+    public static function getCacheConfig(string $key)
     {
         $cacheConfig = Config::get('web.main.cache');
-        return $cacheConfig[$key] ?? $cacheConfig['common'];
+        return $cacheConfig[$key] ?? [];
     }
 
     /**
      * 获取缓存
-     * @param $key
-     * @return Repository
+     * @param string $key
      * @throws \Exception
      */
-    public static function getCacheData($key)
+    public static function getTagsCacheData(string $key)
     {
         $cacheConfig = self::getCacheConfig($key);
-        if (isset($cacheConfig['tags'])) {
-            return Cache::tags($cacheConfig['tags'])->get($cacheConfig['key'], []);
-        } else {
-            return Cache::get($cacheConfig['key'], []);
+        $data = [];
+        if (!empty($cacheConfig) && isset($cacheConfig['tags'], $cacheConfig['key'])) {
+            $data = Cache::tags($cacheConfig['tags'])->get($cacheConfig['key'], []);
         }
+        return $data;
     }
 
     /**
@@ -260,37 +259,30 @@ trait LotteryLogics
 
     /**
      * 保存
-     * @param $key
-     * @param $value
+     * @param string $key
+     * @param mixed $value
      * @throws \Exception
      */
-    public static function saveCacheData($key, $value): void
+    public static function saveTagsCacheData($key, $value): void
     {
         $cacheConfig = self::getCacheConfig($key);
-        if (isset($cacheConfig['tags'])) {
+        if (isset($cacheConfig['tags'], $cacheConfig['key'])) {
             if ($cacheConfig['expire_time'] <= 0) {
                 Cache::tags($cacheConfig['tags'])->forever($cacheConfig['key'], $value);
             } else {
                 $expireTime = Carbon::now()->addSeconds($cacheConfig['expire_time']);
                 Cache::tags($cacheConfig['tags'])->put($cacheConfig['key'], $value, $expireTime);
             }
-        } else {
-            if ($cacheConfig['expire_time'] <= 0) {
-                Cache::forever($cacheConfig['key'], $value);
-            } else {
-                $expireTime = Carbon::now()->addSeconds($cacheConfig['expire_time']);
-                Cache::put($cacheConfig['key'], $value, $expireTime);
-            }
         }
     }
 
     /**
      * 获取 单个玩法 对象
-     * @param $methodId
+     * @param string $methodId
      * @return array|mixed
      * @throws \Exception
      */
-    public function getMethodObject($methodId)
+    public function getMethodObject(string $methodId)
     {
         $data = self::getAllMethodObject($this->series_id);
         return $data[$methodId] ?? [];
@@ -298,15 +290,15 @@ trait LotteryLogics
 
     /**
      * 获取 系列 玩法对象 缓存
-     * @param $seriesId
+     * @param string $seriesId
      * @return mixed
      * @throws \Exception
      */
-    public static function getAllMethodObject($seriesId)
+    public static function getAllMethodObject(string $seriesId)
     {
         $data = [];
-        if (self::hasCache('method_object')) {
-            $data = self::getCacheData('method_object');
+        if (self::hasTagsCache('method_object')) {
+            $data = self::getTagsCacheData('method_object');
             if (isset($data[$seriesId])) {
                 return $data[$seriesId];
             }
@@ -322,16 +314,16 @@ trait LotteryLogics
             $_data[$item->method_id] = $methodObject;
         }
         $data[$seriesId] = $_data;
-        self::saveCacheData('method_object', $data);
+        self::saveTagsCacheData('method_object', $data);
         return $_data;
     }
 
     /**
      * 获取 玩法配置 - 配置 + 对象
-     * @param $methodId
+     * @param string $methodId
      * @return array
      */
-    public function getMethod($methodId)
+    public function getMethod(string $methodId)
     {
         $methods = $this->method_config;
         return $methods[$methodId] ?? [];
@@ -340,12 +332,11 @@ trait LotteryLogics
     /**
      * 只用于前端展示
      * @return array
-     * @throws
      */
     public static function getAllLotteryToFrontEnd()
     {
-        if (self::hasCache('lottery_for_frontend')) {
-            return self::getCacheData('lottery_for_frontend');
+        if (self::hasTagsCache('lottery_for_frontend')) {
+            return self::getTagsCacheData('lottery_for_frontend');
         }
         $lotteries = self::where('status', 1)->get();
         $cacheData = [];
@@ -408,14 +399,13 @@ trait LotteryLogics
                 'defaultMethod' => $defaultMethod,
             ];
         }
-        self::saveCacheData('lottery_for_frontend', $cacheData);
+        self::saveTagsCacheData('lottery_for_frontend', $cacheData);
         return $cacheData;
     }
 
     /**
      * 检查录入的号码
-     * @param $series
-     * @param $code
+     * @param string $codeStr
      * @return bool
      */
     public function checkCodeFormat($codeStr)
@@ -553,7 +543,7 @@ trait LotteryLogics
             ];
         }
         $frontendLotteryInfoCache = 'frontend_lottery_lotteryInfo';
-        self::saveCacheData($frontendLotteryInfoCache, $cacheData);
+        self::saveTagsCacheData($frontendLotteryInfoCache, $cacheData);
         return $cacheData;
     }
 

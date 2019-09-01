@@ -30,27 +30,29 @@ trait LotteryBasicWayLogics
     {
         $sBetNumber = $project->bet_number;
         $aPrized = [];
-        foreach ($oSeriesWay->WinningNumber as $iSeriesMethodId => $sWnNumber) {
-            $oSeriesMethod = LotterySeriesMethod::find($iSeriesMethodId);
-            $oBasicMethod = $oSeriesMethod->basicMethod;
+        if (is_array($oSeriesWay->WinningNumber)) {
+            foreach ($oSeriesWay->WinningNumber as $iSeriesMethodId => $sWnNumber) {
+                $oSeriesMethod = LotterySeriesMethod::find($iSeriesMethodId);
+                $oBasicMethod = $oSeriesMethod->basicMethod;
 //            $iOffset = $oSeriesMethod->offset >= 0 ?
-//                $oSeriesMethod->offset : $oSeriesMethod->offset + $oSeriesWay->digital_count;
-//            $this->sPosition = $sPosition ?? $iOffset;
-//            $oBasicMethod->sPosition = $sPosition;
-            $sBetNumberFinal = $this->formatBetNumber($sBetNumber, $oSeriesMethod, $oSeriesWay, $sWnNumber);
-            $iCount = $oBasicMethod->getPrizeCount($oSeriesWay, $this, $sWnNumber, $sBetNumberFinal);
-            $iLevel = $this->getPrizeLevel(
-                $oSeriesWay,
-                $oBasicMethod,
-                $sWnNumber,
-                $iCount,
-                $sBetNumber,
-                $sBetNumberFinal
-            );
-            if (isset($aPrized[$oSeriesMethod->basic_method_id])) {
-                $aPrized[$oSeriesMethod->basic_method_id][$iLevel] += $iCount;
-            } else {
-                $aPrized[$oSeriesMethod->basic_method_id][$iLevel] = $iCount;
+                //                $oSeriesMethod->offset : $oSeriesMethod->offset + $oSeriesWay->digital_count;
+                //            $this->sPosition = $sPosition ?? $iOffset;
+                //            $oBasicMethod->sPosition = $sPosition;
+                $sBetNumberFinal = $this->formatBetNumber($sBetNumber, $oSeriesMethod, $oSeriesWay, $sWnNumber);
+                $iCount = $oBasicMethod->getPrizeCount($oSeriesWay, $this, $sWnNumber, $sBetNumberFinal);
+                $iLevel = $this->getPrizeLevel(
+                    $oSeriesWay,
+                    $oBasicMethod,
+                    $sWnNumber,
+                    $iCount,
+                    $sBetNumber,
+                    $sBetNumberFinal
+                );
+                if (isset($aPrized[$oSeriesMethod->basic_method_id])) {
+                    $aPrized[$oSeriesMethod->basic_method_id][$iLevel] += $iCount;
+                } else {
+                    $aPrized[$oSeriesMethod->basic_method_id][$iLevel] = $iCount;
+                }
             }
         }
         return $aPrized;
@@ -66,8 +68,8 @@ trait LotteryBasicWayLogics
     ) {
         $aPrizeLevels = $oBasicMethod->getPrizeLevels();
         if ($this->function == 'MultiSequencing') {
-            for ($i = 0; $i < $oSeriesWay->digital_count - $this->iWidthOfWnNumber; $i++) {//来自 formatbetnumber
-                $iCount *= $this->aMultiples[$i];//来自 formatbetnumber
+            for ($i = 0; $i < $oSeriesWay->digital_count - $this->iWidthOfWnNumber; $i++) { //来自 formatbetnumber
+                $iCount *= $this->aMultiples[$i]; //来自 formatbetnumber
             }
         }
         if (($iLevel = count($aPrizeLevels)) > 1) {
@@ -75,8 +77,8 @@ trait LotteryBasicWayLogics
                 case 'k3contain':
                     $iLevelIndex = 0;
                     foreach ($aPrizeLevels as $sRule => $sLevel) {
-                        if (false !== strpos($sWnNumber, (string)$sRule) &&
-                            false !== strpos((string)$sRule, $sBetNumberFinal) &&
+                        if (false !== strpos($sWnNumber, (string) $sRule) &&
+                            false !== strpos((string) $sRule, $sBetNumberFinal) &&
                             ($iLevelIndex === 0 || $sLevel < $iLevelIndex)
                         ) {
                             $iLevelIndex = $sLevel;
@@ -124,8 +126,8 @@ trait LotteryBasicWayLogics
                     // 幸运28 游戏玩法，先获取中奖号码的奖金等级，未获取到 则是 串关
                     !is_array($sWnNumber) or $sWnNumber = implode($sWnNumber);
                     $iLevelIndex = $oBasicMethod->lottery_type == 2 ?
-                        (int)$sWnNumber :
-                        DigitalNumber::getSum($sWnNumber);
+                    (int) $sWnNumber :
+                    DigitalNumber::getSum($sWnNumber);
                     if (isset($aPrizeLevels[$iLevelIndex])) {
                         $iLevel = $aPrizeLevels[$iLevelIndex];
                     } else {
@@ -140,8 +142,8 @@ trait LotteryBasicWayLogics
                 default:
                     !is_array($sWnNumber) or $sWnNumber = implode($sWnNumber);
                     $iLevelIndex = $oBasicMethod->lottery_type == 2 ?
-                        (int)$sWnNumber :
-                        DigitalNumber::getSum($sWnNumber);
+                    (int) $sWnNumber :
+                    DigitalNumber::getSum($sWnNumber);
                     $iLevel = $aPrizeLevels[$iLevelIndex];
                     break;
             }
@@ -158,41 +160,41 @@ trait LotteryBasicWayLogics
      * @return mixed
      */
     /* public function getPrizeLevel(LotterySeriesWay $oSeriesWay, LotteryBasicMethod $oBasicMethod)
-     {
-         $arrWhere = [
-             ['method_id', '=', $oSeriesWay->lottery_method_id],
-             ['series_id', '=', $oSeriesWay->series_code],
-         ];
-         $prizeLevelQuery = $oBasicMethod->prizeLevel()->where($arrWhere);
-         if ($this->sPosition !== null) {
- //            $arrWhere[] = ['position', '=', (string)$this->sPosition];
-             $positon = (string)$this->sPosition;
-             $prizeLevelQuery->whereRaw('FIND_IN_SET('.$positon.',position)');
-         }
-         $prizeLevel = $prizeLevelQuery->first();
-         if ($prizeLevel === null) {
-             $prizeLevelQuery = $oBasicMethod->prizeLevel()->where($arrWhere);
-             $prizeLevelRowCount = $prizeLevelQuery->count();
-             if ($prizeLevelRowCount === 1) { //只有一行奖金的时候就取一行
-                 $prizeLevel = $prizeLevelQuery->first();
-             } elseif ($prizeLevelRowCount < 1) { //没有奖金的时候
-                 $errorString = 'PrizeLevel Query Null'.json_encode($oSeriesWay).
-                 'whereDatas are '.json_encode($arrWhere).
-                 'Query is '.$prizeLevelQuery->toSql();
-                 Log::channel('issues')->error($errorString);
-             } else {//有多条奖金时候
-                 $errorString = 'PrizeLevel Query have Multiple Rows '.json_encode($oSeriesWay).
-                 'whereDatas are '.json_encode($arrWhere).
-                 'Query is '.$prizeLevelQuery->toSql();
-                 $prizeDetailToDecide = $prizeLevelQuery->get()->toJson();
-                 Log::channel('issues')->error($errorString);
-                 Log::channel('issues')->error($prizeDetailToDecide);
-             }
-         }
-         return $prizeLevel->level;
-     }*/
+    {
+    $arrWhere = [
+    ['method_id', '=', $oSeriesWay->lottery_method_id],
+    ['series_id', '=', $oSeriesWay->series_code],
+    ];
+    $prizeLevelQuery = $oBasicMethod->prizeLevel()->where($arrWhere);
+    if ($this->sPosition !== null) {
+    //            $arrWhere[] = ['position', '=', (string)$this->sPosition];
+    $positon = (string)$this->sPosition;
+    $prizeLevelQuery->whereRaw('FIND_IN_SET('.$positon.',position)');
+    }
+    $prizeLevel = $prizeLevelQuery->first();
+    if ($prizeLevel === null) {
+    $prizeLevelQuery = $oBasicMethod->prizeLevel()->where($arrWhere);
+    $prizeLevelRowCount = $prizeLevelQuery->count();
+    if ($prizeLevelRowCount === 1) { //只有一行奖金的时候就取一行
+    $prizeLevel = $prizeLevelQuery->first();
+    } elseif ($prizeLevelRowCount < 1) { //没有奖金的时候
+    $errorString = 'PrizeLevel Query Null'.json_encode($oSeriesWay).
+    'whereDatas are '.json_encode($arrWhere).
+    'Query is '.$prizeLevelQuery->toSql();
+    Log::channel('issues')->error($errorString);
+    } else {//有多条奖金时候
+    $errorString = 'PrizeLevel Query have Multiple Rows '.json_encode($oSeriesWay).
+    'whereDatas are '.json_encode($arrWhere).
+    'Query is '.$prizeLevelQuery->toSql();
+    $prizeDetailToDecide = $prizeLevelQuery->get()->toJson();
+    Log::channel('issues')->error($errorString);
+    Log::channel('issues')->error($prizeDetailToDecide);
+    }
+    }
+    return $prizeLevel->level;
+    }*/
 
-    public function formatBetNumber($sBetNumber, $oSeriesMethod, $oSeriesWay, $sWnNumber)
+    public function formatBetNumber(string $sBetNumber, $oSeriesMethod, $oSeriesWay, $sWnNumber)
     {
         switch ($oSeriesWay->series_code) {
             case 'lotto':
@@ -208,13 +210,13 @@ trait LotteryBasicWayLogics
 //            case 'LottoMultiOne'://已拆弹跟以前不一样了
                 $aBetNumbers = explode($sSplitChar, $sBetNumber);
                 $iOffset = $oSeriesMethod->offset >= 0 ?
-                    $oSeriesMethod->offset : $oSeriesMethod->offset + $oSeriesWay->digital_count;
+                $oSeriesMethod->offset : $oSeriesMethod->offset + $oSeriesWay->digital_count;
                 $this->sPosition = $iOffset;
                 $sBetNumberFinal = $aBetNumbers[$iOffset];
                 break;
             case 'LottoSingleOne':
                 $iOffset = $oSeriesMethod->offset >= 0 ?
-                    $oSeriesMethod->offset : $oSeriesMethod->offset + $oSeriesWay->digital_count;
+                $oSeriesMethod->offset : $oSeriesMethod->offset + $oSeriesWay->digital_count;
                 $this->sPosition = $iOffset;
                 $sBetNumberFinal = $sBetNumber;
                 break;

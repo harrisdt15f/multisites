@@ -32,11 +32,11 @@ class MobileAuthController extends FrontendApiMainController
     /**
      * Login user and create token
      *
-     * @param  Request                  $request
      * @param  FrontendAuthLoginAction  $action
-     * @return JsonResponse [string]    access_token
+     * @param  Request $request
+     * @return JsonResponse
      */
-    public function login(Request $request, FrontendAuthLoginAction $action): JsonResponse
+    public function login(FrontendAuthLoginAction $action, Request $request): JsonResponse
     {
         return $action->execute($this, $request);
     }
@@ -52,7 +52,6 @@ class MobileAuthController extends FrontendApiMainController
         $inputDatas['host'] = $request->server('HTTP_HOST');
         return $action->execute($this, $inputDatas);
     }
-    
 
     /**
      * 用户信息

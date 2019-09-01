@@ -28,11 +28,11 @@ class FrontendAuthController extends FrontendApiMainController
     /**
      * Login user and create token
      *
-     * @param Request $request
      * @param FrontendAuthLoginAction $action
+     * @param Request $request
      * @return JsonResponse [string]    access_token
      */
-    public function login(Request $request, FrontendAuthLoginAction $action): JsonResponse
+    public function login(FrontendAuthLoginAction $action, Request $request): JsonResponse
     {
         return $action->execute($this, $request);
     }
@@ -72,9 +72,7 @@ class FrontendAuthController extends FrontendApiMainController
                 ];
                 return $this->msgOut(true, $data);
             } catch (Exception $e) {
-                $errorObj = $e->getPrevious()->getPrevious();
-                [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-                return $this->msgOut(false, [], $sqlState, $msg);
+                return $this->msgOut(false, [], $e->getCode(), $e->getMessage());
             }
         }
     }

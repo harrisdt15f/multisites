@@ -18,7 +18,7 @@ use Illuminate\Http\Request;
 
 class PartnerAdminGroupController extends BackEndApiMainController
 {
-    protected $postUnaccess = ['id', 'updated_at', 'created_at']; //不需要接收的字段
+    public $postUnaccess = ['id', 'updated_at', 'created_at']; //不需要接收的字段
 
     /**
      * Display a listing of the resource.
@@ -89,7 +89,7 @@ class PartnerAdminGroupController extends BackEndApiMainController
     public function specificGroupUsers(
         PartnerAdminGroupSpecificGroupUsersRequest $request,
         PartnerAdminGroupSpecificGroupUsersAction $action
-    ) : JsonResponse {
+    ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
     }

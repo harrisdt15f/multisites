@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\FrontendApi;
 
 use App\Http\Controllers\Controller;
-use App\Models\Admin\SystemConfiguration;
 use App\Models\DeveloperUsage\Frontend\FrontendAppRoute;
 use App\Models\DeveloperUsage\Frontend\FrontendWebRoute;
-use App\Models\SystemPlatform;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Input;
@@ -39,11 +37,8 @@ class FrontendApiMainController extends Controller
         $this->handleEndUser();
         $this->middleware(function ($request, $next) {
             $this->userOperateLog();
-            if ($this->partnerUser !== null) {
-                if ($this->partnerUser->platform()->exists()) {
-                    $this->currentPlatformEloq = new SystemPlatform();
-                    $this->currentPlatformEloq = $this->partnerUser->platform; //获取目前账号用户属于平台的对象
-                }
+            if (($this->partnerUser !== null) && $this->partnerUser->platform()->exists()) {
+                $this->currentPlatformEloq = $this->partnerUser->platform; //获取目前账号用户属于平台的对象
             }
             $this->minClassicPrizeGroup = (int)configure('min_bet_prize_group', 1800);//平台最低投注奖金组
             $this->maxClassicPrizeGroup = (int)configure('max_bet_prize_group', 1960);//平台最高投注奖金组
@@ -96,12 +91,12 @@ class FrontendApiMainController extends Controller
     }
 
     /**
-     * @param  bool  $success
-     * @param  array  $data
+     * @param  bool    $success
+     * @param  mixed   $data
      * @param  string  $code
-     * @param  string  $message
-     * @param  null  $placeholder
-     * @param  null  $substituted
+     * @param  mixed   $message
+     * @param  string  $placeholder
+     * @param  mixed   $substituted
      * @return JsonResponse
      */
     public function msgOut(
@@ -109,20 +104,20 @@ class FrontendApiMainController extends Controller
         $data = [],
         $code = '',
         $message = '',
-        $placeholder = null,
-        $substituted = null
+        $placeholder = '',
+        $substituted = ''
     ): JsonResponse {
         $defaultSuccessCode = '200';
         $defaultErrorCode = '404';
         if ($success === true) {
-            $code = $code == '' ? $defaultSuccessCode : $code;
+            $code = $code === '' ? $defaultSuccessCode : $code;
         } else {
-            $code = $code == '' ? $defaultErrorCode : $code;
+            $code = $code === '' ? $defaultErrorCode : $code;
         }
-        if ($placeholder === null || $substituted === null) {
-            $message = $message == '' ? __('frontend-codes-map.' . $code) : $message;
+        if ($placeholder === '' || $substituted === '') {
+            $message = $message === '' ? __('frontend-codes-map.' . $code) : $message;
         } else {
-            $message = $message == '' ? __('frontend-codes-map.' . $code, [$placeholder => $substituted]) : $message;
+            $message = $message === '' ? __('frontend-codes-map.' . $code, [$placeholder => $substituted]) : $message;
         }
         $datas = [
             'success' => $success,
@@ -140,11 +135,11 @@ class FrontendApiMainController extends Controller
 
     /**
      * Generate Search Query
-     * @param $eloqM
-     * @param $searchAbleFields
-     * @param  int  $fixedJoin
-     * @param $withTable
-     * @param $withSearchAbleFields
+     * @param  object  $eloqM
+     * @param  array   $searchAbleFields
+     * @param  int     $fixedJoin
+     * @param  mixed   $withTable
+     * @param  array   $withSearchAbleFields
      * @param  string  $orderFields
      * @param  string  $orderFlow
      * @return mixed
@@ -154,7 +149,7 @@ class FrontendApiMainController extends Controller
         $searchAbleFields,
         $fixedJoin = 0,
         $withTable = null,
-        $withSearchAbleFields = null,
+        $withSearchAbleFields = [],
         $orderFields = 'updated_at',
         $orderFlow = 'desc'
     ) {
@@ -165,20 +160,21 @@ class FrontendApiMainController extends Controller
         $timeConditions = Arr::wrap(json_decode($timeConditionField, true));
         $extraWhereContitions = $this->inputs['extra_where'] ?? [];
         $extraContitions = $this->inputs['extra_column'] ?? [];
-        $queryEloq = new $eloqM;
+        $queryEloq = new $eloqM();
         $sizeOfInputs = count($searchCriterias);
         //with Criterias
         $withSearchCriterias = Arr::only($this->inputs, $withSearchAbleFields);
         $sizeOfWithInputs = count($withSearchCriterias);
 
         $pageSize = $this->inputs['page_size'] ?? 20;
-        if ($sizeOfInputs == 1) {
+        if ($sizeOfInputs === 1) {
             //for single where condition searching
             if (!empty($searchCriterias)) {
+                $whereData = [];
                 foreach ($searchCriterias as $key => $value) {
                     if ($value !== '*') {
                         $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
-                        if ($sign == 'LIKE') {
+                        if ($sign === 'LIKE') {
                             $sign = strtolower($sign);
                             $value = '%' . $value . '%';
                         }
@@ -227,7 +223,7 @@ class FrontendApiMainController extends Controller
                     foreach ($searchCriterias as $key => $value) {
                         if ($value !== '*') {
                             $sign = array_key_exists($key, $queryConditions) ? $queryConditions[$key] : '=';
-                            if ($sign == 'LIKE') {
+                            if ($sign === 'LIKE') {
                                 $sign = strtolower($sign);
                                 $value = '%' . $value . '%';
                             }
@@ -296,18 +292,17 @@ class FrontendApiMainController extends Controller
             $method = $extraWhereContitions['method'];
             $queryEloq = $queryEloq->$method($extraWhereContitions['key'], $extraWhereContitions['value']);
         }
-        $data = $queryEloq->orderBy($orderFields, $orderFlow)->paginate($pageSize);
-        return $data;
+        return $queryEloq->orderBy($orderFields, $orderFlow)->paginate($pageSize);
     }
 
     /**
      * Join Table with Eloquent
-     * @param $queryEloq
-     * @param $fixedJoin
-     * @param $withTable
-     * @param $sizeOfWithInputs
-     * @param $withSearchCriterias
-     * @param $queryConditions
+     * @param  object  $queryEloq
+     * @param  int     $fixedJoin
+     * @param  mixed   $withTable
+     * @param  int     $sizeOfWithInputs
+     * @param  array   $withSearchCriterias
+     * @param  array   $queryConditions
      * @return mixed
      */
     public function eloqToJoin(
@@ -330,13 +325,14 @@ class FrontendApiMainController extends Controller
                 case 1: //有一个连表查询的情况下
                     $queryEloq = $queryEloq->with($withTable)->whereHas(
                         $withTable,
-                        function ($query) use (
+                        static function ($query) use (
                             $sizeOfWithInputs,
                             $withSearchCriterias,
                             $queryConditions
                         ) {
                             if ($sizeOfWithInputs > 1) {
                                 if (!empty($withSearchCriterias)) {
+                                    $whereData = [];
                                     foreach ($withSearchCriterias as $key => $value) {
                                         if ($value !== '*') {
                                             $whereCriteria = [];
@@ -352,7 +348,7 @@ class FrontendApiMainController extends Controller
                                     $query->where($whereData);
                                 }
                             } else {
-                                if ($sizeOfWithInputs == 1) {
+                                if ($sizeOfWithInputs === 1) {
                                     if (!empty($withSearchCriterias)) {
                                         foreach ($withSearchCriterias as $key => $value) {
                                             if ($value !== '*') {
@@ -360,7 +356,7 @@ class FrontendApiMainController extends Controller
                                                     $key,
                                                     $queryConditions
                                                 ) ? $queryConditions[$key] : '=';
-                                                if ($sign == 'LIKE') {
+                                                if ($sign === 'LIKE') {
                                                     $sign = strtolower($sign);
                                                     $value = '%' . $value . '%';
                                                 }
@@ -379,7 +375,7 @@ class FrontendApiMainController extends Controller
     }
 
     /**
-     * @param $eloqM
+     * @param  object $eloqM
      * @param  array  $datas
      */
     public function editAssignment($eloqM, $datas)

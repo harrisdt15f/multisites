@@ -30,8 +30,8 @@ trait LotterySeriesWayLogics
     }
 
     /**
-     * @param $methodId
-     * @param $seriesCode
+     * @param string $methodId
+     * @param string $seriesCode
      * @return mixed
      */
     public static function getSeriesWayByMethodId($methodId, $seriesCode)
@@ -39,6 +39,6 @@ trait LotterySeriesWayLogics
         return self::where('lottery_method_id', $methodId)
             ->where('series_code', $seriesCode)
             ->withCacheCooldownSeconds(86400)
-            ->first();// override default cooldown seconds in model
+            ->first(); // override default cooldown seconds in model
     }
 }

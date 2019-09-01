@@ -12,10 +12,10 @@ class LotteriesTraceIssueListAction
     /**
      * 彩种可追号的奖期列表
      * @param  FrontendApiMainController  $contll
-     * @param  $inputDatas
+     * @param  array $inputDatas
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
+    public function execute(FrontendApiMainController $contll, array $inputDatas): JsonResponse
     {
         $lottery = LotteryList::findBySign($inputDatas['lottery_sign']);
         $canTraceIssueEloq = LotteryIssue::getCanTraceIssue($lottery->en_name, $lottery->max_trace_number);

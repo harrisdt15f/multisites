@@ -2,8 +2,8 @@
 
 namespace App\Models\DeveloperUsage\Frontend\Traits;
 
-use Illuminate\Support\Facades\Cache;
 use App\Lib\BaseCache;
+use Illuminate\Support\Facades\Cache;
 
 trait FrontendModelTraits
 {
@@ -15,6 +15,7 @@ trait FrontendModelTraits
      */
     public function allFrontendModel($type): array
     {
+        $typeArr = [];
         if ($type == 2) {
             $typeArr = [1, 2];
         } elseif ($type == 3) {
@@ -83,12 +84,12 @@ trait FrontendModelTraits
 
     public function getCacheModuleValue($name, $redisKey)
     {
-        $data = self::getCacheData($redisKey);
+        $data = self::getTagsCacheData($redisKey);
         if (empty($data)) {
             $qrcodeELoq = self::select('value', 'status')->where('en_name', $name)->first();
             if ($qrcodeELoq !== null && $qrcodeELoq->status === 1) {
                 $data = $qrcodeELoq->value;
-                self::saveCacheData($redisKey, $data);
+                self::saveTagsCacheData($redisKey, $data);
             }
         }
         return $data;

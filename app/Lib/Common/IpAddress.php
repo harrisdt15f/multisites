@@ -10,8 +10,8 @@ class IpAddress
 
     /**
      * 调用第三方接口查询IP地址
-     * @param  [string] $ip [IP]
-     * @return [object]  $addressIpELoq   [description]
+     * @param  string $ip [IP]
+     * @return object  $addressIpELoq   [description]
      */
     public function getAddress($ip)
     {
@@ -39,8 +39,8 @@ class IpAddress
 
     /**
      * 将查询到的数据插入system_address_ips表
-     * @param  [array] $data [IP地址数据]
-     * @return [object]  $addressIpELoq
+     * @param  array   $data             [IP地址数据]
+     * @return object  $addressIpELoq
      */
     public function insertAddress($data)
     {

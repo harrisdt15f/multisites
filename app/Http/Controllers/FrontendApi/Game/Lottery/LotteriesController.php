@@ -96,8 +96,8 @@ class LotteriesController extends FrontendApiMainController
 
     /**
      * 游戏-追号历史
-     * @param  LotteriesProjectHistoryRequest  $request
-     * @param  LotteriesProjectHistoryAction  $action
+     * @param  LotteriesTracesHistoryRequest  $request
+     * @param  LotteriesTracesHistoryAction  $action
      * @return JsonResponse
      */
     public function tracesHistory(

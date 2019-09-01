@@ -7,16 +7,16 @@ class FundOperation
 {
     /**
      *
-     * @param $eloqM
-     * @param $type  0系统对管理操作   1超管对管理操作  2管理对用户操作  3超管对用户操作
-     * @param $in_out  0减少   1增加
-     * @param $OperationAdminId     操作人ID
-     * @param $OperationAdminName   操作人NAME
-     * @param $OperationId          被操作人ID
-     * @param $OperationName        被操作人NAME
-     * @param $amount               操作金额
-     * @param $content              具体描述
-     * @param $AuditFlow0ID         审核表id
+     * @param object  $eloqM
+     * @param int     $type  0系统对管理操作   1超管对管理操作  2管理对用户操作  3超管对用户操作
+     * @param int     $in_out  0减少   1增加
+     * @param mixed   $OperationAdminId     操作人ID
+     * @param mixed   $OperationAdminName   操作人NAME
+     * @param mixed   $OperationId          被操作人ID
+     * @param mixed   $OperationName        被操作人NAME
+     * @param float   $amount               操作金额
+     * @param string  $comment              具体描述
+     * @param mixed   $AuditFlow0ID         审核表id
      */
     public function insertOperationDatas(
         $eloqM,
@@ -66,7 +66,7 @@ class FundOperation
     /**
      * 查看该管理员今日 手动添加的充值额度是否在限额内
      * @param  int     $adminId       [需要充值的管理员id]
-     * @param  folat   $rechargeFund  [充值的额度]
+     * @param  float   $rechargeFund  [充值的额度]
      * @return array
      */
     public function checkRechargeToday($adminId, $rechargeFund)

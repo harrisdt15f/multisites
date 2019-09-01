@@ -17,12 +17,9 @@ use App\Http\SingleActions\Frontend\Homepage\HomepageReadMessageAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageShowHomepageModelAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageActivityAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageBannerAction;
-use App\Http\SingleActions\Frontend\Homepage\HompageIcoAction;
-use App\Http\SingleActions\Frontend\Homepage\HompageLogoAction;
 use App\Http\SingleActions\Frontend\Homepage\HompageLotteryNoticeListAction;
 use App\Http\SingleActions\Frontend\Homepage\HompagePopularLotteriesAction;
 use App\Http\SingleActions\Frontend\Homepage\HompagePopularMethodsAction;
-use App\Http\SingleActions\Frontend\Homepage\HompageQrCodeAction;
 use Illuminate\Http\JsonResponse;
 
 class HomepageController extends FrontendApiMainController

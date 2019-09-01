@@ -28,7 +28,7 @@ class BackendAuthRegisterRequest extends BaseFormRequest
             'email' => 'required|email|unique:backend_admin_users',
             'password' => 'required',
             'is_test' => 'required|numeric',
-            'group_id' => 'required|numeric',
+            'group_id' => 'required|numeric|exists:backend_admin_access_groups,id',
         ];
     }
 

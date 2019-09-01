@@ -26,12 +26,12 @@ class LotterySchedule extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return void
      */
     public function handle()
     {
         $lotterySign = $this->argument('lottery_sign');
-        if ($lotterySign) {
+        if ($lotterySign !== null && is_string($lotterySign)) {
             $lotteryIssueEloq = LotteryIssue::where([
                 ['lottery_id', $lotterySign],
                 ['end_time', '<', time()],

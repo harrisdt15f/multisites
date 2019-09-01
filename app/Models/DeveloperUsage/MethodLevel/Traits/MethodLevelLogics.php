@@ -17,7 +17,7 @@ trait MethodLevelLogics
         $redisKey = 'lottery_method_leve_detail';
         $data = [];
         if ($update === 0) {
-            $data = self::getCacheData($redisKey);
+            $data = self::getTagsCacheData($redisKey);
         }
         if (empty($data)) {
             $methodtype = self::groupBy('method_id')->orderBy('id', 'asc')->get();
@@ -27,7 +27,7 @@ trait MethodLevelLogics
                     ->get()
                     ->toArray();
             }
-            self::saveCacheData($redisKey, $data);
+            self::saveTagsCacheData($redisKey, $data);
         }
         return $data;
     }

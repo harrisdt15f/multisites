@@ -19,8 +19,8 @@ trait FrontendUsersAccountsTypeLogics
     {
         $query = self::orderBy('id', 'desc');
 
-        $currentPage = isset($c['page_index']) ? (int)$c['page_index'] : 1;
-        $pageSize = isset($c['page_size']) ? (int)$c['page_size'] : 15;
+        $currentPage = isset($c['page_index']) ? (int) $c['page_index'] : 1;
+        $pageSize = isset($c['page_size']) ? (int) $c['page_size'] : 15;
         $offset = ($currentPage - 1) * $pageSize;
 
         $total = $query->count();
@@ -30,7 +30,7 @@ trait FrontendUsersAccountsTypeLogics
             'data' => $data,
             'total' => $total,
             'currentPage' => $currentPage,
-            'totalPage' => (int)ceil($total / $pageSize)
+            'totalPage' => (int) ceil($total / $pageSize),
         ];
     }
 
@@ -59,7 +59,7 @@ trait FrontendUsersAccountsTypeLogics
 
     /**
      * 获取具体详情
-     * @param $sign
+     * @param string $sign
      * @return array|mixed
      */
     public static function getTypeBySign($sign)
@@ -72,12 +72,12 @@ trait FrontendUsersAccountsTypeLogics
     public static function getDataListFromCache()
     {
         $key = 'account_change_type';
-        if (self::hasCache($key)) {
-            return self::getCacheData($key);
+        if (self::hasTagsCache($key)) {
+            return self::getTagsCacheData($key);
         } else {
             $allCache = self::getDataFromDb();
             if ($allCache) {
-                self::saveCacheData($key, $allCache);
+                self::saveTagsCacheData($key, $allCache);
             }
             return $allCache;
         }
@@ -108,13 +108,12 @@ trait FrontendUsersAccountsTypeLogics
             ->groupBy(DB::raw('fuat.id'))->pluck('param');
         $params = explode(',', $accTypeParams[0]);
         $paramsFlipped = array_flip($params);
-        $finalParams = array_fill_keys(array_keys($paramsFlipped), 'required');
-        return $finalParams;
+        return array_fill_keys(array_keys($paramsFlipped), 'required');
     }
 
     /**
      * @param  array  $field
-     * @return array
+     * @return mixed
      */
     public static function getTypeList($field)
     {
