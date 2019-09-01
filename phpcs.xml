@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ruleset name="Laravel Standards">
-<description>The Laravel Coding Standards</description>
+<description>Xuanwu Coding Standards</description>
 <rule ref="Generic.Classes.DuplicateClassName"/>
 <rule ref="Generic.CodeAnalysis.EmptyStatement"/>
 <rule ref="Generic.CodeAnalysis.ForLoopShouldBeWhileLoop"/>
@@ -31,7 +31,6 @@
 <rule ref="SlevomatCodingStandard.Functions.UnusedParameter"/>
 <rule ref="SlevomatCodingStandard.Functions.UselessParameterDefaultValue"/>
 <rule ref="SlevomatCodingStandard.Namespaces.UselessAlias"/>
-<!-- <rule ref="SlevomatCodingStandard.PHP.RequireNowdoc"/> -->
 <rule ref="SlevomatCodingStandard.PHP.UselessParentheses"/>
 <rule ref="SlevomatCodingStandard.PHP.UselessSemicolon"/>
 <rule ref="SlevomatCodingStandard.Variables.DuplicateAssignmentToVariable"/>
@@ -42,10 +41,52 @@
 <rule ref="SlevomatCodingStandard.ControlStructures.NewWithParentheses"/>
 <rule ref="SlevomatCodingStandard.PHP.ShortList"/>
 <rule ref="SlevomatCodingStandard.PHP.TypeCast"/>
-<!-- <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName"/> -->
 <rule ref="SlevomatCodingStandard.Classes.ClassConstantVisibility"/>
 <rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue"/>
 <rule ref="SlevomatCodingStandard.Commenting.EmptyComment"/>
+<rule ref="SlevomatCodingStandard.Classes.SuperfluousAbstractClassNaming"/>
+<rule ref="SlevomatCodingStandard.Classes.SuperfluousInterfaceNaming"/>
+<rule ref="SlevomatCodingStandard.Classes.SuperfluousExceptionNaming"/>
+<!-- <rule ref="SlevomatCodingStandard.PHP.RequireNowdoc"/> -->
+<!-- <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName"/> -->
+<!-- <rule ref="Squiz.NamingConventions.ValidVariableName"/> -->
+<!-- <rule ref="Squiz.NamingConventions.ValidVariableName.PublicHasUnderscore"/> -->
+<!-- <rule ref="Squiz.NamingConventions.ValidVariableName.PrivateNoUnderscore"/> -->
+<!-- <rule ref="Squiz.NamingConventions.ValidVariableName.NotCamelCaps"/> -->
+<!-- <rule ref="Squiz.NamingConventions.ValidVariableName.MemberNotCamelCaps"/> -->
+<rule ref="Squiz.NamingConventions.ValidVariableName.StringNotCamelCaps"/>
+<rule ref="ObjectCalisthenics.Metrics.MaxNestingLevel">
+        <properties>
+            <property name="maxNestingLevel" value="3"/>
+        </properties>
+</rule>
+<rule ref="ObjectCalisthenics.NamingConventions.ElementNameMinimalLength">
+        <properties>
+            <property name="minLength" value="4"/>
+            <property name="allowedShortNames" type="array" value="i,id,to,up"/>
+        </properties>
+</rule>
+<rule ref="ObjectCalisthenics.Files.ClassTraitAndInterfaceLength">
+        <properties>
+            <property name="maxLength" value="500"/>
+        </properties>
+</rule>
+<rule ref="ObjectCalisthenics.Files.FunctionLength">
+        <properties>
+            <property name="maxLength" value="50"/>
+        </properties>
+</rule>
+<rule ref="ObjectCalisthenics.Metrics.PropertyPerClassLimit">
+        <properties>
+            <property name="maxCount" value="20"/>
+        </properties>
+</rule>
+    <!-- <rule ref="ObjectCalisthenics.Metrics.MethodPerClassLimit">
+        <properties>
+            <property name="maxCount" value="10"/>
+        </properties>
+    </rule> -->
+
 <!-- -->
 <rule ref="Generic.Commenting.Todo"/>
 <rule ref="Generic.Commenting.Fixme"/>
