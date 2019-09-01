@@ -8,10 +8,12 @@ use App\Http\Requests\Backend\Users\Fund\RechargeCheckAuditSuccessRequest;
 use App\Http\SingleActions\Backend\Users\Fund\RechargeCheckAuditFailureAction;
 use App\Http\SingleActions\Backend\Users\Fund\RechargeCheckAuditSuccessAction;
 use App\Http\SingleActions\Backend\Users\Fund\RechargeCheckDetailAction;
+use App\Http\SingleActions\Payment\PayRechargeAction;
 use App\Lib\Common\InternalNoticeMessage;
 use App\Models\Admin\BackendAdminUser;
 use App\Models\Admin\Message\BackendSystemNoticeList;
 use Illuminate\Http\JsonResponse;
+use App\Http\Requests\Backend\Users\Fund\RechargeListRequest;
 
 class RechargeCheckController extends BackEndApiMainController
 {
@@ -88,5 +90,16 @@ class RechargeCheckController extends BackEndApiMainController
         if ($admin !== null) {
             $messageObj->insertMessage($type, $message, $admin->toArray());
         }
+    }
+
+    /**
+     * 充值列表
+     * @param PayRechargeAction $action
+     * @param RechargeListRequest $request
+     * @return JsonResponse
+     */
+    public function backRechargeList(PayRechargeAction $action, RechargeListRequest $request) : JsonResponse
+    {
+        return $action->backRechargeList($this, $request);
     }
 }

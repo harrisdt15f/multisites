@@ -482,7 +482,6 @@ trait ProjectTraits
     /**
      * @param $openNumber
      * @param $sWnNumber
-     * @param $iBasicMethodId
      * @return bool
      */
     public function setFail(
