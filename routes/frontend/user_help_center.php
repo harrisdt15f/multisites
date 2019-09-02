@@ -1,8 +1,4 @@
 <?php
-/**
- * @Author: Fish
- * @Date:   2019/7/3 19:03
- */
 
 Route::group(['prefix' => 'user-help', 'namespace' => 'User\Help'], function () {
     $namePrefix = 'web-api.UserHelpCenterController.';

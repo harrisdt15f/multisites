@@ -150,9 +150,17 @@ class FrontendAuthController extends FrontendApiMainController
         if ($type === 1) {
             $field = 'password';
             $oldPassword = $targetUserEloq->password;
+            //检验用户新密码与资金密码不能一致
+            if (Hash::check($inputDatas['new_password'], $targetUserEloq->fund_password)) {
+                return $this->msgOut(false, [], '100025');
+            }
         } elseif ($type === 2) {
             $field = 'fund_password';
             $oldPassword = $targetUserEloq->fund_password;
+            //检验资金新密码与用户密码不能一致
+            if (Hash::check($inputDatas['new_password'], $targetUserEloq->password)) {
+                return $this->msgOut(false, [], '100024');
+            }
         } else {
             return $this->msgOut(false, [], '100010');
         }
