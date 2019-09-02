@@ -15,10 +15,14 @@ trait LotteryPrizeDetailLogic
         $prizeEloq = self::where('group_id', '=', $iGroupId)
             ->where('method_id', '=', $iBasicMethodId)
             ->withCacheCooldownSeconds(86400)
-            ->get(['level', 'prize']);
+            ->get(['level', 'prize','series_code','full_prize']);
         $aPrize = [];
         foreach ($prizeEloq as $oPrizeDetail) {
-            $aPrize[$oPrizeDetail->level] = $oPrizeDetail->prize;
+            if (in_array($oPrizeDetail->series_code, self::$seriesFullFillAble, false)) {
+                $aPrize[$oPrizeDetail->level] = 0.9 * $oPrizeDetail->full_prize;
+            } else {
+                $aPrize[$oPrizeDetail->level] = $oPrizeDetail->prize;
+            }
         }
         return $aPrize;
     }

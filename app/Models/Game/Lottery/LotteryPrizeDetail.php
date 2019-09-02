@@ -15,4 +15,5 @@ class LotteryPrizeDetail extends BaseModel
 {
     use LotteryPrizeDetailLogic;
     protected $guarded = ['id'];
+    public static $seriesFullFillAble = ['sd', 'ssl', 'lotto', 'p3p5'];
 }
