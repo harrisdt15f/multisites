@@ -15,6 +15,7 @@ use App\Http\SingleActions\Frontend\FrontendAuthResetSpecificInfosAction;
 use App\Http\SingleActions\Frontend\FrontendAuthSetFundPasswordAction;
 use App\Http\SingleActions\Frontend\FrontendAuthUserDetailAction;
 use App\Http\SingleActions\Frontend\FrontendAuthUserSpecificInfosAction;
+use App\Http\SingleActions\Frontend\FrontendCommonHandleUserPasswordAction;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -125,59 +126,12 @@ class FrontendAuthController extends FrontendApiMainController
      * @param FrontendAuthResetUserPasswordRequest $request
      * @return JsonResponse
      */
-    public function resetUserPassword(FrontendAuthResetUserPasswordRequest $request): JsonResponse
-    {
+    public function resetUserPassword(
+        FrontendAuthResetUserPasswordRequest $request,
+        FrontendCommonHandleUserPasswordAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
-        return $this->commonHandleUserPassword($inputDatas, 1);
-    }
-
-    /**
-     * 修改 用户密码1 资金密码2 共用处理
-     * @param array $inputDatas
-     * @param int $type
-     * @return JsonResponse
-     */
-    public function commonHandleUserPassword($inputDatas, $type): JsonResponse
-    {
-        $targetUserEloq = $this->eloqM::find($this->partnerUser->id);
-        if ($inputDatas['old_password'] === $inputDatas['new_password']) {
-            return $this->msgOut(false, [], '100007');
-        }
-        if ($inputDatas['new_password'] !== $inputDatas['confirm_password']) {
-            return $this->msgOut(false, [], '100008');
-        }
-        if ($type === 1) {
-            $field = 'password';
-            $oldPassword = $targetUserEloq->password;
-            //检验用户新密码与资金密码不能一致
-            if (Hash::check($inputDatas['new_password'], $targetUserEloq->fund_password)) {
-                return $this->msgOut(false, [], '100025');
-            }
-        } elseif ($type === 2) {
-            $field = 'fund_password';
-            $oldPassword = $targetUserEloq->fund_password;
-            //检验资金新密码与用户密码不能一致
-            if (Hash::check($inputDatas['new_password'], $targetUserEloq->password)) {
-                return $this->msgOut(false, [], '100024');
-            }
-        } else {
-            return $this->msgOut(false, [], '100010');
-        }
-        //校验密码
-        if (!Hash::check($inputDatas['old_password'], $oldPassword)) {
-            return $this->msgOut(false, [], '100009');
-        }
-        //修改密码
-        $targetUserEloq->$field = Hash::make($inputDatas['new_password']);
-        if ($targetUserEloq->save()) {
-            if ($type === 1) {
-                // $targetUserEloq->remember_token = $token;
-                $this->refresh(); //修改登录密码更新token
-            }
-            return $this->msgOut(true);
-        } else {
-            return $this->msgOut(false, [], '100011');
-        }
+        return $action->execute($this,$inputDatas, 1);
     }
 
     /**
@@ -185,10 +139,12 @@ class FrontendAuthController extends FrontendApiMainController
      * @param FrontendAuthResetFundPasswordRequest $request
      * @return JsonResponse
      */
-    public function resetFundPassword(FrontendAuthResetFundPasswordRequest $request): JsonResponse
-    {
+    public function resetFundPassword(
+        FrontendAuthResetFundPasswordRequest $request,
+        FrontendCommonHandleUserPasswordAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
-        return $this->commonHandleUserPassword($inputDatas, 2);
+        return $action->execute($this,$inputDatas, 2);
     }
 
     //用户设置资金密码
