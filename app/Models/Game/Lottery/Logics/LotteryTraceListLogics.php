@@ -9,10 +9,12 @@ use Illuminate\Support\Facades\Request;
 
 trait LotteryTraceListLogics
 {
-    //获取所有等待开奖的注单信息
+    //获取一个追号主下所有未开奖的追号list
     public function getUnfinishedTrace($traceId, $userId)
     {
-        return self::where([['trace_id', $traceId], ['status', self::STATUS_WAITING], ['user_id', $userId]])->get();
+        return self::where([['trace_id', $traceId], ['user_id', $userId]])
+            ->whereIn('status', [self::STATUS_WAITING, self::STATUS_RUNNING])
+            ->get();
     }
 
     //获取已经结束注单
