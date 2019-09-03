@@ -55,7 +55,7 @@ trait TraceTraits
         $from
     ) {
         $traceMainData = [
-            'trace_serial_number' => self::getProjectSerialNumber(),
+            'trace_serial_number' => Project::getProjectSerialNumber(),
             'user_id' => $user->id,
             'username' => $user->username,
             'top_id' => $user->top_id,
