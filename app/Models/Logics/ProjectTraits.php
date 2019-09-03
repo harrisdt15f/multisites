@@ -118,7 +118,7 @@ trait ProjectTraits
         FrontendUser $user,
         LotteryList $lottery,
         $_item,
-        $inputDatas,
+        array $inputDatas,
         $isTrace,
         $traceFirstMultiple,
         LotteryIssue $currentIssue,
