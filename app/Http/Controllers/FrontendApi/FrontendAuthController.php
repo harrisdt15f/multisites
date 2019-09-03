@@ -71,8 +71,8 @@ class FrontendAuthController extends FrontendApiMainController
                     'expires_at' => $expireAt,
                 ];
                 return $this->msgOut(true, $data);
-            } catch (Exception $e) {
-                return $this->msgOut(false, [], $e->getCode(), $e->getMessage());
+            } catch (Exception $exception) {
+                return $this->msgOut(false, [], $exception->getCode(), $exception->getMessage());
             }
         }
     }
@@ -84,8 +84,7 @@ class FrontendAuthController extends FrontendApiMainController
      */
     public function refresh()
     {
-        $token = $this->currentAuth->refresh();
-        return $token;
+        return $this->currentAuth->refresh();
     }
 
     /**
@@ -173,7 +172,7 @@ class FrontendAuthController extends FrontendApiMainController
         if ($targetUserEloq->save()) {
             if ($type === 1) {
                 // $targetUserEloq->remember_token = $token;
-                $token = $this->refresh(); //修改登录密码更新token
+                $this->refresh(); //修改登录密码更新token
             }
             return $this->msgOut(true);
         } else {
