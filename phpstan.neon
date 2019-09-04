@@ -15,5 +15,5 @@ parameters:
         - '#Access to an undefined property App\\Http\\Controllers\\MobileApi\\[a-zA-Z0-9\\_]+::\$eloqM\.#'
         - '#Access to an undefined property object::\$uri\.#'
     excludes_analyse:
-            - */Models/Game/Lottery/LotteryIssue.php
+        - */Models/Game/Lottery/LotteryIssue.php
         #- /*/*/FileToBeExcluded.php
