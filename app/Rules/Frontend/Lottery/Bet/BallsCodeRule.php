@@ -55,7 +55,11 @@ class BallsCodeRule implements Rule
         if (empty($pattern)) {
             $pattern = Config::get('game.method_regex.'.$this->lottery->series_id.'.default');
         }
-        return $this->checkValid($pattern, $value);
+        if ($pattern !== null) {
+            return $this->checkValid($pattern, $value);
+        } else {
+            return true;
+        }
     }
 
     /**
@@ -99,7 +103,7 @@ class BallsCodeRule implements Rule
     }
 
     /**
-     * @param string $attribute
+     * @param  string  $attribute
      * @return string
      */
     private function checkMethodId($attribute): string
