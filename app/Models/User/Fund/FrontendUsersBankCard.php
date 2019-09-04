@@ -7,7 +7,7 @@ use LaravelArdent\Ardent\Ardent;
 
 class FrontendUsersBankCard extends Ardent
 {
-    public const NATURAL_STATUS = 1;
+    public const INITIALIZATION_STATUS = 1;
     protected $appends = ['card_num'];
     /**
      * The attributes that are mass assignable.
