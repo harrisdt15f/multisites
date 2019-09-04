@@ -24,13 +24,14 @@ class UserBankCardAddRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'owner_name' => 'required|string', //姓名
+            'owner_name' => 'nullable|string', //姓名
             'bank_sign' => 'required|alpha', //银行code
             'bank_name' => 'required|string', //银行名称
             'card_number' => ['required', 'regex:/^(\d{15}|\d{16}|\d{19})$/'], //银行卡号
             'province_id' => 'required|exists:users_regions,id', //省份id
             'city_id' => 'required|exists:users_regions,id', //城市id
             'branch' => 'required|string', //支行
+            'fun_password'=>'nullable|string',
         ];
     }
 
