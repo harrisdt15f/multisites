@@ -114,8 +114,9 @@ trait LotteryTraceListLogics
         LotteryList $lottery,
         $_item,
         $aPrizeSettingOfWay,
-        $from
-    ): void {
+        $from,
+        $traceResult
+    ) {
         $i = 1;
         foreach ($traceData as $issue => $multiple) {
             if ($i === 1) {
@@ -125,41 +126,45 @@ trait LotteryTraceListLogics
                 $project_serial_number = null;
                 $status = self::STATUS_WAITING;
             }
-            foreach ($data as $dataItem) {
-                $traceListData = [
-                    'user_id' => $user->id,
-                    'username' => $user->username,
-                    'top_id' => $user->top_id,
-                    'rid' => $user->rid,
-                    'trace_id' => $traceId,
-                    'order_queue' => $i,
-                    'parent_id' => $user->parent_id,
-                    'is_tester' => $user->is_tester,
-                    'series_id' => $lottery->series_id,
-                    'project_id' => $project->id,
-                    'project_serial_number' => $project_serial_number,
-                    'lottery_sign' => $lottery->en_name,
-                    'method_sign' => $dataItem['method_id'],
-                    'method_group' => $_item['method_group'],
-                    'method_name' => $dataItem['method_name'],
-                    'issue' => $issue,
-                    'bet_number' => $dataItem['code'],
-                    'mode' => $dataItem['mode'],
-                    'times' => $dataItem['times'] * $multiple,
-                    'single_price' => $dataItem['price'],
-                    'total_price' => $dataItem['total_price'] * $multiple,
-                    'user_prize_group' => $user->prize_group,
-                    'bet_prize_group' => $dataItem['prize_group'],
-                    'prize_set' => json_encode($aPrizeSettingOfWay),
-                    'ip' => Request::ip(),
-                    'proxy_ip' => json_encode(Request::ip()),
-                    'bet_from' => $from,
-                    'status' => $status,
-                ];
-                $_item['total_price'] += $traceListData['total_price'];
-                self::create($traceListData);
+            $issueEloq = $traceResult->where('issue', $issue)->first();
+            if ($issueEloq !== null) {
+                foreach ($data as $dataItem) {
+                    $traceListData = [
+                        'user_id' => $user->id,
+                        'username' => $user->username,
+                        'top_id' => $user->top_id,
+                        'rid' => $user->rid,
+                        'trace_id' => $traceId,
+                        'order_queue' => $i,
+                        'parent_id' => $user->parent_id,
+                        'is_tester' => $user->is_tester,
+                        'series_id' => $lottery->series_id,
+                        'project_id' => $project->id,
+                        'project_serial_number' => $project_serial_number,
+                        'lottery_sign' => $lottery->en_name,
+                        'method_sign' => $dataItem['method_id'],
+                        'method_group' => $_item['method_group'],
+                        'method_name' => $dataItem['method_name'],
+                        'issue' => $issue,
+                        'bet_number' => $dataItem['code'],
+                        'mode' => $dataItem['mode'],
+                        'times' => $dataItem['times'] * $multiple,
+                        'single_price' => $dataItem['price'],
+                        'total_price' => $dataItem['total_price'] * $multiple,
+                        'user_prize_group' => $user->prize_group,
+                        'bet_prize_group' => $dataItem['prize_group'],
+                        'prize_set' => json_encode($aPrizeSettingOfWay),
+                        'ip' => Request::ip(),
+                        'proxy_ip' => json_encode(Request::ip()),
+                        'bet_from' => $from,
+                        'status' => $status,
+                        'issue_end_time' => $issueEloq->end_time
+                    ];
+                    $_item['total_price'] += $traceListData['total_price'];
+                    self::create($traceListData);
+                }
+                $i++;
             }
-            $i++;
         }
     }
 }

@@ -35,10 +35,10 @@ trait ProjectTraits
         $from = 1
     ): array {
         $traceFirstMultiple = 1;
-        $isTrace = 0;
         $traceData = [];
         $returnData = [];
-        $traceResult = self::traceCompile($lottery, $currentIssue, $inputDatas, $traceFirstMultiple, $traceData);
+        $isTrace = (int) $inputDatas['is_trace'];
+        $traceResult = self::traceCompile($lottery, $currentIssue, $inputDatas, $traceFirstMultiple, $traceData, $isTrace);
         if (isset($traceResult['error'])) {
             return $traceResult;
         } else {
@@ -54,11 +54,16 @@ trait ProjectTraits
                     $from
                 );
                 if ($traceData) {
-                    self::saveTrace($project, $user, $lottery, $data, $traceData, $_item, $inputDatas, $from);
+                    $accountType = 'trace_cost';
+                    $cost = self::saveTrace($project, $user, $lottery, $data, $traceData, $_item, $inputDatas, $from, $traceResult);
+                } else {
+                    $accountType = 'bet_cost';
+                    $cost = $_item['total_price'];
                 }
                 $returnData['project'][] = [
                     'id' => $project->id,
-                    'cost' => $_item['total_price'],
+                    'account_type' => $accountType,
+                    'cost' => $cost,
                     'lottery_id' => $lottery->en_name,
                     'method_id' => $_item['method_id'],
                 ];
@@ -80,9 +85,9 @@ trait ProjectTraits
         LotteryIssue $currentIssue,
         array $inputDatas,
         &$traceFirstMultiple,
-        &$traceData
+        &$traceData,
+        $isTrace
     ) {
-        $isTrace = (int)$inputDatas['is_trace'];
         if ($isTrace === 1 && count($inputDatas['trace_issues']) > 1) {
             // 追号期号
             $arrTraceKeys = array_keys($inputDatas['trace_issues']);
@@ -93,10 +98,12 @@ trait ProjectTraits
             if (count($arrTraceKeys) !== $traceDataCollection->count()) {
                 $traceError['error'] = '100309';
                 return $traceError;
+            } else {
+                return $traceDataCollection;
             }
         } elseif ($isTrace === 0) {
             // 投注期号是否正确
-            if ($currentIssue->issue !== (string)key($inputDatas['trace_issues'])) {
+            if ($currentIssue->issue !== (string) key($inputDatas['trace_issues'])) {
                 $traceError['error'] = '100310';
                 return $traceError;
             }
@@ -170,6 +177,7 @@ trait ProjectTraits
             'proxy_ip' => json_encode(Request::ip()),
             'bet_from' => $from,
             'time_bought' => time(),
+            'status_flow' => $isTrace === 1 ? self::STATUS_FLOW_TRACE : self::STATUS_FLOW_NORMAL,
         ];
         return self::create($projectData);
     }
@@ -179,7 +187,7 @@ trait ProjectTraits
      */
     public static function getProjectSerialNumber(): string
     {
-        return 'XW'.Str::orderedUuid()->getNodeHex();
+        return 'XW' . Str::orderedUuid()->getNodeHex();
     }
 
     /**
@@ -200,8 +208,9 @@ trait ProjectTraits
         $traceData,
         $_item,
         $inputDatas,
-        $from
-    ): void {
+        $from,
+        $traceResult
+    ) {
         LotteryPrizeGroup::makePrizeSettingArray(
             $_item['method_id'],
             self::DEFAULT_PRIZE_GROUP,
@@ -211,7 +220,7 @@ trait ProjectTraits
             $aMaxPrize
         );
         // 保存主追号
-        $traceId = LotteryTrace::createTraceData(
+        $trace = LotteryTrace::createTraceData(
             $user,
             $project,
             $lottery,
@@ -223,7 +232,7 @@ trait ProjectTraits
         );
         // 保存追号列表
         LotteryTraceList::createTraceListData(
-            $traceId,
+            $trace['id'],
             $traceData,
             $data,
             $project,
@@ -231,8 +240,10 @@ trait ProjectTraits
             $lottery,
             $_item,
             $aPrizeSettingOfWay,
-            $from
+            $from,
+            $traceResult
         );
+        return $trace['total_price'];
     }
 
     public function setWon(
@@ -328,12 +339,12 @@ trait ProjectTraits
                     $arrLevel[] = $iLevel;
                     $arrBasicMethodId[] = $iBasicMethodId;
                 } else {
-                    $errorString = 'There have no Count:'.$iBasicMethodId.' level:'.$iLevel.' Count:'.$iCount;
+                    $errorString = 'There have no Count:' . $iBasicMethodId . ' level:' . $iLevel . ' Count:' . $iCount;
                     Log::channel('issues')->info($errorString);
                 }
             } else {
-                $levelDataNote = 'leveldata'.json_encode($aPrizeOfBasicMethod);
-                $errorString = 'There have no prize for  Basic MethodId'.$iBasicMethodId.$levelDataNote;
+                $levelDataNote = 'leveldata' . json_encode($aPrizeOfBasicMethod);
+                $errorString = 'There have no prize for  Basic MethodId' . $iBasicMethodId . $levelDataNote;
                 Log::channel('issues')->error($errorString);
             }
         }
@@ -385,11 +396,11 @@ trait ProjectTraits
      */
     private function formatWiningNumber(
         $sWnNumber = null
-    ): ?string {
+    ):  ? string {
         return is_array($sWnNumber) ? implode('', $sWnNumber) : $sWnNumber;
     }
 
-    public function sendMoney(): void
+    public function sendMoney() : void
     {
         $params = [
             'amount' => $this->bonus,
@@ -411,7 +422,7 @@ trait ProjectTraits
             }
         } catch (Exception $e) {
             $result = false;
-            $info = '投注-异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine();
+            $info = '投注-异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine();
             Log::channel('calculate-prize')->info($info); //Clog::userBet
         }
         if ($result === true) {
@@ -433,7 +444,7 @@ trait ProjectTraits
             $oProject->save();
             if (!empty($this->errors()->first())) {
                 $result = false;
-                $info = '更新状态出错'.json_encode($this->errors()->first(), JSON_PRETTY_PRINT);
+                $info = '更新状态出错' . json_encode($this->errors()->first(), JSON_PRETTY_PRINT);
                 Log::channel('calculate-prize')->info($info);
             } else {
                 $result = true;

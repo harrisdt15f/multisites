@@ -42,7 +42,7 @@ trait TraceTraits
      * @param $aPrizeSettingOfWay
      * @param $inputDatas
      * @param $from
-     * @return mixed
+     * @return array
      */
     public static function createTraceData(
         FrontendUser $user,
@@ -53,7 +53,8 @@ trait TraceTraits
         $aPrizeSettingOfWay,
         $inputDatas,
         $from
-    ) {
+    ): array{
+        $totalPrice = $_item['total_price'] * count($traceData);
         $traceMainData = [
             'trace_serial_number' => Project::getProjectSerialNumber(),
             'user_id' => $user->id,
@@ -74,7 +75,7 @@ trait TraceTraits
             'mode' => $_item['mode'],
             'times' => $_item['times'],
             'single_price' => $_item['price'],
-            'total_price' => $_item['total_price'],
+            'total_price' => $totalPrice,
             'win_stop' => $inputDatas['trace_win_stop'],
             'total_issues' => count($traceData),
             'finished_issues' => 0,
@@ -90,7 +91,8 @@ trait TraceTraits
             'proxy_ip' => json_encode(Request::ip()),
             'bet_from' => $from,
         ];
-        // 保存追号主
-        return self::create($traceMainData)->id;
+        $data['id'] = self::create($traceMainData)->id;
+        $data['total_price'] = $totalPrice;
+        return $data;
     }
 }
