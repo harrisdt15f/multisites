@@ -180,6 +180,7 @@
 <exclude-pattern>*/Http/Kernel.php</exclude-pattern>
 <exclude-pattern>*/Providers/*</exclude-pattern>
 <exclude-pattern>git-hooks/</exclude-pattern>
+<exclude-pattern>app/Models/Game/Lottery/Logics/IssueCacheCalcLogics.php</exclude-pattern>
 <arg name="colors"/>
 <arg value="spvnl"/>
 <ini name="memory_limit" value="128M"/>
