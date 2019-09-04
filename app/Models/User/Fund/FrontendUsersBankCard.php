@@ -9,7 +9,6 @@ class FrontendUsersBankCard extends Ardent
 {
     public const NATURAL_STATUS = 1;
     protected $appends = ['card_num'];
-    protected $hidden = ['card_number'];
     /**
      * The attributes that are mass assignable.
      *
