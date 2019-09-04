@@ -11,6 +11,7 @@ namespace App\Http\Requests\Frontend\Game\Lottery;
 use App\Http\Requests\BaseFormRequest;
 use App\Rules\Frontend\Lottery\Bet\BallsCodeRule;
 use App\Rules\Frontend\Lottery\Bet\MethodCountsRule;
+use Exception;
 
 class LotteriesBetRequest extends BaseFormRequest
 {
@@ -28,12 +29,16 @@ class LotteriesBetRequest extends BaseFormRequest
      * Get the validation rules that apply to the request.
      *
      * @return array
+     * @throws Exception
      */
     public function rules(): array
     {
         return [
             'lottery_sign' => 'required|string|min:4|max:10|exists:lottery_lists,en_name',
             'trace_issues.*' => 'required|integer|between:1,1000',
+//            'balls'=>[
+//                new BallsCodeRule($this->get('lottery_sign'), $this->get('balls'))
+//            ],
             'balls.*.method_id' => 'required|exists:lottery_methods,method_id',
             'balls.*.method_group' => 'required|exists:lottery_methods,method_group',
             'balls.*.method_name' => 'required',
@@ -52,6 +57,8 @@ class LotteriesBetRequest extends BaseFormRequest
             //float '1.000', '0.100', '0.010', '0.001'
             'balls.*.prize_group' => 'required|integer',
             'balls.*.price' => 'required|integer|in:1,2',
+            'balls.*.challenge'=> 'required|integer|in:0,1',
+            'balls.*.challenge_prize'=> 'required|integer|between:0,40000',
             'trace_win_stop' => 'required|integer',
             'total_cost' => 'required|regex:/^\d+(\.\d{1,3})?$/',
             'from' => 'integer',
