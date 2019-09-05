@@ -35,7 +35,7 @@
 <rule ref="SlevomatCodingStandard.PHP.UselessSemicolon"/>
 <rule ref="SlevomatCodingStandard.Variables.DuplicateAssignmentToVariable"/>
 <rule ref="SlevomatCodingStandard.Variables.UnusedVariable"/>
-<rule ref="SlevomatCodingStandard.Variables.UselessVariable"/>
+<!--<rule ref="SlevomatCodingStandard.Variables.UselessVariable"/>-->
 <rule ref="SlevomatCodingStandard.Exceptions.DeadCatch"/>
 <rule ref="SlevomatCodingStandard.Classes.TraitUseDeclaration"/>
 <rule ref="SlevomatCodingStandard.ControlStructures.NewWithParentheses"/>

@@ -11,7 +11,7 @@ trait TraceTraits
 {
     /**
      * 获取列表
-     * @param  array $condition
+     * @param  array  $condition
      * @return array
      */
     public static function getList($condition): array
@@ -20,8 +20,8 @@ trait TraceTraits
         if (isset($condition['en_name'])) {
             $query->where('en_name', '=', $condition['en_name']);
         }
-        $currentPage = isset($condition['page_index']) ? (int) $condition['page_index'] : 1;
-        $pageSize = isset($condition['page_size']) ? (int) $condition['page_size'] : 15;
+        $currentPage = isset($condition['page_index']) ? (int)$condition['page_index'] : 1;
+        $pageSize = isset($condition['page_size']) ? (int)$condition['page_size'] : 15;
         $offset = ($currentPage - 1) * $pageSize;
         $total = $query->count();
         $menus = $query->skip($offset)->take($pageSize)->get();
@@ -29,7 +29,7 @@ trait TraceTraits
             'data' => $menus,
             'total' => $total,
             'currentPage' => $currentPage,
-            'totalPage' => (int) ceil($total / $pageSize),
+            'totalPage' => (int)ceil($total / $pageSize),
         ];
     }
 
@@ -53,7 +53,7 @@ trait TraceTraits
         $aPrizeSettingOfWay,
         $inputDatas,
         $from
-    ): array{
+    ): array {
         $totalPrice = $_item['total_price'] * count($traceData);
         $traceMainData = [
             'trace_serial_number' => Project::getProjectSerialNumber(),
@@ -90,6 +90,8 @@ trait TraceTraits
             'ip' => Request::ip(),
             'proxy_ip' => json_encode(Request::ip()),
             'bet_from' => $from,
+            'challenge_prize' => $_item['challenge_prize'],
+            'challenge' => $_item['challenge'],
         ];
         $data['id'] = self::create($traceMainData)->id;
         $data['total_price'] = $totalPrice;
