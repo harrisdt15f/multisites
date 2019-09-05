@@ -6,6 +6,7 @@ use App\Models\Game\Lottery\LotteryIssue;
 use App\Models\Game\Lottery\LotteryList;
 use App\Models\Game\Lottery\LotterySerie;
 use Illuminate\Support\Facades\Redis;
+use ArrayObject;
 
 /**
  * Created by PhpStorm.
@@ -320,8 +321,22 @@ trait IssueCacheCalcLogics
             $redisData = array_slice($redisData, 0, $trueRange);
         }
         $resCalcData[] = $redisData;
-        $resCalcData[] = $totalArr;
+        $resCalcData[] = self::changeArrayType($totalArr);
         return json_encode($resCalcData);
+    }
+
+    private static function changeArrayType($totalArr){
+        $resData = array();
+        foreach($totalArr as $toKey => $toVal){
+
+            foreach ($toVal as $seKey=>$seVal){
+                if($seKey===0 && $toKey===0){
+                    return $totalArr;
+                }
+                $resData[$toKey][]=$seVal;
+            }
+        }
+        return $resData;
     }
 
     /*获取上层对应的位置*/
