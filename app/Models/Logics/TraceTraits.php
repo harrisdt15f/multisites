@@ -11,7 +11,7 @@ trait TraceTraits
 {
     /**
      * 获取列表
-     * @param  array $condition
+     * @param  array  $condition
      * @return array
      */
     public static function getList($condition): array
@@ -20,8 +20,8 @@ trait TraceTraits
         if (isset($condition['en_name'])) {
             $query->where('en_name', '=', $condition['en_name']);
         }
-        $currentPage = isset($condition['page_index']) ? (int) $condition['page_index'] : 1;
-        $pageSize = isset($condition['page_size']) ? (int) $condition['page_size'] : 15;
+        $currentPage = isset($condition['page_index']) ? (int)$condition['page_index'] : 1;
+        $pageSize = isset($condition['page_size']) ? (int)$condition['page_size'] : 15;
         $offset = ($currentPage - 1) * $pageSize;
         $total = $query->count();
         $menus = $query->skip($offset)->take($pageSize)->get();
@@ -29,7 +29,7 @@ trait TraceTraits
             'data' => $menus,
             'total' => $total,
             'currentPage' => $currentPage,
-            'totalPage' => (int) ceil($total / $pageSize),
+            'totalPage' => (int)ceil($total / $pageSize),
         ];
     }
 
@@ -42,7 +42,7 @@ trait TraceTraits
      * @param $aPrizeSettingOfWay
      * @param $inputDatas
      * @param $from
-     * @return mixed
+     * @return array
      */
     public static function createTraceData(
         FrontendUser $user,
@@ -53,7 +53,8 @@ trait TraceTraits
         $aPrizeSettingOfWay,
         $inputDatas,
         $from
-    ) {
+    ): array {
+        $totalPrice = $_item['total_price'] * count($traceData);
         $traceMainData = [
             'trace_serial_number' => Project::getProjectSerialNumber(),
             'user_id' => $user->id,
@@ -74,7 +75,7 @@ trait TraceTraits
             'mode' => $_item['mode'],
             'times' => $_item['times'],
             'single_price' => $_item['price'],
-            'total_price' => $_item['total_price'],
+            'total_price' => $totalPrice,
             'win_stop' => $inputDatas['trace_win_stop'],
             'total_issues' => count($traceData),
             'finished_issues' => 0,
@@ -89,8 +90,11 @@ trait TraceTraits
             'ip' => Request::ip(),
             'proxy_ip' => json_encode(Request::ip()),
             'bet_from' => $from,
+            'challenge_prize' => $_item['challenge_prize'],
+            'challenge' => $_item['challenge'],
         ];
-        // 保存追号主
-        return self::create($traceMainData)->id;
+        $data['id'] = self::create($traceMainData)->id;
+        $data['total_price'] = $totalPrice;
+        return $data;
     }
 }

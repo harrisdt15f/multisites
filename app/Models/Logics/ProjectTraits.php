@@ -5,11 +5,8 @@ namespace App\Models\Logics;
 use App\Models\Game\Lottery\LotteryIssue;
 use App\Models\Game\Lottery\LotteryList;
 use App\Models\Game\Lottery\LotteryPrizeGroup;
-use App\Models\Game\Lottery\LotteryTraceList;
-use App\Models\LotteryTrace;
 use App\Models\User\FrontendUser;
 use Exception;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
@@ -35,72 +32,97 @@ trait ProjectTraits
         $from = 1
     ): array {
         $traceFirstMultiple = 1;
-        $isTrace = 0;
         $traceData = [];
-        $returnData = [];
-        $traceResult = self::traceCompile($lottery, $currentIssue, $inputDatas, $traceFirstMultiple, $traceData);
+        $isTrace = (int)$inputDatas['is_trace'];
+        $traceResult = self::traceCompile(
+            $lottery,
+            $currentIssue,
+            $inputDatas,
+            $traceFirstMultiple,
+            $traceData,
+            $isTrace
+        );
         if (isset($traceResult['error'])) {
             return $traceResult;
         } else {
-            foreach ($data as $_item) {
-                $project = self::saveSingleProject(
-                    $user,
-                    $lottery,
-                    $_item,
-                    $inputDatas,
-                    $isTrace,
-                    $traceFirstMultiple,
-                    $currentIssue,
-                    $from
-                );
-                if ($traceData) {
-                    self::saveTrace($project, $user, $lottery, $data, $traceData, $_item, $inputDatas, $from);
-                }
-                $returnData['project'][] = [
-                    'id' => $project->id,
-                    'cost' => $_item['total_price'],
-                    'lottery_id' => $lottery->en_name,
-                    'method_id' => $_item['method_id'],
-                ];
-            }
+            $returnData = self::addProjectsandTraces(
+                $user,
+                $lottery,
+                $currentIssue,
+                $data,
+                $inputDatas,
+                $isTrace,
+                $traceFirstMultiple,
+                $traceData,
+                $traceResult,
+                $from
+            );
             return $returnData;
         }
     }
 
     /**
+     * @param  FrontendUser  $user
      * @param  LotteryList  $lottery
      * @param  LotteryIssue  $currentIssue
+     * @param $data
      * @param  array  $inputDatas
+     * @param $isTrace
      * @param $traceFirstMultiple
      * @param $traceData
-     * @return mixed
+     * @param $traceResult
+     * @param  int  $from
+     * @return array
      */
-    public static function traceCompile(
+    private static function addProjectsandTraces(
+        FrontendUser $user,
         LotteryList $lottery,
         LotteryIssue $currentIssue,
+        $data,
         array $inputDatas,
-        &$traceFirstMultiple,
-        &$traceData
-    ) {
-        $isTrace = (int)$inputDatas['is_trace'];
-        if ($isTrace === 1 && count($inputDatas['trace_issues']) > 1) {
-            // 追号期号
-            $arrTraceKeys = array_keys($inputDatas['trace_issues']);
-            $traceDataCollection = $lottery->checkTraceData($arrTraceKeys);
-            $traceFirstMultiple = Arr::first($inputDatas['trace_issues']);
-            // $traceData = array_slice($inputDatas['trace_issues'], 1, null, true);
-            $traceData = $inputDatas['trace_issues'];
-            if (count($arrTraceKeys) !== $traceDataCollection->count()) {
-                $traceError['error'] = '100309';
-                return $traceError;
+        $isTrace,
+        $traceFirstMultiple,
+        $traceData,
+        $traceResult,
+        int $from
+    ): array {
+        $returnData = [];
+        foreach ($data as $_item) {
+            $project = self::saveSingleProject(
+                $user,
+                $lottery,
+                $_item,
+                $inputDatas,
+                $isTrace,
+                $traceFirstMultiple,
+                $currentIssue,
+                $from
+            );
+            if ($traceData) {
+                $accountType = 'trace_cost';
+                $cost = self::saveTrace(
+                    $project,
+                    $user,
+                    $lottery,
+                    $traceData,
+                    $_item,
+                    $inputDatas,
+                    $from,
+                    $traceResult
+                );
+            } else {
+                $accountType = 'bet_cost';
+                $cost = $_item['total_price'];
             }
-        } elseif ($isTrace === 0) {
-            // 投注期号是否正确
-            if ($currentIssue->issue !== (string)key($inputDatas['trace_issues'])) {
-                $traceError['error'] = '100310';
-                return $traceError;
-            }
+            $returnData['project'][] = [
+                'id' => $project->id,
+                'account_type' => $accountType,
+                'cost' => $cost,
+                'lottery_id' => $lottery->en_name,
+                'method_id' => $_item['method_id'],
+            ];
         }
+        return $returnData;
     }
 
     /**
@@ -124,11 +146,6 @@ trait ProjectTraits
         LotteryIssue $currentIssue,
         $from
     ) {
-        if ($lottery->serie()->exists()) {
-            $subTractPrize = $lottery->serie->price_difference;
-        } else {
-            $subTractPrize = 0;
-        }
         $bresult = LotteryPrizeGroup::makePrizeSettingArray(
             $_item['method_id'],
             self::DEFAULT_PRIZE_GROUP,
@@ -139,6 +156,48 @@ trait ProjectTraits
         );
         if ($bresult) {
             die('奖金组错误');
+        }
+        $projectData = self::getSingleProjectData(
+            $user,
+            $lottery,
+            $_item,
+            $inputDatas,
+            $isTrace,
+            $traceFirstMultiple,
+            $currentIssue,
+            $aPrizeSettingOfWay,
+            $from
+        );
+        return self::create($projectData);
+    }
+
+    /**
+     * @param  FrontendUser  $user
+     * @param  LotteryList  $lottery
+     * @param $_item
+     * @param  array  $inputDatas
+     * @param $isTrace
+     * @param $traceFirstMultiple
+     * @param  LotteryIssue  $currentIssue
+     * @param $aPrizeSettingOfWay
+     * @param $from
+     * @return array
+     */
+    private static function getSingleProjectData(
+        FrontendUser $user,
+        LotteryList $lottery,
+        $_item,
+        array $inputDatas,
+        $isTrace,
+        $traceFirstMultiple,
+        LotteryIssue $currentIssue,
+        $aPrizeSettingOfWay,
+        $from
+    ): array {
+        if ($lottery->serie()->exists()) {
+            $subTractPrize = $lottery->serie->price_difference;
+        } else {
+            $subTractPrize = 0;
         }
         $projectData = [
             'serial_number' => self::getProjectSerialNumber(),
@@ -170,8 +229,11 @@ trait ProjectTraits
             'proxy_ip' => json_encode(Request::ip()),
             'bet_from' => $from,
             'time_bought' => time(),
+            'status_flow' => $isTrace === 1 ? self::STATUS_FLOW_TRACE : self::STATUS_FLOW_NORMAL,
+            'challenge_prize' => $_item['challenge_prize'],
+            'challenge' => $_item['challenge'],
         ];
-        return self::create($projectData);
+        return $projectData;
     }
 
     /**
@@ -180,59 +242,6 @@ trait ProjectTraits
     public static function getProjectSerialNumber(): string
     {
         return 'XW'.Str::orderedUuid()->getNodeHex();
-    }
-
-    /**
-     * @param  mixed  $project
-     * @param  FrontendUser  $user
-     * @param  LotteryList  $lottery
-     * @param  array  $data
-     * @param  array  $traceData
-     * @param  array  $_item
-     * @param  array  $inputDatas
-     * @param  int  $from
-     */
-    public static function saveTrace(
-        $project,
-        FrontendUser $user,
-        LotteryList $lottery,
-        $data,
-        $traceData,
-        $_item,
-        $inputDatas,
-        $from
-    ): void {
-        LotteryPrizeGroup::makePrizeSettingArray(
-            $_item['method_id'],
-            self::DEFAULT_PRIZE_GROUP,
-            $lottery->series_id,
-            $aPrizeSettings,
-            $aPrizeSettingOfWay,
-            $aMaxPrize
-        );
-        // 保存主追号
-        $traceId = LotteryTrace::createTraceData(
-            $user,
-            $project,
-            $lottery,
-            $traceData,
-            $_item,
-            $aPrizeSettingOfWay,
-            $inputDatas,
-            $from
-        );
-        // 保存追号列表
-        LotteryTraceList::createTraceListData(
-            $traceId,
-            $traceData,
-            $data,
-            $project,
-            $user,
-            $lottery,
-            $_item,
-            $aPrizeSettingOfWay,
-            $from
-        );
     }
 
     public function setWon(
@@ -247,11 +256,17 @@ trait ProjectTraits
                 'open_number' => $openNumber,
                 'winning_number' => $this->formatWiningNumber($sWnNumber),
                 'level' => implode(',', $arrLevel), //@todo may be with string to concact
-                'bonus' => $totalBonus,
                 'is_win' => 1,
                 'time_count' => now()->timestamp,
                 'status' => self::STATUS_WON,
             ];
+            if (($this->challenge === 1) && $totalBonus > $this->challenge_prize) {//单挑模式返奖
+                $data['bonus'] = $this->challenge_prize;
+                $data['bonus_expected'] = $totalBonus;
+            } else {
+                $data['bonus'] = $totalBonus;
+                $data['bonus_expected'] = $totalBonus;
+            }
             try {
                 DB::beginTransaction();
                 $this->update($data); //@todo maybe only a time update

@@ -97,25 +97,25 @@ trait LotteryTraceListLogics
     /**
      * @param $traceId
      * @param $traceData
-     * @param $data
      * @param  Project  $project
      * @param  FrontendUser  $user
      * @param  LotteryList  $lottery
      * @param $_item
      * @param $aPrizeSettingOfWay
      * @param $from
+     * @param $traceResult
      */
     public static function createTraceListData(
         $traceId,
         $traceData,
-        $data,
         Project $project,
         FrontendUser $user,
         LotteryList $lottery,
         $_item,
         $aPrizeSettingOfWay,
-        $from
-    ): void {
+        $from,
+        $traceResult
+    ) {
         $i = 1;
         foreach ($traceData as $issue => $multiple) {
             if ($i === 1) {
@@ -125,7 +125,8 @@ trait LotteryTraceListLogics
                 $project_serial_number = null;
                 $status = self::STATUS_WAITING;
             }
-            foreach ($data as $dataItem) {
+            $issueEloq = $traceResult->where('issue', $issue)->first();
+            if ($issueEloq !== null) {
                 $traceListData = [
                     'user_id' => $user->id,
                     'username' => $user->username,
@@ -139,27 +140,29 @@ trait LotteryTraceListLogics
                     'project_id' => $project->id,
                     'project_serial_number' => $project_serial_number,
                     'lottery_sign' => $lottery->en_name,
-                    'method_sign' => $dataItem['method_id'],
+                    'method_sign' => $_item['method_id'],
                     'method_group' => $_item['method_group'],
-                    'method_name' => $dataItem['method_name'],
+                    'method_name' => $_item['method_name'],
                     'issue' => $issue,
-                    'bet_number' => $dataItem['code'],
-                    'mode' => $dataItem['mode'],
-                    'times' => $dataItem['times'] * $multiple,
-                    'single_price' => $dataItem['price'],
-                    'total_price' => $dataItem['total_price'] * $multiple,
+                    'bet_number' => $_item['code'],
+                    'mode' => $_item['mode'],
+                    'times' => $_item['times'] * $multiple,
+                    'single_price' => $_item['price'],
+                    'total_price' => $_item['total_price'] * $multiple,
                     'user_prize_group' => $user->prize_group,
-                    'bet_prize_group' => $dataItem['prize_group'],
+                    'bet_prize_group' => $_item['prize_group'],
                     'prize_set' => json_encode($aPrizeSettingOfWay),
                     'ip' => Request::ip(),
                     'proxy_ip' => json_encode(Request::ip()),
                     'bet_from' => $from,
                     'status' => $status,
+                    'issue_end_time' => $issueEloq->end_time,
+                    'challenge_prize' => $_item['challenge_prize'],
+                    'challenge' => $_item['challenge'],
                 ];
-                $_item['total_price'] += $traceListData['total_price'];
                 self::create($traceListData);
+                $i++;
             }
-            $i++;
         }
     }
 }

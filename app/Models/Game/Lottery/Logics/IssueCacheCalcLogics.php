@@ -27,7 +27,7 @@ trait IssueCacheCalcLogics
      */
     public static function cacheRe(LotteryIssue $lotteryIssue)
     {
-        $key = $lotteryIssue->lottery_id;//key
+        $lotKey = $lotteryIssue->lottery_id;//lotKey
         $issue = $lotteryIssue->issue;//将期 sort
         //   $code = $lotteryIssue->official_code . ',' . $issue;//奖号 value = value . issue 保证唯一性,避免两期开出同样号码无法入库的情况
 
@@ -38,19 +38,19 @@ trait IssueCacheCalcLogics
         self::changeIssue($issue);
 
         //记录当前 使用有序集合存储开奖信息，开奖期号作为sort，彩票lottery_id作为集合名称 例如 hljssc 值为开奖号码
-        Redis::zadd($key, $issue, $data);
+        Redis::zadd($lotKey, $issue, $data);
 
         //判断缓存容积，若单个彩种信息条数 = 1,代表第一次记录 进行缓存初始化，增加容错率 设定为>5 redis
-        $count = Redis::zcard($key);
+        $count = Redis::zcard($lotKey);
 
         //初始化数据
         if ($count < self::$update_limit) {
-            self::flushIssueCache($key);
+            self::flushIssueCache($lotKey);
         }
 
         //切除多余数据
         if ($count > self::$code_range) {
-            self::cutCacheData($key, $count);
+            self::cutCacheData($lotKey, $count);
         }
 
         return true;
@@ -83,14 +83,13 @@ trait IssueCacheCalcLogics
         }
 
         //写入缓存
-        foreach ($issues as $v) {
-            $data = self::changeValue($v);
-            $key = $v->lottery_id;//key
-            $issue = $v->issue;//将期 sort
+        foreach ($issues as $issueValue) {
+            $data = self::changeValue($issueValue);
+            $issueKey = $issueValue->lottery_id;//issueKey
+            $issue = $issueValue->issue;//将期 sort
             //奖期统一
             self::changeIssue($issue);
-
-            Redis::zadd($key, $issue, $data); //数据补齐
+            Redis::zadd($issueKey, $issue, $data); //数据补齐
         }
         $count = Redis::zcard($lottery_id);
         if ($count > 100) {
@@ -120,9 +119,7 @@ trait IssueCacheCalcLogics
         $returnData['open_time'] = $value->official_open_time;
         $returnData['issue'] = $value->issue;
         $returnData['code'] = $value->official_code;
-
         $lottery_id = $value->lottery_id;
-
         //六合彩不进行拆分
         if ($value->lottery_id === 'lhc') {
             $returnData['data'] = $returnData['code'];
@@ -149,20 +146,20 @@ trait IssueCacheCalcLogics
         $codeRange = array_flip($codeRange);
         ksort($codeRange);
         $secondData = array();
-        foreach ($codeRange as $cr => $cv) {
-            $secondData[$cr] = [1, 0, 1];
-            unset($cv);
+        foreach ($codeRange as $codeRangeK => $codeRangeV) {
+            $secondData[$codeRangeK] = [1, 0, 1];
+            unset($codeRangeV);
         }
         $resData = array();
-        foreach ($arrCode as $k => $v) {
-            $v = (int)$v;
-            $resData[$k] = $secondData;
-            foreach ($resData[$k] as $rd => $rv) {
-                $resData[$k][$rd][0] = $v === $rd ? 0 : 1;
-                $resData[$k][$rd][1] = $v;
-                $resData[$k][$rd][2] = $resData[$k][$rd][0];
-                $resData[$k][$rd][3] = $resData[$k][$rd][0] === 0 ? 1 : 0;//记录连号
-                unset($rv);
+        foreach ($arrCode as $arrCodeK => $arrCodeV) {
+            $arrCodeV = (int)$arrCodeV;
+            $resData[$arrCodeK] = $secondData;
+            foreach ($resData[$arrCodeK] as $resDataArrCpdeK => $resDataArrCodeV) {
+                $resData[$arrCodeK][$resDataArrCpdeK][0] = $arrCodeV === $resDataArrCpdeK ? 0 : 1;
+                $resData[$arrCodeK][$resDataArrCpdeK][1] = $arrCodeV;
+                $resData[$arrCodeK][$resDataArrCpdeK][2] = $resData[$arrCodeK][$resDataArrCpdeK][0];
+                $resData[$arrCodeK][$resDataArrCpdeK][3] = $resData[$arrCodeK][$resDataArrCpdeK][0] === 0 ? 1 : 0;//记录连号
+                unset($resDataArrCodeV);
             }
         }
         $returnData['data'] = $resData;
@@ -212,54 +209,49 @@ trait IssueCacheCalcLogics
         } else {
             $arrCode = str_split(json_decode($redisData[0])->code);
         }
-
-        $row = count($arrCode);
-        $totalArr = self::createArray($row, $lotteryList);
+        $rowNumber = count($arrCode);
+        $totalArr = self::createArray($rowNumber, $lotteryList);
         $redisCount = count($redisData);
         $trueRange = $redisCount > $range ? $range + 1 : $redisCount;
-        //01 $codeRange = explode(',', $lotteryList->valid_code);
-        //01 $startIndex = $codeRange[0];
-
+        $codeRangeCount = count(explode(',', $lotteryList->valid_code));
         //循环到指定的范围
-        foreach ($redisData as $k => $v) {
+        foreach ($redisData as $redisDataKey => $totalArrV) {
             /*
-                        if ($k == 0)
-                            continue;*/
-
-            if ($k > $range) {
+                                    if ($redisDataKey == 0)
+                                        continue;
+            */
+            if ($redisDataKey > $range) {
                 break;
             }
             //v是一次开奖的数据
-            $redisData[$k] = json_decode($v);
-            $vdata = $redisData[$k]->data;
+            $redisData[$redisDataKey] = json_decode($totalArrV);
+            $vdata = $redisData[$redisDataKey]->data;
 
             //循环单列
             foreach ($vdata as $vdataKey => $vdataValue) {
                 $typeFlag = is_object($vdataValue);
 
                 if ($typeFlag === false) {
-                    $obj = new \stdClass();
-                    foreach ($vdataValue as $oak => $oav) {
-                        $obj->$oak = $oav;
+                    $stdObj = new \stdClass();
+                    foreach ($vdataValue as $vdataValueK => $vdataValueV) {
+                        $stdObj->$vdataValueK = $vdataValueV;
                     }
-                    $vdataValue = $obj;
-                    $vdata[$vdataKey] = $obj;
-                    $redisData[$k]->data[$vdataKey] = $obj;
+                    $vdataValue = $stdObj;
+                    $vdata[$vdataKey] = $stdObj;
+                    $redisData[$redisDataKey]->data[$vdataKey] = $stdObj;
                 }
                 //上一层对应的位置 上一组开奖对应
-                $preSite = $k === 0 ? 0 : $redisData[$k - 1]->data[$vdataKey];
+                $preSite = $redisDataKey === 0 ? 0 : $redisData[$redisDataKey - 1]->data[$vdataKey];
 
                 //偏移位 就是当前的中奖号码
                 $moveKey = $vdataValue->{1}[1];
-
                 //totalArr 统计数组中对应的位置
-                $totalSite = $vdataKey * $row + $moveKey;
+                $totalSite = $vdataKey * $codeRangeCount + $moveKey;
 
                 //如果中了统计总位置加1
                 $totalArr[0][$totalSite]++;
-
                 foreach ($vdataValue as $vdataItemKey => $vdatavaItemValue) {
-                    $site = $vdataKey * $row + $vdataItemKey;
+                    $site = $vdataKey * $rowNumber + $vdataItemKey;
                     /*最大遗漏*/
                     //记j录的漏号
                     $preMax = $totalArr[2][$site];
@@ -275,7 +267,7 @@ trait IssueCacheCalcLogics
                             $totalArr[3][$site];
                             //如果开号
                             //$currentLcz =  $vdataValue->$vdataItemKey[3]; //当前的连开值加上上一个的值
-                            if ($k !== 0) {
+                            if ($redisDataKey !== 0) {
                                 $vdataValue->$vdataItemKey[3] = $vdataValue->$vdataItemKey[3] + $preSite->$vdataItemKey[3];
                                 if ($vdataValue->$vdataItemKey[3] > $preLxMax) {
                                     $totalArr[3][$site] = $vdataValue->$vdataItemKey[3];
@@ -290,7 +282,7 @@ trait IssueCacheCalcLogics
                     }
 
                     //不是开号当前遗漏期数等于他加他之前
-                    if ($k === 0) {
+                    if ($redisDataKey === 0) {
                         $beData = 0;
                     } else {
                         // dd($preSite);
@@ -305,21 +297,21 @@ trait IssueCacheCalcLogics
                 }
             }
         }
-        foreach ($totalArr[1] as $tk => $v) {
+        foreach ($totalArr[1] as $totalArrK => $totalArrV) {
             //遗漏值平均 公式为 彩票总期数减去历史中奖次数，得出历史遗漏总值，历史遗漏总值除以历史中奖次等于平均遗漏值。
             //历史中奖期数
-            $history = $totalArr[0][$tk];
+            $history = $totalArr[0][$totalArrK];
             if ($history === 0) {
                 continue;
             } else if ($trueRange - $history === 0) {
-                $totalArr[1][$tk] = 0;
+                $totalArr[1][$totalArrK] = 0;
             } else {
-                $totalArr[1][$tk] = ($trueRange - $history) / $history;
-                if (is_float($totalArr[1][$tk])) {
-                    $totalArr[1][$tk] = round($totalArr[1][$tk], 2);
+                $totalArr[1][$totalArrK] = ($trueRange - $history) / $history;
+                if (is_float($totalArr[1][$totalArrK])) {
+                    $totalArr[1][$totalArrK] = round($totalArr[1][$totalArrK], 2);
                 }
             }
-            unset($v);
+            unset($totalArrV);
         }
 
         $redisDataCount = count($redisData);
@@ -327,7 +319,6 @@ trait IssueCacheCalcLogics
         if ($redisDataCount > $trueRange) {
             $redisData = array_slice($redisData, 0, $trueRange);
         }
-
         $resCalcData[] = $redisData;
         $resCalcData[] = $totalArr;
         return json_encode($resCalcData);
@@ -337,20 +328,23 @@ trait IssueCacheCalcLogics
 
 
     /*创建指定列数的数组*/
-    private static function createArray($row, $lotteryList)
+    private static function createArray($rowNumber, $lotteryList)
     {
         $codeRange = explode(',', $lotteryList->valid_code);
         sort($codeRange);
-        $startInde = $codeRange[0];
-        $lastValue = $codeRange[count($codeRange) - 1];
+        $startInde = (int)$codeRange[0];
+        $lastValue = (int)$codeRange[count($codeRange) - 1];
+        if ($startInde === 0) {
+            $lastValue++;
+        }
         //出现总次数
-        $data[] = array_fill($startInde, $row * $lastValue, 0);
+        $data[] = array_fill($startInde, $rowNumber * $lastValue, 0);
         //平均遗漏值
-        $data[] = array_fill($startInde, $row * $lastValue, 0);
+        $data[] = array_fill($startInde, $rowNumber * $lastValue, 0);
         //最大遗漏值
-        $data[] = array_fill($startInde, $row * $lastValue, 0);
+        $data[] = array_fill($startInde, $rowNumber * $lastValue, 0);
         //最大连出值
-        $data[] = array_fill($startInde, $row * $lastValue, 0);
+        $data[] = array_fill($startInde, $rowNumber * $lastValue, 0);
         return $data;
     }
 }

@@ -61,6 +61,10 @@ class FundOperation
         }
         $eloqM->fill($OperationDatas);
         $eloqM->save();
+        if ($eloqM->errors()->messages()) {
+            return false;
+        }
+        return true;
     }
 
     /**
