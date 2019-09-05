@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Game\Lottery\LotteryList;
 use App\Models\Game\Lottery\LotteryTraceList;
+use App\Models\Game\Lottery\ProjectHandleTrace;
 use App\Models\Logics\ProjectTraits;
 use App\Models\User\FrontendUser;
 use App\Models\User\Fund\FrontendUsersAccount;
@@ -13,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 class Project extends BaseModel
 {
     use ProjectTraits;
+    use ProjectHandleTrace;
 
     protected $guarded = ['id'];
 
