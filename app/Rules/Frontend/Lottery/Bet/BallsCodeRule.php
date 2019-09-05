@@ -71,11 +71,15 @@ class BallsCodeRule implements Rule
     {
         $result = true;
         $method = $this->lottery->getMethod($methodId);
-        $validator = Validator::make($method, [
+        $rule = [
             'status' => 'required|in:1', //玩法状态
             'object' => 'required', //玩法对象
             'method_name' => 'required', // 玩法未定义
-        ]);
+        ];
+        $messages = [
+            'status.required' => '玩法未开放',
+        ];
+        $validator = Validator::make($method, $rule, $messages);
         $oMethod = $method['object']; // 玩法 - 对象
         if ($validator->fails()) {
             $this->message = $validator->errors()->first();
