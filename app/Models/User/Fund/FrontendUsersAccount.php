@@ -3,12 +3,14 @@
 namespace App\Models\User\Fund;
 
 use App\Models\User\Fund\Logics\UserAccountLogics;
+use App\Models\User\Fund\Logics\UserTraceAccountLogics;
 use App\Models\User\FrontendUser;
 use LaravelArdent\Ardent\Ardent;
 
 class FrontendUsersAccount extends Ardent
 {
     use UserAccountLogics;
+    use UserTraceAccountLogics;
 
     protected $guarded = ['id'];
 
