@@ -31,6 +31,7 @@ class UserBankCardAddRequest extends BaseFormRequest
             'province_id' => 'required|exists:users_regions,id', //省份id
             'city_id' => 'required|exists:users_regions,id', //城市id
             'branch' => 'required|string', //支行
+            'fund_password'=>'nullable|string',
         ];
     }
 

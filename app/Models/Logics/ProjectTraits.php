@@ -257,11 +257,17 @@ trait ProjectTraits
                 'open_number' => $openNumber,
                 'winning_number' => $this->formatWiningNumber($sWnNumber),
                 'level' => implode(',', $arrLevel), //@todo may be with string to concact
-                'bonus' => $totalBonus,
                 'is_win' => 1,
                 'time_count' => now()->timestamp,
                 'status' => self::STATUS_WON,
             ];
+            if (($this->challenge === 1) && $totalBonus > $this->challenge_prize) {//单挑模式返奖
+                $data['bonus'] = $this->challenge_prize;
+                $data['bonus_expected'] = $totalBonus;
+            } else {
+                $data['bonus'] = $totalBonus;
+                $data['bonus_expected'] = $totalBonus;
+            }
             try {
                 DB::beginTransaction();
                 $this->update($data); //@todo maybe only a time update
