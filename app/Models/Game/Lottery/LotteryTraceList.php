@@ -6,6 +6,7 @@ use App\Models\BaseModel;
 use App\Models\LotteryTrace;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Game\Lottery\Logics\LotteryTraceListLogics;
+use App\Models\User\FrontendUser;
 
 class LotteryTraceList extends BaseModel
 {
@@ -23,5 +24,10 @@ class LotteryTraceList extends BaseModel
     public function trace(): BelongsTo
     {
         return $this->belongsTo(LotteryTrace::class, 'trace_id', 'id');
+    }
+
+    public function user()
+    {
+        return $this->hasOne(FrontendUser::class, 'id', 'user_id');
     }
 }

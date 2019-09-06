@@ -4,6 +4,9 @@ namespace App\Models\User\Fund;
 
 use App\Models\BackendAdminAuditFlowList;
 use App\Models\BaseModel;
+use App\Models\User\FrontendUser;
+use App\Models\User\UsersRechargeHistorie;
+use App\Models\Admin\Fund\BackendAdminRechargePocessAmount;
 
 class BackendAdminRechargehumanLog extends BaseModel
 {
@@ -20,7 +23,21 @@ class BackendAdminRechargehumanLog extends BaseModel
 
     public function auditFlow()
     {
-        $data = $this->hasOne(BackendAdminAuditFlowList::class, 'id', 'audit_flow_id');
-        return $data;
+        return $this->hasOne(BackendAdminAuditFlowList::class, 'id', 'audit_flow_id');
+    }
+
+    public function user()
+    {
+        return $this->hasOne(FrontendUser::class, 'id', 'user_id');
+    }
+
+    public function rechargeHistorie()
+    {
+        return $this->hasOne(UsersRechargeHistorie::class, 'id', 'recharge_id');
+    }
+
+    public function adminAmount()
+    {
+        return $this->hasOne(BackendAdminRechargePocessAmount::class, 'admin_id', 'admin_id');
     }
 }

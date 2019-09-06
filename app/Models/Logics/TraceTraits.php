@@ -35,7 +35,6 @@ trait TraceTraits
 
     /**
      * @param  FrontendUser  $user
-     * @param  Project  $project
      * @param  LotteryList  $lottery
      * @param $traceData
      * @param $_item
@@ -46,7 +45,7 @@ trait TraceTraits
      */
     public static function createTraceData(
         FrontendUser $user,
-        Project $project,
+        //Project $project,
         LotteryList $lottery,
         $traceData,
         $_item,
@@ -81,7 +80,7 @@ trait TraceTraits
             'finished_issues' => 0,
             'canceled_issues' => 0,
             'start_issue' => key($traceData),
-            'now_issue' => $project->issue,
+            //'now_issue' => $project->issue,
             'end_issue' => array_key_last($traceData),
             'stop_issue' => '',
             'issue_process' => json_encode($traceData),

@@ -17,6 +17,7 @@ class FundOperation
      * @param float   $amount               操作金额
      * @param string  $comment              具体描述
      * @param mixed   $AuditFlow0ID         审核表id
+     * @param mixed   $rechargeId           审核表id
      */
     public function insertOperationDatas(
         $eloqM,
@@ -28,7 +29,8 @@ class FundOperation
         $OperationName,
         $amount,
         $comment,
-        $AuditFlow0ID
+        $AuditFlow0ID,
+        $rechargeId = null
     ) {
 
         $OperationDatas = [
@@ -37,6 +39,7 @@ class FundOperation
             'amount' => $amount,
             'comment' => $comment,
             'audit_flow_id' => $AuditFlow0ID,
+            'recharge_id' => $rechargeId,
         ];
         if ($type === 0) {
             $OperationDatas['admin_id'] = $OperationId;

@@ -97,7 +97,6 @@ trait LotteryTraceListLogics
     /**
      * @param $traceId
      * @param $traceData
-     * @param  Project  $project
      * @param  FrontendUser  $user
      * @param  LotteryList  $lottery
      * @param $_item
@@ -108,7 +107,7 @@ trait LotteryTraceListLogics
     public static function createTraceListData(
         $traceId,
         $traceData,
-        Project $project,
+        //Project $project,
         FrontendUser $user,
         LotteryList $lottery,
         $_item,
@@ -118,13 +117,14 @@ trait LotteryTraceListLogics
     ) {
         $i = 1;
         foreach ($traceData as $issue => $multiple) {
+            /* 追号时的逻辑改动   先统一全部生成等待状态的trace_list
             if ($i === 1) {
-                $project_serial_number = $project->serial_number;
-                $status = self::STATUS_RUNNING;
+            $project_serial_number = $project->serial_number;
+            $status = self::STATUS_RUNNING;
             } else {
-                $project_serial_number = null;
-                $status = self::STATUS_WAITING;
-            }
+            $project_serial_number = null;
+            $status = self::STATUS_WAITING;
+            }*/
             $issueEloq = $traceResult->where('issue', $issue)->first();
             if ($issueEloq !== null) {
                 $traceListData = [
@@ -137,8 +137,8 @@ trait LotteryTraceListLogics
                     'parent_id' => $user->parent_id,
                     'is_tester' => $user->is_tester,
                     'series_id' => $lottery->series_id,
-                    'project_id' => $project->id,
-                    'project_serial_number' => $project_serial_number,
+                    //'project_id' => $project->id,
+                    'project_serial_number' => null,
                     'lottery_sign' => $lottery->en_name,
                     'method_sign' => $_item['method_id'],
                     'method_group' => $_item['method_group'],
@@ -155,7 +155,7 @@ trait LotteryTraceListLogics
                     'ip' => Request::ip(),
                     'proxy_ip' => json_encode(Request::ip()),
                     'bet_from' => $from,
-                    'status' => $status,
+                    'status' => self::STATUS_WAITING,
                     'issue_end_time' => $issueEloq->end_time,
                     'challenge_prize' => $_item['challenge_prize'],
                     'challenge' => $_item['challenge'],

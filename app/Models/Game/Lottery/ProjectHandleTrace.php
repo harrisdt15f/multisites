@@ -53,7 +53,6 @@ trait ProjectHandleTrace
     }
 
     /**
-     * @param  mixed  $project
      * @param  FrontendUser  $user
      * @param  LotteryList  $lottery
      * @param  array  $traceData
@@ -62,7 +61,6 @@ trait ProjectHandleTrace
      * @param  int  $from
      */
     public static function saveTrace(
-        $project,
         FrontendUser $user,
         LotteryList $lottery,
         $traceData,
@@ -82,7 +80,6 @@ trait ProjectHandleTrace
         // 保存主追号
         $trace = LotteryTrace::createTraceData(
             $user,
-            $project,
             $lottery,
             $traceData,
             $_item,
@@ -94,7 +91,6 @@ trait ProjectHandleTrace
         LotteryTraceList::createTraceListData(
             $trace['id'],
             $traceData,
-            $project,
             $user,
             $lottery,
             $_item,
