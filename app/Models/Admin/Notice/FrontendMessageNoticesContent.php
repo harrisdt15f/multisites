@@ -3,6 +3,7 @@
 namespace App\Models\Admin\Notice;
 
 use App\Models\BaseModel;
+use App\Models\Admin\Notice\FrontendMessageNotice;
 
 class FrontendMessageNoticesContent extends BaseModel
 {
@@ -15,4 +16,15 @@ class FrontendMessageNoticesContent extends BaseModel
     // {
     //     return Request::server("HTTP_HOST") . $this->attributes['pic_path'];
     // }
+    
+    public function receiveUserList()
+    {
+    	return $this->hasMany(FrontendMessageNotice::class, 'notices_content_id', 'id');
+    }
+
+    public function delete()
+    {
+        $this->receiveUserList()->delete();
+        return parent::delete();
+    }
 }

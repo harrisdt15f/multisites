@@ -36,7 +36,7 @@ class NoticeController extends BackEndApiMainController
      * @param  NoticeAddAction  $action
      * @return JsonResponse
      */
-    public function add(NoticeAddRequest $request, NoticeAddAction $action): JsonResponse
+    public function addNotice(NoticeAddRequest $request, NoticeAddAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
@@ -61,6 +61,18 @@ class NoticeController extends BackEndApiMainController
      * @return JsonResponse
      */
     public function delete(NoticeDeleteRequest $request, NoticeDeleteAction $action): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
+    }
+
+    /**
+     * 公告排序
+     * @param  NoticeSortRequest $request
+     * @param  NoticeSortAction  $action
+     * @return JsonResponse
+     */
+    public function sort(NoticeSortRequest $request, NoticeSortAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);

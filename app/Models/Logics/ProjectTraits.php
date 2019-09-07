@@ -230,7 +230,7 @@ trait ProjectTraits
             'proxy_ip' => json_encode(Request::ip()),
             'bet_from' => $from,
             'time_bought' => time(),
-            'status_flow' => $isTrace === 1 ? self::STATUS_FLOW_TRACE : self::STATUS_FLOW_NORMAL,
+            //'status_flow' => $isTrace === 1 ? self::STATUS_FLOW_TRACE : self::STATUS_FLOW_NORMAL,
             'challenge_prize' => $_item['challenge_prize'],
             'challenge' => $_item['challenge'],
         ];
