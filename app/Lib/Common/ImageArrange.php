@@ -16,19 +16,13 @@ class ImageArrange
         // 检验一下上传的文件是否有效.
         if ($file->isValid()) {
             $folder = 'uploaded_files';
-            if (file_exists($folder)) {
-                if (!is_writable($folder)) {
-                    return ['success' => false, 'msg' => '文件夹' . $folder . '没有写入权限'];
-                } else {
-                    if (!is_writable($path)) {
-                        mkdir($path, 0777, true);
-                        chmod($path, 0777);
-                    } else {
-                        return ['success' => false, 'msg' => '没有操作权限'];
-                    }
-                }
+            if (!is_writable($folder)) {
+                return ['success' => false, 'msg' => '文件夹' . $folder . '没有写入权限'];
             } else {
-                return ['success' => false, 'msg' => '文件夹' . $folder . '不存在'];
+                if (!is_writable($path)) {
+                    mkdir($path, 0777, true);
+                    chmod($path, 0777);
+                }
             }
             // 缓存在tmp文件夹中的文件名 例如 php8933.tmp 这种类型的.
             $clientName = $file->getClientOriginalName();
@@ -56,25 +50,19 @@ class ImageArrange
      */
     public function creatThumbnail($srcPath, $maxWidth, $maxHight, $prefix = 'sm_', $flag = true)
     {
-        //获取文件的后缀
-        $arr = explode('.', $srcPath);
-        $picType = end($arr);
+        $srcPathArr = explode('.', $srcPath);//获取文件的后缀
+        $picType = end($srcPathArr);
         if ($picType === 'jpg') {
             $picType = 'jpeg';
         }
-        //拼接打开图片的函数
-        $open_fn = 'imagecreatefrom' . $picType;
-        //打开源图
-        if (!is_callable($open_fn)) {
+        $open_fn = 'imagecreatefrom' . $picType;//拼接打开图片的函数
+        if (!is_callable($open_fn)) {//打开源图
             return '';
         }
-        $src = $open_fn($srcPath);
-        //源图的宽
-        $src_w = imagesx($src);
-        //源图的高
-        $src_h = imagesy($src);
-        //是否等比缩放
-        if ($flag) {
+        $source = $open_fn($srcPath);
+        $src_w = imagesx($source);//源图的宽
+        $src_h = imagesy($source);//源图的高
+        if ($flag) {//是否等比缩放
             //等比
             //求目标图片的宽高
             if ($maxWidth / $maxHight < $src_w / $src_h) {
@@ -98,26 +86,18 @@ class ImageArrange
         }
         $dst_x = 0;
         $dst_y = 0;
-        //创建目标图
-        $dst = imagecreatetruecolor((int) $dst_w, (int) $dst_h);
-        if ($dst === false) {
+        $targetPic = imagecreatetruecolor((int) $dst_w, (int) $dst_h);//创建目标图
+        if ($targetPic === false) {
             return '';
         }
-        //生成缩略图
-        imagecopyresampled($dst, $src, $dst_x, $dst_y, 0, 0, (int) $dst_w, (int) $dst_h, $src_w, $src_h);
-        //文件名
-        $filename = basename($srcPath);
-        //文件夹名
-        $foldername = substr(dirname($srcPath), 0);
-        //缩略图存放路径
-        $thumb_path = $foldername . '/' . $prefix . $filename;
-        //把缩略图上传到指定的文件夹
-        imagepng($dst, $thumb_path);
-        //销毁图片资源
-        imagedestroy($dst);
-        imagedestroy($src);
-        //返回新的缩略图的文件名
-        return $thumb_path;
+        imagecopyresampled($targetPic, $source, $dst_x, $dst_y, 0, 0, (int) $dst_w, (int) $dst_h, $src_w, $src_h);//生成缩略图
+        $filename = basename($srcPath);//文件名
+        $foldername = substr(dirname($srcPath), 0);//文件夹名
+        $thumb_path = $foldername . '/' . $prefix . $filename;//缩略图存放路径
+        imagepng($targetPic, $thumb_path);//把缩略图上传到指定的文件夹
+        imagedestroy($targetPic);//销毁图片资源
+        imagedestroy($source);//销毁图片资源
+        return $thumb_path;//返回新的缩略图的文件名
     }
 
     //删除文件
