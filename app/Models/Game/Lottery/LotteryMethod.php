@@ -10,8 +10,8 @@ class LotteryMethod extends BaseModel
 {
     use MethodsLogics;
 
-    public const OPEN = 1;
-    public const CLOSE = 0;
+    public const STATUS_OPEN = 1;
+    public const STATUS_CLOSE = 0;
     
     protected $guarded = ['id'];
 
