@@ -40,7 +40,7 @@ class AllocationRechargeFundControl extends Command
         //拥有权限的管理员
         $admins = BackendAdminUser::from('backend_admin_users as admin')
             ->select('admin.*', 'fund.fund')
-            ->leftJoin('backend_admin_recharge_pocess_amounts as fund', 'fund.admin_id', '=', 'admin.id')
+            ->leftJoin('backend_admin_recharge_process_amounts as fund', 'fund.admin_id', '=', 'admin.id')
             ->whereIn('group_id', $groups)
             ->get()->toArray();
         foreach ($admins as $admin) {
