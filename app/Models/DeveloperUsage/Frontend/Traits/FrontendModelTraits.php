@@ -16,9 +16,9 @@ trait FrontendModelTraits
     public function allFrontendModel($type): array
     {
         $typeArr = [];
-        if ($type == 2) {
+        if ($type === 2) {
             $typeArr = [1, 2];
-        } elseif ($type == 3) {
+        } elseif ($type === 3) {
             $typeArr = [1, 3];
         }
         $parentFrontendModel = self::parentModel($typeArr);
@@ -35,64 +35,31 @@ trait FrontendModelTraits
     }
 
     //获取首页基本内容
-    public function getWebBasicContent()
+    public static function getWebBasicContent($update = false)
     {
-        $data = [];
-        $contentFunctions = [ // key=>方法名
-            'ico' => 'getIco',
-            'logo' => 'getLogo',
-            'qrcode' => 'getQrcode',
-            'customer_service' => 'getCustomerService',
-        ];
-        foreach ($contentFunctions as $key => $function) {
-            $data[$key] = $this->$function();
+        if ($update === false) {
+            $data = self::getTagsCacheData('web_basic_content');
+        } else {
+            $data = [];
         }
-        return $data;
-    }
-
-    //获取客服
-    public function getCustomerService()
-    {
-        $name = 'customer.service';
-        $redisKey = 'homepage_customer_service';
-        return $this->getCacheModuleValue($name, $redisKey);
-    }
-
-    //获取icon
-    public function getIco()
-    {
-        $name = 'frontend.ico';
-        $redisKey = 'homepage_ico';
-        return $this->getCacheModuleValue($name, $redisKey);
-    }
-
-    //获取logo
-    public function getLogo()
-    {
-        $name = 'logo';
-        $redisKey = 'homepage_logo';
-        return $this->getCacheModuleValue($name, $redisKey);
-    }
-
-    //获取二维码
-    public function getQrcode()
-    {
-        $name = 'qr.code';
-        $redisKey = 'homepage_qrcode';
-        return $this->getCacheModuleValue($name, $redisKey);
-    }
-
-    public function getCacheModuleValue($name, $redisKey)
-    {
-        $data = self::getTagsCacheData($redisKey);
         if (empty($data)) {
-            $qrcodeELoq = self::select('value', 'status')->where('en_name', $name)->first();
-            if ($qrcodeELoq !== null && $qrcodeELoq->status === 1) {
-                $data = $qrcodeELoq->value;
-                self::saveTagsCacheData($redisKey, $data);
-            }
+            $data['ico'] = self::getModuleValue('frontend.ico', 'value');
+            $data['logo'] = self::getModuleValue('logo', 'value');
+            $data['qrcode'] = self::getModuleValue('qr.code', 'value');
+            $data['customer_service'] = self::getModuleValue('customer.service', 'value');
+            self::saveTagsCacheData('web_basic_content', $data);
         }
         return $data;
+    }
+
+    /**
+     * 获取一个模块指定的字段值
+     * @param  string $en_name 模块英文名
+     * @return mixed
+     */
+    public static function getModuleValue($en_name, $field)
+    {
+        return self::where('en_name', $en_name)->value($field);
     }
 
     /**
@@ -132,7 +99,7 @@ trait FrontendModelTraits
         if ($parentEloq === null) {
             $parentEloq = self::createPageModel();
         }
-        $frontendModuleEloq = new self;
+        $frontendModuleEloq = new self();
         $addData = [
             'label' => '开奖公告',
             'en_name' => 'lottery.notice',
@@ -155,7 +122,7 @@ trait FrontendModelTraits
         if ($parentEloq === null) {
             $parentEloq = self::createPageModel();
         }
-        $frontendModuleEloq = new self;
+        $frontendModuleEloq = new self();
         $addData = [
             'label' => '手机端开奖公告',
             'en_name' => 'mobile.lottery.notice',
@@ -178,7 +145,7 @@ trait FrontendModelTraits
         if ($parentEloq === null) {
             $parentEloq = self::createHomepage();
         }
-        $frontendModuleEloq = new self;
+        $frontendModuleEloq = new self();
         $addData = [
             'label' => '主题板块',
             'en_name' => 'page.model',
@@ -195,7 +162,7 @@ trait FrontendModelTraits
     //生成 首页 前台模块
     public static function createHomepage()
     {
-        $frontendModuleEloq = new self;
+        $frontendModuleEloq = new self();
         $addData = [
             'label' => '首页',
             'en_name' => 'homepage',
@@ -216,7 +183,7 @@ trait FrontendModelTraits
         if ($parentEloq === null) {
             $parentEloq = self::createPageModel();
         }
-        $frontendModuleEloq = new self;
+        $frontendModuleEloq = new self();
         $addData = [
             'label' => 'app端热门彩种一',
             'en_name' => 'mobile.popular.lotteries.one',
@@ -239,7 +206,7 @@ trait FrontendModelTraits
         if ($parentEloq === null) {
             $parentEloq = self::createPageModel();
         }
-        $frontendModuleEloq = new self;
+        $frontendModuleEloq = new self();
         $addData = [
             'label' => 'web端热门彩种一',
             'en_name' => 'popular.lotteries.one',

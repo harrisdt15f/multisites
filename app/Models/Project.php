@@ -36,10 +36,6 @@ class Project extends BaseModel
     public const STATUS_COMMISSION_PARTIAL = 2;
     public const STATUS_COMMISSION_FINISHED = 4;
 
-    public const STATUS_FLOW_NORMAL = 0;
-    public const STATUS_FLOW_TRACE = 1;
-    public const STATUS_FLOW_TRACE_CANCEL = 2;
-
     /**
      * @return HasOne
      */

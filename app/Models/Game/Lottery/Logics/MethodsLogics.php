@@ -91,4 +91,14 @@ trait MethodsLogics
         }
         return ['success' => true];
     }
+
+    //检查玩法是否存在&状态是否开启
+    public static function checkMethod($lottery, $methodId)
+    {
+        return self::where([
+            ['lottery_id', $lottery],
+            ['method_id', $methodId],
+            ['status', self::STATUS_OPEN]
+        ])->exists();
+    }
 }

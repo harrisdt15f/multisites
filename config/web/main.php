@@ -130,7 +130,7 @@ return [
             'tags'          => 'homepage'
         ],
 
-        'homepage_customer_service'    => [
+        /*'homepage_customer_service'    => [
             'key'           => 'homepage_customer_service',
             'expire_time'   => 0,
             'name'          => '首页客服链接缓存',
@@ -155,6 +155,13 @@ return [
             'key'           => 'homepage_qrcode',
             'expire_time'   => 0,
             'name'          => '首页二维码缓存',
+            'tags'          => 'homepage'
+        ],*/
+
+        'web_basic_content'    => [
+            'key'           => 'web_basic_content',
+            'expire_time'   => 0,
+            'name'          => '首页基本内容缓存',
             'tags'          => 'homepage'
         ],
 
