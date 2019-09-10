@@ -7,18 +7,18 @@
  */
 
 if (!function_exists('configure')) {
-    function configure($key = null, $default = null)
+    function configure($sysKey = null, $default = null)
     {
-        if (is_null($key)) {
+        if (is_null($sysKey)) {
             return app('Configure');
         } else {
-            return app('Configure')->get($key, $default);
+            return app('Configure')->get($sysKey, $default);
         }
     }
 }
 
 if (!function_exists('curl_post')) {
-    function curl_post($url, $data, $user_agent = null, $conn_timeout = 7, $timeout = 60)
+    function curl_post($requrl, $data, $user_agent = null, $conn_timeout = 7, $timeout = 60)
     {
         $headers = array(
             'Accept: application/json',
@@ -30,27 +30,27 @@ if (!function_exists('curl_post')) {
              AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.57 Safari/537.36';
         }
         $headers[] = $user_agent;
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $conn_timeout);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+        $curlH = curl_init();
+        curl_setopt($curlH, CURLOPT_URL, $requrl);
+        curl_setopt($curlH, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curlH, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curlH, CURLOPT_HEADER, 0);
+        curl_setopt($curlH, CURLOPT_CONNECTTIMEOUT, $conn_timeout);
+        curl_setopt($curlH, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($curlH, CURLOPT_TIMEOUT, $timeout);
         if ($data) {
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+            curl_setopt($curlH, CURLOPT_POST, 1);
+            curl_setopt($curlH, CURLOPT_POSTFIELDS, http_build_query($data));
         }
-        $res = curl_exec($ch);
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $err = curl_errno($ch);
-        curl_close($ch);
-        if (($err) || ($httpcode !== 200)) {
+        $result = curl_exec($curlH);
+        $httpcode = curl_getinfo($curlH, CURLINFO_HTTP_CODE);
+        $error = curl_errno($curlH);
+        curl_close($curlH);
+        if ($error || ($httpcode !== 200)) {
             return null;
         }
 
-        return $res;
+        return $result;
     }
 }
 
@@ -69,7 +69,19 @@ if (!function_exists('real_ip')) {
         if (isset($_SERVER['REMOTE_ADDR']) && !empty($_SERVER['REMOTE_ADDR'])) {
             return $_SERVER['REMOTE_ADDR'];
         } else {
-            return "0.0.0.0";
+            return '0.0.0.0';
         }
+    }
+}
+
+function objectToArray($obj)
+{
+    if (is_object($obj)) {
+        $obj = get_object_vars($obj);
+    }
+    if (is_array($obj)) {
+        return array_map(__FUNCTION__, $obj);
+    } else {
+        return $obj;
     }
 }
