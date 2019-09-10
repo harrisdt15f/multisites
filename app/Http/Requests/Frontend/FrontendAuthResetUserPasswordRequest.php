@@ -27,7 +27,7 @@ class FrontendAuthResetUserPasswordRequest extends BaseFormRequest
             // 'id' => 'required|numeric|exists:frontend_users',
             // 'username' => 'required|exists:frontend_users',
             'old_password' => 'required|string',
-            'password' => ['required', 'string','between:6,16', 'regex:/^(?=.*[a-zA-Z]+)(?=.*[0-9]+)[a-zA-Z0-9]+$/', 'confirmed'],
+            'password' => ['required', 'string','between:6,16', 'regex:/^(?=.*[a-zA-Z]+)(?=.*[0-9]+)[a-zA-Z0-9]+$/', 'confirmed', 'different:old_password'],
             'password_confirmation' => 'required|string',
         ];
     }
