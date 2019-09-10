@@ -118,7 +118,7 @@ trait LotteryTrendLogic
         }
         $oQuery = $oQuery->orderBy('end_time', 'desc');
         $oQuery = $oQuery->take($iCount);
-        $data = $oQuery->get($aColumns)->sortBy('end_time')->toArray();
+        $data = $oQuery->get($aColumns)->sortBy('end_time')->makeHidden(['end_time'])->toArray();
         return $data;
     }
 
