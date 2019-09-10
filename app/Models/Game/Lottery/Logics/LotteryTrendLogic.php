@@ -476,8 +476,18 @@ trait LotteryTrendLogic
             // 遍历每一位号码，生成每一位号码在0-9数字上的分布数据
             foreach ($aBalls as $key2 => $value) {
                 $value = (int)$value;
-                $arr = $this->makeRowData($key2, $key1, $value, $aOmissionBarStatus, $aLostTimes, $aTimes,
-                    $aAvgOmission, $aMaxOmission, $aMaxContinous, $aMaxContinousCache);
+                $arr = $this->makeRowData(
+                    $key2,
+                    $key1,
+                    $value,
+                    $aOmissionBarStatus,
+                    $aLostTimes,
+                    $aTimes,
+                    $aAvgOmission,
+                    $aMaxOmission,
+                    $aMaxContinous,
+                    $aMaxContinousCache
+                );
                 $data[$key1][$key2 + 2] = $arr;
                 // $aAllNumbers[$key2 + 2] = $value;
             }
@@ -487,12 +497,27 @@ trait LotteryTrendLogic
                     $data[$key1][] = $this->countNumberDistribution($aBalls, $iBallsLen);
                     $data[$key1][] = $this->countNumberRangeTrendPattern($aBalls);
                     $data[$key1][] = $this->countNumberSumPattern($aBalls);
-
-                    $this->countPairAndRangeOmission($data, $key1, $tempOmissionForPair, $tempOmissionForRange, $aTimes,
-                        $aAvgOmission, $aMaxOmission, $aMaxContinous, $aMaxContinousCache);
-
-                    $this->countDistributionOmission($data, $key1, $tempOmissionForDistribution, $aTimes, $aAvgOmission,
-                        $aMaxOmission, $aMaxContinous, $aMaxContinousCache);
+                    $this->countPairAndRangeOmission(
+                        $data,
+                        $key1,
+                        $tempOmissionForPair,
+                        $tempOmissionForRange,
+                        $aTimes,
+                        $aAvgOmission,
+                        $aMaxOmission,
+                        $aMaxContinous,
+                        $aMaxContinousCache
+                    );
+                    $this->countDistributionOmission(
+                        $data,
+                        $key1,
+                        $tempOmissionForDistribution,
+                        $aTimes,
+                        $aAvgOmission,
+                        $aMaxOmission,
+                        $aMaxContinous,
+                        $aMaxContinousCache
+                    );
                     break;
                 case '3':
                     $data[$key1][] = $this->countNumberDistribution($aBalls, $iBallsLen);
@@ -511,17 +536,41 @@ trait LotteryTrendLogic
                     $data[$key1][] = $iSum;
                     $data[$key1][] = $iSumTail;
 
-                    $this->countDistributionOmission($data, $key1, $tempOmissionForDistribution, $aTimes, $aAvgOmission,
-                        $aMaxOmission, $aMaxContinous, $aMaxContinousCache);
-                    $this->countNumberStyleOmission($data, $key1, $tempOmissionForNumberStyle, $aTimes, $aAvgOmission,
-                        $aMaxOmission, $aMaxContinous, $aMaxContinousCache);
+                    $this->countDistributionOmission(
+                        $data,
+                        $key1,
+                        $tempOmissionForDistribution,
+                        $aTimes,
+                        $aAvgOmission,
+                        $aMaxOmission,
+                        $aMaxContinous,
+                        $aMaxContinousCache
+                    );
+                    $this->countNumberStyleOmission(
+                        $data,
+                        $key1,
+                        $tempOmissionForNumberStyle,
+                        $aTimes,
+                        $aAvgOmission,
+                        $aMaxOmission,
+                        $aMaxContinous,
+                        $aMaxContinousCache
+                    );
                     break;
                 case '5':
                 case '4':
                 default:
                     $data[$key1][] = $this->countNumberDistribution($aBalls, $iBallsLen);
-                    $this->countDistributionOmission($data, $key1, $tempOmissionForDistribution, $aTimes, $aAvgOmission,
-                        $aMaxOmission, $aMaxContinous, $aMaxContinousCache);
+                    $this->countDistributionOmission(
+                        $data,
+                        $key1,
+                        $tempOmissionForDistribution,
+                        $aTimes,
+                        $aAvgOmission,
+                        $aMaxOmission,
+                        $aMaxContinous,
+                        $aMaxContinousCache
+                    );
                     break;
             }
         }
