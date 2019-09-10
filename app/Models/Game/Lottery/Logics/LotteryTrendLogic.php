@@ -96,7 +96,7 @@ trait LotteryTrendLogic
             return false;
         }
         if (empty($colums)) {
-            $aColumns = ['issue', 'official_code'];
+            $aColumns = ['issue', 'official_code', 'end_time'];
         } else {
             $aColumns = $colums;
         }
@@ -118,7 +118,7 @@ trait LotteryTrendLogic
         }
         $oQuery = $oQuery->orderBy('end_time', 'desc');
         $oQuery = $oQuery->take($iCount);
-        $data = $oQuery->get($aColumns)->toArray();
+        $data = $oQuery->get($aColumns)->sortBy('end_time')->toArray();
         return $data;
     }
 
