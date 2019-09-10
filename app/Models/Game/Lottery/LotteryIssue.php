@@ -3,6 +3,7 @@
 namespace App\Models\Game\Lottery;
 
 use App\Models\BaseModel;
+use App\Models\Game\Lottery\Logics\IssueCacheCalcLogics;
 use App\Models\Game\Lottery\Logics\IssueEncodeLogics;
 use App\Models\Game\Lottery\Logics\IssueLogics;
 use App\Models\Game\Lottery\Logics\LotteryTrendCommonLogic;
@@ -18,6 +19,7 @@ class LotteryIssue extends BaseModel
     use IssueCalculateLogic;
     use LotteryTrendLogic;
     use LotteryTrendCommonLogic;
+    use IssueCacheCalcLogics;
 
     /**
      * 中奖号码状态：等待开奖

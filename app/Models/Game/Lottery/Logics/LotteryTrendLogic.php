@@ -574,8 +574,6 @@ trait LotteryTrendLogic
                     break;
             }
         }
-        // pr($aOmissionBarStatus);exit;
-        // pr($aTimes);exit;
         // 平均遗漏值
         $iLenTimes = count($aAvgOmission);
         for ($i = 0; $i < $iLenTimes; $i++) {
@@ -629,9 +627,6 @@ trait LotteryTrendLogic
         $aMaxOmission = array_fill(0, 29, 0);
         $aMaxContinous = $aMaxContinousCache = array_fill(0, 29, 0);
         $aOmissionBarStatus = array_fill(0, $this->iBallNum * $iCount, -1);
-
-        // pr(count($aOmissionBarStatus));
-        // exit;
         // -------------------end 统计数据----------------------
         // 遍历统计数据, 需要依据页面展现顺序，依次填充数据
         // for ($key1 = $this->iDataLen - 1; $key1 >= 0; $key1--) {
