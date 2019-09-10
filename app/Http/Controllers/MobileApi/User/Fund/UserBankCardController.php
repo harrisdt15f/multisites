@@ -6,12 +6,14 @@ use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Http\Requests\Frontend\User\Fund\UserBankCardAddRequest;
 use App\Http\Requests\Frontend\User\Fund\UserBankCardDeleteRequest;
 use App\Http\Requests\Frontend\User\Fund\UserBankCityListsRequest;
+use App\Http\Requests\Frontend\User\Fund\UserBankCardTwoAddVerifiyRequest;
 use App\Http\SingleActions\Frontend\User\Fund\UserBankBankListsAction;
 use App\Http\SingleActions\Frontend\User\Fund\UserBankCardAddAction;
 use App\Http\SingleActions\Frontend\User\Fund\UserBankCardDeleteAction;
 use App\Http\SingleActions\Frontend\User\Fund\UserBankCardListsAction;
 use App\Http\SingleActions\Frontend\User\Fund\UserBankCityListsAction;
 use App\Http\SingleActions\Frontend\User\Fund\UserBankProvinceListsAction;
+use App\Http\SingleActions\Frontend\User\Fund\UserBankCardTwoAddVerifiyAction;
 use Illuminate\Http\JsonResponse;
 
 class UserBankCardController extends FrontendApiMainController
@@ -32,7 +34,7 @@ class UserBankCardController extends FrontendApiMainController
      * @param UserBankCardAddAction  $action
      * @return JsonResponse
      */
-    public function add(UserBankCardAddRequest $request, UserBankCardAddAction $action): JsonResponse
+    public function addCard(UserBankCardAddRequest $request, UserBankCardAddAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
@@ -77,6 +79,18 @@ class UserBankCardController extends FrontendApiMainController
      * @return JsonResponse
      */
     public function cityLists(UserBankCityListsRequest $request, UserBankCityListsAction $action): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
+    }
+
+    /**
+     * 二次添加银行卡验证资金密码与开户姓名
+     * @param UserBankCardTwoAddVerifiyRequest $request
+     * @param UserBankCardTwoAddVerifiyAction $action
+     * @return JsonResponse
+     */
+    public function twoAddVerifiy(UserBankCardTwoAddVerifiyRequest $request, UserBankCardTwoAddVerifiyAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
