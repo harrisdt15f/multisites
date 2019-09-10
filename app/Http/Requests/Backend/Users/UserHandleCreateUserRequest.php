@@ -3,8 +3,6 @@
 namespace App\Http\Requests\Backend\Users;
 
 use App\Http\Requests\BaseFormRequest;
-use App\Models\Admin\SystemConfiguration;
-use Illuminate\Support\Facades\Cache;
 
 class UserHandleCreateUserRequest extends BaseFormRequest
 {
@@ -25,24 +23,23 @@ class UserHandleCreateUserRequest extends BaseFormRequest
      */
     public function rules(): array
     {
-        $min = configure('min_bet_prize_group') ?? 1800;
-        $max = configure('max_bet_prize_group') ?? 1960;
+        $minBetPrize = configure('min_bet_prize_group') ?? 1800;
+        $maxBetPrize = configure('max_bet_prize_group') ?? 1960;
         return [
             'username' => 'required|unique:frontend_users',
-            'password' => 'required',
-            'fund_password' => 'required',
+            'password' => ['required', 'string', 'between:6,16','different:fund_password', 'regex:/^(?=.*[a-zA-Z]+)(?=.*[0-9]+)[a-zA-Z0-9]+$/'],
+            'fund_password' => ['required', 'string','between:6,18','different:password', 'regex:/^(?=.*[a-zA-Z]+)(?=.*[0-9]+)[a-zA-Z0-9]+$/'],
             'is_tester' => 'required|numeric',
-            'prize_group' => 'required|numeric|between:' . $min . ',' . $max,
+            'prize_group' => 'required|numeric|between:' . $minBetPrize . ',' . $maxBetPrize,
             'type' => 'required|numeric',
         ];
     }
 
-    /*public function messages()
-{
-return [
-'lottery_sign.required' => 'lottery_sign is required!',
-'trace_issues.required' => 'trace_issues is required!',
-'balls.required' => 'balls is required!'
-];
-}*/
+    public function messages()
+    {
+        return [
+        'password.regex' => '密码必须是字母+数字组合，不能有特殊字符',
+        'fund_password.regex' => '资金密码必须是字母+数字组合，不能有特殊字符',
+        ];
+    }
 }

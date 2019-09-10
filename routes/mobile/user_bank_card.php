@@ -1,6 +1,6 @@
 <?php
 
-Route::group(['prefix' => 'user-bank-card', 'namespace' => 'User\Fund'], function () {
+Route::group(['prefix' => 'user-bank-card', 'namespace' => 'User\Fund'], static function () {
     $namePrefix = 'mobile-api.UserBankCardController.';
     $controller = 'UserBankCardController@';
     //用户银行卡列表
@@ -15,4 +15,6 @@ Route::group(['prefix' => 'user-bank-card', 'namespace' => 'User\Fund'], functio
     Route::match(['get', 'options'], 'province-lists', ['as' => $namePrefix . 'province-lists', 'uses' => $controller . 'provinceLists']);
     //添加银行卡时选择的城市列表
     Route::match(['post', 'options'], 'city-lists', ['as' => $namePrefix . 'city-lists', 'uses' => $controller . 'cityLists']);
+    //二次添加银行卡验证资金密码与开户姓名
+    Route::match(['post', 'options'], 'two-add-verifiy', ['as' => $namePrefix . 'two-add-verifiy', 'uses' => $controller . 'twoAddVerifiy']);
 });

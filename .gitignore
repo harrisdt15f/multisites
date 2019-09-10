@@ -30,6 +30,8 @@ app/models/Game/Lottery/Logics/SeriesLogic
 
 database
 
+.gitmodules
+
 .phpstorm.meta.php
 
 _ide_helper_models.php
