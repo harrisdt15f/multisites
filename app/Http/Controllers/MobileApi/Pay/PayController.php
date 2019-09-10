@@ -59,9 +59,9 @@ class PayController extends FrontendApiMainController
         return $action->rechargeList($this, $request);
     }
 
-    public function realRechargeList(PayRechargeAction $action, RechargeList $request): JsonResponse
+    public function realRechargeList(PayRechargeAction $action): JsonResponse
     {
-        return $action->realRechargeList($this, $request);
+        return $action->realRechargeList($this);
     }
 
     /**
