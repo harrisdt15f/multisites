@@ -35,12 +35,11 @@ class UserHandleCreateUserRequest extends BaseFormRequest
         ];
     }
 
-    /*public function messages()
-{
-return [
-'lottery_sign.required' => 'lottery_sign is required!',
-'trace_issues.required' => 'trace_issues is required!',
-'balls.required' => 'balls is required!'
-];
-}*/
+    public function messages()
+    {
+        return [
+        'password.regex' => '密码必须是字母+数字组合，不能有特殊字符',
+        'fund_password.regex' => '资金密码必须是字母+数字组合，不能有特殊字符',
+        ];
+    }
 }
