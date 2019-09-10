@@ -24,8 +24,8 @@ class FrontendAuthSetFundPasswordRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'password' => 'required|string',
-            'confirm_password' => 'required|string',
+            'password' => ['required', 'string','between:6,18', 'regex:/^(?=.*[a-zA-Z]+)(?=.*[0-9]+)[a-zA-Z0-9]+$/', 'confirmed'],
+            'password_confirmation' => 'required|string',
         ];
     }
 
