@@ -124,6 +124,7 @@ trait LotteryTrendLogic
             ->take($iCount)
             ->get($aColumns)
             ->sortBy('end_time')
+            ->makeHidden(['end_time'])
             ->toArray();
         $data = array_values(array_filter($data));
         return $data;
