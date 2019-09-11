@@ -116,9 +116,16 @@ trait LotteryTrendLogic
             }
             $iCount = static::$iIssueLimit;
         }
-        $oQuery = $oQuery->orderBy('end_time', 'desc');
-        $oQuery = $oQuery->take($iCount);
-        $data = $oQuery->get($aColumns)->sortBy('end_time')->makeHidden(['end_time'])->toArray();
+        //select issue,official_code,end_time from (select * from `lottery_issues` where (`lottery_id` = ? and `official_code` is not null) order by `end_time` desc limit 30) as b order by end_time asc
+        /*"bindings" => array:2 [
+            0 => "cqssc"
+      1 => ""*/
+        $data = $oQuery->orderBy('end_time', 'desc')
+            ->take($iCount)
+            ->get($aColumns)
+            ->sortBy('end_time')
+            ->toArray();
+        $data = array_values(array_filter($data));
         return $data;
     }
 
