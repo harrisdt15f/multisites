@@ -587,8 +587,6 @@ trait LotteryTrendLogic
         $statistics = [$aTimes, $aAvgOmission, $aMaxOmission, $aMaxContinous];
         // $aNumberTemp = array_slice($aTimes, $this->iBallNum * 10 + intval($this->iBallNum == 2), 10);
         // $hotAndCold = $aNumberTemp; // $this->generateHotAndColdNumber($aNumberTemp);
-        // pr($aNumberTemp);
-        // pr(json_encode($data));exit;
     }
 
 
