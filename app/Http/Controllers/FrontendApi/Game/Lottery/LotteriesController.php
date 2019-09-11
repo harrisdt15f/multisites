@@ -26,7 +26,6 @@ use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesTracesHistoryAction;
 use App\Http\Requests\Mobile\Game\Lottery\LotteriesTraceIssueListRequest;
 use App\Http\SingleActions\Mobile\Game\Lottery\LotteriesTraceIssueListAction;
 use App\Models\Game\Lottery\LotteryIssue;
-use Exception;
 use Illuminate\Http\JsonResponse;
 
 class LotteriesController extends FrontendApiMainController
@@ -113,9 +112,9 @@ class LotteriesController extends FrontendApiMainController
      * @param  LotteriesBetRequest  $request
      * @param  LotteriesBetAction  $action
      * @return JsonResponse
-     * @throws Exception
+     * @throws \Exception
      */
-    public function bet(LotteriesBetRequest $request, LotteriesBetAction $action): JsonResponse
+    public function lotteryBet(LotteriesBetRequest $request, LotteriesBetAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
@@ -185,6 +184,6 @@ class LotteriesController extends FrontendApiMainController
     public function trend(LotteriesTrendRequest $request, LotteriesTrendAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
-        return $action->execute($this, $inputDatas);
+        return $action->execute($this, $inputDatas,$iType = 1);
     }
 }
