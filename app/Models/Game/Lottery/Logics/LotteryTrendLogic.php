@@ -802,7 +802,7 @@ trait LotteryTrendLogic
             $index = $iNum * 6 + $i;
 
             //当前号码为开奖号码数字
-            if ($sBall === $iNumber) {
+            if ((int)$sBall === $iNumber) {
                 $aLostTimes[$index] = 0;
                 $iOmission = 0;
                 ++$aTimes[$index];

@@ -100,7 +100,7 @@ trait LotteryTrendCommonLogic
         for ($iStart; $iStart <= $iCount; $iStart++) {
             $num = 0;
             for ($j = 0; $j < $iBallsLen; $j++) {
-                if ($aBalls[$j] === $iStart) {
+                if ((int)$aBalls[$j] === $iStart) {
                     ++$num;
                 }
             }
