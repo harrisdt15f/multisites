@@ -201,7 +201,7 @@ class BackEndApiMainController extends Controller
 
     /**
      * Generate Search Query
-     * @param  object  $eloqM
+     * @param  mixed   $eloqM
      * @param  array   $searchAbleFields
      * @param  int     $fixedJoin
      * @param  mixed   $withTable

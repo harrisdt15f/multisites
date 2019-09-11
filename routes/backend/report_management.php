@@ -1,6 +1,6 @@
 <?php
 //报表管理
-Route::group(['prefix' => 'reportManagement', 'namespace' => 'Report'], function () {
+Route::group(['prefix' => 'reportManagement', 'namespace' => 'Report'], static function () {
     $namePrefix = 'backend-api.reportManagement.';
     $controller = 'ReportManagementController@';
     //玩家帐变报表
@@ -26,5 +26,11 @@ Route::group(['prefix' => 'reportManagement', 'namespace' => 'Report'], function
         ['post', 'options'],
         'user-bets',
         ['as' => $namePrefix . 'user-bets', 'uses' => $controller . 'userBets']
+    );
+    //玩家追号报表
+    Route::match(
+        ['post', 'options'],
+        'user-trace',
+        ['as' => $namePrefix . 'user-trace', 'uses' => $controller . 'userTrace']
     );
 });
