@@ -8,6 +8,7 @@ use App\Http\SingleActions\Backend\Report\ReportManagementUserAccountChangeActio
 use App\Http\SingleActions\Backend\Report\ReportManagementUserBetsAction;
 use App\Http\SingleActions\Backend\Report\ReportManagementUserRechargeHistoryAction;
 use App\Http\Requests\Backend\Report\ReportManagementUserBetsRequest;
+use App\Http\Requests\Backend\Report\ReportManagementUserAccountChangeRequest;
 use Illuminate\Http\JsonResponse;
 
 class ReportManagementController extends BackEndApiMainController
@@ -17,9 +18,12 @@ class ReportManagementController extends BackEndApiMainController
      * @param   ReportManagementUserAccountChangeAction $action
      * @return  JsonResponse
      */
-    public function userAccountChange(ReportManagementUserAccountChangeAction $action): JsonResponse
-    {
-        return $action->execute($this);
+    public function userAccountChange(
+        ReportManagementUserAccountChangeRequest $request,
+        ReportManagementUserAccountChangeAction $action
+    ): JsonResponse {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
     }
 
     /**

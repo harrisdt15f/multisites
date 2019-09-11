@@ -25,16 +25,18 @@ class ReportManagementUserBetsRequest extends BaseFormRequest
     {
         return [
             'id' => 'integer',
-            'serial_number' => 'alpha_num',
-            'username' => 'alpha_num|exists:frontend_users',
-            'series_id' => 'alpha_num',
-            'lottery_sign' => 'alpha_num',
-            'method_sign' => 'alpha_num',
-            'is_tester' => 'in:0,1',
-            'issue' => 'alpha_dash',
-            'status' => 'integer',
-            'get_sub' => 'required|in:0,1',
-            'time_condtions' => 'string',
+            'serial_number' => 'alpha_num', //注单编号
+            'username' => 'alpha_num|exists:frontend_users', //用户名称
+            'get_sub' => 'required|in:0,1', //是否查询下级(0否   1是)
+            'series_id' => 'alpha_num', //彩种系列
+            'lottery_sign' => 'alpha_num', //彩种
+            'method_sign' => 'alpha_num', //玩法
+            'is_tester' => 'in:0,1', //是否测试用户 0否  1是
+            'issue' => 'alpha_dash', //奖期号
+            'status' => 'integer', //注单状态（0待开奖 1已撤销 2未中奖 3已中奖 4已派奖）
+            'time_condtions' => 'string', //下注时间
+            'times' => 'integer', //下注倍数
+            'ip' => 'ip',
         ];
     }
 
