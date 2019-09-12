@@ -22,7 +22,6 @@ use Illuminate\Http\JsonResponse;
 class HomepageController extends FrontendApiMainController
 {
     private $bannerFlag = 1; //网页端banner
-    public $tags = 'homepage';
 
     /**
      * 需要展示的前台模块

@@ -34,7 +34,7 @@ trait PayTraits
             $data['company_order_num'] = BasePay::createRechargeOrderNum();
             $data['client_ip'] = real_ip();
             $data['deposit_mode'] = 1;
-            $data['status'] = UsersRechargeHistorie::AUTOMATIC;
+            $data['status'] = UsersRechargeHistorie::MODE_AUTOMATIC;
             $data['source'] = $from;
             $resule = UsersRechargeHistorie::create($data);
         } catch (Exception $e) {
@@ -52,6 +52,7 @@ trait PayTraits
      */
     public static function createWithdrawOrder(FrontendUser $user, array $datas)
     {
+        DB::beginTransaction();
         try {
             $data['user_id'] = $user->id;
             $data['username'] = $user->username;
@@ -67,20 +68,18 @@ trait PayTraits
             $data['request_time'] = time();
             $data['order_id'] = BasePay::createWithdrawOrderNum();
             $data['client_ip'] = real_ip();
-            $data['status'] = UsersWithdrawHistorie::WAIT;
+            $data['status'] = UsersWithdrawHistorie::STATUS_AUDIT_WAIT;
             $data['source'] = $datas['from'] ?? 'web';
 
-            DB::beginTransaction();
             $resule = UsersWithdrawHistorie::create($data);
-            try {
                 $params = [
                     'user_id' => $user->id,
                     'amount' => $datas['amount'],
                 ];
                 $account = FrontendUsersAccount::where('user_id', $user->id)->first();
                 if ($account !== null) {
-                    $res = $account->operateAccount($params, 'withdraw_frozen');
-                    if ($res !== true) {
+                    $resource = $account->operateAccount($params, 'withdraw_frozen');
+                    if ($resource !== true) {
                         DB::rollBack();
                     }
                     DB::commit();
@@ -88,12 +87,9 @@ trait PayTraits
                     DB::rollBack();
                     Log::channel('pay-withdraw')->info('用户account表不存在');
                 }
-            } catch (Exception $e) {
-                DB::rollBack();
-                Log::channel('pay-withdraw')->info('异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine());
-            }
         } catch (Exception $e) {
-            Log::channel('pay-withdraw')->error('error-' . $e->getMessage() . '|' . $e->getLine() . '|' . $e->getFile());
+            DB::rollBack();
+            Log::channel('pay-withdraw')->info('异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine());
             return false;
         }
         return $resule;
