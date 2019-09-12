@@ -6,7 +6,7 @@
  */
 
 //首页
-Route::group(['prefix' => 'homepage', 'namespace' => 'Homepage'], function () {
+Route::group(['prefix' => 'homepage', 'namespace' => 'Homepage'], static function () {
     $namePrefix = 'web-api.HomepageController.';
     $controller = 'HomepageController@';
     //首页-需要展示的模块
@@ -53,16 +53,6 @@ Route::group(['prefix' => 'homepage', 'namespace' => 'Homepage'], function () {
     Route::match(['get', 'options'], 'lottery-notice-list', [
         'as' => $namePrefix . 'lottery-notice-list',
         'uses' => $controller . 'lotteryNoticeList',
-    ]);
-    //热门棋牌
-    Route::match(['get', 'options'], 'popular-chess-cards-lists', [
-        'as' => $namePrefix . 'popular-chess-cards-lists',
-        'uses' => $controller . 'popularChessCardsLists',
-    ]);
-    //热门电子
-    Route::match(['get', 'options'], 'popular-e-game-lists', [
-        'as' => $namePrefix . 'popular-e-game-lists',
-        'uses' => $controller . 'popularEGameLists',
     ]);
     //活动接口
     Route::match(['post', 'options'], 'activity-list', [
