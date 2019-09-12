@@ -14,6 +14,7 @@ use App\Http\Requests\Backend\Users\UserHandleDeductionBalanceRequest;
 use App\Http\Requests\Backend\Users\UserHandleSetUserAvatarRequest;
 use App\Http\Requests\Backend\Users\UserHandleUserAccountChangeRequest;
 use App\Http\Requests\Backend\Users\UserHandleUserRechargeHistoryRequest;
+use App\Http\Requests\Backend\Users\UserHandleDeleteBankCardRequest;
 use App\Http\SingleActions\Backend\Users\UserHandleBankCardListAction;
 use App\Http\SingleActions\Backend\Users\UserHandleCommonAppliedPasswordHandleAction;
 use App\Http\SingleActions\Backend\Users\UserHandleCommonAuditPasswordAction;
@@ -27,7 +28,7 @@ use App\Http\SingleActions\Backend\Users\UserHandleSetUserAvatarAction;
 use App\Http\SingleActions\Backend\Users\UserHandleUserAccountChangeAction;
 use App\Http\SingleActions\Backend\Users\UserHandleUserRechargeHistoryAction;
 use App\Http\SingleActions\Backend\Users\UserHandleUsersInfoAction;
-use App\Models\Admin\BackendAdminAuditPasswordsList;
+use App\Http\SingleActions\Backend\Users\UserHandleDeleteBankCardAction;
 use Illuminate\Http\JsonResponse;
 
 class UserHandleController extends BackEndApiMainController
@@ -247,8 +248,22 @@ class UserHandleController extends BackEndApiMainController
         UserHandleBankCardListAction $action
     ): JsonResponse {
         $inputDatas = $request->validated();
-        return $action->execute($this);
+        return $action->execute($this, $inputDatas);
     }
+
+    /**
+     * @param UserHandleDeleteBankCardRequest $request
+     * @param UserHandleDeleteBankCardAction $action
+     * @return JsonResponse
+     */
+    public function deleteBankCard(
+        UserHandleDeleteBankCardRequest $request,
+        UserHandleDeleteBankCardAction $action
+    ): JsonResponse {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
+    }
+
     /**
      * 获取系统公共头像列表
      * @param  UserHandlePublicAvatarAction $action

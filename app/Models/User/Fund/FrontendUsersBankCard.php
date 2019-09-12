@@ -2,7 +2,7 @@
 
 namespace App\Models\User\Fund;
 
-use App\Http\Controllers\FrontendApi\FrontendApiMainController;
+use App\Models\User\UsersRegion;
 use LaravelArdent\Ardent\Ardent;
 
 class FrontendUsersBankCard extends Ardent
@@ -20,5 +20,15 @@ class FrontendUsersBankCard extends Ardent
     {
         $lastFour = mb_substr($this->card_number,-4);
         return '**** **** **** ' . $lastFour;
+    }
+
+    public function province()
+    {
+        return $this->hasOne(UsersRegion::class, 'id', 'province_id');
+    }
+
+    public function city()
+    {
+        return $this->hasOne(UsersRegion::class, 'id', 'city_id');
     }
 }
