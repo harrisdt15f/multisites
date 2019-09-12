@@ -36,16 +36,13 @@ trait LotteryTrendCommonLogic
         & $aMaxContinousCache
     ) {
         $result = [];
-        //$iCount = $this->iType == 1 ? 10 : 11;
         $iCount = $this->iCount;
         // 11选5的遗漏次数数组排序是万千百十个位[0-10][11-21][22-32][33-43][44-54]
-        $iAdditional = $this->iType === 'ssc' ? 0 : $iNum;
         for ($i = 0; $i < $iCount; $i++) {
-//            $iNumber = $this->iType == 1 ? $i : $i + 1;
-            $iNumber = ($this->iCount === 10 && $this->iType !== 'pk10') ? $i : $i + 1;
+            $iNumber = $this->iCount === 10 && $this->iType !== 'pk10' ? $i : $i + 1;
             $index = $iNum * $this->iCount + $i;
             //当前号码为开奖号码数字
-            if ($sBall == $iNumber) {
+            if ((int)$sBall === $iNumber) {
                 $aLostTimes[$index] = 0;
                 $iOmission = 0;
                 ++$aTimes[$index];
@@ -54,14 +51,10 @@ trait LotteryTrendCommonLogic
             } else {
                 isset($aLostTimes[$index]) ? ++$aLostTimes[$index] : $aLostTimes[$index] = 1;
                 $iOmission = 1;
-
                 $aMaxOmission[$index] = max($aLostTimes[$index], $aMaxOmission[$index]);
                 $aMaxContinousCache[$index] = 0;
-
-                // $aOmissionBarStatus[$index] = -1;
             }
-            // $aAvgOmission[$index]  += $aLostTimes[$index];
-            if ($aLostTimes[$index] == 0) {
+            if ($aLostTimes[$index] === 0) {
                 $aAvgOmission[$index]++;
             }
             $aMaxContinous[$index] = max($aMaxContinousCache[$index], $aMaxContinous[$index]);
@@ -100,7 +93,7 @@ trait LotteryTrendCommonLogic
         for ($iStart; $iStart <= $iCount; $iStart++) {
             $num = 0;
             for ($j = 0; $j < $iBallsLen; $j++) {
-                if ($aBalls[$j] === $iStart) {
+                if ((int)$aBalls[$j] === $iStart) {
                     ++$num;
                 }
             }
