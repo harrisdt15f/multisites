@@ -7,7 +7,7 @@
  */
 
 //管理总代用户与玩家
-Route::group(['prefix' => 'user-handle', 'namespace' => 'Users'], function () {
+Route::group(['prefix' => 'user-handle', 'namespace' => 'Users'], static function () {
     $namePrefix = 'backend-api.userhandle.';
     $controller = 'UserHandleController@';
     //创建总代
@@ -44,4 +44,6 @@ Route::group(['prefix' => 'user-handle', 'namespace' => 'Users'], function () {
     Route::match(['post', 'options'], 'public-avatar', ['as' => $namePrefix . 'public-avatar', 'uses' => $controller . 'publicAvatar']);
     //设定用户头像
     Route::match(['post', 'options'], 'set-user-avatar', ['as' => $namePrefix . 'set-user-avatar', 'uses' => $controller . 'setUserAvatar']);
+    //删除银行卡
+    Route::match(['post', 'options'], 'delete-bank-card', ['as' => $namePrefix . 'delete-bank-card', 'uses' => $controller . 'deleteBankCard']);
 });

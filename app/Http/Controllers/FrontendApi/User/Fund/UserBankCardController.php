@@ -4,12 +4,10 @@ namespace App\Http\Controllers\FrontendApi\User\Fund;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Http\Requests\Frontend\User\Fund\UserBankCardAddRequest;
-use App\Http\Requests\Frontend\User\Fund\UserBankCardDeleteRequest;
 use App\Http\Requests\Frontend\User\Fund\UserBankCityListsRequest;
 use App\Http\Requests\Frontend\User\Fund\UserBankCardTwoAddVerifiyRequest;
 use App\Http\SingleActions\Frontend\User\Fund\UserBankBankListsAction;
 use App\Http\SingleActions\Frontend\User\Fund\UserBankCardAddAction;
-use App\Http\SingleActions\Frontend\User\Fund\UserBankCardDeleteAction;
 use App\Http\SingleActions\Frontend\User\Fund\UserBankCardListsAction;
 use App\Http\SingleActions\Frontend\User\Fund\UserBankCityListsAction;
 use App\Http\SingleActions\Frontend\User\Fund\UserBankProvinceListsAction;
@@ -35,18 +33,6 @@ class UserBankCardController extends FrontendApiMainController
      * @return JsonResponse
      */
     public function addCard(UserBankCardAddRequest $request, UserBankCardAddAction $action): JsonResponse
-    {
-        $inputDatas = $request->validated();
-        return $action->execute($this, $inputDatas);
-    }
-
-    /**
-     * 用户删除绑定银行卡
-     * @param  UserBankCardDeleteRequest $request
-     * @param  UserBankCardDeleteAction  $action
-     * @return JsonResponse
-     */
-    public function delete(UserBankCardDeleteRequest $request, UserBankCardDeleteAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);

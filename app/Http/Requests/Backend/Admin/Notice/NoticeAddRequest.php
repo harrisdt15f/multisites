@@ -27,7 +27,7 @@ class NoticeAddRequest extends BaseFormRequest
             'type' => 'required|numeric', // 1公告 2站内信
             // 'receive_user' => 'required_if:type,2',
             'title' => 'required|string', // 标题
-            'introduction' => 'required|string', //简介
+            'describe' => 'required|string', //简介
             'content' => 'required|string', // 内容
             'pic_name' => 'string', //图片名称
             'pic_path' => 'string', //图片路径
