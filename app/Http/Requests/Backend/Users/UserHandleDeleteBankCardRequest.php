@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Frontend\User\Fund;
+namespace App\Http\Requests\Backend\Users;
 
 use App\Http\Requests\BaseFormRequest;
 
-class UserBankCardDeleteRequest extends BaseFormRequest
+class UserHandleDeleteBankCardRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

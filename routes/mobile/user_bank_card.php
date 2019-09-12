@@ -6,9 +6,7 @@ Route::group(['prefix' => 'user-bank-card', 'namespace' => 'User\Fund'], static 
     //用户银行卡列表
     Route::match(['get', 'options'], 'lists', ['as' => $namePrefix . 'lists', 'uses' => $controller . 'lists']);
     //用户添加绑定银行卡
-    Route::match(['post', 'options'], 'add', ['as' => $namePrefix . 'add', 'uses' => $controller . 'add']);
-    //用户删除绑定银行卡
-    Route::match(['post', 'options'], 'delete', ['as' => $namePrefix . 'delete', 'uses' => $controller . 'delete']);
+    Route::match(['post', 'options'], 'add', ['as' => $namePrefix . 'add', 'uses' => $controller . 'addCard']);
     //添加银行卡时选择的银行列表
     Route::match(['get', 'options'], 'bank-lists', ['as' => $namePrefix . 'bank-lists', 'uses' => $controller . 'bankLists']);
     //添加银行卡时选择的省份列表

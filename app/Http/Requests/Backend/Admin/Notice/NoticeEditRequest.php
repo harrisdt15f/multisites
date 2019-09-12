@@ -26,11 +26,13 @@ class NoticeEditRequest extends BaseFormRequest
         return [
             'id' => 'required|numeric|exists:frontend_message_notices_contents,id',
             'title' => 'required|string',
+            'describe' => 'required|string', //简介
             'content' => 'required|string',
             'pic_name' => 'string', //图片名称
             'pic_path' => 'string', //图片路径
             'start_time' => 'date_format:Y-m-d H:i:s',
             'end_time' => 'date_format:Y-m-d H:i:s',
+            'status' => 'required|string', //1显示 0隐藏
         ];
     }
 

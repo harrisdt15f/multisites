@@ -38,5 +38,4 @@ class FrontendAuthResetFundPasswordRequest extends BaseFormRequest
             'password.regex' => '资金密码必须是字母+数字的组合，不能有特殊字符',
         ];
     }
-
 }
