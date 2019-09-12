@@ -11,7 +11,6 @@ use App\Http\Requests\Frontend\Game\Lottery\LotteriesIssueHistoryRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesLastIssuesRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesProjectHistoryRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesStopTraceRequest;
-use App\Http\Requests\Frontend\Game\Lottery\LotteriesTracesHistoryRequest;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesAvailableIssuesAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesBetAction;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesCancelBetAction;
@@ -95,16 +94,12 @@ class LotteriesController extends FrontendApiMainController
 
     /**
      * 游戏-追号历史
-     * @param  LotteriesTracesHistoryRequest  $request
      * @param  LotteriesTracesHistoryAction  $action
      * @return JsonResponse
      */
-    public function tracesHistory(
-        LotteriesTracesHistoryRequest $request,
-        LotteriesTracesHistoryAction $action
-    ): JsonResponse {
-        $inputDatas = $request->validated();
-        return $action->execute($this, $inputDatas);
+    public function tracesHistory(LotteriesTracesHistoryAction $action): JsonResponse
+    {
+        return $action->execute($this);
     }
 
     /**
