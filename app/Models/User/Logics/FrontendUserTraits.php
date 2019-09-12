@@ -33,11 +33,11 @@ trait FrontendUserTraits
         }
 
         // 发起充值
-        $pay = Pay::getHandle();
-        $pay->setRechargeOrder($order);
-        $pay->setRechargeUser($this);
+        $payHandle = Pay::getHandle();
+        $payHandle->setRechargeOrder($order);
+        $payHandle->setRechargeUser($this);
 
-        $data = $pay->recharge($amount, $order->order_id, $channel, $bankSign);
+        $data = $payHandle->recharge($amount, $order->order_id, $channel, $bankSign);
         if (!is_array($data)) {
             $order->status = -1;
             $order->fail_reason = $data ?? '';
@@ -56,5 +56,22 @@ trait FrontendUserTraits
     {
         $message = $this->message;
         return $message->where('status', FrontendMessageNotice::STATUS_UNREAD)->count();
+    }
+
+    //根据username获取用户
+    public static function nameGetUser($username)
+    {
+        return self::where('username', $username)->first();
+    }
+
+    //获取所有下级（包括自己）的id
+    public static function getSubIds($userId)
+    {
+        $users = self::where('id', $userId)->orWhere('parent_id', $userId)->pluck('id');
+        $userIds = [];
+        if ($users->isNotEmpty()) {
+            $userIds = $users->toArray();
+        }
+        return $userIds;
     }
 }
