@@ -21,6 +21,11 @@ class Crypt
     public function handle($request, Closure $next)
     {
         $requestNum = count($request->request);
+        //系统配置为不加密传输数据时直接放行
+        $isCryptData = configure('is_crypt_data');
+        if((bool) $isCryptData === false){
+            return $next($request);
+        }
         //空参放行
         if (!$requestNum) {
             return $next($request);
@@ -29,52 +34,51 @@ class Crypt
         if (config('app.env') !== "local") {
             //检验参数是否符合规范 系统只允许接入一个名为DATA的参数
             if ($requestNum!==1 || !isset($request['data'])) {
-                $con = new FrontendApiMainController();
-                return $con->msgOut(false, [], '100507');
+                return $this->returnMsgout(false, [], '100507');
             }
         }
         $inData = $request->input('data');
         //带DATA数据却为null
         if (is_null($inData)) {
-            $con = new FrontendApiMainController();
-            return $con->msgOut(false, [], '100506');
+            return $this->returnMsgout(false, [], '100506');
         }
         //错误返回
         if (!is_string($inData)) {
             $con = new FrontendApiMainController();
-            return $con->msgOut(false, [], '100500');
+            return $this->returnMsgout(false, [], '100500');
         }
         $requestCryptData = explode(self::LIMIT, $inData);
         if (count($requestCryptData)!=3) {
-            $con = new FrontendApiMainController();
-            return  $con->msgOut(false, [], '100501');
+            return $this->returnMsgout(false, [], '100501');
         }
         $data = $requestCryptData[0];//固定位 数组 自生成
         $iv =self::rsaDeCrypt($requestCryptData[1]);
         if ($iv==false) {
-            $con = new FrontendApiMainController();
-            return $con->msgOut(false, [], '100502');
+            return $this->returnMsgout(false, [], '100502');
         }
         $key =self::rsaDeCrypt($requestCryptData[2]);
         if ($key==false) {
-            $con = new FrontendApiMainController();
-            return $con->msgOut(false, [], '100503');
+            return $this->returnMsgout(false, [], '100503');
         }
         $deAesData = self::deAesCrypt($data, $key, $iv) ;
         if ($deAesData==false) {
-            $con = new FrontendApiMainController();
-            return $con->msgOut(false, [], '100505');
+            return $this->returnMsgout(false, [], '100505');
         }
         $deData = json_decode((string)$deAesData);
         if (is_null($deData)) {
-            $con = new FrontendApiMainController();
-            return $con->msgOut(false, [], '100504');
+            return $this->returnMsgout(false, [], '100504');
         }
         foreach ($deData as $k => $v) {
             $request[$k]=$v;
         }
         unset($request['data']);
         return $next($request);
+    }
+
+    public function returnMsgout($success, $data, $code)
+    {
+        $con = new FrontendApiMainController();
+        return $con->msgOut($success, $data, $code);
     }
     /**
      * RSA解密 自带私钥
