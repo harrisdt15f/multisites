@@ -29,6 +29,7 @@ class ActivityInfosSortRequest extends BaseFormRequest
             'front_sort' => 'required|numeric|gt:0',
             'rearways_sort' => 'required|numeric|gt:0',
             'sort_type' => 'required|numeric|in:1,2',
+            'type' => 'required|numeric|in:1,2',
         ];
     }
 
