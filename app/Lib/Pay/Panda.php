@@ -2,6 +2,7 @@
 
 namespace App\Lib\Pay;
 
+use App\Models\User\FrontendUser;
 use Illuminate\Support\Facades\Log;
 
 class Panda extends BasePay
@@ -43,11 +44,11 @@ class Panda extends BasePay
 
     /**
      * 获取支付渠道
-     * @param object $user
+     * @param FrontendUser $user
      * @param string $source
      * @return array
      */
-    public function getRechargeChannel($user, $source = 'phone')
+    public function getRechargeChannel(FrontendUser $user, $source = 'phone')
     {
         $params = [
             'merchant_id' => $this->constant['merchantId'],
