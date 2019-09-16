@@ -62,6 +62,7 @@ trait LotteryTrendLogic
         'ssc' => '',
         'lotto' => ' ',
         'sd' => '',
+        'ssl' => '',
         'p3p5' => '',
         'k3' => '',
         'pk10' => ','
@@ -159,13 +160,21 @@ trait LotteryTrendLogic
         $oLottery = LotteryList::where('en_name', $sLotteryId);
         $strSeriesId = $oLottery->series_id;
         $this->iCount = count(explode(',', $oLottery->valid_code));
-        $this->iType = $strSeriesId === 'p3p5' ? 'sd' : $strSeriesId;
+        $this->setIType($strSeriesId);
         $aOccurrenceData = $this->generateOccurrenceData($data);
         $result = [
             'isSuccess' => 1,
             'data' => $aOccurrenceData,
         ];
         return $result;
+    }
+
+    /**
+     * @param string $strSeriesId
+     */
+    private function setIType($strSeriesId): void
+    {
+        $this->iType = in_array($strSeriesId, ['p3p5', 'sd', 'ssl']) ? 'sd' : $strSeriesId;
     }
 
     /**
@@ -189,7 +198,7 @@ trait LotteryTrendLogic
         $this->lotteryId = $sLotteryId;
         $this->iCount = count(explode(',', $oLottery->valid_code));
         // 获取series_id
-        $this->iType = $strSeriesId === 'p3p5' ? 'sd' : $strSeriesId;
+        $this->setIType($strSeriesId);
         // 获取奖期开奖数据
         if ($this->iType === 'lhc') {
             $data = $this->getIssuesByParams($sLotteryId, $iNumType, $iBeginTime, $iEndTime, $iCount,
