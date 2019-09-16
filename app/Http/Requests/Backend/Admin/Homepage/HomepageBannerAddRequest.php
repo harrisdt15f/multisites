@@ -28,7 +28,7 @@ class HomepageBannerAddRequest extends BaseFormRequest
             'content' => 'required|string',
             'pic' => 'required|image',
             'type' => 'required|numeric|in:1,2,3', //1 内部  2 活动  3 外部
-            'redirect_url' => 'string|required_if:type,1',
+            'redirect_url' => 'string|required_if:type,1,3',
             'activity_id' => 'numeric|required_if:type,2|exists:frontend_activity_contents,id',
             'status' => 'required|numeric|in:0,1',
             'start_time' => 'required|date',
