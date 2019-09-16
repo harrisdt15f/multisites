@@ -25,7 +25,7 @@ class LotteriesTrendRequest extends BaseFormRequest
     {
         return [
             'lottery_id' => 'required|string', //lottery_lists
-            'num_type' => 'required|integer', //玩法类型
+            'num_type' => 'required|alpha_num|max:3', //玩法类型
             'count' => 'required|integer|in:30,50,100', //多少条
 //            'begin_time' => 'required|date', //开始时间
 //            'end_time' => 'required|date', //结束时间
@@ -41,7 +41,7 @@ class LotteriesTrendRequest extends BaseFormRequest
     {
         return [
             'lottery_id' => 'trim|escape', //彩种id
-            'num_type' => 'trim|escape|cast:integer', //玩法类型
+            'num_type' => 'trim|escape', //玩法类型
             'count' => 'trim|escape|cast:integer', //多少条
 //            'begin_time' => 'trim|escape', //开始时间
 //            'end_time' => 'trim|escape', //结束时间
