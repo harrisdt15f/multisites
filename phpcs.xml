@@ -64,7 +64,7 @@
 <rule ref="ObjectCalisthenics.NamingConventions.ElementNameMinimalLength">
         <properties>
             <property name="minLength" value="4"/>
-            <property name="allowedShortNames" type="array" value="i,id,to,up,e"/>
+            <property name="allowedShortNames" type="array" value="i,id,to,up,e,app"/>
         </properties>
 </rule>
 <rule ref="ObjectCalisthenics.Files.ClassTraitAndInterfaceLength">
