@@ -9,12 +9,10 @@ class UsersWithdrawHistorie extends BaseModel
 {
     use PayTraits;
 
-    const WAIT = 0; //等待状态
-    const WITHDRAWSUCCESS = 1; //充值成功
-    const WITHDRAWFAILURE = 2; //充值失败
-    const UNDERWAYAUDIT = 10; //正在审核
-    const AUDITSUCCESS = 11; //审核成功
-    const AUDITFAILURE = 12; //审核失败
+    public const STATUS_AUDIT_WAIT = 0; //等待审核
+    public const STATUS_AUDIT_FAILURE = 1; //审核驳回
+    public const STATUS_AUDIT_SUCCESS = 2; //审核通过
+    public const STATUS_ARRIVAL = 3; //提现到账
 
     protected $guarded = ['id'];
 }

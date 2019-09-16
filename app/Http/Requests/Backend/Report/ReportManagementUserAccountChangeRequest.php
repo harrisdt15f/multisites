@@ -27,7 +27,7 @@ class ReportManagementUserAccountChangeRequest extends BaseFormRequest
             'serial_number' => 'string', //编号
             'username' => 'string', //用户名
             'type_sign' => 'alpha_dash', //帐变类型标识
-            'in_out' => 'integer|in:0,1', //出入类型 1增加 2减少
+            'in_out' => 'integer|in:1,2', //出入类型 1增加 2减少
             'is_tester' => 'integer|in:0,1', //是否测试用户 0否  1是
             'get_sub' => 'required|integer|in:0,1', //是否查询下级(0否   1是)
             'ip' => 'ip', //ip

@@ -2,7 +2,6 @@
 
 namespace App\Lib\Pay;
 
-use App\Lib\Clog;
 use App\Models\User\FrontendUser;
 use Illuminate\Support\Facades\Log;
 
@@ -16,13 +15,13 @@ class Panda extends BasePay
     {
 
         $merchantId = config('pay.panda.merchant_id'); //商户号
-        $key = config('pay.panda.key'); //商户密匙
+        $pandaKey = config('pay.panda.key'); //商户密匙
         $gateway = config('pay.panda.gateway'); //接口地址
 
         $this->constant = [
             'callback' => self::getNotifyUrl($this->sign),
             'url' => $gateway,
-            'key' => $key,
+            'key' => $pandaKey,
             'merchantId' => $merchantId,
         ];
         $this->constant['recharge_channel_url'] = $this->constant['url'] . 'recharge_channel';
@@ -80,7 +79,7 @@ class Panda extends BasePay
     public function recharge($amount, $orderId, $channel, $source = 'web')
     {
         $callbackUrl = self::getCallbackUrl($this->sign);
-        $url = $this->constant['recharge_url'];
+        $rechargeUrl = $this->constant['recharge_url'];
         $merchantId = $this->constant['merchantId'];
 
         $param = [];
@@ -94,12 +93,12 @@ class Panda extends BasePay
         $param['client_ip'] = real_ip();
         $param['time'] = time();
 
-        $key = $this->constant['key'];
+        $pandaKey = $this->constant['key'];
 
-        $param['sign'] = $this->encrypt($param, $key);
+        $param['sign'] = $this->encrypt($param, $pandaKey);
 
         Log::channel('pay-recharge')->info('recharge:【发起充值，参数传递】' . json_encode($param));
-        $result = json_decode(curl_post($url, $param), true);
+        $result = json_decode(curl_post($rechargeUrl, $param), true);
         Log::channel('pay-recharge')->info('recharge:【充值请求返回】' . json_encode($result));
 
         return $result;
@@ -116,8 +115,8 @@ class Panda extends BasePay
 
     public function withdrawal($withDrawInfo)
     {
-        $key = $this->constant['key'];
-        $url = $this->constant['withdrawal_url'];
+        $pandaKey = $this->constant['key'];
+        $withdrawalUrl = $this->constant['withdrawal_url'];
         $merchant = $this->constant['merchantId'];
 
         $params = [
@@ -131,10 +130,10 @@ class Panda extends BasePay
             'client_ip' => real_ip(),
         ];
 
-        $params['sign'] = $this->encrypt($params, $key);
+        $params['sign'] = $this->encrypt($params, $pandaKey);
 
         Log::channel('pay-withdraw')->info('withdraw:【发起提现，参数传递】' . json_encode($params));
-        $result = json_decode(curl_post($url, $params), true);
+        $result = json_decode(curl_post($withdrawalUrl, $params), true);
         Log::channel('pay-withdraw')->info('withdraw:【提现请求返回】' . json_encode($result));
         if ($result['status'] === 'success') {
             return [true, $result['msg']];
@@ -151,8 +150,8 @@ class Panda extends BasePay
     public function queryWithdrawOrderStatus(string $orderId)
     {
 
-        $key = $this->constant['key'];
-        $url = $this->constant['withdrawal_query_url'];
+        $pandaKey = $this->constant['key'];
+        $withQueryUrl = $this->constant['withdrawal_query_url'];
         $merchant = $this->constant['merchantId'];
 
         $params = [
@@ -161,10 +160,10 @@ class Panda extends BasePay
             'client_ip' => real_ip(),
         ];
 
-        $params['sign'] = $this->encrypt($params, $key);
+        $params['sign'] = $this->encrypt($params, $pandaKey);
 
         Log::channel('pay-withdraw')->info('withdraw-query:【发送请求】' . json_encode($params));
-        $result = json_decode(curl_post($url, $params), true);
+        $result = json_decode(curl_post($withQueryUrl, $params), true);
 
         Log::channel('pay-withdraw')->info('withdraw-query:【请求结果】' . json_encode($result));
 
@@ -177,24 +176,24 @@ class Panda extends BasePay
 
     public function encrypt(array $data, $signKey)
     {
-        $str = '';
+        $string = '';
         ksort($data);
-        foreach ($data as $key => $value) {
-            if ('sign' === $key || self::isEmpty($value)) {
+        foreach ($data as $dataKey => $value) {
+            if ('sign' === $dataKey || self::isEmpty($value)) {
                 continue;
             }
-            $str .= $key . '=' . $value . '&';
+            $string .= $dataKey . '=' . $value . '&';
         }
-        $str .= 'key=' . $signKey;
+        $string .= 'key=' . $signKey;
 
-        return md5($str);
+        return md5($string);
     }
 
     // 异步验签方法
     public function checkRechargeCallbackSign($data, $keySign = 'sign')
     {
-        $key = $this->constant['key'];
-        $mySign = $this->encrypt($data, $key);
+        $pandaKey = $this->constant['key'];
+        $mySign = $this->encrypt($data, $pandaKey);
         if (isset($data[$keySign]) && !empty($data[$keySign]) && $data[$keySign] === $mySign) {
             return true;
         }

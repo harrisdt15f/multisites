@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\MobileApi\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Http\Requests\Frontend\Homepage\HomepageNoticeRequest;
 use App\Http\Requests\Frontend\Homepage\HomepageReadMessageRequest;
 use App\Http\SingleActions\Frontend\Homepage\HomepageActivityListAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageGetBasicContentAction;
@@ -86,11 +85,10 @@ class HomepageController extends FrontendApiMainController
 
     /**
      * 公告|站内信 列表
-     * @param  HomepageNoticeRequest  $request
      * @param  HomepageNoticeAction $action
      * @return JsonResponse
      */
-    public function notice(HomepageNoticeRequest $request, HomepageNoticeAction $action): JsonResponse
+    public function notice(HomepageNoticeAction $action): JsonResponse
     {
         return $action->execute($this);
     }

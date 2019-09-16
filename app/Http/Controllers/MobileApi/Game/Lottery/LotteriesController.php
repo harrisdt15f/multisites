@@ -9,7 +9,6 @@ use App\Http\Requests\Frontend\Game\Lottery\LotteriesCancelBetRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesLastIssuesRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesProjectHistoryRequest;
 use App\Http\Requests\Frontend\Game\Lottery\LotteriesStopTraceRequest;
-use App\Http\Requests\Frontend\Game\Lottery\LotteriesTracesHistoryRequest;
 use App\Http\Requests\Mobile\Game\Lottery\LotteriesIssueHistoryRequest;
 use App\Http\Requests\Mobile\Game\Lottery\LotteriesTraceIssueListRequest;
 use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesAvailableIssuesAction;
@@ -24,6 +23,8 @@ use App\Http\SingleActions\Mobile\Game\Lottery\LotterieslotteryCenterAction;
 use App\Http\SingleActions\Mobile\Game\Lottery\LotteriesLotteryListAction;
 use App\Http\SingleActions\Mobile\Game\Lottery\LotteriesProjectHistoryAction;
 use App\Http\SingleActions\Mobile\Game\Lottery\LotteriesTraceIssueListAction;
+use App\Http\Requests\Frontend\Game\Lottery\LotteriesTrendRequest;
+use App\Http\SingleActions\Frontend\Game\Lottery\LotteriesTrendAction;
 use Illuminate\Http\JsonResponse;
 
 class LotteriesController extends FrontendApiMainController
@@ -92,16 +93,13 @@ class LotteriesController extends FrontendApiMainController
 
     /**
      * 游戏-追号历史
-     * @param   LotteriesTracesHistoryRequest  $request
      * @param   LotteriesTracesHistoryAction   $action
      * @return  JsonResponse
      */
     public function tracesHistory(
-        LotteriesTracesHistoryRequest $request,
         LotteriesTracesHistoryAction $action
     ): JsonResponse {
-        $inputDatas = $request->validated();
-        return $action->execute($this, $inputDatas);
+        return $action->execute($this);
     }
 
     /**
@@ -110,7 +108,7 @@ class LotteriesController extends FrontendApiMainController
      * @param   LotteriesBetAction   $action
      * @return  JsonResponse
      */
-    public function bet(LotteriesBetRequest $request, LotteriesBetAction $action): JsonResponse
+    public function lotteryBet(LotteriesBetRequest $request, LotteriesBetAction $action): JsonResponse
     {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
@@ -174,5 +172,17 @@ class LotteriesController extends FrontendApiMainController
     ): JsonResponse {
         $inputDatas = $request->validated();
         return $action->execute($this, $inputDatas);
+    }
+
+    /**
+     * 获取走势图接口
+     * @param  LotteriesTrendRequest $request
+     * @param  LotteriesTrendAction  $action
+     * @return JsonResponse
+     */
+    public function trend(LotteriesTrendRequest $request, LotteriesTrendAction $action): JsonResponse
+    {
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas,$iType = 1);
     }
 }

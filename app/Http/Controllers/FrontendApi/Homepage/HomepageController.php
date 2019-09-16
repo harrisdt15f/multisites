@@ -3,15 +3,12 @@
 namespace App\Http\Controllers\FrontendApi\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Http\Requests\Frontend\Homepage\HomepageNoticeRequest;
 use App\Http\Requests\Frontend\Homepage\HomepageReadMessageRequest;
 use App\Http\SingleActions\Frontend\Homepage\HomepageActivityListAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageGetBasicContentAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageGetPopularGameAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageGetWebInfoAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageNoticeAction;
-use App\Http\SingleActions\Frontend\Homepage\HomepagePopularChessCardsListsAction;
-use App\Http\SingleActions\Frontend\Homepage\HomepagePopularEGameListsAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageRankingAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageReadMessageAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageShowHomepageModelAction;
@@ -25,7 +22,6 @@ use Illuminate\Http\JsonResponse;
 class HomepageController extends FrontendApiMainController
 {
     private $bannerFlag = 1; //网页端banner
-    public $tags = 'homepage';
 
     /**
      * 需要展示的前台模块
@@ -79,11 +75,10 @@ class HomepageController extends FrontendApiMainController
 
     /**
      * 公告|站内信 列表
-     * @param  HomepageNoticeRequest  $request
      * @param  HomepageNoticeAction   $action
      * @return JsonResponse
      */
-    public function notice(HomepageNoticeRequest $request, HomepageNoticeAction $action): JsonResponse
+    public function notice(HomepageNoticeAction $action): JsonResponse
     {
         return $action->execute($this);
     }
@@ -116,26 +111,6 @@ class HomepageController extends FrontendApiMainController
      * @return JsonResponse
      */
     public function lotteryNoticeList(HompageLotteryNoticeListAction $action): JsonResponse
-    {
-        return $action->execute($this);
-    }
-
-    /**
-     * 热门棋牌
-     * @param  HomepagePopularChessCardsListsAction $action
-     * @return JsonResponse
-     */
-    public function popularChessCardsLists(HomepagePopularChessCardsListsAction $action): JsonResponse
-    {
-        return $action->execute($this);
-    }
-
-    /**
-     * 热门电子
-     * @param  HomepagePopularEGameListsAction $action
-     * @return JsonResponse
-     */
-    public function popularEGameLists(HomepagePopularEGameListsAction $action): JsonResponse
     {
         return $action->execute($this);
     }

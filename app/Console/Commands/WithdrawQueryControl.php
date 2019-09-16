@@ -30,12 +30,12 @@ class WithdrawQueryControl extends Command
 
     public function handle()
     {
-        $rows = UsersWithdrawHistorie::where('status', '=', UsersWithdrawHistorie::AUDITSUCCESS)
+        $rows = UsersWithdrawHistorie::where('status', '=', UsersWithdrawHistorie::STATUS_AUDIT_SUCCESS)
             ->select('id', 'order_id')
             ->get();
         if (!empty($rows)) {
-            foreach ($rows as $v) {
-                dispatch(new WithdrawQuery($v));
+            foreach ($rows as $value) {
+                dispatch(new WithdrawQuery($value));
             }
         }
     }
