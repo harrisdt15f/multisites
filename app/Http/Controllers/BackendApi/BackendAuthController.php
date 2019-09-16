@@ -6,13 +6,12 @@ use App\Http\Requests\Backend\BackendAuthDeletePartnerAdminRequest;
 use App\Http\Requests\Backend\BackendAuthRegisterRequest;
 use App\Http\Requests\Backend\BackendAuthSelfResetPasswordRequest;
 use App\Http\Requests\Backend\BackendAuthUpdatePAdmPasswordRequest;
-use App\Http\Requests\Backend\BackendAuthSearchUserRequest;
 use App\Http\Requests\Backend\BackendAuthSearchGroupRequest;
 use App\Http\Requests\Backend\BackendAuthUpdateUserGroupRequest;
 use App\Http\SingleActions\Backend\BackendAuthAllUserAction;
 use App\Http\SingleActions\Backend\BackendAuthDeletePartnerAdminAction;
-use App\Http\SingleActions\Backend\BackendAuthLoginAction;
-use App\Http\SingleActions\Backend\BackendAuthLogoutAction;
+use App\Http\SingleActions\Common\Backend\BackendAuthLoginAction;
+use App\Http\SingleActions\Common\Backend\BackendAuthLogoutAction;
 use App\Http\SingleActions\Backend\BackendAuthRegisterAction;
 use App\Http\SingleActions\Backend\BackendAuthSelfResetPasswordAction;
 use App\Http\SingleActions\Backend\BackendAuthUpdatePAdmPasswordAction;
@@ -159,16 +158,13 @@ class BackendAuthController extends BackEndApiMainController
     }
 
     /**
-     * @param  BackendAuthSearchUserRequest $request
      * @param  BackendAuthSearchUserAction $action
      * @return JsonResponse
      */
     public function searchUser(
-        BackendAuthSearchUserRequest $request,
         BackendAuthSearchUserAction $action
     ): ?JsonResponse {
-        $inputDatas = $request->validated();
-        return $action->execute($this, $inputDatas);
+        return $action->execute($this);
     }
 
     /**
