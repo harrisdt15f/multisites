@@ -4,6 +4,7 @@ namespace App\Http\Controllers\MobileApi\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Http\Requests\Frontend\Homepage\HomepageReadMessageRequest;
+use App\Http\Requests\Frontend\Homepage\HomePageNoticeRequest;
 use App\Http\SingleActions\Frontend\Homepage\HomepageActivityListAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageGetBasicContentAction;
 use App\Http\SingleActions\Frontend\Homepage\HomepageGetWebInfoAction;
@@ -88,9 +89,10 @@ class HomepageController extends FrontendApiMainController
      * @param  HomepageNoticeAction $action
      * @return JsonResponse
      */
-    public function notice(HomepageNoticeAction $action): JsonResponse
+    public function notice(HomePageNoticeRequest $request, HomepageNoticeAction $action): JsonResponse
     {
-        return $action->execute($this);
+        $inputDatas = $request->validated();
+        return $action->execute($this, $inputDatas);
     }
 
     /**
