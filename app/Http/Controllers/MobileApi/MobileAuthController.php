@@ -7,7 +7,6 @@ use App\Http\Requests\Frontend\FrontendAuthRegisterRequest;
 use App\Http\Requests\Frontend\FrontendAuthResetFundPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthResetSpecificInfosRequest;
 use App\Http\Requests\Frontend\FrontendAuthResetUserPasswordRequest;
-use App\Http\Requests\Frontend\FrontendAuthSelfResetPasswordRequest;
 use App\Http\Requests\Frontend\FrontendAuthSetFundPasswordRequest;
 use App\Http\SingleActions\Frontend\FrontendAuthLoginAction;
 use App\Http\SingleActions\Frontend\FrontendAuthLogoutAction;
@@ -16,9 +15,9 @@ use App\Http\SingleActions\Frontend\FrontendAuthResetSpecificInfosAction;
 use App\Http\SingleActions\Frontend\FrontendAuthSetFundPasswordAction;
 use App\Http\SingleActions\Frontend\FrontendAuthUserDetailAction;
 use App\Http\SingleActions\Frontend\FrontendAuthUserSpecificInfosAction;
+use App\Http\SingleActions\Frontend\FrontendCommonHandleUserPasswordAction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 
 class MobileAuthController extends FrontendApiMainController
 {
@@ -100,10 +99,12 @@ class MobileAuthController extends FrontendApiMainController
      * @param  FrontendAuthResetUserPasswordRequest $request
      * @return JsonResponse
      */
-    public function resetUserPassword(FrontendAuthResetUserPasswordRequest $request): JsonResponse
-    {
+    public function resetUserPassword(
+        FrontendAuthResetUserPasswordRequest $request,
+        FrontendCommonHandleUserPasswordAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
-        return $this->commonHandleUserPassword($inputDatas, 1);
+        return $action->execute($this, $inputDatas, 1);
     }
 
     /**
@@ -111,49 +112,12 @@ class MobileAuthController extends FrontendApiMainController
      * @param  FrontendAuthResetFundPasswordRequest $request
      * @return JsonResponse
      */
-    public function resetFundPassword(FrontendAuthResetFundPasswordRequest $request): JsonResponse
-    {
+    public function resetFundPassword(
+        FrontendAuthResetFundPasswordRequest $request,
+        FrontendCommonHandleUserPasswordAction $action
+    ): JsonResponse {
         $inputDatas = $request->validated();
-        return $this->commonHandleUserPassword($inputDatas, 2);
-    }
-
-    /**
-     * 修改 用户密码1 资金密码2 共用处理
-     * @param  array  $inputDatas
-     * @param  int    $type
-     * @return JsonResponse
-     */
-    public function commonHandleUserPassword($inputDatas, $type): JsonResponse
-    {
-        $targetUserEloq = $this->eloqM::find($this->partnerUser->id);
-        if ($inputDatas['old_password'] === $inputDatas['new_password']) {
-            return $this->msgOut(false, [], '100007');
-        }
-        if ($inputDatas['new_password'] !== $inputDatas['confirm_password']) {
-            return $this->msgOut(false, [], '100008');
-        }
-        if ($type === 1) {
-            $field = 'password';
-            $oldPassword = $targetUserEloq->password;
-            $token = $this->refresh();
-            $targetUserEloq->remember_token = $token;
-        } elseif ($type === 2) {
-            $field = 'fund_password';
-            $oldPassword = $targetUserEloq->fund_password;
-        } else {
-            return $this->msgOut(false, [], '100010');
-        }
-        //校验密码
-        if (!Hash::check($inputDatas['old_password'], $oldPassword)) {
-            return $this->msgOut(false, [], '100009');
-        }
-        //修改密码
-        $targetUserEloq->$field = Hash::make($inputDatas['new_password']);
-        if ($targetUserEloq->save()) {
-            return $this->msgOut(true);
-        } else {
-            return $this->msgOut(false, [], '100011');
-        }
+        return $action->execute($this, $inputDatas, 2);
     }
 
     //用户设置资金密码

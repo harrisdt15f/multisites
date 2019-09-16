@@ -162,7 +162,6 @@ class FrontendApiMainController extends Controller
         $extraWhereIn = $this->inputs['where_in'] ?? [];
         $extraContitions = $this->inputs['extra_column'] ?? [];
         $queryEloq = new $eloqM();
-        $sizeOfInputs = count($searchCriterias);
         //with Criterias  现在需要多表查询  所以放到连表的时候获取
         // $withSearchCriterias = Arr::only($this->inputs, $withSearchAbleFields);
         // $sizeOfWithInputs = count($withSearchCriterias);
@@ -171,7 +170,6 @@ class FrontendApiMainController extends Controller
         //where
         $whereData = $this->getWhereData(
             $extraContitions,
-            $sizeOfInputs,
             $searchCriterias,
             $queryConditions,
             $timeConditions,
@@ -247,7 +245,6 @@ class FrontendApiMainController extends Controller
     /**
      * 获取查询的表的where条件
      * @param  array $extraContitions
-     * @param  int $sizeOfInputs
      * @param  array $searchCriterias
      * @param  array $queryConditions
      * @param  array $timeConditions
@@ -255,7 +252,6 @@ class FrontendApiMainController extends Controller
      */
     private function getWhereData(
         $extraContitions,
-        $sizeOfInputs,
         $searchCriterias,
         $queryConditions,
         $timeConditions
@@ -265,29 +261,23 @@ class FrontendApiMainController extends Controller
             $whereData = array_merge($whereData, $extraContitions);
         }
 
-        if ($sizeOfInputs > 1) {
-            //for multiple where condition searching
-            foreach ($searchCriterias as $field => $value) {
-                $sign = array_key_exists($field, $queryConditions) ? $queryConditions[$field] : '=';
-                if ($sign === 'LIKE') {
-                    $sign = strtolower($sign);
-                    $value = '%' . $value . '%';
-                }
-                $whereCriteria = [];
-                $whereCriteria[] = $field;
-                $whereCriteria[] = $sign;
-                $whereCriteria[] = $value;
-                $whereData[] = $whereCriteria;
+        //for multiple where condition searching
+        foreach ($searchCriterias as $field => $value) {
+            $sign = array_key_exists($field, $queryConditions) ? $queryConditions[$field] : '=';
+            if ($sign === 'LIKE') {
+                $sign = strtolower($sign);
+                $value = '%' . $value . '%';
             }
-            if (!empty($timeConditions)) {
-                $whereData = array_merge($whereData, $timeConditions);
-            }
-        } else {
-            $whereData = array_merge($whereData, $searchCriterias);
-            if (!empty($timeConditions)) {
-                $whereData = array_merge($whereData, $timeConditions);
-            }
+            $whereCriteria = [];
+            $whereCriteria[] = $field;
+            $whereCriteria[] = $sign;
+            $whereCriteria[] = $value;
+            $whereData[] = $whereCriteria;
         }
+        if (!empty($timeConditions)) {
+            $whereData = array_merge($whereData, $timeConditions);
+        }
+
         return $whereData;
     }
 

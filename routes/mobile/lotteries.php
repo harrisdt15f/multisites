@@ -6,7 +6,7 @@
  * Time: 2:17 PM
  */
 //游戏接口
-Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], function () {
+Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], static function () {
 
     $namePrefix = 'mobile-api.LotteriesController.';
     $controller = 'LotteriesController@';
@@ -44,7 +44,7 @@ Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], function 
     //游戏投注接口
     Route::match(['post', 'options'], 'bet', [
         'as' => $namePrefix . 'bet',
-        'uses' => $controller . 'bet',
+        'uses' => $controller . 'lotteryBet',
     ]);
     //开奖中心接口
     Route::match(['get', 'options'], 'lotteryCenter', [
@@ -75,5 +75,10 @@ Route::group(['prefix' => 'lotteries', 'namespace' => 'Game\Lottery'], function 
     Route::match(['post', 'options'], 'trace-issue-list', [
         'as' => $namePrefix . 'trace-issue-list',
         'uses' => $controller . 'traceIssueList',
+    ]);
+    //获取走势图接口
+    Route::match(['post', 'options'], 'trend', [
+        'as' => $namePrefix . 'trend',
+        'uses' => $controller . 'trend'
     ]);
 });

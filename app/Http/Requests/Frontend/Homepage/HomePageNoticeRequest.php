@@ -4,7 +4,7 @@ namespace App\Http\Requests\Frontend\Homepage;
 
 use App\Http\Requests\BaseFormRequest;
 
-class HomepageNoticeRequest extends BaseFormRequest
+class HomePageNoticeRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,7 @@ class HomepageNoticeRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'type' => 'required|numeric',
+            'type' => 'required|integer|exists:frontend_message_notices_contents',
         ];
     }
 }
