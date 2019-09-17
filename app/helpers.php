@@ -74,14 +74,14 @@ if (!function_exists('real_ip')) {
     }
 }
 
-function objectToArray($obj)
+function objectToArray($object)
 {
-    if (is_object($obj)) {
-        $obj = get_object_vars($obj);
+    if (is_object($object)) {
+        $object = get_object_vars($object);
     }
-    if (is_array($obj)) {
-        return array_map(__FUNCTION__, $obj);
+    if (is_array($object)) {
+        return array_map(__FUNCTION__, $object);
     } else {
-        return $obj;
+        return $object;
     }
 }
